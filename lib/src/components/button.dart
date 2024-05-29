@@ -23,6 +23,8 @@ class Button extends StatefulWidget {
   final Color? iconColor;
   final ButtonSize size;
   final double? spaceBetween;
+  final double? height;
+  final double? iconSize;
   final bool expand;
   final EdgeInsetsGeometry? padding;
 
@@ -39,6 +41,8 @@ class Button extends StatefulWidget {
     this.expand = false,
     this.iconColor,
     this.padding,
+    this.height,
+    this.iconSize,
   });
 
   @override
@@ -91,34 +95,34 @@ class _ButtonState extends State<Button> {
         return widget.variant == ButtonVariant.filled
             ? token.filledPrimaryHoverButtonColor
             : widget.variant == ButtonVariant.outline
-            ? token.outlinePrimaryHoverButtonColor
-            : token.ghostPrimaryHoverButtonColor;
+                ? token.outlinePrimaryHoverButtonColor
+                : token.ghostPrimaryHoverButtonColor;
       case ButtonType.secondary:
         return widget.variant == ButtonVariant.filled
             ? token.filledSecondaryHoverButtonColor
             : widget.variant == ButtonVariant.outline
-            ? token.outlineSecondaryHoverButtonColor
-            : token.ghostSecondaryHoverButtonColor;
+                ? token.outlineSecondaryHoverButtonColor
+                : token.ghostSecondaryHoverButtonColor;
       case ButtonType.danger:
         return widget.variant == ButtonVariant.filled
             ? token.filledDangerHoverButtonColor
             : widget.variant == ButtonVariant.outline
-            ? token.outlineDangerHoverButtonColor
-            : token.ghostDangerHoverButtonColor;
+                ? token.outlineDangerHoverButtonColor
+                : token.ghostDangerHoverButtonColor;
       case ButtonType.info:
         return widget.variant == ButtonVariant.filled
             ? token.filledInfoHoverButtonColor
             : widget.variant == ButtonVariant.outline
-            ? token.outlineInfoHoverButtonColor
-            : token.ghostInfoHoverButtonColor;
+                ? token.outlineInfoHoverButtonColor
+                : token.ghostInfoHoverButtonColor;
       case ButtonType.warning:
         return widget.variant == ButtonVariant.filled
             ? token.filledWarningHoverButtonColor
             : widget.variant == ButtonVariant.outline
-            ? token.outlineWarningHoverButtonColor
-            : token.ghostWarningHoverButtonColor;
+                ? token.outlineWarningHoverButtonColor
+                : token.ghostWarningHoverButtonColor;
       case ButtonType.custom:
-        return widget.color?.withOpacity(0.5);
+        return widget.color?.withOpacity(0.2);
     }
   }
 
@@ -183,7 +187,7 @@ class _ButtonState extends State<Button> {
   }
 
   EdgeInsetsGeometry buttonPadding(ThemeToken token) {
-    if(widget.padding!=null) {
+    if (widget.padding != null) {
       return widget.padding!;
     }
     switch (widget.size) {
@@ -197,6 +201,9 @@ class _ButtonState extends State<Button> {
   }
 
   double? buttonHeight(ThemeToken token) {
+    if (widget.height != null) {
+      return widget.height;
+    }
     switch (widget.size) {
       case ButtonSize.sm:
         return token.smButtonHeight;
@@ -208,6 +215,9 @@ class _ButtonState extends State<Button> {
   }
 
   double? buttonIconSize(ThemeToken token) {
+    if (widget.iconSize != null) {
+      return widget.iconSize;
+    }
     switch (widget.size) {
       case ButtonSize.sm:
         return token.smButtonIconSize;
