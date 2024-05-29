@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
+import 'buttons.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -58,18 +60,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,52 +81,24 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-        itemCount: ButtonVariant.values.length,
-        padding: const EdgeInsets.all(10),
-        itemBuilder: (context, index) {
-          ButtonVariant variant = ButtonVariant.values[index];
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text("${variant.name}", style: TextStyle(fontSize: 20),),
-                ],
-              ),
-              ...ButtonType.values.map((type) {
-                return Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ...ButtonSize.values.map((size) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Button(
-                            variant: variant,
-                            type: type,
-                            size: size,
-                            onTap: () {},
-                            icon: Icons.filter,
-                            child: Text(type.name),
-                          ),
-                        ),),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            ],
-          );
-        },
+      body: Column(
+        children: [
+          Button(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ButtonsDetails(),
+                ),
+              );
+            },
+            child: const Text("Buttons"),
+          ),
+          MDFormInputField(
+            name: "name",
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

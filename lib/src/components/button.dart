@@ -24,6 +24,7 @@ class Button extends StatefulWidget {
   final ButtonSize size;
   final double? spaceBetween;
   final bool expand;
+  final EdgeInsetsGeometry? padding;
 
   const Button({
     super.key,
@@ -37,6 +38,7 @@ class Button extends StatefulWidget {
     this.spaceBetween = 8,
     this.expand = false,
     this.iconColor,
+    this.padding,
   });
 
   @override
@@ -181,6 +183,9 @@ class _ButtonState extends State<Button> {
   }
 
   EdgeInsetsGeometry buttonPadding(ThemeToken token) {
+    if(widget.padding!=null) {
+      return widget.padding!;
+    }
     switch (widget.size) {
       case ButtonSize.sm:
         return token.smButtonPadding;
