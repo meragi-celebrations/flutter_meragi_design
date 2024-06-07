@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
@@ -43,7 +45,37 @@ class Button extends StatefulWidget {
     this.padding,
     this.height,
     this.iconSize,
-  });
+  })  : menuChildren = const [],
+        builder = null,
+        _isDropdown = false,
+        dividerColor = null;
+
+  const Button.dropdown({
+    super.key,
+    this.onTap,
+    this.icon,
+    this.child,
+    this.variant = ButtonVariant.filled,
+    this.type = ButtonType.standard,
+    this.color,
+    this.size = ButtonSize.rg,
+    this.spaceBetween = 8,
+    this.expand = false,
+    this.iconColor,
+    this.padding,
+    this.height,
+    this.iconSize,
+    this.dividerColor,
+    required this.builder,
+    required this.menuChildren,
+  })  : assert(builder != null),
+        _isDropdown = true;
+
+  final MenuAnchorChildBuilder? builder;
+  final List<Widget> menuChildren;
+  final bool _isDropdown;
+  bool get isDropdown => _isDropdown;
+  final Color? dividerColor;
 
   @override
   State<Button> createState() => _ButtonState();
@@ -289,6 +321,41 @@ class _ButtonState extends State<Button> {
     }
   }
 
+  double? buttonDividerSize(ThemeToken token) {
+    if (widget.height != null) {
+      return widget.height;
+    }
+    switch (widget.size) {
+      case ButtonSize.sm:
+        return token.smButtonHeight;
+      case ButtonSize.rg:
+        return token.rgButtonHeight;
+      case ButtonSize.lg:
+        return token.lgButtonHeight;
+    }
+  }
+  Color? buttonDividerColor(ThemeToken token) {
+    if(widget.dividerColor != null) {
+      return widget.dividerColor;
+    }
+    switch (widget.type) {
+      case ButtonType.standard:
+        return token.outlineStandardBorderButtonColor;
+      case ButtonType.primary:
+        return token.filledPrimaryButtonColor;
+      case ButtonType.secondary:
+        return token.filledSecondaryButtonColor;
+      case ButtonType.danger:
+        return token.filledDangerButtonColor;
+      case ButtonType.info:
+        return token.filledInfoButtonColor;
+      case ButtonType.warning:
+        return token.filledWarningButtonColor;
+      case ButtonType.custom:
+        return widget.color ?? token.outlineStandardBorderButtonColor;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeToken token = MeragiTheme.of(context).token;
@@ -301,46 +368,84 @@ class _ButtonState extends State<Button> {
         if (widget.onTap == null) {
           isEnabled = false;
         }
-        return MouseRegion(
-          onEnter: (_) {
-            _stateController.updateState(ButtonState.hovered);
-          },
-          onExit: (_) {
-            _stateController.updateState(ButtonState.hovered);
-          },
-          child: GestureDetector(
-            onTap: widget.onTap,
-            child: Container(
-              padding: buttonPadding(token),
-              height: buttonHeight(token),
-              decoration: BoxDecoration(
-                color: isEnabled
-                    ? isHovered
-                        ? buttonHoverColor(token)
-                        : buttonColor(token)
-                    : buttonDisabledColor(token),
-                border: buttonBorder(token, isEnabled),
-                borderRadius: buttonRadius(token),
-              ),
-              child: Row(
-                mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (widget.icon != null)
-                    Icon(
-                      widget.icon!,
-                      size: buttonIconSize(token),
-                      color: isEnabled ? buttonIconColor(token) : token.disabledIconButtonColor,
+        return Container(
+          decoration: BoxDecoration(
+            color: isEnabled
+                ? isHovered
+                ? buttonHoverColor(token)
+                : buttonColor(token)
+                : buttonDisabledColor(token),
+            border: widget.isDropdown ? buttonBorder(token, isEnabled) : null,
+            borderRadius: buttonRadius(token),
+          ),
+          child: Row(
+            children: [
+              MouseRegion(
+                onEnter: (_) {
+                  _stateController.updateState(ButtonState.hovered);
+                },
+                onExit: (_) {
+                  _stateController.updateState(ButtonState.hovered);
+                },
+                child: GestureDetector(
+                  onTap: widget.onTap,
+                  child: Container(
+                    padding: buttonPadding(token),
+                    height: buttonHeight(token),
+                    decoration: BoxDecoration(
+                      color: isEnabled
+                          ? isHovered
+                              ? buttonHoverColor(token)
+                              : buttonColor(token)
+                          : buttonDisabledColor(token),
+                      border: widget.isDropdown ? null : buttonBorder(token, isEnabled),
+                      borderRadius: buttonRadius(token),
                     ),
-                  if (widget.icon != null && widget.child != null) SizedBox(width: widget.spaceBetween),
-                  if (widget.child != null)
-                    DefaultTextStyle.merge(
-                      style: buttonTextStyle(token),
-                      child: widget.child!,
+                    child: Row(
+                      mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (widget.icon != null)
+                          Icon(
+                            widget.icon!,
+                            size: buttonIconSize(token),
+                            color: isEnabled ? buttonIconColor(token) : token.disabledIconButtonColor,
+                          ),
+                        if (widget.icon != null && widget.child != null) SizedBox(width: widget.spaceBetween),
+                        if (widget.child != null)
+                          DefaultTextStyle.merge(
+                            style: buttonTextStyle(token),
+                            child: widget.child!,
+                          ),
+                      ],
                     ),
-                ],
+                  ),
+                ),
               ),
-            ),
+
+              if (widget.isDropdown)
+                Row(
+                  children: [
+                    SizedBox(
+                      height: buttonDividerSize(token),
+                      child: VerticalDivider(
+                        color: buttonDividerColor(token),
+                        width: 0,
+                      ),
+                    ),
+                    MenuAnchor(
+                      menuChildren: widget.menuChildren,
+                      builder: (context, controller, child) {
+                        return SizedBox(
+                          height: buttonHeight(token),
+                          width: buttonHeight(token),
+                          child: widget.builder!=null ? widget.builder!(context, controller, child) : null,
+                        );
+                      },
+                    ),
+                  ],
+                )
+            ],
           ),
         );
       },
