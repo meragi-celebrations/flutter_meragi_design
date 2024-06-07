@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
@@ -370,7 +368,7 @@ class _ButtonState extends State<Button> {
         }
         return Container(
           decoration: BoxDecoration(
-            color: isEnabled
+            color: widget.isDropdown ? buttonColor(token) : isEnabled
                 ? isHovered
                 ? buttonHoverColor(token)
                 : buttonColor(token)
@@ -393,11 +391,11 @@ class _ButtonState extends State<Button> {
                     padding: buttonPadding(token),
                     height: buttonHeight(token),
                     decoration: BoxDecoration(
-                      color: isEnabled
+                      color: widget.isDropdown ? isEnabled
                           ? isHovered
                               ? buttonHoverColor(token)
                               : buttonColor(token)
-                          : buttonDisabledColor(token),
+                          : buttonDisabledColor(token) : null,
                       border: widget.isDropdown ? null : buttonBorder(token, isEnabled),
                       borderRadius: buttonRadius(token),
                     ),
