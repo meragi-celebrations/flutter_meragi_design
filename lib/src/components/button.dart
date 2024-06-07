@@ -376,9 +376,9 @@ class _ButtonState extends State<Button> {
             border: widget.isDropdown ? buttonBorder(token, isEnabled) : null,
             borderRadius: buttonRadius(token),
           ),
-          child: Row(
-            children: [
-              MouseRegion(
+          child: Builder(
+            builder: (context) {
+              Widget baseButton = MouseRegion(
                 onEnter: (_) {
                   _stateController.updateState(ButtonState.hovered);
                 },
@@ -393,8 +393,8 @@ class _ButtonState extends State<Button> {
                     decoration: BoxDecoration(
                       color: widget.isDropdown ? isEnabled
                           ? isHovered
-                              ? buttonHoverColor(token)
-                              : buttonColor(token)
+                          ? buttonHoverColor(token)
+                          : buttonColor(token)
                           : buttonDisabledColor(token) : null,
                       border: widget.isDropdown ? null : buttonBorder(token, isEnabled),
                       borderRadius: buttonRadius(token),
@@ -419,31 +419,40 @@ class _ButtonState extends State<Button> {
                     ),
                   ),
                 ),
-              ),
-
-              if (widget.isDropdown)
-                Row(
+              );
+              if(widget.isDropdown) {
+                return Row(
+                  mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: buttonDividerSize(token),
-                      child: VerticalDivider(
-                        color: buttonDividerColor(token),
-                        width: 0,
-                      ),
-                    ),
-                    MenuAnchor(
-                      menuChildren: widget.menuChildren,
-                      builder: (context, controller, child) {
-                        return SizedBox(
-                          height: buttonHeight(token),
-                          width: buttonHeight(token),
-                          child: widget.builder!=null ? widget.builder!(context, controller, child) : null,
-                        );
-                      },
-                    ),
+                    baseButton,
+                    if (widget.isDropdown)
+                      Row(
+                        children: [
+                          SizedBox(
+                            height: buttonDividerSize(token),
+                            child: VerticalDivider(
+                              color: buttonDividerColor(token),
+                              width: 0,
+                            ),
+                          ),
+                          MenuAnchor(
+                            menuChildren: widget.menuChildren,
+                            builder: (context, controller, child) {
+                              return SizedBox(
+                                height: buttonHeight(token),
+                                width: buttonHeight(token),
+                                child: widget.builder!=null ? widget.builder!(context, controller, child) : null,
+                              );
+                            },
+                          ),
+                        ],
+                      )
                   ],
-                )
-            ],
+                );
+              }
+              return baseButton;
+            }
           ),
         );
       },
