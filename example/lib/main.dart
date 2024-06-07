@@ -94,9 +94,6 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             child: const Text("Buttons"),
           ),
-          MDFormInputField(
-            name: "name",
-          ),
         ],
       ),
     );

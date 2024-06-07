@@ -25,7 +25,10 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
             children: [
               Row(
                 children: [
-                  Text("${variant.name}", style: TextStyle(fontSize: 20),),
+                  Text(
+                    "${variant.name}",
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ],
               ),
               ...ButtonType.values.map((type) {
@@ -36,17 +39,54 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        ...ButtonSize.values.map((size) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Button(
-                            variant: variant,
-                            type: type,
-                            size: size,
-                            onTap: () {},
-                            icon: Icons.filter,
-                            child: Text(type.name),
+                        ...ButtonSize.values.map(
+                          (size) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Column(
+                              children: [
+                                Button(
+                                  variant: variant,
+                                  type: type,
+                                  size: size,
+                                  onTap: () {},
+                                  icon: Icons.filter,
+                                  child: Text(type.name),
+                                ),
+                                const SizedBox(height: 10),
+                                Button.dropdown(
+                                  variant: variant,
+                                  type: type,
+                                  size: size,
+                                  onTap: () {},
+                                  icon: Icons.filter,
+                                  menuChildren: [
+                                    Button(
+                                      variant: variant,
+                                      type: type,
+                                      size: size,
+                                      onTap: () {},
+                                      icon: Icons.filter,
+                                      child: Text(type.name),
+                                    )
+                                  ],
+                                  builder: (context, controller, child) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        if (!controller.isOpen) {
+                                          controller.open();
+                                        } else {
+                                          controller.close();
+                                        }
+                                      },
+                                      child: const Icon(Icons.add),
+                                    );
+                                  },
+                                  child: Text(type.name),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),),
+                        ),
                       ],
                     ),
                   ),
