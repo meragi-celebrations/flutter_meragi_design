@@ -9,6 +9,27 @@ part of 'theme_tokens.dart';
 // **************************************************************************
 
 mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
+  Color get defaultCardBackgroundColor;
+  Color get primaryCardBackgroundColor;
+  Color get secondaryCardBackgroundColor;
+  Color get dangerCardBackgroundColor;
+  Color get successCardBackgroundColor;
+  Color get warningCardBackgroundColor;
+  Color get defaultCardBorderColor;
+  Color get primaryCardBorderColor;
+  Color get secondaryCardBorderColor;
+  Color get dangerCardBorderColor;
+  Color get successCardBorderColor;
+  Color get warningCardBorderColor;
+  EdgeInsets get smCardPadding;
+  EdgeInsets get rgCardPadding;
+  EdgeInsets get lgCardPadding;
+  double get cardBorderWidth;
+  double get smCardBorderRadius;
+  double get rgCardBorderRadius;
+  double get lgCardBorderRadius;
+  double get cardDividerThickness;
+  double get cardDividerHeight;
   Color get filledStandardButtonColor;
   Color get filledPrimaryButtonColor;
   Color get filledSecondaryButtonColor;
@@ -72,9 +93,76 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   Color get ghostDangerHoverButtonColor;
   Color get ghostInfoHoverButtonColor;
   Color get ghostWarningHoverButtonColor;
+  Color get defaultTagBackgroundColor;
+  Color get primaryTagBackgroundColor;
+  Color get secondaryTagBackgroundColor;
+  Color get dangerTagBackgroundColor;
+  Color get successTagBackgroundColor;
+  Color get warningTagBackgroundColor;
+  Color get defaultTagBorderColor;
+  Color get primaryTagBorderColor;
+  Color get secondaryTagBorderColor;
+  Color get dangerTagBorderColor;
+  Color get successTagBorderColor;
+  Color get warningTagBorderColor;
+  EdgeInsets get smTagPadding;
+  EdgeInsets get rgTagPadding;
+  EdgeInsets get lgTagPadding;
+  double get tagBorderWidth;
+  double get smTagBorderRadius;
+  double get rgTagBorderRadius;
+  double get lgTagBorderRadius;
+  double get smTagTextHeight;
+  double get rgTagTextHeight;
+  double get lgTagTextHeight;
+  double get smTagTextSize;
+  double get rgTagTextSize;
+  double get lgTagTextSize;
+  FontWeight get smTagTextWeight;
+  FontWeight get rgTagTextWeight;
+  FontWeight get lgTagTextWeight;
+  Color get defaultTagTextColor;
+  Color get primaryTagTextColor;
+  Color get secondaryTagTextColor;
+  Color get dangerTagTextColor;
+  Color get successTagTextColor;
+  Color get warningTagTextColor;
+  double get smTagIconSize;
+  double get rgTagIconSize;
+  double get lgTagIconSize;
+  Color get defaultTagIconColor;
+  Color get primaryTagIconColor;
+  Color get secondaryTagIconColor;
+  Color get dangerTagIconColor;
+  Color get successTagIconColor;
+  Color get warningTagIconColor;
+  double get smTagSpacing;
+  double get rgTagSpacing;
+  double get lgTagSpacing;
 
   @override
   ThemeToken copyWith({
+    Color? defaultCardBackgroundColor,
+    Color? primaryCardBackgroundColor,
+    Color? secondaryCardBackgroundColor,
+    Color? dangerCardBackgroundColor,
+    Color? successCardBackgroundColor,
+    Color? warningCardBackgroundColor,
+    Color? defaultCardBorderColor,
+    Color? primaryCardBorderColor,
+    Color? secondaryCardBorderColor,
+    Color? dangerCardBorderColor,
+    Color? successCardBorderColor,
+    Color? warningCardBorderColor,
+    EdgeInsets? smCardPadding,
+    EdgeInsets? rgCardPadding,
+    EdgeInsets? lgCardPadding,
+    double? cardBorderWidth,
+    double? smCardBorderRadius,
+    double? rgCardBorderRadius,
+    double? lgCardBorderRadius,
+    double? cardDividerThickness,
+    double? cardDividerHeight,
     Color? filledStandardButtonColor,
     Color? filledPrimaryButtonColor,
     Color? filledSecondaryButtonColor,
@@ -138,8 +226,87 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     Color? ghostDangerHoverButtonColor,
     Color? ghostInfoHoverButtonColor,
     Color? ghostWarningHoverButtonColor,
+    Color? defaultTagBackgroundColor,
+    Color? primaryTagBackgroundColor,
+    Color? secondaryTagBackgroundColor,
+    Color? dangerTagBackgroundColor,
+    Color? successTagBackgroundColor,
+    Color? warningTagBackgroundColor,
+    Color? defaultTagBorderColor,
+    Color? primaryTagBorderColor,
+    Color? secondaryTagBorderColor,
+    Color? dangerTagBorderColor,
+    Color? successTagBorderColor,
+    Color? warningTagBorderColor,
+    EdgeInsets? smTagPadding,
+    EdgeInsets? rgTagPadding,
+    EdgeInsets? lgTagPadding,
+    double? tagBorderWidth,
+    double? smTagBorderRadius,
+    double? rgTagBorderRadius,
+    double? lgTagBorderRadius,
+    double? smTagTextHeight,
+    double? rgTagTextHeight,
+    double? lgTagTextHeight,
+    double? smTagTextSize,
+    double? rgTagTextSize,
+    double? lgTagTextSize,
+    FontWeight? smTagTextWeight,
+    FontWeight? rgTagTextWeight,
+    FontWeight? lgTagTextWeight,
+    Color? defaultTagTextColor,
+    Color? primaryTagTextColor,
+    Color? secondaryTagTextColor,
+    Color? dangerTagTextColor,
+    Color? successTagTextColor,
+    Color? warningTagTextColor,
+    double? smTagIconSize,
+    double? rgTagIconSize,
+    double? lgTagIconSize,
+    Color? defaultTagIconColor,
+    Color? primaryTagIconColor,
+    Color? secondaryTagIconColor,
+    Color? dangerTagIconColor,
+    Color? successTagIconColor,
+    Color? warningTagIconColor,
+    double? smTagSpacing,
+    double? rgTagSpacing,
+    double? lgTagSpacing,
   }) {
     return ThemeToken(
+      defaultCardBackgroundColor:
+          defaultCardBackgroundColor ?? this.defaultCardBackgroundColor,
+      primaryCardBackgroundColor:
+          primaryCardBackgroundColor ?? this.primaryCardBackgroundColor,
+      secondaryCardBackgroundColor:
+          secondaryCardBackgroundColor ?? this.secondaryCardBackgroundColor,
+      dangerCardBackgroundColor:
+          dangerCardBackgroundColor ?? this.dangerCardBackgroundColor,
+      successCardBackgroundColor:
+          successCardBackgroundColor ?? this.successCardBackgroundColor,
+      warningCardBackgroundColor:
+          warningCardBackgroundColor ?? this.warningCardBackgroundColor,
+      defaultCardBorderColor:
+          defaultCardBorderColor ?? this.defaultCardBorderColor,
+      primaryCardBorderColor:
+          primaryCardBorderColor ?? this.primaryCardBorderColor,
+      secondaryCardBorderColor:
+          secondaryCardBorderColor ?? this.secondaryCardBorderColor,
+      dangerCardBorderColor:
+          dangerCardBorderColor ?? this.dangerCardBorderColor,
+      successCardBorderColor:
+          successCardBorderColor ?? this.successCardBorderColor,
+      warningCardBorderColor:
+          warningCardBorderColor ?? this.warningCardBorderColor,
+      smCardPadding: smCardPadding ?? this.smCardPadding,
+      rgCardPadding: rgCardPadding ?? this.rgCardPadding,
+      lgCardPadding: lgCardPadding ?? this.lgCardPadding,
+      cardBorderWidth: cardBorderWidth ?? this.cardBorderWidth,
+      smCardBorderRadius: smCardBorderRadius ?? this.smCardBorderRadius,
+      rgCardBorderRadius: rgCardBorderRadius ?? this.rgCardBorderRadius,
+      lgCardBorderRadius: lgCardBorderRadius ?? this.lgCardBorderRadius,
+      cardDividerThickness: cardDividerThickness ?? this.cardDividerThickness,
+      cardDividerHeight: cardDividerHeight ?? this.cardDividerHeight,
       filledStandardButtonColor:
           filledStandardButtonColor ?? this.filledStandardButtonColor,
       filledPrimaryButtonColor:
@@ -251,6 +418,65 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           ghostInfoHoverButtonColor ?? this.ghostInfoHoverButtonColor,
       ghostWarningHoverButtonColor:
           ghostWarningHoverButtonColor ?? this.ghostWarningHoverButtonColor,
+      defaultTagBackgroundColor:
+          defaultTagBackgroundColor ?? this.defaultTagBackgroundColor,
+      primaryTagBackgroundColor:
+          primaryTagBackgroundColor ?? this.primaryTagBackgroundColor,
+      secondaryTagBackgroundColor:
+          secondaryTagBackgroundColor ?? this.secondaryTagBackgroundColor,
+      dangerTagBackgroundColor:
+          dangerTagBackgroundColor ?? this.dangerTagBackgroundColor,
+      successTagBackgroundColor:
+          successTagBackgroundColor ?? this.successTagBackgroundColor,
+      warningTagBackgroundColor:
+          warningTagBackgroundColor ?? this.warningTagBackgroundColor,
+      defaultTagBorderColor:
+          defaultTagBorderColor ?? this.defaultTagBorderColor,
+      primaryTagBorderColor:
+          primaryTagBorderColor ?? this.primaryTagBorderColor,
+      secondaryTagBorderColor:
+          secondaryTagBorderColor ?? this.secondaryTagBorderColor,
+      dangerTagBorderColor: dangerTagBorderColor ?? this.dangerTagBorderColor,
+      successTagBorderColor:
+          successTagBorderColor ?? this.successTagBorderColor,
+      warningTagBorderColor:
+          warningTagBorderColor ?? this.warningTagBorderColor,
+      smTagPadding: smTagPadding ?? this.smTagPadding,
+      rgTagPadding: rgTagPadding ?? this.rgTagPadding,
+      lgTagPadding: lgTagPadding ?? this.lgTagPadding,
+      tagBorderWidth: tagBorderWidth ?? this.tagBorderWidth,
+      smTagBorderRadius: smTagBorderRadius ?? this.smTagBorderRadius,
+      rgTagBorderRadius: rgTagBorderRadius ?? this.rgTagBorderRadius,
+      lgTagBorderRadius: lgTagBorderRadius ?? this.lgTagBorderRadius,
+      smTagTextHeight: smTagTextHeight ?? this.smTagTextHeight,
+      rgTagTextHeight: rgTagTextHeight ?? this.rgTagTextHeight,
+      lgTagTextHeight: lgTagTextHeight ?? this.lgTagTextHeight,
+      smTagTextSize: smTagTextSize ?? this.smTagTextSize,
+      rgTagTextSize: rgTagTextSize ?? this.rgTagTextSize,
+      lgTagTextSize: lgTagTextSize ?? this.lgTagTextSize,
+      smTagTextWeight: smTagTextWeight ?? this.smTagTextWeight,
+      rgTagTextWeight: rgTagTextWeight ?? this.rgTagTextWeight,
+      lgTagTextWeight: lgTagTextWeight ?? this.lgTagTextWeight,
+      defaultTagTextColor: defaultTagTextColor ?? this.defaultTagTextColor,
+      primaryTagTextColor: primaryTagTextColor ?? this.primaryTagTextColor,
+      secondaryTagTextColor:
+          secondaryTagTextColor ?? this.secondaryTagTextColor,
+      dangerTagTextColor: dangerTagTextColor ?? this.dangerTagTextColor,
+      successTagTextColor: successTagTextColor ?? this.successTagTextColor,
+      warningTagTextColor: warningTagTextColor ?? this.warningTagTextColor,
+      smTagIconSize: smTagIconSize ?? this.smTagIconSize,
+      rgTagIconSize: rgTagIconSize ?? this.rgTagIconSize,
+      lgTagIconSize: lgTagIconSize ?? this.lgTagIconSize,
+      defaultTagIconColor: defaultTagIconColor ?? this.defaultTagIconColor,
+      primaryTagIconColor: primaryTagIconColor ?? this.primaryTagIconColor,
+      secondaryTagIconColor:
+          secondaryTagIconColor ?? this.secondaryTagIconColor,
+      dangerTagIconColor: dangerTagIconColor ?? this.dangerTagIconColor,
+      successTagIconColor: successTagIconColor ?? this.successTagIconColor,
+      warningTagIconColor: warningTagIconColor ?? this.warningTagIconColor,
+      smTagSpacing: smTagSpacing ?? this.smTagSpacing,
+      rgTagSpacing: rgTagSpacing ?? this.rgTagSpacing,
+      lgTagSpacing: lgTagSpacing ?? this.lgTagSpacing,
     );
   }
 
@@ -258,6 +484,43 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   ThemeToken lerp(covariant ThemeExtension<ThemeToken>? other, double t) {
     if (other is! ThemeToken) return this as ThemeToken;
     return ThemeToken(
+      defaultCardBackgroundColor: Color.lerp(
+          defaultCardBackgroundColor, other.defaultCardBackgroundColor, t)!,
+      primaryCardBackgroundColor: Color.lerp(
+          primaryCardBackgroundColor, other.primaryCardBackgroundColor, t)!,
+      secondaryCardBackgroundColor: Color.lerp(
+          secondaryCardBackgroundColor, other.secondaryCardBackgroundColor, t)!,
+      dangerCardBackgroundColor: Color.lerp(
+          dangerCardBackgroundColor, other.dangerCardBackgroundColor, t)!,
+      successCardBackgroundColor: Color.lerp(
+          successCardBackgroundColor, other.successCardBackgroundColor, t)!,
+      warningCardBackgroundColor: Color.lerp(
+          warningCardBackgroundColor, other.warningCardBackgroundColor, t)!,
+      defaultCardBorderColor:
+          Color.lerp(defaultCardBorderColor, other.defaultCardBorderColor, t)!,
+      primaryCardBorderColor:
+          Color.lerp(primaryCardBorderColor, other.primaryCardBorderColor, t)!,
+      secondaryCardBorderColor: Color.lerp(
+          secondaryCardBorderColor, other.secondaryCardBorderColor, t)!,
+      dangerCardBorderColor:
+          Color.lerp(dangerCardBorderColor, other.dangerCardBorderColor, t)!,
+      successCardBorderColor:
+          Color.lerp(successCardBorderColor, other.successCardBorderColor, t)!,
+      warningCardBorderColor:
+          Color.lerp(warningCardBorderColor, other.warningCardBorderColor, t)!,
+      smCardPadding: t < 0.5 ? smCardPadding : other.smCardPadding,
+      rgCardPadding: t < 0.5 ? rgCardPadding : other.rgCardPadding,
+      lgCardPadding: t < 0.5 ? lgCardPadding : other.lgCardPadding,
+      cardBorderWidth: t < 0.5 ? cardBorderWidth : other.cardBorderWidth,
+      smCardBorderRadius:
+          t < 0.5 ? smCardBorderRadius : other.smCardBorderRadius,
+      rgCardBorderRadius:
+          t < 0.5 ? rgCardBorderRadius : other.rgCardBorderRadius,
+      lgCardBorderRadius:
+          t < 0.5 ? lgCardBorderRadius : other.lgCardBorderRadius,
+      cardDividerThickness:
+          t < 0.5 ? cardDividerThickness : other.cardDividerThickness,
+      cardDividerHeight: t < 0.5 ? cardDividerHeight : other.cardDividerHeight,
       filledStandardButtonColor: Color.lerp(
           filledStandardButtonColor, other.filledStandardButtonColor, t)!,
       filledPrimaryButtonColor: Color.lerp(
@@ -388,6 +651,76 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           ghostInfoHoverButtonColor, other.ghostInfoHoverButtonColor, t)!,
       ghostWarningHoverButtonColor: Color.lerp(
           ghostWarningHoverButtonColor, other.ghostWarningHoverButtonColor, t)!,
+      defaultTagBackgroundColor: Color.lerp(
+          defaultTagBackgroundColor, other.defaultTagBackgroundColor, t)!,
+      primaryTagBackgroundColor: Color.lerp(
+          primaryTagBackgroundColor, other.primaryTagBackgroundColor, t)!,
+      secondaryTagBackgroundColor: Color.lerp(
+          secondaryTagBackgroundColor, other.secondaryTagBackgroundColor, t)!,
+      dangerTagBackgroundColor: Color.lerp(
+          dangerTagBackgroundColor, other.dangerTagBackgroundColor, t)!,
+      successTagBackgroundColor: Color.lerp(
+          successTagBackgroundColor, other.successTagBackgroundColor, t)!,
+      warningTagBackgroundColor: Color.lerp(
+          warningTagBackgroundColor, other.warningTagBackgroundColor, t)!,
+      defaultTagBorderColor:
+          Color.lerp(defaultTagBorderColor, other.defaultTagBorderColor, t)!,
+      primaryTagBorderColor:
+          Color.lerp(primaryTagBorderColor, other.primaryTagBorderColor, t)!,
+      secondaryTagBorderColor: Color.lerp(
+          secondaryTagBorderColor, other.secondaryTagBorderColor, t)!,
+      dangerTagBorderColor:
+          Color.lerp(dangerTagBorderColor, other.dangerTagBorderColor, t)!,
+      successTagBorderColor:
+          Color.lerp(successTagBorderColor, other.successTagBorderColor, t)!,
+      warningTagBorderColor:
+          Color.lerp(warningTagBorderColor, other.warningTagBorderColor, t)!,
+      smTagPadding: t < 0.5 ? smTagPadding : other.smTagPadding,
+      rgTagPadding: t < 0.5 ? rgTagPadding : other.rgTagPadding,
+      lgTagPadding: t < 0.5 ? lgTagPadding : other.lgTagPadding,
+      tagBorderWidth: t < 0.5 ? tagBorderWidth : other.tagBorderWidth,
+      smTagBorderRadius: t < 0.5 ? smTagBorderRadius : other.smTagBorderRadius,
+      rgTagBorderRadius: t < 0.5 ? rgTagBorderRadius : other.rgTagBorderRadius,
+      lgTagBorderRadius: t < 0.5 ? lgTagBorderRadius : other.lgTagBorderRadius,
+      smTagTextHeight: t < 0.5 ? smTagTextHeight : other.smTagTextHeight,
+      rgTagTextHeight: t < 0.5 ? rgTagTextHeight : other.rgTagTextHeight,
+      lgTagTextHeight: t < 0.5 ? lgTagTextHeight : other.lgTagTextHeight,
+      smTagTextSize: t < 0.5 ? smTagTextSize : other.smTagTextSize,
+      rgTagTextSize: t < 0.5 ? rgTagTextSize : other.rgTagTextSize,
+      lgTagTextSize: t < 0.5 ? lgTagTextSize : other.lgTagTextSize,
+      smTagTextWeight: t < 0.5 ? smTagTextWeight : other.smTagTextWeight,
+      rgTagTextWeight: t < 0.5 ? rgTagTextWeight : other.rgTagTextWeight,
+      lgTagTextWeight: t < 0.5 ? lgTagTextWeight : other.lgTagTextWeight,
+      defaultTagTextColor:
+          Color.lerp(defaultTagTextColor, other.defaultTagTextColor, t)!,
+      primaryTagTextColor:
+          Color.lerp(primaryTagTextColor, other.primaryTagTextColor, t)!,
+      secondaryTagTextColor:
+          Color.lerp(secondaryTagTextColor, other.secondaryTagTextColor, t)!,
+      dangerTagTextColor:
+          Color.lerp(dangerTagTextColor, other.dangerTagTextColor, t)!,
+      successTagTextColor:
+          Color.lerp(successTagTextColor, other.successTagTextColor, t)!,
+      warningTagTextColor:
+          Color.lerp(warningTagTextColor, other.warningTagTextColor, t)!,
+      smTagIconSize: t < 0.5 ? smTagIconSize : other.smTagIconSize,
+      rgTagIconSize: t < 0.5 ? rgTagIconSize : other.rgTagIconSize,
+      lgTagIconSize: t < 0.5 ? lgTagIconSize : other.lgTagIconSize,
+      defaultTagIconColor:
+          Color.lerp(defaultTagIconColor, other.defaultTagIconColor, t)!,
+      primaryTagIconColor:
+          Color.lerp(primaryTagIconColor, other.primaryTagIconColor, t)!,
+      secondaryTagIconColor:
+          Color.lerp(secondaryTagIconColor, other.secondaryTagIconColor, t)!,
+      dangerTagIconColor:
+          Color.lerp(dangerTagIconColor, other.dangerTagIconColor, t)!,
+      successTagIconColor:
+          Color.lerp(successTagIconColor, other.successTagIconColor, t)!,
+      warningTagIconColor:
+          Color.lerp(warningTagIconColor, other.warningTagIconColor, t)!,
+      smTagSpacing: t < 0.5 ? smTagSpacing : other.smTagSpacing,
+      rgTagSpacing: t < 0.5 ? rgTagSpacing : other.rgTagSpacing,
+      lgTagSpacing: t < 0.5 ? lgTagSpacing : other.lgTagSpacing,
     );
   }
 
@@ -396,6 +729,48 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is ThemeToken &&
+            const DeepCollectionEquality().equals(
+                defaultCardBackgroundColor, other.defaultCardBackgroundColor) &&
+            const DeepCollectionEquality().equals(
+                primaryCardBackgroundColor, other.primaryCardBackgroundColor) &&
+            const DeepCollectionEquality().equals(secondaryCardBackgroundColor,
+                other.secondaryCardBackgroundColor) &&
+            const DeepCollectionEquality().equals(
+                dangerCardBackgroundColor, other.dangerCardBackgroundColor) &&
+            const DeepCollectionEquality().equals(
+                successCardBackgroundColor, other.successCardBackgroundColor) &&
+            const DeepCollectionEquality().equals(
+                warningCardBackgroundColor, other.warningCardBackgroundColor) &&
+            const DeepCollectionEquality()
+                .equals(defaultCardBorderColor, other.defaultCardBorderColor) &&
+            const DeepCollectionEquality()
+                .equals(primaryCardBorderColor, other.primaryCardBorderColor) &&
+            const DeepCollectionEquality().equals(
+                secondaryCardBorderColor, other.secondaryCardBorderColor) &&
+            const DeepCollectionEquality()
+                .equals(dangerCardBorderColor, other.dangerCardBorderColor) &&
+            const DeepCollectionEquality()
+                .equals(successCardBorderColor, other.successCardBorderColor) &&
+            const DeepCollectionEquality()
+                .equals(warningCardBorderColor, other.warningCardBorderColor) &&
+            const DeepCollectionEquality()
+                .equals(smCardPadding, other.smCardPadding) &&
+            const DeepCollectionEquality()
+                .equals(rgCardPadding, other.rgCardPadding) &&
+            const DeepCollectionEquality()
+                .equals(lgCardPadding, other.lgCardPadding) &&
+            const DeepCollectionEquality()
+                .equals(cardBorderWidth, other.cardBorderWidth) &&
+            const DeepCollectionEquality()
+                .equals(smCardBorderRadius, other.smCardBorderRadius) &&
+            const DeepCollectionEquality()
+                .equals(rgCardBorderRadius, other.rgCardBorderRadius) &&
+            const DeepCollectionEquality()
+                .equals(lgCardBorderRadius, other.lgCardBorderRadius) &&
+            const DeepCollectionEquality()
+                .equals(cardDividerThickness, other.cardDividerThickness) &&
+            const DeepCollectionEquality()
+                .equals(cardDividerHeight, other.cardDividerHeight) &&
             const DeepCollectionEquality().equals(
                 filledStandardButtonColor, other.filledStandardButtonColor) &&
             const DeepCollectionEquality().equals(
@@ -424,19 +799,12 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
                 other.outlineDangerBorderButtonColor) &&
             const DeepCollectionEquality().equals(outlineInfoBorderButtonColor,
                 other.outlineInfoBorderButtonColor) &&
-            const DeepCollectionEquality().equals(
-                outlineWarningBorderButtonColor,
-                other.outlineWarningBorderButtonColor) &&
-            const DeepCollectionEquality()
-                .equals(smButtonHeight, other.smButtonHeight) &&
-            const DeepCollectionEquality()
-                .equals(smButtonPadding, other.smButtonPadding) &&
-            const DeepCollectionEquality()
-                .equals(rgButtonHeight, other.rgButtonHeight) &&
-            const DeepCollectionEquality()
-                .equals(rgButtonPadding, other.rgButtonPadding) &&
-            const DeepCollectionEquality()
-                .equals(lgButtonHeight, other.lgButtonHeight) &&
+            const DeepCollectionEquality().equals(outlineWarningBorderButtonColor, other.outlineWarningBorderButtonColor) &&
+            const DeepCollectionEquality().equals(smButtonHeight, other.smButtonHeight) &&
+            const DeepCollectionEquality().equals(smButtonPadding, other.smButtonPadding) &&
+            const DeepCollectionEquality().equals(rgButtonHeight, other.rgButtonHeight) &&
+            const DeepCollectionEquality().equals(rgButtonPadding, other.rgButtonPadding) &&
+            const DeepCollectionEquality().equals(lgButtonHeight, other.lgButtonHeight) &&
             const DeepCollectionEquality().equals(lgButtonPadding, other.lgButtonPadding) &&
             const DeepCollectionEquality().equals(smBorderRadius, other.smBorderRadius) &&
             const DeepCollectionEquality().equals(rgBorderRadius, other.rgBorderRadius) &&
@@ -481,13 +849,80 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(ghostSecondaryHoverButtonColor, other.ghostSecondaryHoverButtonColor) &&
             const DeepCollectionEquality().equals(ghostDangerHoverButtonColor, other.ghostDangerHoverButtonColor) &&
             const DeepCollectionEquality().equals(ghostInfoHoverButtonColor, other.ghostInfoHoverButtonColor) &&
-            const DeepCollectionEquality().equals(ghostWarningHoverButtonColor, other.ghostWarningHoverButtonColor));
+            const DeepCollectionEquality().equals(ghostWarningHoverButtonColor, other.ghostWarningHoverButtonColor) &&
+            const DeepCollectionEquality().equals(defaultTagBackgroundColor, other.defaultTagBackgroundColor) &&
+            const DeepCollectionEquality().equals(primaryTagBackgroundColor, other.primaryTagBackgroundColor) &&
+            const DeepCollectionEquality().equals(secondaryTagBackgroundColor, other.secondaryTagBackgroundColor) &&
+            const DeepCollectionEquality().equals(dangerTagBackgroundColor, other.dangerTagBackgroundColor) &&
+            const DeepCollectionEquality().equals(successTagBackgroundColor, other.successTagBackgroundColor) &&
+            const DeepCollectionEquality().equals(warningTagBackgroundColor, other.warningTagBackgroundColor) &&
+            const DeepCollectionEquality().equals(defaultTagBorderColor, other.defaultTagBorderColor) &&
+            const DeepCollectionEquality().equals(primaryTagBorderColor, other.primaryTagBorderColor) &&
+            const DeepCollectionEquality().equals(secondaryTagBorderColor, other.secondaryTagBorderColor) &&
+            const DeepCollectionEquality().equals(dangerTagBorderColor, other.dangerTagBorderColor) &&
+            const DeepCollectionEquality().equals(successTagBorderColor, other.successTagBorderColor) &&
+            const DeepCollectionEquality().equals(warningTagBorderColor, other.warningTagBorderColor) &&
+            const DeepCollectionEquality().equals(smTagPadding, other.smTagPadding) &&
+            const DeepCollectionEquality().equals(rgTagPadding, other.rgTagPadding) &&
+            const DeepCollectionEquality().equals(lgTagPadding, other.lgTagPadding) &&
+            const DeepCollectionEquality().equals(tagBorderWidth, other.tagBorderWidth) &&
+            const DeepCollectionEquality().equals(smTagBorderRadius, other.smTagBorderRadius) &&
+            const DeepCollectionEquality().equals(rgTagBorderRadius, other.rgTagBorderRadius) &&
+            const DeepCollectionEquality().equals(lgTagBorderRadius, other.lgTagBorderRadius) &&
+            const DeepCollectionEquality().equals(smTagTextHeight, other.smTagTextHeight) &&
+            const DeepCollectionEquality().equals(rgTagTextHeight, other.rgTagTextHeight) &&
+            const DeepCollectionEquality().equals(lgTagTextHeight, other.lgTagTextHeight) &&
+            const DeepCollectionEquality().equals(smTagTextSize, other.smTagTextSize) &&
+            const DeepCollectionEquality().equals(rgTagTextSize, other.rgTagTextSize) &&
+            const DeepCollectionEquality().equals(lgTagTextSize, other.lgTagTextSize) &&
+            const DeepCollectionEquality().equals(smTagTextWeight, other.smTagTextWeight) &&
+            const DeepCollectionEquality().equals(rgTagTextWeight, other.rgTagTextWeight) &&
+            const DeepCollectionEquality().equals(lgTagTextWeight, other.lgTagTextWeight) &&
+            const DeepCollectionEquality().equals(defaultTagTextColor, other.defaultTagTextColor) &&
+            const DeepCollectionEquality().equals(primaryTagTextColor, other.primaryTagTextColor) &&
+            const DeepCollectionEquality().equals(secondaryTagTextColor, other.secondaryTagTextColor) &&
+            const DeepCollectionEquality().equals(dangerTagTextColor, other.dangerTagTextColor) &&
+            const DeepCollectionEquality().equals(successTagTextColor, other.successTagTextColor) &&
+            const DeepCollectionEquality().equals(warningTagTextColor, other.warningTagTextColor) &&
+            const DeepCollectionEquality().equals(smTagIconSize, other.smTagIconSize) &&
+            const DeepCollectionEquality().equals(rgTagIconSize, other.rgTagIconSize) &&
+            const DeepCollectionEquality().equals(lgTagIconSize, other.lgTagIconSize) &&
+            const DeepCollectionEquality().equals(defaultTagIconColor, other.defaultTagIconColor) &&
+            const DeepCollectionEquality().equals(primaryTagIconColor, other.primaryTagIconColor) &&
+            const DeepCollectionEquality().equals(secondaryTagIconColor, other.secondaryTagIconColor) &&
+            const DeepCollectionEquality().equals(dangerTagIconColor, other.dangerTagIconColor) &&
+            const DeepCollectionEquality().equals(successTagIconColor, other.successTagIconColor) &&
+            const DeepCollectionEquality().equals(warningTagIconColor, other.warningTagIconColor) &&
+            const DeepCollectionEquality().equals(smTagSpacing, other.smTagSpacing) &&
+            const DeepCollectionEquality().equals(rgTagSpacing, other.rgTagSpacing) &&
+            const DeepCollectionEquality().equals(lgTagSpacing, other.lgTagSpacing));
   }
 
   @override
   int get hashCode {
     return Object.hashAll([
       runtimeType.hashCode,
+      const DeepCollectionEquality().hash(defaultCardBackgroundColor),
+      const DeepCollectionEquality().hash(primaryCardBackgroundColor),
+      const DeepCollectionEquality().hash(secondaryCardBackgroundColor),
+      const DeepCollectionEquality().hash(dangerCardBackgroundColor),
+      const DeepCollectionEquality().hash(successCardBackgroundColor),
+      const DeepCollectionEquality().hash(warningCardBackgroundColor),
+      const DeepCollectionEquality().hash(defaultCardBorderColor),
+      const DeepCollectionEquality().hash(primaryCardBorderColor),
+      const DeepCollectionEquality().hash(secondaryCardBorderColor),
+      const DeepCollectionEquality().hash(dangerCardBorderColor),
+      const DeepCollectionEquality().hash(successCardBorderColor),
+      const DeepCollectionEquality().hash(warningCardBorderColor),
+      const DeepCollectionEquality().hash(smCardPadding),
+      const DeepCollectionEquality().hash(rgCardPadding),
+      const DeepCollectionEquality().hash(lgCardPadding),
+      const DeepCollectionEquality().hash(cardBorderWidth),
+      const DeepCollectionEquality().hash(smCardBorderRadius),
+      const DeepCollectionEquality().hash(rgCardBorderRadius),
+      const DeepCollectionEquality().hash(lgCardBorderRadius),
+      const DeepCollectionEquality().hash(cardDividerThickness),
+      const DeepCollectionEquality().hash(cardDividerHeight),
       const DeepCollectionEquality().hash(filledStandardButtonColor),
       const DeepCollectionEquality().hash(filledPrimaryButtonColor),
       const DeepCollectionEquality().hash(filledSecondaryButtonColor),
@@ -551,12 +986,80 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(ghostDangerHoverButtonColor),
       const DeepCollectionEquality().hash(ghostInfoHoverButtonColor),
       const DeepCollectionEquality().hash(ghostWarningHoverButtonColor),
+      const DeepCollectionEquality().hash(defaultTagBackgroundColor),
+      const DeepCollectionEquality().hash(primaryTagBackgroundColor),
+      const DeepCollectionEquality().hash(secondaryTagBackgroundColor),
+      const DeepCollectionEquality().hash(dangerTagBackgroundColor),
+      const DeepCollectionEquality().hash(successTagBackgroundColor),
+      const DeepCollectionEquality().hash(warningTagBackgroundColor),
+      const DeepCollectionEquality().hash(defaultTagBorderColor),
+      const DeepCollectionEquality().hash(primaryTagBorderColor),
+      const DeepCollectionEquality().hash(secondaryTagBorderColor),
+      const DeepCollectionEquality().hash(dangerTagBorderColor),
+      const DeepCollectionEquality().hash(successTagBorderColor),
+      const DeepCollectionEquality().hash(warningTagBorderColor),
+      const DeepCollectionEquality().hash(smTagPadding),
+      const DeepCollectionEquality().hash(rgTagPadding),
+      const DeepCollectionEquality().hash(lgTagPadding),
+      const DeepCollectionEquality().hash(tagBorderWidth),
+      const DeepCollectionEquality().hash(smTagBorderRadius),
+      const DeepCollectionEquality().hash(rgTagBorderRadius),
+      const DeepCollectionEquality().hash(lgTagBorderRadius),
+      const DeepCollectionEquality().hash(smTagTextHeight),
+      const DeepCollectionEquality().hash(rgTagTextHeight),
+      const DeepCollectionEquality().hash(lgTagTextHeight),
+      const DeepCollectionEquality().hash(smTagTextSize),
+      const DeepCollectionEquality().hash(rgTagTextSize),
+      const DeepCollectionEquality().hash(lgTagTextSize),
+      const DeepCollectionEquality().hash(smTagTextWeight),
+      const DeepCollectionEquality().hash(rgTagTextWeight),
+      const DeepCollectionEquality().hash(lgTagTextWeight),
+      const DeepCollectionEquality().hash(defaultTagTextColor),
+      const DeepCollectionEquality().hash(primaryTagTextColor),
+      const DeepCollectionEquality().hash(secondaryTagTextColor),
+      const DeepCollectionEquality().hash(dangerTagTextColor),
+      const DeepCollectionEquality().hash(successTagTextColor),
+      const DeepCollectionEquality().hash(warningTagTextColor),
+      const DeepCollectionEquality().hash(smTagIconSize),
+      const DeepCollectionEquality().hash(rgTagIconSize),
+      const DeepCollectionEquality().hash(lgTagIconSize),
+      const DeepCollectionEquality().hash(defaultTagIconColor),
+      const DeepCollectionEquality().hash(primaryTagIconColor),
+      const DeepCollectionEquality().hash(secondaryTagIconColor),
+      const DeepCollectionEquality().hash(dangerTagIconColor),
+      const DeepCollectionEquality().hash(successTagIconColor),
+      const DeepCollectionEquality().hash(warningTagIconColor),
+      const DeepCollectionEquality().hash(smTagSpacing),
+      const DeepCollectionEquality().hash(rgTagSpacing),
+      const DeepCollectionEquality().hash(lgTagSpacing),
     ]);
   }
 }
 
 extension ThemeTokenBuildContextProps on BuildContext {
   ThemeToken get themeToken => Theme.of(this).extension<ThemeToken>()!;
+  Color get defaultCardBackgroundColor => themeToken.defaultCardBackgroundColor;
+  Color get primaryCardBackgroundColor => themeToken.primaryCardBackgroundColor;
+  Color get secondaryCardBackgroundColor =>
+      themeToken.secondaryCardBackgroundColor;
+  Color get dangerCardBackgroundColor => themeToken.dangerCardBackgroundColor;
+  Color get successCardBackgroundColor => themeToken.successCardBackgroundColor;
+  Color get warningCardBackgroundColor => themeToken.warningCardBackgroundColor;
+  Color get defaultCardBorderColor => themeToken.defaultCardBorderColor;
+  Color get primaryCardBorderColor => themeToken.primaryCardBorderColor;
+  Color get secondaryCardBorderColor => themeToken.secondaryCardBorderColor;
+  Color get dangerCardBorderColor => themeToken.dangerCardBorderColor;
+  Color get successCardBorderColor => themeToken.successCardBorderColor;
+  Color get warningCardBorderColor => themeToken.warningCardBorderColor;
+  EdgeInsets get smCardPadding => themeToken.smCardPadding;
+  EdgeInsets get rgCardPadding => themeToken.rgCardPadding;
+  EdgeInsets get lgCardPadding => themeToken.lgCardPadding;
+  double get cardBorderWidth => themeToken.cardBorderWidth;
+  double get smCardBorderRadius => themeToken.smCardBorderRadius;
+  double get rgCardBorderRadius => themeToken.rgCardBorderRadius;
+  double get lgCardBorderRadius => themeToken.lgCardBorderRadius;
+  double get cardDividerThickness => themeToken.cardDividerThickness;
+  double get cardDividerHeight => themeToken.cardDividerHeight;
   Color get filledStandardButtonColor => themeToken.filledStandardButtonColor;
   Color get filledPrimaryButtonColor => themeToken.filledPrimaryButtonColor;
   Color get filledSecondaryButtonColor => themeToken.filledSecondaryButtonColor;
@@ -653,4 +1156,51 @@ extension ThemeTokenBuildContextProps on BuildContext {
   Color get ghostInfoHoverButtonColor => themeToken.ghostInfoHoverButtonColor;
   Color get ghostWarningHoverButtonColor =>
       themeToken.ghostWarningHoverButtonColor;
+  Color get defaultTagBackgroundColor => themeToken.defaultTagBackgroundColor;
+  Color get primaryTagBackgroundColor => themeToken.primaryTagBackgroundColor;
+  Color get secondaryTagBackgroundColor =>
+      themeToken.secondaryTagBackgroundColor;
+  Color get dangerTagBackgroundColor => themeToken.dangerTagBackgroundColor;
+  Color get successTagBackgroundColor => themeToken.successTagBackgroundColor;
+  Color get warningTagBackgroundColor => themeToken.warningTagBackgroundColor;
+  Color get defaultTagBorderColor => themeToken.defaultTagBorderColor;
+  Color get primaryTagBorderColor => themeToken.primaryTagBorderColor;
+  Color get secondaryTagBorderColor => themeToken.secondaryTagBorderColor;
+  Color get dangerTagBorderColor => themeToken.dangerTagBorderColor;
+  Color get successTagBorderColor => themeToken.successTagBorderColor;
+  Color get warningTagBorderColor => themeToken.warningTagBorderColor;
+  EdgeInsets get smTagPadding => themeToken.smTagPadding;
+  EdgeInsets get rgTagPadding => themeToken.rgTagPadding;
+  EdgeInsets get lgTagPadding => themeToken.lgTagPadding;
+  double get tagBorderWidth => themeToken.tagBorderWidth;
+  double get smTagBorderRadius => themeToken.smTagBorderRadius;
+  double get rgTagBorderRadius => themeToken.rgTagBorderRadius;
+  double get lgTagBorderRadius => themeToken.lgTagBorderRadius;
+  double get smTagTextHeight => themeToken.smTagTextHeight;
+  double get rgTagTextHeight => themeToken.rgTagTextHeight;
+  double get lgTagTextHeight => themeToken.lgTagTextHeight;
+  double get smTagTextSize => themeToken.smTagTextSize;
+  double get rgTagTextSize => themeToken.rgTagTextSize;
+  double get lgTagTextSize => themeToken.lgTagTextSize;
+  FontWeight get smTagTextWeight => themeToken.smTagTextWeight;
+  FontWeight get rgTagTextWeight => themeToken.rgTagTextWeight;
+  FontWeight get lgTagTextWeight => themeToken.lgTagTextWeight;
+  Color get defaultTagTextColor => themeToken.defaultTagTextColor;
+  Color get primaryTagTextColor => themeToken.primaryTagTextColor;
+  Color get secondaryTagTextColor => themeToken.secondaryTagTextColor;
+  Color get dangerTagTextColor => themeToken.dangerTagTextColor;
+  Color get successTagTextColor => themeToken.successTagTextColor;
+  Color get warningTagTextColor => themeToken.warningTagTextColor;
+  double get smTagIconSize => themeToken.smTagIconSize;
+  double get rgTagIconSize => themeToken.rgTagIconSize;
+  double get lgTagIconSize => themeToken.lgTagIconSize;
+  Color get defaultTagIconColor => themeToken.defaultTagIconColor;
+  Color get primaryTagIconColor => themeToken.primaryTagIconColor;
+  Color get secondaryTagIconColor => themeToken.secondaryTagIconColor;
+  Color get dangerTagIconColor => themeToken.dangerTagIconColor;
+  Color get successTagIconColor => themeToken.successTagIconColor;
+  Color get warningTagIconColor => themeToken.warningTagIconColor;
+  double get smTagSpacing => themeToken.smTagSpacing;
+  double get rgTagSpacing => themeToken.rgTagSpacing;
+  double get lgTagSpacing => themeToken.lgTagSpacing;
 }
