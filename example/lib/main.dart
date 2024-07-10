@@ -1,3 +1,6 @@
+import 'package:example/cards.dart';
+import 'package:example/descriptions.dart';
+import 'package:example/tags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
@@ -60,9 +63,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -94,6 +94,42 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             // expand: true,
             child: const Text("Buttons"),
+          ),
+          Button(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CardDetails(),
+                ),
+              );
+            },
+            // expand: true,
+            child: const Text("Cards"),
+          ),
+          Button(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TagDetails(),
+                ),
+              );
+            },
+            // expand: true,
+            child: const Text("Tags"),
+          ),
+          Button(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DescriptionDetails(),
+                ),
+              );
+            },
+            // expand: true,
+            child: const Text("Descriptions"),
           ),
         ],
       ),
