@@ -64,11 +64,18 @@ class _CrudMainState extends State<CrudMain> {
       fromJson: TodoModel.staticFromJson,
     );
     getListBloc.isPaginationEnabled.value = false;
+    getListBloc.msgController?.stream.listen((event) {
+      print("type: ${event.type}, message: ${event.message}");
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    getListBloc.onSuccess = (data) {
+      print("On Success called, and has context");
+    };
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("CRUD Main"),
