@@ -1,4 +1,5 @@
 import 'package:example/cards.dart';
+import 'package:example/crud_main.dart';
 import 'package:example/descriptions.dart';
 import 'package:example/tags.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,8 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
 import 'buttons.dart';
 
-void main() {
+void main() async {
+  await MeragiCrud.initCache();
   runApp(const MyApp());
 }
 
@@ -130,6 +132,18 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             // expand: true,
             child: const Text("Descriptions"),
+          ),
+          Button(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CrudMain(),
+                ),
+              );
+            },
+            // expand: true,
+            child: const Text("CRUD"),
           ),
         ],
       ),
