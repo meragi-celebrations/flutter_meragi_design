@@ -109,8 +109,9 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
     customSorters.removeAt(index);
   }
 
-  String getKey() {
-    return url + json.encode(customFilters) + json.encode(customSorters);
+  String getKey(
+      List<Map<String, String>> filters, List<Map<String, String>> sorters) {
+    return url + json.encode(filters) + json.encode(sorters);
   }
 
   get() async {
@@ -129,11 +130,12 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
           "value": "${pageSize.value}",
         });
       }
+
       filters.addAll(customFilters);
 
       sorters.addAll(customSorters);
 
-      var key = getKey();
+      var key = getKey(filters, sorters);
 
       var cachedResponse = cache.get(key);
 
@@ -186,15 +188,6 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   updatePageSize(int newPageSize) {
     pageSize.value = newPageSize;
-  }
-
-  refreshList() {
-    currentPage.value = 1;
-    totalPages.value = 1;
-    cache.delete(getKey());
-    list.value.clear();
-    list.notifyListeners();
-    get();
   }
 
   nextPage() {
