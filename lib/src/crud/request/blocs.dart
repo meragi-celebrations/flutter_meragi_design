@@ -414,6 +414,5 @@ class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
       String key = "$url$id";
       cache.delete(key);
     }
-    return true;
   }
 }
