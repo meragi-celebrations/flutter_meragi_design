@@ -17,16 +17,16 @@ class MessageType {
 
   const MessageType(this.message, this.type, this.data);
 
-  const MessageType.success(String message, dynamic data)
+  const MessageType.success(String message, {dynamic data})
       : this(message, MessageTypeEnum.success, data);
 
-  const MessageType.error(String message, dynamic data)
+  const MessageType.error(String message, {dynamic data})
       : this(message, MessageTypeEnum.error, data);
 
-  const MessageType.info(String message, dynamic data)
+  const MessageType.info(String message, {dynamic data})
       : this(message, MessageTypeEnum.info, data);
 
-  const MessageType.warning(String message, dynamic data)
+  const MessageType.warning(String message, {dynamic data})
       : this(message, MessageTypeEnum.warning, data);
 }
 
@@ -155,14 +155,14 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
 
       onSuccess?.call(list.value);
 
-      showMessage(MessageType.success("", list.value));
+      showMessage(MessageType.success("", data: list.value));
 
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", e));
+      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
@@ -283,13 +283,13 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
       cache.put(key, res);
       handleResponse(res);
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", response.value));
+      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", e));
+      showMessage(MessageType.error("", data: e));
     } finally {
       onSettled?.call();
     }
@@ -323,13 +323,13 @@ class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
 
       response.value = fromJson(res) as T?;
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", response.value));
+      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", e));
+      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
@@ -360,13 +360,13 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
       var res = await repo.update(url, id, data: data);
       response.value = fromJson(res);
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", response.value));
+      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", e));
+      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
@@ -401,13 +401,13 @@ class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
       requestState.value = RequestState.loading;
       await repo.delete(url, id);
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", response.value));
+      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", e));
+      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
