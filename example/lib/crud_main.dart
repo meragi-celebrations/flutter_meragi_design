@@ -64,9 +64,6 @@ class _CrudMainState extends State<CrudMain> {
       fromJson: TodoModel.staticFromJson,
     );
     getListBloc.isPaginationEnabled.value = false;
-    getListBloc.msgController?.stream.listen((event) {
-      print("type: ${event.type}, message: ${event.message}");
-    });
     super.initState();
   }
 
