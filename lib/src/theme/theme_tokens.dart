@@ -59,7 +59,8 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   @override
   final double cardDividerHeight;
 
-  //Button Colors
+  // Button
+  // // Button Colors
   @override
   final Color filledStandardButtonColor;
   @override
@@ -89,7 +90,7 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   @override
   final Color outlineWarningBorderButtonColor;
 
-  //Button Sizes
+  // //Button Sizes
   @override
   final double smButtonHeight;
   @override
@@ -108,6 +109,14 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final double rgBorderRadius;
   @override
   final double lgBorderRadius;
+
+  // // Space between icon and text
+  @override
+  final double smButtonSpaceBetween;
+  @override
+  final double rgButtonSpaceBetween;
+  @override
+  final double lgButtonSpaceBetween;
 
   //icon
   @override
@@ -330,6 +339,9 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.rgButtonPadding,
     required this.lgButtonHeight,
     required this.lgButtonPadding,
+    required this.smButtonSpaceBetween,
+    required this.rgButtonSpaceBetween,
+    required this.lgButtonSpaceBetween,
     required this.smBorderRadius,
     required this.rgBorderRadius,
     required this.lgBorderRadius,

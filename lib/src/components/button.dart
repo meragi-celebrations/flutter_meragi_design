@@ -39,7 +39,7 @@ class Button extends StatefulWidget {
     this.type = ButtonType.standard,
     this.color,
     this.size = ButtonSize.rg,
-    this.spaceBetween = 8,
+    this.spaceBetween,
     this.expand = false,
     this.iconColor,
     this.padding,
@@ -61,7 +61,7 @@ class Button extends StatefulWidget {
     this.type = ButtonType.standard,
     this.color,
     this.size = ButtonSize.rg,
-    this.spaceBetween = 8,
+    this.spaceBetween,
     this.expand = false,
     this.iconColor,
     this.padding,
@@ -266,6 +266,20 @@ class _ButtonState extends State<Button> {
     }
   }
 
+  double? buttonSpaceBetween(ThemeToken token) {
+    if (widget.spaceBetween != null) {
+      return widget.spaceBetween;
+    }
+    switch (widget.size) {
+      case ButtonSize.sm:
+        return token.smButtonSpaceBetween;
+      case ButtonSize.rg:
+        return token.rgButtonSpaceBetween;
+      case ButtonSize.lg:
+        return token.lgButtonSpaceBetween;
+    }
+  }
+
   Color? buttonIconColor(ThemeToken token) {
     ButtonVariant variant = widget.variant;
     switch (widget.type) {
@@ -442,7 +456,7 @@ class _ButtonState extends State<Button> {
                           ),
                         if ((widget.icon != null || widget.isLoading) &&
                             widget.child != null)
-                          SizedBox(width: widget.spaceBetween),
+                          SizedBox(width: buttonSpaceBetween(token)),
                         if (widget.child != null)
                           DefaultTextStyle.merge(
                             style: buttonTextStyle(token),

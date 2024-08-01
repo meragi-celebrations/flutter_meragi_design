@@ -132,18 +132,18 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                                   child: const Text(
                                       "Loading custom indicator (click)"),
                                 ),
+                                Button(
+                                  variant: variant,
+                                  type: type,
+                                  onTap: () {},
+                                  icon: Icons.image,
+                                  isLoading: value,
+                                  size: ButtonSize.sm,
+                                )
                               ],
                             );
                           },
                         ),
-                        Button(
-                          variant: variant,
-                          type: type,
-                          onTap: () {},
-                          icon: Icons.add,
-                          isLoading: true,
-                          size: ButtonSize.sm,
-                        )
                       ],
                     ),
                   ),

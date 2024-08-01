@@ -52,6 +52,9 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   double get smBorderRadius;
   double get rgBorderRadius;
   double get lgBorderRadius;
+  double get smButtonSpaceBetween;
+  double get rgButtonSpaceBetween;
+  double get lgButtonSpaceBetween;
   double get smButtonIconSize;
   double get rgButtonIconSize;
   double get lgButtonIconSize;
@@ -185,6 +188,9 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     double? smBorderRadius,
     double? rgBorderRadius,
     double? lgBorderRadius,
+    double? smButtonSpaceBetween,
+    double? rgButtonSpaceBetween,
+    double? lgButtonSpaceBetween,
     double? smButtonIconSize,
     double? rgButtonIconSize,
     double? lgButtonIconSize,
@@ -342,6 +348,9 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       smBorderRadius: smBorderRadius ?? this.smBorderRadius,
       rgBorderRadius: rgBorderRadius ?? this.rgBorderRadius,
       lgBorderRadius: lgBorderRadius ?? this.lgBorderRadius,
+      smButtonSpaceBetween: smButtonSpaceBetween ?? this.smButtonSpaceBetween,
+      rgButtonSpaceBetween: rgButtonSpaceBetween ?? this.rgButtonSpaceBetween,
+      lgButtonSpaceBetween: lgButtonSpaceBetween ?? this.lgButtonSpaceBetween,
       smButtonIconSize: smButtonIconSize ?? this.smButtonIconSize,
       rgButtonIconSize: rgButtonIconSize ?? this.rgButtonIconSize,
       lgButtonIconSize: lgButtonIconSize ?? this.lgButtonIconSize,
@@ -564,6 +573,12 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       smBorderRadius: t < 0.5 ? smBorderRadius : other.smBorderRadius,
       rgBorderRadius: t < 0.5 ? rgBorderRadius : other.rgBorderRadius,
       lgBorderRadius: t < 0.5 ? lgBorderRadius : other.lgBorderRadius,
+      smButtonSpaceBetween:
+          t < 0.5 ? smButtonSpaceBetween : other.smButtonSpaceBetween,
+      rgButtonSpaceBetween:
+          t < 0.5 ? rgButtonSpaceBetween : other.rgButtonSpaceBetween,
+      lgButtonSpaceBetween:
+          t < 0.5 ? lgButtonSpaceBetween : other.lgButtonSpaceBetween,
       smButtonIconSize: t < 0.5 ? smButtonIconSize : other.smButtonIconSize,
       rgButtonIconSize: t < 0.5 ? rgButtonIconSize : other.rgButtonIconSize,
       lgButtonIconSize: t < 0.5 ? lgButtonIconSize : other.lgButtonIconSize,
@@ -809,6 +824,9 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(smBorderRadius, other.smBorderRadius) &&
             const DeepCollectionEquality().equals(rgBorderRadius, other.rgBorderRadius) &&
             const DeepCollectionEquality().equals(lgBorderRadius, other.lgBorderRadius) &&
+            const DeepCollectionEquality().equals(smButtonSpaceBetween, other.smButtonSpaceBetween) &&
+            const DeepCollectionEquality().equals(rgButtonSpaceBetween, other.rgButtonSpaceBetween) &&
+            const DeepCollectionEquality().equals(lgButtonSpaceBetween, other.lgButtonSpaceBetween) &&
             const DeepCollectionEquality().equals(smButtonIconSize, other.smButtonIconSize) &&
             const DeepCollectionEquality().equals(rgButtonIconSize, other.rgButtonIconSize) &&
             const DeepCollectionEquality().equals(lgButtonIconSize, other.lgButtonIconSize) &&
@@ -945,6 +963,9 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(smBorderRadius),
       const DeepCollectionEquality().hash(rgBorderRadius),
       const DeepCollectionEquality().hash(lgBorderRadius),
+      const DeepCollectionEquality().hash(smButtonSpaceBetween),
+      const DeepCollectionEquality().hash(rgButtonSpaceBetween),
+      const DeepCollectionEquality().hash(lgButtonSpaceBetween),
       const DeepCollectionEquality().hash(smButtonIconSize),
       const DeepCollectionEquality().hash(rgButtonIconSize),
       const DeepCollectionEquality().hash(lgButtonIconSize),
@@ -1088,6 +1109,9 @@ extension ThemeTokenBuildContextProps on BuildContext {
   double get smBorderRadius => themeToken.smBorderRadius;
   double get rgBorderRadius => themeToken.rgBorderRadius;
   double get lgBorderRadius => themeToken.lgBorderRadius;
+  double get smButtonSpaceBetween => themeToken.smButtonSpaceBetween;
+  double get rgButtonSpaceBetween => themeToken.rgButtonSpaceBetween;
+  double get lgButtonSpaceBetween => themeToken.lgButtonSpaceBetween;
   double get smButtonIconSize => themeToken.smButtonIconSize;
   double get rgButtonIconSize => themeToken.rgButtonIconSize;
   double get lgButtonIconSize => themeToken.lgButtonIconSize;
