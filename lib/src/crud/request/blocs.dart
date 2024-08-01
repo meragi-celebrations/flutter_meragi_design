@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,28 +6,6 @@ import 'package:flutter_meragi_design/src/crud/request/enums.dart';
 import 'package:flutter_meragi_design/src/crud/request/model.dart';
 import 'package:flutter_meragi_design/src/crud/request/repo.dart';
 import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
-
-enum MessageTypeEnum { success, error, info, warning }
-
-class MessageType {
-  final String message;
-  final MessageTypeEnum type;
-  final dynamic data;
-
-  const MessageType(this.message, this.type, this.data);
-
-  const MessageType.success(String message, {dynamic data})
-      : this(message, MessageTypeEnum.success, data);
-
-  const MessageType.error(String message, {dynamic data})
-      : this(message, MessageTypeEnum.error, data);
-
-  const MessageType.info(String message, {dynamic data})
-      : this(message, MessageTypeEnum.info, data);
-
-  const MessageType.warning(String message, {dynamic data})
-      : this(message, MessageTypeEnum.warning, data);
-}
 
 abstract class BaseBloc<T extends CRUDModel> {
   final String url;
@@ -39,16 +16,6 @@ abstract class BaseBloc<T extends CRUDModel> {
   Function(Object error)? onError;
   VoidCallback? onSettled;
 
-  StreamController<MessageType>? msgController;
-
-  void showMessage(MessageType message) {
-    msgController?.sink.add(message);
-  }
-
-  void dispose() {
-    msgController?.close();
-  }
-
   BaseBloc({
     required this.url,
     required this.repo,
@@ -56,10 +23,7 @@ abstract class BaseBloc<T extends CRUDModel> {
     this.onSuccess,
     this.onError,
     this.onSettled,
-    this.msgController,
-  }) {
-    msgController ??= StreamController.broadcast();
-  }
+  });
 }
 
 class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
@@ -70,7 +34,6 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSuccess,
     super.onError,
     super.onSettled,
-    super.msgController,
   });
 
   //#region -List
@@ -157,14 +120,11 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
 
       onSuccess?.call(list.value);
 
-      showMessage(MessageType.success("", data: list.value));
-
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
@@ -231,7 +191,6 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSuccess,
     super.onError,
     super.onSettled,
-    super.msgController,
     String? itemId,
   }) {
     if (itemId != null) {
@@ -276,13 +235,11 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
       cache.put(key, res);
       handleResponse(res);
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", data: e));
     } finally {
       onSettled?.call();
     }
@@ -301,7 +258,6 @@ class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSuccess,
     super.onError,
     super.onSettled,
-    super.msgController,
   });
 
   ValueNotifier<RequestState> requestState =
@@ -316,13 +272,11 @@ class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
 
       response.value = fromJson(res) as T?;
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
@@ -338,7 +292,6 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSuccess,
     super.onError,
     super.onSettled,
-    super.msgController,
   });
 
   ValueNotifier<RequestState> requestState =
@@ -353,13 +306,11 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
       var res = await repo.update(url, id, data: data);
       response.value = fromJson(res);
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
@@ -380,7 +331,6 @@ class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSuccess,
     super.onError,
     super.onSettled,
-    super.msgController,
   });
 
   ValueNotifier<RequestState> requestState =
@@ -394,13 +344,11 @@ class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
       requestState.value = RequestState.loading;
       await repo.delete(url, id);
       onSuccess?.call(response.value);
-      showMessage(MessageType.success("", data: response.value));
       requestState.value = RequestState.done;
     } catch (e, s) {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
-      showMessage(MessageType.error("", data: e));
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
