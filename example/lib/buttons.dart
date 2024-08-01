@@ -9,11 +9,13 @@ class ButtonsDetails extends StatefulWidget {
 }
 
 class _ButtonsDetailsState extends State<ButtonsDetails> {
+  ValueNotifier<bool> isLoading = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Buttons"),
+        title: const Text("Buttons"),
       ),
       body: ListView.builder(
         itemCount: ButtonVariant.values.length,
@@ -87,6 +89,61 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                             ),
                           ),
                         ),
+                        ValueListenableBuilder(
+                          valueListenable: isLoading,
+                          builder: (context, value, _) {
+                            return Column(
+                              children: [
+                                Button(
+                                  variant: variant,
+                                  type: type,
+                                  onTap: () {
+                                    isLoading.value = !value;
+                                  },
+                                  isLoading: value,
+                                  icon: Icons.filter,
+                                  child: const Text("Loading (click)"),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Button.dropdown(
+                                  builder: (context, controller, child) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        if (!controller.isOpen) {
+                                          controller.open();
+                                        } else {
+                                          controller.close();
+                                        }
+                                      },
+                                      child: const Icon(Icons.add),
+                                    );
+                                  },
+                                  menuChildren: const [],
+                                  variant: variant,
+                                  type: type,
+                                  onTap: () {
+                                    isLoading.value = !value;
+                                  },
+                                  isLoading: value,
+                                  loadingWidget:
+                                      const CircularProgressIndicator(),
+                                  child: const Text(
+                                      "Loading custom indicator (click)"),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Button(
+                          variant: variant,
+                          type: type,
+                          onTap: () {},
+                          icon: Icons.add,
+                          isLoading: true,
+                          size: ButtonSize.sm,
+                        )
                       ],
                     ),
                   ),

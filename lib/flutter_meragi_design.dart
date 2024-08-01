@@ -12,3 +12,5 @@ export 'src/crud/request/model.dart';
 export 'src/crud/request/repo.dart';
 export 'src/theme/theme.dart';
 export 'src/theme/tokens/light.dart';
+export 'src/theme/tokens/light_wide.dart';
+export 'src/utils/platform.dart';

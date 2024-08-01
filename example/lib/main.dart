@@ -19,6 +19,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MeragiTheme(
+      token: isPlatform([MeragiPlatform.android, MeragiPlatform.ios])
+          ? light
+          : lightWide,
       child: MaterialApp(
         title: 'Flutter Meragi Design',
         theme: ThemeData(
