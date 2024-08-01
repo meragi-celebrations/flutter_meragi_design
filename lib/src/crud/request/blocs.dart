@@ -8,7 +8,7 @@ import 'package:flutter_meragi_design/src/crud/request/repo.dart';
 import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
 
 abstract class BaseBloc<T extends CRUDModel> {
-  final String url;
+  String? url;
   final CRUDRepository repo;
   final T Function(dynamic json) fromJson;
 
@@ -17,9 +17,9 @@ abstract class BaseBloc<T extends CRUDModel> {
   VoidCallback? onSettled;
 
   BaseBloc({
-    required this.url,
     required this.repo,
     required this.fromJson,
+    this.url,
     this.onSuccess,
     this.onError,
     this.onSettled,
@@ -74,7 +74,7 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   String getKey(
       List<Map<String, String>> filters, List<Map<String, String>> sorters) {
-    return url + json.encode(filters) + json.encode(sorters);
+    return url! + json.encode(filters) + json.encode(sorters);
   }
 
   get() async {
@@ -111,7 +111,7 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
         list.notifyListeners();
       }
 
-      var res = await repo.getList(url, filters: filters, sorters: sorters);
+      var res = await repo.getList(url!, filters: filters, sorters: sorters);
 
       cache.put(key, res);
 
@@ -231,7 +231,7 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
         requestState.value = RequestState.fetching;
         handleResponse(cachedResponse);
       }
-      var res = await repo.getOne(url, id.value, filters: customFilters);
+      var res = await repo.getOne(url!, id.value, filters: customFilters);
       cache.put(key, res);
       handleResponse(res);
       onSuccess?.call(response.value);
@@ -252,9 +252,9 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
 
 class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
   CreateBloc({
-    required super.url,
     required super.repo,
     required super.fromJson,
+    super.url,
     super.onSuccess,
     super.onError,
     super.onSettled,
@@ -265,10 +265,11 @@ class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
   ValueNotifier<T?> response = ValueNotifier(null);
 
   mutate(Map<String, dynamic> data,
-      {Map<String, dynamic> dataFiles = const {}}) async {
+      {Map<String, dynamic> dataFiles = const {}, String? url}) async {
+    String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
-      var res = await repo.create(url, data: data, files: dataFiles);
+      var res = await repo.create(finalUrl, data: data, files: dataFiles);
 
       response.value = fromJson(res) as T?;
       onSuccess?.call(response.value);
@@ -286,9 +287,9 @@ class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
 
 class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
   UpdateBloc({
-    required super.url,
     required super.repo,
     required super.fromJson,
+    super.url,
     super.onSuccess,
     super.onError,
     super.onSettled,
@@ -300,10 +301,11 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  mutate(dynamic id, Map<String, dynamic> data) async {
+  mutate(dynamic id, Map<String, dynamic> data, {String? url}) async {
+    String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
-      var res = await repo.update(url, id, data: data);
+      var res = await repo.update(finalUrl, id, data: data);
       response.value = fromJson(res);
       onSuccess?.call(response.value);
       requestState.value = RequestState.done;
@@ -317,7 +319,7 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
 
       // Request is successful, remove from cache
       // so it get updated in next fetch
-      String key = "$url$id";
+      String key = "$finalUrl$id";
       cache.delete(key);
     }
   }
@@ -325,9 +327,9 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
 
 class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
   DeleteBloc({
-    required super.url,
     required super.repo,
     required super.fromJson,
+    super.url,
     super.onSuccess,
     super.onError,
     super.onSettled,
@@ -339,10 +341,11 @@ class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  mutate(dynamic id) async {
+  mutate(dynamic id, {String? url}) async {
+    String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
-      await repo.delete(url, id);
+      await repo.delete(finalUrl, id);
       onSuccess?.call(response.value);
       requestState.value = RequestState.done;
     } catch (e, s) {
@@ -352,7 +355,7 @@ class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
       requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
-      String key = "$url$id";
+      String key = "$finalUrl$id";
       cache.delete(key);
     }
   }
