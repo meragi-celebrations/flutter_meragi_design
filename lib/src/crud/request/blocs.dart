@@ -9,7 +9,7 @@ import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
 
 abstract class BaseBloc<T extends CRUDModel> {
   String? url;
-  final CRUDRepository repo;
+  final MDRepository repo;
   final T Function(dynamic json) fromJson;
 
   Function(dynamic data)? onSuccess;
@@ -37,11 +37,9 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
   });
 
   //#region -List
-  PropertyNotifier<PaginatedResponse<List<T>>?> pageResponse =
-      PropertyNotifier(null);
+  PropertyNotifier<PaginatedResponse<List<T>>?> pageResponse = PropertyNotifier(null);
   PropertyNotifier<List<T>> list = PropertyNotifier([]);
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<int> currentPage = ValueNotifier(1);
   ValueNotifier<int> totalPages = ValueNotifier(1);
   ValueNotifier<int> totalCount = ValueNotifier(0);
@@ -52,8 +50,7 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  addFilters(List<Map<String, String>> newFilters,
-      {ListFilterAddType type = ListFilterAddType.append}) {
+  addFilters(List<Map<String, String>> newFilters, {ListFilterAddType type = ListFilterAddType.append}) {
     if (type == ListFilterAddType.reset) {
       customFilters = [];
     }
@@ -72,8 +69,7 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
     customSorters.removeAt(index);
   }
 
-  String getKey(
-      List<Map<String, String>> filters, List<Map<String, String>> sorters) {
+  String getKey(List<Map<String, String>> filters, List<Map<String, String>> sorters) {
     return url! + json.encode(filters) + json.encode(sorters);
   }
 
@@ -133,16 +129,13 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   void handleResponse(response) {
     if (isPaginationEnabled.value) {
-      List<T> listData = List.from(
-          ((response['results'] ?? []) as List).map((e) => fromJson(e)));
+      List<T> listData = List.from(((response['results'] ?? []) as List).map((e) => fromJson(e)));
       pageResponse.value = PaginatedResponse.fromJson(response, listData);
       list.value = listData;
-      totalPages.value =
-          ((pageResponse.value?.count ?? 0) / pageSize.value).ceil();
+      totalPages.value = ((pageResponse.value?.count ?? 0) / pageSize.value).ceil();
       totalCount.value = pageResponse.value?.count?.toInt() ?? 0;
     } else {
-      list.value =
-          List.from(((response ?? []) as List).map((e) => fromJson(e)));
+      list.value = List.from(((response ?? []) as List).map((e) => fromJson(e)));
     }
   }
 
@@ -198,8 +191,7 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
     }
   }
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
   List<Map<String, String>> customFilters = [];
 
@@ -207,8 +199,7 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  addFilters(List<Map<String, String>> newFilters,
-      {ListFilterAddType type = ListFilterAddType.append}) {
+  addFilters(List<Map<String, String>> newFilters, {ListFilterAddType type = ListFilterAddType.append}) {
     if (type == ListFilterAddType.reset) {
       customFilters = [];
     }
@@ -260,12 +251,10 @@ class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
-  mutate(Map<String, dynamic> data,
-      {Map<String, dynamic> dataFiles = const {}, String? url}) async {
+  mutate(Map<String, dynamic> data, {Map<String, dynamic> dataFiles = const {}, String? url}) async {
     String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
@@ -295,8 +284,7 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
   RequestCache cache = RequestCache();
@@ -335,8 +323,7 @@ class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
   RequestCache cache = RequestCache();
