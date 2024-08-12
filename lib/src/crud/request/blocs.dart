@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/crud/request/cache.dart';
 import 'package:flutter_meragi_design/src/crud/request/enums.dart';
 import 'package:flutter_meragi_design/src/crud/request/model.dart';
 import 'package:flutter_meragi_design/src/crud/request/repo.dart';
 import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
+import 'package:flutter_meragi_design/src/utils/qs.dart';
 
 abstract class BaseBloc<T extends CRUDModel> {
   String? url;
@@ -31,6 +33,7 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
     required super.url,
     required super.repo,
     required super.fromJson,
+    this.isInfinite = false,
     super.onSuccess,
     super.onError,
     super.onSettled,
@@ -47,6 +50,8 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
   ValueNotifier<bool> isPaginationEnabled = ValueNotifier(true);
   List<Map<String, String>> customFilters = [];
   List<Map<String, String>> customSorters = [];
+
+  final bool isInfinite;
 
   RequestCache cache = RequestCache();
 
@@ -70,7 +75,14 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
   }
 
   String getKey(List<Map<String, String>> filters, List<Map<String, String>> sorters) {
-    return url! + json.encode(filters) + json.encode(sorters);
+    Map<String, String> data = {};
+    if (sorters.isNotEmpty) {
+      data.addAll(parseSorterListToMap(sorters));
+    }
+    if (filters.isNotEmpty) {
+      data.addAll(parseFilterListToMap(filters));
+    }
+    return url! + Uri(queryParameters: data).query;
   }
 
   get() async {
@@ -103,7 +115,7 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
       } else {
         requestState.value = RequestState.fetching;
 
-        this.handleResponse(cachedResponse);
+        this.handleResponse(cachedResponse, cached: true);
         list.notifyListeners();
       }
 
@@ -127,11 +139,21 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
     }
   }
 
-  void handleResponse(response) {
+  void handleResponse(response, {bool cached = false}) {
     if (isPaginationEnabled.value) {
-      List<T> listData = List.from(((response['results'] ?? []) as List).map((e) => fromJson(e)));
-      pageResponse.value = PaginatedResponse.fromJson(response, listData);
-      list.value = listData;
+      if (isInfinite) {
+        //if result is cached then we need to remove previous results, if not then we need to remove last page results
+        if (cached) {
+          list.value.addAll(List.from(((response['results'] ?? []) as List).map((e) => fromJson(e))));
+        } else {
+          list.value.removeRange(list.value.length - pageSize.value, list.value.length);
+          list.value.addAll(List.from(((response['results'] ?? []) as List).map((e) => fromJson(e))));
+        }
+      } else {
+        List<T> listData = List.from(((response['results'] ?? []) as List).map((e) => fromJson(e)));
+        pageResponse.value = PaginatedResponse.fromJson(response, listData);
+        list.value = listData;
+      }
       totalPages.value = ((pageResponse.value?.count ?? 0) / pageSize.value).ceil();
       totalCount.value = pageResponse.value?.count?.toInt() ?? 0;
     } else {
@@ -173,6 +195,14 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
 
   togglePagination(bool value) {
     isPaginationEnabled.value = value;
+  }
+
+  reset() {
+    currentPage.value = 1;
+    totalPages.value = 1;
+    list.value.clear();
+    list.notifyListeners();
+    get();
   }
 }
 
