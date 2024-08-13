@@ -1,9 +1,3 @@
-abstract class CRUDModel {
-  CRUDModel fromJson(dynamic json);
-
-  Map<String, dynamic> toJson();
-}
-
 class PaginatedResponse<T> {
   PaginatedResponse({
     this.count,

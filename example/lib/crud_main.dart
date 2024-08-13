@@ -2,7 +2,7 @@ import 'package:example/crud/repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
-class TodoModel extends CRUDModel {
+class TodoModel {
   int? userId;
   int? id;
   String? title;
@@ -18,7 +18,6 @@ class TodoModel extends CRUDModel {
     completed = json['completed'];
   }
 
-  @override
   Map<String, dynamic> toJson() {
     final dynamic data = {};
     data['userId'] = userId;
@@ -28,7 +27,6 @@ class TodoModel extends CRUDModel {
     return data;
   }
 
-  @override
   TodoModel fromJson(json) {
     return TodoModel.buildFromJson(json);
   }
@@ -70,7 +68,7 @@ class _CrudMainState extends State<CrudMain> {
   @override
   Widget build(BuildContext context) {
     getListBloc.onSuccess = (data) {
-      print("On Success called, and has context");
+      debugPrint("On Success called, and has context");
     };
 
     return Scaffold(

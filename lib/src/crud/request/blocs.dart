@@ -9,7 +9,7 @@ import 'package:flutter_meragi_design/src/crud/request/repo.dart';
 import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
 import 'package:flutter_meragi_design/src/utils/qs.dart';
 
-abstract class BaseBloc<T extends CRUDModel> {
+abstract class BaseBloc<T> {
   String? url;
   final MDRepository repo;
   final T Function(dynamic json) fromJson;
@@ -28,7 +28,7 @@ abstract class BaseBloc<T extends CRUDModel> {
   });
 }
 
-class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
+class GetListBloc<T> extends BaseBloc<T> {
   GetListBloc({
     required super.url,
     required super.repo,
@@ -206,7 +206,7 @@ class GetListBloc<T extends CRUDModel> extends BaseBloc<T> {
   }
 }
 
-class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
+class GetOneBloc<T> extends BaseBloc<T> {
   GetOneBloc({
     required super.url,
     required super.repo,
@@ -271,7 +271,7 @@ class GetOneBloc<T extends CRUDModel> extends BaseBloc<T> {
   }
 }
 
-class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
+class CreateBloc<T> extends BaseBloc<T> {
   CreateBloc({
     required super.repo,
     required super.fromJson,
@@ -304,7 +304,7 @@ class CreateBloc<T extends CRUDModel> extends BaseBloc<T> {
   }
 }
 
-class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
+class UpdateBloc<T> extends BaseBloc<T> {
   UpdateBloc({
     required super.repo,
     required super.fromJson,
@@ -343,7 +343,7 @@ class UpdateBloc<T extends CRUDModel> extends BaseBloc<T> {
   }
 }
 
-class DeleteBloc<T extends CRUDModel> extends BaseBloc<T> {
+class DeleteBloc<T> extends BaseBloc<T> {
   DeleteBloc({
     required super.repo,
     required super.fromJson,
