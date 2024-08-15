@@ -23,13 +23,14 @@ class ExampleRepo extends MDRepository {
   }
 
   @override
-  Future getList(String url,
+  Future<ListResponse> getList(String url,
       {List<Map<String, String>> filters = const [], List<Map<String, String>> sorters = const []}) async {
     Response res = await dio.get(url);
     if (res.statusCode == 200) {
       var rData = res.data;
-      return rData;
+      return ListResponse(count: rData['count'], url: url, result: rData['results']);
     }
+    return ListResponse(count: 0, url: url, result: []);
   }
 
   @override

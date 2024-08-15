@@ -40,7 +40,7 @@ class GetListBloc<T> extends BaseBloc<T> {
   });
 
   //#region -List
-  PropertyNotifier<PaginatedResponse<List<T>>?> pageResponse = PropertyNotifier(null);
+  PropertyNotifier<ListResponse<List<T>>?> pageResponse = PropertyNotifier(null);
   PropertyNotifier<List<T>> list = PropertyNotifier([]);
   ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<int> currentPage = ValueNotifier(1);
@@ -111,17 +111,21 @@ class GetListBloc<T> extends BaseBloc<T> {
       var cachedResponse = cache.get(key);
 
       if (cachedResponse == null) {
-        requestState.value = RequestState.loading;
+        if (isInfinite) {
+          requestState.value = currentPage.value > 1 ? RequestState.paginating : RequestState.loading;
+        } else {
+          requestState.value = RequestState.loading;
+        }
       } else {
         requestState.value = RequestState.fetching;
-
-        this.handleResponse(cachedResponse, cached: true);
+        ListResponse cacheResponseInList = ListResponse.fromJson(cachedResponse, cachedResponse["results"]);
+        this.handleResponse(cacheResponseInList, cached: true);
         list.notifyListeners();
       }
 
-      var res = await repo.getList(url!, filters: filters, sorters: sorters);
+      ListResponse res = await repo.getList(url!, filters: filters, sorters: sorters);
 
-      cache.put(key, res);
+      cache.put(key, res.toJson());
 
       this.handleResponse(res);
       list.notifyListeners();
@@ -139,25 +143,39 @@ class GetListBloc<T> extends BaseBloc<T> {
     }
   }
 
-  void handleResponse(response, {bool cached = false}) {
+  Map<String, Map<String, int>> urlCallQueue = {};
+
+  void handleResponse(ListResponse response, {bool cached = false}) {
     if (isPaginationEnabled.value) {
+      List<T> listData = List.from(((response.result ?? []) as List).map((e) => fromJson(e)));
+      pageResponse.value = ListResponse.fromJson(response.toJson(), listData);
+      debugPrint("pageResponse ${pageResponse.value?.count} ${pageResponse.value?.url}");
       if (isInfinite) {
         //if result is cached then we need to remove previous results, if not then we need to remove last page results
         if (cached) {
-          list.value.addAll(List.from(((response['results'] ?? []) as List).map((e) => fromJson(e))));
+          urlCallQueue[response.url] = {
+            "startIndex": list.value.length,
+            "endIndex": list.value.length + listData.length,
+          };
+
+          list.value.addAll(listData);
         } else {
-          list.value.removeRange(list.value.length - pageSize.value, list.value.length);
-          list.value.addAll(List.from(((response['results'] ?? []) as List).map((e) => fromJson(e))));
+          Map<String, int>? urlQueueData = urlCallQueue[response.url];
+          if (urlQueueData != null) {
+            list.value.removeRange(urlQueueData['startIndex']!, urlQueueData['endIndex']!);
+            list.value.addAll(listData);
+            urlCallQueue.remove(response.url);
+          } else {
+            list.value.addAll(listData);
+          }
         }
       } else {
-        List<T> listData = List.from(((response['results'] ?? []) as List).map((e) => fromJson(e)));
-        pageResponse.value = PaginatedResponse.fromJson(response, listData);
         list.value = listData;
       }
       totalPages.value = ((pageResponse.value?.count ?? 0) / pageSize.value).ceil();
-      totalCount.value = pageResponse.value?.count?.toInt() ?? 0;
+      totalCount.value = pageResponse.value?.count.toInt() ?? 0;
     } else {
-      list.value = List.from(((response ?? []) as List).map((e) => fromJson(e)));
+      list.value = List.from(((response.result ?? []) as List).map((e) => fromJson(e)));
     }
   }
 
