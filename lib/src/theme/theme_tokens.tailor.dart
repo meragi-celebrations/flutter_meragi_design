@@ -142,6 +142,26 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   double get smTagSpacing;
   double get rgTagSpacing;
   double get lgTagSpacing;
+  TextStyle get displayTextStyle;
+  TextStyle get h1TextStyle;
+  TextStyle get h2TextStyle;
+  TextStyle get h3TextStyle;
+  TextStyle get h4TextStyle;
+  TextStyle get h5TextStyle;
+  TextStyle get h6TextStyle;
+  TextStyle get linkTextStyle;
+  TextStyle get codeTextStyle;
+  TextStyle get quoteTextStyle;
+  TextStyle get bodyTextStyle;
+  TextStyle get captionTextStyle;
+  Color get primaryTextColor;
+  Color get secondaryTextColor;
+  Color get successTextColor;
+  Color get warningTextColor;
+  Color get infoTextColor;
+  Color get errorTextColor;
+  Color get disabledTextColor;
+  Color get defaultTextColor;
 
   @override
   ThemeToken copyWith({
@@ -278,6 +298,26 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     double? smTagSpacing,
     double? rgTagSpacing,
     double? lgTagSpacing,
+    TextStyle? displayTextStyle,
+    TextStyle? h1TextStyle,
+    TextStyle? h2TextStyle,
+    TextStyle? h3TextStyle,
+    TextStyle? h4TextStyle,
+    TextStyle? h5TextStyle,
+    TextStyle? h6TextStyle,
+    TextStyle? linkTextStyle,
+    TextStyle? codeTextStyle,
+    TextStyle? quoteTextStyle,
+    TextStyle? bodyTextStyle,
+    TextStyle? captionTextStyle,
+    Color? primaryTextColor,
+    Color? secondaryTextColor,
+    Color? successTextColor,
+    Color? warningTextColor,
+    Color? infoTextColor,
+    Color? errorTextColor,
+    Color? disabledTextColor,
+    Color? defaultTextColor,
   }) {
     return ThemeToken(
       defaultCardBackgroundColor:
@@ -486,6 +526,26 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       smTagSpacing: smTagSpacing ?? this.smTagSpacing,
       rgTagSpacing: rgTagSpacing ?? this.rgTagSpacing,
       lgTagSpacing: lgTagSpacing ?? this.lgTagSpacing,
+      displayTextStyle: displayTextStyle ?? this.displayTextStyle,
+      h1TextStyle: h1TextStyle ?? this.h1TextStyle,
+      h2TextStyle: h2TextStyle ?? this.h2TextStyle,
+      h3TextStyle: h3TextStyle ?? this.h3TextStyle,
+      h4TextStyle: h4TextStyle ?? this.h4TextStyle,
+      h5TextStyle: h5TextStyle ?? this.h5TextStyle,
+      h6TextStyle: h6TextStyle ?? this.h6TextStyle,
+      linkTextStyle: linkTextStyle ?? this.linkTextStyle,
+      codeTextStyle: codeTextStyle ?? this.codeTextStyle,
+      quoteTextStyle: quoteTextStyle ?? this.quoteTextStyle,
+      bodyTextStyle: bodyTextStyle ?? this.bodyTextStyle,
+      captionTextStyle: captionTextStyle ?? this.captionTextStyle,
+      primaryTextColor: primaryTextColor ?? this.primaryTextColor,
+      secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
+      successTextColor: successTextColor ?? this.successTextColor,
+      warningTextColor: warningTextColor ?? this.warningTextColor,
+      infoTextColor: infoTextColor ?? this.infoTextColor,
+      errorTextColor: errorTextColor ?? this.errorTextColor,
+      disabledTextColor: disabledTextColor ?? this.disabledTextColor,
+      defaultTextColor: defaultTextColor ?? this.defaultTextColor,
     );
   }
 
@@ -736,6 +796,34 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       smTagSpacing: t < 0.5 ? smTagSpacing : other.smTagSpacing,
       rgTagSpacing: t < 0.5 ? rgTagSpacing : other.rgTagSpacing,
       lgTagSpacing: t < 0.5 ? lgTagSpacing : other.lgTagSpacing,
+      displayTextStyle:
+          TextStyle.lerp(displayTextStyle, other.displayTextStyle, t)!,
+      h1TextStyle: TextStyle.lerp(h1TextStyle, other.h1TextStyle, t)!,
+      h2TextStyle: TextStyle.lerp(h2TextStyle, other.h2TextStyle, t)!,
+      h3TextStyle: TextStyle.lerp(h3TextStyle, other.h3TextStyle, t)!,
+      h4TextStyle: TextStyle.lerp(h4TextStyle, other.h4TextStyle, t)!,
+      h5TextStyle: TextStyle.lerp(h5TextStyle, other.h5TextStyle, t)!,
+      h6TextStyle: TextStyle.lerp(h6TextStyle, other.h6TextStyle, t)!,
+      linkTextStyle: TextStyle.lerp(linkTextStyle, other.linkTextStyle, t)!,
+      codeTextStyle: TextStyle.lerp(codeTextStyle, other.codeTextStyle, t)!,
+      quoteTextStyle: TextStyle.lerp(quoteTextStyle, other.quoteTextStyle, t)!,
+      bodyTextStyle: TextStyle.lerp(bodyTextStyle, other.bodyTextStyle, t)!,
+      captionTextStyle:
+          TextStyle.lerp(captionTextStyle, other.captionTextStyle, t)!,
+      primaryTextColor:
+          Color.lerp(primaryTextColor, other.primaryTextColor, t)!,
+      secondaryTextColor:
+          Color.lerp(secondaryTextColor, other.secondaryTextColor, t)!,
+      successTextColor:
+          Color.lerp(successTextColor, other.successTextColor, t)!,
+      warningTextColor:
+          Color.lerp(warningTextColor, other.warningTextColor, t)!,
+      infoTextColor: Color.lerp(infoTextColor, other.infoTextColor, t)!,
+      errorTextColor: Color.lerp(errorTextColor, other.errorTextColor, t)!,
+      disabledTextColor:
+          Color.lerp(disabledTextColor, other.disabledTextColor, t)!,
+      defaultTextColor:
+          Color.lerp(defaultTextColor, other.defaultTextColor, t)!,
     );
   }
 
@@ -913,7 +1001,27 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(warningTagIconColor, other.warningTagIconColor) &&
             const DeepCollectionEquality().equals(smTagSpacing, other.smTagSpacing) &&
             const DeepCollectionEquality().equals(rgTagSpacing, other.rgTagSpacing) &&
-            const DeepCollectionEquality().equals(lgTagSpacing, other.lgTagSpacing));
+            const DeepCollectionEquality().equals(lgTagSpacing, other.lgTagSpacing) &&
+            const DeepCollectionEquality().equals(displayTextStyle, other.displayTextStyle) &&
+            const DeepCollectionEquality().equals(h1TextStyle, other.h1TextStyle) &&
+            const DeepCollectionEquality().equals(h2TextStyle, other.h2TextStyle) &&
+            const DeepCollectionEquality().equals(h3TextStyle, other.h3TextStyle) &&
+            const DeepCollectionEquality().equals(h4TextStyle, other.h4TextStyle) &&
+            const DeepCollectionEquality().equals(h5TextStyle, other.h5TextStyle) &&
+            const DeepCollectionEquality().equals(h6TextStyle, other.h6TextStyle) &&
+            const DeepCollectionEquality().equals(linkTextStyle, other.linkTextStyle) &&
+            const DeepCollectionEquality().equals(codeTextStyle, other.codeTextStyle) &&
+            const DeepCollectionEquality().equals(quoteTextStyle, other.quoteTextStyle) &&
+            const DeepCollectionEquality().equals(bodyTextStyle, other.bodyTextStyle) &&
+            const DeepCollectionEquality().equals(captionTextStyle, other.captionTextStyle) &&
+            const DeepCollectionEquality().equals(primaryTextColor, other.primaryTextColor) &&
+            const DeepCollectionEquality().equals(secondaryTextColor, other.secondaryTextColor) &&
+            const DeepCollectionEquality().equals(successTextColor, other.successTextColor) &&
+            const DeepCollectionEquality().equals(warningTextColor, other.warningTextColor) &&
+            const DeepCollectionEquality().equals(infoTextColor, other.infoTextColor) &&
+            const DeepCollectionEquality().equals(errorTextColor, other.errorTextColor) &&
+            const DeepCollectionEquality().equals(disabledTextColor, other.disabledTextColor) &&
+            const DeepCollectionEquality().equals(defaultTextColor, other.defaultTextColor));
   }
 
   @override
@@ -1053,6 +1161,26 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(smTagSpacing),
       const DeepCollectionEquality().hash(rgTagSpacing),
       const DeepCollectionEquality().hash(lgTagSpacing),
+      const DeepCollectionEquality().hash(displayTextStyle),
+      const DeepCollectionEquality().hash(h1TextStyle),
+      const DeepCollectionEquality().hash(h2TextStyle),
+      const DeepCollectionEquality().hash(h3TextStyle),
+      const DeepCollectionEquality().hash(h4TextStyle),
+      const DeepCollectionEquality().hash(h5TextStyle),
+      const DeepCollectionEquality().hash(h6TextStyle),
+      const DeepCollectionEquality().hash(linkTextStyle),
+      const DeepCollectionEquality().hash(codeTextStyle),
+      const DeepCollectionEquality().hash(quoteTextStyle),
+      const DeepCollectionEquality().hash(bodyTextStyle),
+      const DeepCollectionEquality().hash(captionTextStyle),
+      const DeepCollectionEquality().hash(primaryTextColor),
+      const DeepCollectionEquality().hash(secondaryTextColor),
+      const DeepCollectionEquality().hash(successTextColor),
+      const DeepCollectionEquality().hash(warningTextColor),
+      const DeepCollectionEquality().hash(infoTextColor),
+      const DeepCollectionEquality().hash(errorTextColor),
+      const DeepCollectionEquality().hash(disabledTextColor),
+      const DeepCollectionEquality().hash(defaultTextColor),
     ]);
   }
 }
@@ -1227,4 +1355,24 @@ extension ThemeTokenBuildContextProps on BuildContext {
   double get smTagSpacing => themeToken.smTagSpacing;
   double get rgTagSpacing => themeToken.rgTagSpacing;
   double get lgTagSpacing => themeToken.lgTagSpacing;
+  TextStyle get displayTextStyle => themeToken.displayTextStyle;
+  TextStyle get h1TextStyle => themeToken.h1TextStyle;
+  TextStyle get h2TextStyle => themeToken.h2TextStyle;
+  TextStyle get h3TextStyle => themeToken.h3TextStyle;
+  TextStyle get h4TextStyle => themeToken.h4TextStyle;
+  TextStyle get h5TextStyle => themeToken.h5TextStyle;
+  TextStyle get h6TextStyle => themeToken.h6TextStyle;
+  TextStyle get linkTextStyle => themeToken.linkTextStyle;
+  TextStyle get codeTextStyle => themeToken.codeTextStyle;
+  TextStyle get quoteTextStyle => themeToken.quoteTextStyle;
+  TextStyle get bodyTextStyle => themeToken.bodyTextStyle;
+  TextStyle get captionTextStyle => themeToken.captionTextStyle;
+  Color get primaryTextColor => themeToken.primaryTextColor;
+  Color get secondaryTextColor => themeToken.secondaryTextColor;
+  Color get successTextColor => themeToken.successTextColor;
+  Color get warningTextColor => themeToken.warningTextColor;
+  Color get infoTextColor => themeToken.infoTextColor;
+  Color get errorTextColor => themeToken.errorTextColor;
+  Color get disabledTextColor => themeToken.disabledTextColor;
+  Color get defaultTextColor => themeToken.defaultTextColor;
 }

@@ -319,6 +319,52 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   @override
   final double lgTagSpacing;
 
+  // Typography
+
+  // // Text Style
+  @override
+  final TextStyle displayTextStyle;
+  @override
+  final TextStyle h1TextStyle;
+  @override
+  final TextStyle h2TextStyle;
+  @override
+  final TextStyle h3TextStyle;
+  @override
+  final TextStyle h4TextStyle;
+  @override
+  final TextStyle h5TextStyle;
+  @override
+  final TextStyle h6TextStyle;
+  @override
+  final TextStyle linkTextStyle;
+  @override
+  final TextStyle codeTextStyle;
+  @override
+  final TextStyle quoteTextStyle;
+  @override
+  final TextStyle bodyTextStyle;
+  @override
+  final TextStyle captionTextStyle;
+
+  // // Text color
+  @override
+  final Color primaryTextColor;
+  @override
+  final Color secondaryTextColor;
+  @override
+  final Color successTextColor;
+  @override
+  final Color warningTextColor;
+  @override
+  final Color infoTextColor;
+  @override
+  final Color errorTextColor;
+  @override
+  final Color disabledTextColor;
+  @override
+  final Color defaultTextColor;
+
   const ThemeToken({
     required this.filledStandardButtonColor,
     required this.filledPrimaryButtonColor,
@@ -453,5 +499,25 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.lgTagSpacing,
     required this.smTagSpacing,
     required this.rgTagSpacing,
+    required this.primaryTextColor,
+    required this.secondaryTextColor,
+    required this.successTextColor,
+    required this.warningTextColor,
+    required this.infoTextColor,
+    required this.errorTextColor,
+    required this.disabledTextColor,
+    required this.defaultTextColor,
+    required this.displayTextStyle,
+    required this.bodyTextStyle,
+    required this.h1TextStyle,
+    required this.h2TextStyle,
+    required this.h3TextStyle,
+    required this.h4TextStyle,
+    required this.h5TextStyle,
+    required this.h6TextStyle,
+    required this.quoteTextStyle,
+    required this.codeTextStyle,
+    required this.linkTextStyle,
+    required this.captionTextStyle,
   });
 }

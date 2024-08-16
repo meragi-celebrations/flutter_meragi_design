@@ -155,4 +155,28 @@ ThemeToken lightWide = ThemeToken(
   smTagSpacing: 3,
   rgTagSpacing: 4,
   lgTagSpacing: 5,
+
+  // Text
+  displayTextStyle: const TextStyle(fontSize: 24),
+  h1TextStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+  h2TextStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  h3TextStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  h4TextStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+  h5TextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+  bodyTextStyle: const TextStyle(fontSize: 14),
+  h6TextStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+  captionTextStyle: const TextStyle(fontSize: 10, color: Colors.grey),
+  codeTextStyle: const TextStyle(
+      fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
+  quoteTextStyle: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+  linkTextStyle: const TextStyle(
+      fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
+  primaryTextColor: Colors.deepPurple,
+  secondaryTextColor: Colors.deepPurpleAccent,
+  successTextColor: Colors.green,
+  warningTextColor: Colors.orange,
+  infoTextColor: Colors.blue,
+  errorTextColor: Colors.redAccent,
+  disabledTextColor: Colors.grey,
+  defaultTextColor: Colors.black,
 );
