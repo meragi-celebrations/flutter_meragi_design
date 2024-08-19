@@ -64,22 +64,19 @@ ThemeToken light = ThemeToken(
   ),
   filledStandardHoverButtonColor: Colors.deepPurple[100]!.withOpacity(0.7),
   filledPrimaryHoverButtonColor: Colors.deepPurple.withOpacity(0.7),
-  filledSecondaryHoverButtonColor:
-      Colors.deepPurpleAccent[100]!.withOpacity(0.7),
+  filledSecondaryHoverButtonColor: Colors.deepPurpleAccent[100]!.withOpacity(0.7),
   filledWarningHoverButtonColor: Colors.redAccent[100]!.withOpacity(0.7),
   filledDangerHoverButtonColor: Colors.redAccent.withOpacity(0.7),
   filledInfoHoverButtonColor: Colors.blue.withOpacity(0.7),
   outlineStandardHoverButtonColor: Colors.deepPurple[100]!.withOpacity(0.3),
   outlinePrimaryHoverButtonColor: Colors.deepPurple.withOpacity(0.3),
-  outlineSecondaryHoverButtonColor:
-      Colors.deepPurpleAccent[100]!.withOpacity(0.3),
+  outlineSecondaryHoverButtonColor: Colors.deepPurpleAccent[100]!.withOpacity(0.3),
   outlineWarningHoverButtonColor: Colors.redAccent[100]!.withOpacity(0.3),
   outlineDangerHoverButtonColor: Colors.redAccent.withOpacity(0.3),
   outlineInfoHoverButtonColor: Colors.blue.withOpacity(0.3),
   ghostStandardHoverButtonColor: Colors.deepPurple[100]!.withOpacity(0.3),
   ghostPrimaryHoverButtonColor: Colors.deepPurple.withOpacity(0.3),
-  ghostSecondaryHoverButtonColor:
-      Colors.deepPurpleAccent[100]!.withOpacity(0.3),
+  ghostSecondaryHoverButtonColor: Colors.deepPurpleAccent[100]!.withOpacity(0.3),
   ghostWarningHoverButtonColor: Colors.redAccent[100]!.withOpacity(0.3),
   ghostDangerHoverButtonColor: Colors.redAccent.withOpacity(0.3),
   ghostInfoHoverButtonColor: Colors.blue.withOpacity(0.3),
@@ -87,8 +84,7 @@ ThemeToken light = ThemeToken(
   //Card
   defaultCardBackgroundColor: Colors.white,
   primaryCardBackgroundColor: Colors.deepPurple.shade100.withOpacity(.3),
-  secondaryCardBackgroundColor:
-      Colors.deepPurpleAccent.shade100.withOpacity(.3),
+  secondaryCardBackgroundColor: Colors.deepPurpleAccent.shade100.withOpacity(.3),
   dangerCardBackgroundColor: Colors.redAccent.shade100.withOpacity(.3),
   successCardBackgroundColor: Colors.green.shade100.withOpacity(.3),
   warningCardBackgroundColor: Colors.orange.shade100.withOpacity(.3),

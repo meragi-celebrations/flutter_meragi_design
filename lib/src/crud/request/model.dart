@@ -1,38 +1,26 @@
-abstract class CRUDModel {
-  CRUDModel fromJson(dynamic json);
-
-  Map<String, dynamic> toJson();
-}
-
-class PaginatedResponse<T> {
-  PaginatedResponse({
-    this.count,
-    this.next,
-    this.previous,
-    this.results,
+class ListResponse<T> {
+  ListResponse({
+    required this.count,
+    required this.url,
+    required this.result,
   });
 
-  PaginatedResponse.fromJson(dynamic json, T? data) {
+  ListResponse.fromJson(dynamic json, T data) {
     count = json['count'];
-    next = json['next'];
-    previous = json['previous'];
+    url = json['url'];
     if (json['results'] != null) {
-      results = data;
+      result = data;
     }
   }
-  num? count;
-  String? next;
-  String? previous;
-  T? results;
+  late num count;
+  late String url;
+  late T result;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['count'] = count;
-    map['next'] = next;
-    map['previous'] = previous;
-    // if (results != null) {
-    //   map['results'] = results?.map((v) => v.toJson()).toList();
-    // }
+    map['url'] = url;
+    map['results'] = result;
     return map;
   }
 }
