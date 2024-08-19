@@ -25,93 +25,122 @@ class MDCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeToken token = MeragiTheme.of(context).token;
-
-    Color backgroundColor(ThemeToken token) {
-      switch (type) {
-        case CardType.primary:
-          return token.primaryCardBackgroundColor;
-        case CardType.secondary:
-          return token.secondaryCardBackgroundColor;
-        case CardType.danger:
-          return token.dangerCardBackgroundColor;
-        case CardType.success:
-          return token.successCardBackgroundColor;
-        case CardType.warning:
-          return token.warningCardBackgroundColor;
-        default:
-          return token.defaultCardBackgroundColor;
-      }
-    }
-
-    Color borderColor(ThemeToken token) {
-      switch (type) {
-        case CardType.primary:
-          return token.primaryCardBorderColor;
-        case CardType.secondary:
-          return token.secondaryCardBorderColor;
-        case CardType.danger:
-          return token.dangerCardBorderColor;
-        case CardType.success:
-          return token.successCardBorderColor;
-        case CardType.warning:
-          return token.warningCardBorderColor;
-        default:
-          return token.defaultCardBorderColor;
-      }
-    }
-
-    double borderRadius(ThemeToken token) {
-      switch (size) {
-        case CardSize.sm:
-          return token.smCardBorderRadius;
-        case CardSize.rg:
-          return token.rgCardBorderRadius;
-        case CardSize.lg:
-          return token.lgCardBorderRadius;
-      }
-    }
-
-    EdgeInsets padding(ThemeToken token) {
-      switch (size) {
-        case CardSize.sm:
-          return token.smCardPadding;
-        case CardSize.rg:
-          return token.rgCardPadding;
-        case CardSize.lg:
-          return token.lgCardPadding;
-      }
-    }
-
+    CardDecoration cardDecoration = CardDecoration(
+      context: context,
+      type: type,
+      size: size,
+    );
     return Container(
       width: double.infinity,
-      padding: padding(token),
-      decoration: BoxDecoration(
-        color: backgroundColor(token),
-        border: Border.all(
-          width: 1,
-          color: borderColor(token),
-        ),
-        borderRadius: BorderRadius.circular(borderRadius(token)),
-      ),
+      padding: cardDecoration.padding,
+      decoration: CardDecoration(
+        context: context,
+        type: type,
+        size: size,
+      ).decoration,
       child: Column(
         crossAxisAlignment: alignment,
         children: [
           header ?? const SizedBox.shrink(),
           if (header != null)
             Divider(
-              height: token.cardDividerHeight,
-              thickness: token.cardDividerThickness,
+              height: cardDecoration.dividerHeight,
+              thickness: cardDecoration.dividerThickness,
             ),
           body,
           if (footer != null)
             Divider(
-              height: token.cardDividerHeight,
-              thickness: token.cardDividerThickness,
+              height: cardDecoration.dividerHeight,
+              thickness: cardDecoration.dividerThickness,
             ),
           footer ?? const SizedBox.shrink(),
         ],
       ),
     );
+  }
+}
+
+class CardDecoration {
+  final BuildContext context;
+  final CardType type;
+  final CardSize size;
+
+  CardDecoration(
+      {required this.context, required this.type, required this.size})
+      : assert(context != null, 'context cannot be null'),
+        assert(type != null, 'type cannot be null'),
+        assert(size != null, 'size cannot be null');
+
+  ThemeToken get token => MeragiTheme.of(context).token;
+
+  EdgeInsets get padding {
+    switch (size) {
+      case CardSize.sm:
+        return token.smCardPadding;
+      case CardSize.rg:
+        return token.rgCardPadding;
+      case CardSize.lg:
+        return token.lgCardPadding;
+    }
+  }
+
+  BoxDecoration get decoration {
+    return BoxDecoration(
+      color: backgroundColor,
+      border: Border.all(
+        width: 1,
+        color: borderColor,
+      ),
+      borderRadius: BorderRadius.circular(borderRadius),
+    );
+  }
+
+  double get borderRadius {
+    switch (size) {
+      case CardSize.sm:
+        return token.smCardBorderRadius;
+      case CardSize.rg:
+        return token.rgCardBorderRadius;
+      case CardSize.lg:
+        return token.lgCardBorderRadius;
+    }
+  }
+
+  double get dividerHeight => token.cardDividerHeight;
+
+  double get dividerThickness => token.cardDividerThickness;
+
+  Color get borderColor {
+    switch (type) {
+      case CardType.primary:
+        return token.primaryCardBorderColor;
+      case CardType.secondary:
+        return token.secondaryCardBorderColor;
+      case CardType.danger:
+        return token.dangerCardBorderColor;
+      case CardType.success:
+        return token.successCardBorderColor;
+      case CardType.warning:
+        return token.warningCardBorderColor;
+      default:
+        return token.defaultCardBorderColor;
+    }
+  }
+
+  Color get backgroundColor {
+    switch (type) {
+      case CardType.primary:
+        return token.primaryCardBackgroundColor;
+      case CardType.secondary:
+        return token.secondaryCardBackgroundColor;
+      case CardType.danger:
+        return token.dangerCardBackgroundColor;
+      case CardType.success:
+        return token.successCardBackgroundColor;
+      case CardType.warning:
+        return token.warningCardBackgroundColor;
+      default:
+        return token.defaultCardBackgroundColor;
+    }
   }
 }
