@@ -23,7 +23,14 @@ class MyApp extends StatelessWidget {
     return MeragiTheme(
       token: isPlatform([MeragiPlatform.android, MeragiPlatform.ios])
           ? light
-          : lightWide,
+          : lightWide.copyWithColors(
+              primary: Colors.deepPurple,
+              success: Colors.green,
+              error: Colors.redAccent,
+              warning: Colors.orange,
+              info: Colors.blue,
+              secondary: Colors.deepPurpleAccent.shade100,
+            ),
       child: MaterialApp(
         title: 'Flutter Meragi Design',
         theme: ThemeData(

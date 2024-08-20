@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
+import '../extensions/colors.dart';
+
 part 'theme_tokens.tailor.dart';
 
 @TailorMixin()
@@ -520,4 +522,81 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.linkTextStyle,
     required this.captionTextStyle,
   });
+
+  ThemeToken copyWithColors({
+    Color? primary,
+    Color? secondary,
+    Color? success,
+    Color? warning,
+    Color? info,
+    Color? error,
+  }) {
+    return copyWith(
+      // Card
+      // Background color
+      primaryCardBackgroundColor: primary?.lighten(80),
+      secondaryCardBackgroundColor: secondary?.lighten(80),
+      successCardBackgroundColor: success?.lighten(80),
+      warningCardBackgroundColor: warning?.lighten(80),
+      dangerCardBackgroundColor: error?.lighten(80),
+
+      // // Border Color
+      primaryCardBorderColor: primary?.lighten(40),
+      secondaryCardBorderColor: secondary?.lighten(40),
+      successCardBorderColor: success?.lighten(40),
+      warningCardBorderColor: warning?.lighten(40),
+      dangerCardBorderColor: error?.lighten(40),
+
+      // Button
+      // // Filled Background color
+      filledPrimaryButtonColor: primary,
+      filledSecondaryButtonColor: secondary,
+      filledWarningButtonColor: warning,
+      filledInfoButtonColor: info,
+      filledDangerButtonColor: error,
+
+      // // Filled hover colors
+      filledPrimaryHoverButtonColor: primary?.darken(20),
+      filledSecondaryHoverButtonColor: secondary?.darken(20),
+      filledWarningHoverButtonColor: warning?.darken(20),
+      filledInfoHoverButtonColor: info?.darken(20),
+      filledDangerHoverButtonColor: error?.darken(20),
+
+      // // Outline border color
+      outlinePrimaryBorderButtonColor: primary,
+      outlineSecondaryBorderButtonColor: secondary,
+      outlineWarningBorderButtonColor: warning,
+      outlineInfoBorderButtonColor: info,
+      outlineDangerBorderButtonColor: error,
+
+      // // Outline hover colors
+      outlinePrimaryHoverButtonColor: primary?.lighten(75),
+      outlineSecondaryHoverButtonColor: secondary?.lighten(75),
+      outlineWarningHoverButtonColor: warning?.lighten(75),
+      outlineInfoHoverButtonColor: info?.lighten(75),
+      outlineDangerHoverButtonColor: error?.lighten(75),
+
+      // // Ghost button color
+      ghostPrimaryButtonIconColor: primary,
+      ghostSecondaryButtonIconColor: secondary,
+      ghostWarningButtonIconColor: warning,
+      ghostInfoButtonIconColor: info,
+      ghostDangerButtonIconColor: error,
+
+      // // Ghost hover colors
+      ghostPrimaryHoverButtonColor: primary?.lighten(75),
+      ghostSecondaryHoverButtonColor: secondary?.lighten(75),
+      ghostWarningHoverButtonColor: warning?.lighten(75),
+      ghostInfoHoverButtonColor: info?.lighten(75),
+      ghostDangerHoverButtonColor: error?.lighten(75),
+
+      // typography
+      primaryTextColor: primary,
+      secondaryTextColor: secondary,
+      successTextColor: success,
+      warningTextColor: warning,
+      infoTextColor: info,
+      errorTextColor: error,
+    );
+  }
 }

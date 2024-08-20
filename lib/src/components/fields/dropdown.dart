@@ -5,7 +5,7 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import './extensions.dart';
+import '../../extensions/validators.dart';
 
 /// Field for Dropdown button
 class MDDropdown<T> extends MDFormBuilderField<T> {
@@ -342,9 +342,10 @@ class MDDropdown<T> extends MDFormBuilderField<T> {
                         ],
                       ),
                     ),
-                    const PhosphorIcon(
+                    PhosphorIcon(
                       PhosphorIconsRegular.caretDown,
-                      size: 14,
+                      size:
+                          MeragiTheme.of(state.context).token.smButtonIconSize,
                     ),
                     const SizedBox(
                       width: 8,
@@ -353,39 +354,6 @@ class MDDropdown<T> extends MDFormBuilderField<T> {
                 )),
               ),
             );
-
-            // return DropdownButtonFormField<T>(
-            // isExpanded: isExpanded,
-            // decoration: finalDecoration,
-            // items: items,
-            // value: hasValue ? field.value : null,
-            // style: style,
-            // isDense: isDense,
-            // disabledHint: hasValue
-            //     ? items
-            //         .firstWhere(
-            //             (dropDownItem) => dropDownItem.value == field.value)
-            //         .child
-            //     : disabledHint,
-            // elevation: elevation,
-            // iconSize: iconSize,
-            // icon: icon,
-            // iconDisabledColor: iconDisabledColor,
-            // iconEnabledColor: iconEnabledColor,
-            // onChanged:
-            //     state.enabled ? (T? value) => state.didChange(value) : null,
-            // onTap: onTap,
-            // focusNode: state.effectiveFocusNode,
-            // autofocus: autofocus,
-            // dropdownColor: dropdownColor,
-            // focusColor: focusColor,
-            // itemHeight: itemHeight,
-            // selectedItemBuilder: selectedItemBuilder,
-            // menuMaxHeight: menuMaxHeight,
-            // borderRadius: borderRadius,
-            // enableFeedback: enableFeedback,
-            // alignment: alignment,
-            // );
           },
         );
 
