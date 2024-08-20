@@ -323,39 +323,34 @@ class MDDropdown<T> extends MDFormBuilderField<T> {
                 enableFeedback: enableFeedback,
                 alignment: alignment,
                 iconStyleData: IconStyleData(
-                  icon: (!hasValue || !isClearable)
-                      ? const Row(
-                          children: [
-                            PhosphorIcon(
-                              PhosphorIconsRegular.caretDown,
-                              size: 14,
-                            ),
-                            SizedBox(
-                              width: 8,
-                            )
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            Button(
-                              variant: ButtonVariant.ghost,
-                              size: ButtonSize.sm,
-                              icon: PhosphorIconsRegular.x,
-                              onTap: () {
-                                state.didChange(null);
-                              },
-                            ),
-                            const VerticalDivider(),
-                            const PhosphorIcon(
-                              PhosphorIconsRegular.caretDown,
-                              size: 14,
-                            ),
-                            const SizedBox(
-                              width: 8,
-                            )
-                          ],
-                        ),
-                ),
+                    icon: Row(
+                  children: [
+                    AnimatedOpacity(
+                      opacity: (hasValue && isClearable) ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Row(
+                        children: [
+                          Button(
+                            variant: ButtonVariant.ghost,
+                            size: ButtonSize.sm,
+                            icon: PhosphorIconsRegular.x,
+                            onTap: () {
+                              state.didChange(null);
+                            },
+                          ),
+                          const VerticalDivider(),
+                        ],
+                      ),
+                    ),
+                    const PhosphorIcon(
+                      PhosphorIconsRegular.caretDown,
+                      size: 14,
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    )
+                  ],
+                )),
               ),
             );
 
