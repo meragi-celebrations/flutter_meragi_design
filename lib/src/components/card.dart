@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
+import 'package:flutter_meragi_design/src/theme/style.dart';
 
 enum CardType { defaultType, primary, secondary, danger, success, warning }
 
@@ -60,8 +59,7 @@ class MDCard extends StatelessWidget {
   }
 }
 
-class CardDecoration {
-  final BuildContext context;
+class CardDecoration extends Style {
   final CardType type;
   final CardSize size;
 
@@ -74,7 +72,7 @@ class CardDecoration {
   final double? borderWidthOverride;
 
   CardDecoration({
-    required this.context,
+    required super.context,
     required this.type,
     required this.size,
     this.paddingOverride,
@@ -86,22 +84,45 @@ class CardDecoration {
     this.borderWidthOverride,
   });
 
-  ThemeToken get token => MeragiTheme.of(context).token;
-
-  EdgeInsets get padding {
-    if (paddingOverride != null) {
-      return paddingOverride!;
-    }
-
-    switch (size) {
-      case CardSize.sm:
-        return token.smCardPadding;
-      case CardSize.rg:
-        return token.rgCardPadding;
-      case CardSize.lg:
-        return token.lgCardPadding;
-    }
-  }
+  @override
+  Map get styles => {
+        CardSize.sm: {
+          "padding": token.smCardPadding,
+          "BorderRadius": token.smCardBorderRadius,
+        },
+        CardSize.rg: {
+          "padding": token.rgCardPadding,
+          "BorderRadius": token.rgCardBorderRadius,
+        },
+        CardSize.lg: {
+          "padding": token.lgCardPadding,
+          "BorderRadius": token.lgCardBorderRadius,
+        },
+        CardType.primary: {
+          "backgroundColor": token.primaryCardBackgroundColor,
+          "borderColor": token.primaryCardBorderColor,
+        },
+        CardType.secondary: {
+          "backgroundColor": token.secondaryCardBackgroundColor,
+          "borderColor": token.secondaryCardBorderColor,
+        },
+        CardType.danger: {
+          "backgroundColor": token.dangerCardBackgroundColor,
+          "borderColor": token.dangerCardBorderColor,
+        },
+        CardType.success: {
+          "backgroundColor": token.successCardBackgroundColor,
+          "borderColor": token.successCardBorderColor,
+        },
+        CardType.warning: {
+          "backgroundColor": token.warningCardBackgroundColor,
+          "borderColor": token.warningCardBorderColor,
+        },
+        CardType.defaultType: {
+          "backgroundColor": token.defaultCardBackgroundColor,
+          "borderColor": token.defaultCardBorderColor,
+        }
+      };
 
   BoxDecoration get decoration {
     return BoxDecoration(
@@ -114,86 +135,22 @@ class CardDecoration {
     );
   }
 
-  double get borderRadius {
-    if (borderRadiusOverride != null) {
-      return borderRadiusOverride!;
-    }
+  EdgeInsets get padding => paddingOverride ?? getStyle(size, 'padding');
 
-    switch (size) {
-      case CardSize.sm:
-        return token.smCardBorderRadius;
-      case CardSize.rg:
-        return token.rgCardBorderRadius;
-      case CardSize.lg:
-        return token.lgCardBorderRadius;
-    }
-  }
+  double get borderRadius =>
+      borderRadiusOverride ?? getStyle(size, "BorderRadius");
 
-  Color get backgroundColor {
-    if (backgroundColorOverride != null) {
-      return backgroundColorOverride!;
-    }
+  Color get backgroundColor =>
+      backgroundColorOverride ?? getStyle(type, "backgroundColor");
 
-    switch (type) {
-      case CardType.primary:
-        return token.primaryCardBackgroundColor;
-      case CardType.secondary:
-        return token.secondaryCardBackgroundColor;
-      case CardType.danger:
-        return token.dangerCardBackgroundColor;
-      case CardType.success:
-        return token.successCardBackgroundColor;
-      case CardType.warning:
-        return token.warningCardBackgroundColor;
-      default:
-        return token.defaultCardBackgroundColor;
-    }
-  }
+  Color get borderColor => borderColorOverride ?? getStyle(type, "borderColor");
 
-  Color get borderColor {
-    if (borderColorOverride != null) {
-      return borderColorOverride!;
-    }
+  double get borderWidth => borderWidthOverride ?? token.cardBorderWidth;
 
-    switch (type) {
-      case CardType.primary:
-        return token.primaryCardBorderColor;
-      case CardType.secondary:
-        return token.secondaryCardBorderColor;
-      case CardType.danger:
-        return token.dangerCardBorderColor;
-      case CardType.success:
-        return token.successCardBorderColor;
-      case CardType.warning:
-        return token.warningCardBorderColor;
-      default:
-        return token.defaultCardBorderColor;
-    }
-  }
+  double get dividerHeight => dividerHeightOverride ?? token.cardDividerHeight;
 
-  double get borderWidth {
-    if (borderWidthOverride != null) {
-      return borderWidthOverride!;
-    }
-
-    return token.cardBorderWidth;
-  }
-
-  double get dividerHeight {
-    if (dividerHeightOverride != null) {
-      return dividerHeightOverride!;
-    }
-
-    return token.cardDividerHeight;
-  }
-
-  double get dividerThickness {
-    if (dividerThicknessOverride != null) {
-      return dividerThicknessOverride!;
-    }
-
-    return token.cardDividerThickness;
-  }
+  double get dividerThickness =>
+      dividerThicknessOverride ?? token.cardDividerThickness;
 
   CardDecoration copyWith({
     BuildContext? context,
