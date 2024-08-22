@@ -6,7 +6,7 @@ import 'package:flutter_meragi_design/src/utils/map.dart';
 class Style {
   final BuildContext context;
 
-  Style({required this.context});
+  const Style({required this.context});
 
   ThemeToken get token => MeragiTheme.of(context).token;
 

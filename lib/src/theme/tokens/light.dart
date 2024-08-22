@@ -45,7 +45,7 @@ ThemeToken light = ThemeToken(
   dangerCardBackgroundColor: Colors.redAccent.shade100.withOpacity(.3),
   successCardBackgroundColor: Colors.green.shade100.withOpacity(.3),
   warningCardBackgroundColor: Colors.orange.shade100.withOpacity(.3),
-  defaultCardBorderColor: Colors.black,
+  defaultCardBorderColor: Colors.grey[300]!,
   primaryCardBorderColor: Colors.deepPurple,
   secondaryCardBorderColor: Colors.deepPurpleAccent,
   dangerCardBorderColor: Colors.redAccent,

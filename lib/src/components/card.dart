@@ -9,29 +9,23 @@ class MDCard extends StatelessWidget {
   final Widget? header;
   final Widget body;
   final Widget? footer;
-  final CardType type;
-  final CardSize size;
   final CrossAxisAlignment alignment;
-  final CardDecoration? cardDecoration;
+  final CardDecoration? decoration;
 
   const MDCard({
     super.key,
     this.header,
     required this.body,
     this.footer,
-    this.type = CardType.defaultType,
-    this.size = CardSize.rg,
     this.alignment = CrossAxisAlignment.center,
-    this.cardDecoration,
+    this.decoration,
   });
 
   @override
   Widget build(BuildContext context) {
     CardDecoration finalCardDecoration = CardDecoration(
       context: context,
-      type: type,
-      size: size,
-    ).merge(cardDecoration);
+    ).merge(decoration);
 
     return Container(
       width: double.infinity,
@@ -71,10 +65,10 @@ class CardDecoration extends Style {
   final double? dividerThicknessOverride;
   final double? borderWidthOverride;
 
-  CardDecoration({
+  const CardDecoration({
     required super.context,
-    required this.type,
-    required this.size,
+    this.type = CardType.defaultType,
+    this.size = CardSize.rg,
     this.paddingOverride,
     this.backgroundColorOverride,
     this.borderColorOverride,

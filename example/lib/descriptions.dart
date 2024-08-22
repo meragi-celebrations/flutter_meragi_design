@@ -15,13 +15,16 @@ class _DescriptionDetailsState extends State<DescriptionDetails> {
       appBar: AppBar(
         title: const Text("Tags"),
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             MDCard(
-              type: CardType.primary,
-              header: Text("Min COlumn: 2, Max Column: 5, Horizontal"),
-              body: MDDescription(
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.primary,
+              ),
+              header: const Text("Min COlumn: 2, Max Column: 5, Horizontal"),
+              body: const MDDescription(
                 data: [
                   {
                     'label': Text('Label 1'),
@@ -53,9 +56,12 @@ class _DescriptionDetailsState extends State<DescriptionDetails> {
               ),
             ),
             MDCard(
-              type: CardType.success,
-              header: Text("Min COlumn: 2, Max Column: 5, Vertical"),
-              body: MDDescription(
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.success,
+              ),
+              header: const Text("Min COlumn: 2, Max Column: 5, Vertical"),
+              body: const MDDescription(
                 data: [
                   {
                     'label': Text('Label 1'),
@@ -88,9 +94,12 @@ class _DescriptionDetailsState extends State<DescriptionDetails> {
               ),
             ),
             MDCard(
-              type: CardType.danger,
-              header: Text("Min COlumn: 1, Max Column: 3, Vertical"),
-              body: MDDescription(
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.danger,
+              ),
+              header: const Text("Min COlumn: 1, Max Column: 3, Vertical"),
+              body: const MDDescription(
                 data: [
                   {
                     'label': Text('Label 1'),
