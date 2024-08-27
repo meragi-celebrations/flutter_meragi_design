@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/crud/request/cache.dart';
@@ -258,9 +256,17 @@ class GetOneBloc<T> extends BaseBloc<T> {
     customFilters.removeAt(index);
   }
 
-  get() async {
+  String getKey(String url, List<Map<String, String>> filters) {
+    Map<String, String> data = {};
+    if (filters.isNotEmpty) {
+      data.addAll(parseFilterListToMap(filters));
+    }
+    return url + Uri(queryParameters: data).query;
+  }
+
+  get({String? customUrl}) async {
     try {
-      String key = "$url${id.value}${json.encode(customFilters)}";
+      String key = getKey(customUrl ?? "$url${id.value}", customFilters);
 
       var cachedResponse = cache.get(key);
 
@@ -270,7 +276,13 @@ class GetOneBloc<T> extends BaseBloc<T> {
         requestState.value = RequestState.fetching;
         handleResponse(cachedResponse);
       }
-      var res = await repo.getOne(url!, id.value, filters: customFilters);
+      dynamic res;
+      if (customUrl != null) {
+        res = await repo.custom(customUrl, filters: customFilters);
+      } else {
+        res = await repo.getOne(url!, id.value, filters: customFilters);
+      }
+
       cache.put(key, res);
       handleResponse(res);
       onSuccess?.call(response.value);

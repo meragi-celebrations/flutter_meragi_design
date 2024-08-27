@@ -79,7 +79,10 @@ class _CrudMainState extends State<CrudMain> {
         children: [
           const Text("Get One"),
           Button(
-            type: ButtonType.primary,
+            decoration: ButtonDecoration(
+              context: context,
+              type: ButtonType.primary,
+            ),
             onTap: () {
               getOneBloc.get();
             },
@@ -109,7 +112,10 @@ class _CrudMainState extends State<CrudMain> {
           ),
           const Text("Get List"),
           Button(
-            type: ButtonType.primary,
+            decoration: ButtonDecoration(
+              context: context,
+              type: ButtonType.primary,
+            ),
             onTap: () {
               getListBloc.get();
             },

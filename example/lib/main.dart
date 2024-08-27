@@ -1,7 +1,9 @@
 import 'package:example/cards.dart';
 import 'package:example/crud_main.dart';
 import 'package:example/descriptions.dart';
+import 'package:example/fields.dart';
 import 'package:example/tags.dart';
+import 'package:example/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
@@ -21,7 +23,14 @@ class MyApp extends StatelessWidget {
     return MeragiTheme(
       token: isPlatform([MeragiPlatform.android, MeragiPlatform.ios])
           ? light
-          : lightWide,
+          : lightWide.copyWithColors(
+              primary: Colors.lime,
+              success: Colors.green,
+              error: Colors.redAccent,
+              warning: Colors.orange,
+              info: Colors.blue,
+              secondary: Colors.deepPurpleAccent.shade100,
+            ),
       child: MaterialApp(
         title: 'Flutter Meragi Design',
         theme: ThemeData(
@@ -93,6 +102,18 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
+                  builder: (context) => const TypographyDetails(),
+                ),
+              );
+            },
+            // expand: true,
+            child: const Text("Typography"),
+          ),
+          Button(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
                   builder: (context) => const ButtonsDetails(),
                 ),
               );
@@ -135,6 +156,18 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             // expand: true,
             child: const Text("Descriptions"),
+          ),
+          Button(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FieldDetails(),
+                ),
+              );
+            },
+            // expand: true,
+            child: const Text("Fields"),
           ),
           Button(
             onTap: () {

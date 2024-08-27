@@ -11,7 +11,7 @@ class ExampleRepo extends MDRepository {
   }
 
   @override
-  Future custom(id) {
+  Future custom(url, {List<Map<String, String>> filters = const []}) {
     // TODO: implement custom
     throw UnimplementedError();
   }

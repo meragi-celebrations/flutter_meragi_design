@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
+import '../extensions/colors.dart';
+
 part 'theme_tokens.tailor.dart';
 
 @TailorMixin()
@@ -62,33 +64,44 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   // Button
   // // Button Colors
   @override
-  final Color filledStandardButtonColor;
+  final Color standardButtonColor;
   @override
-  final Color filledPrimaryButtonColor;
+  final Color primaryButtonColor;
   @override
-  final Color filledSecondaryButtonColor;
+  final Color secondaryButtonColor;
   @override
-  final Color filledDangerButtonColor;
+  final Color dangerButtonColor;
   @override
-  final Color filledInfoButtonColor;
+  final Color infoButtonColor;
   @override
-  final Color filledWarningButtonColor;
+  final Color warningButtonColor;
+
+  // // Hover Color
+  @override
+  final Color standardHoverButtonColor;
+  @override
+  final Color primaryHoverButtonColor;
+  @override
+  final Color secondaryHoverButtonColor;
+  @override
+  final Color warningHoverButtonColor;
+  @override
+  final Color dangerHoverButtonColor;
+  @override
+  final Color infoHoverButtonColor;
 
   @override
-  final Color outlineBackgroundColor;
-
+  final Color standardFilledHoverButtonColor;
   @override
-  final Color outlineStandardBorderButtonColor;
+  final Color primaryFilledHoverButtonColor;
   @override
-  final Color outlinePrimaryBorderButtonColor;
+  final Color secondaryFilledHoverButtonColor;
   @override
-  final Color outlineSecondaryBorderButtonColor;
+  final Color dangerFilledHoverButtonColor;
   @override
-  final Color outlineDangerBorderButtonColor;
+  final Color infoFilledHoverButtonColor;
   @override
-  final Color outlineInfoBorderButtonColor;
-  @override
-  final Color outlineWarningBorderButtonColor;
+  final Color warningFilledHoverButtonColor;
 
   // //Button Sizes
   @override
@@ -127,86 +140,29 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final double lgButtonIconSize;
 
   @override
-  final Color filledStandardButtonIconColor;
+  final Color disabledButtonColor;
   @override
-  final Color filledPrimaryButtonIconColor;
-  @override
-  final Color filledSecondaryButtonIconColor;
-  @override
-  final Color filledDangerButtonIconColor;
-  @override
-  final Color filledInfoButtonIconColor;
-  @override
-  final Color filledWarningButtonIconColor;
+  final Color disabledTextColor;
 
   @override
-  final Color ghostStandardButtonIconColor;
+  final Color standardButtonTextColor;
   @override
-  final Color ghostPrimaryButtonIconColor;
+  final Color primaryButtonTextColor;
   @override
-  final Color ghostSecondaryButtonIconColor;
+  final Color secondaryButtonTextColor;
   @override
-  final Color ghostDangerButtonIconColor;
+  final Color dangerButtonTextColor;
   @override
-  final Color ghostInfoButtonIconColor;
+  final Color infoButtonTextColor;
   @override
-  final Color ghostWarningButtonIconColor;
+  final Color warningButtonTextColor;
 
   @override
-  final Color filledDisabledButtonColor;
+  final double smButtonTextHeight;
   @override
-  final Color ghostDisabledButtonColor;
+  final double rgButtonTextHeight;
   @override
-  final Color outlinedDisabledButtonColor;
-  @override
-  final Color outlinedDisabledBorderButtonColor;
-
-  @override
-  final Color disabledIconButtonColor;
-
-  @override
-  final TextStyle smButtonTextStyle;
-  @override
-  final TextStyle rgButtonTextStyle;
-  @override
-  final TextStyle lgButtonTextStyle;
-
-  @override
-  final Color filledStandardHoverButtonColor;
-  @override
-  final Color filledPrimaryHoverButtonColor;
-  @override
-  final Color filledSecondaryHoverButtonColor;
-  @override
-  final Color filledDangerHoverButtonColor;
-  @override
-  final Color filledInfoHoverButtonColor;
-  @override
-  final Color filledWarningHoverButtonColor;
-  @override
-  final Color outlineStandardHoverButtonColor;
-  @override
-  final Color outlinePrimaryHoverButtonColor;
-  @override
-  final Color outlineSecondaryHoverButtonColor;
-  @override
-  final Color outlineDangerHoverButtonColor;
-  @override
-  final Color outlineInfoHoverButtonColor;
-  @override
-  final Color outlineWarningHoverButtonColor;
-  @override
-  final Color ghostStandardHoverButtonColor;
-  @override
-  final Color ghostPrimaryHoverButtonColor;
-  @override
-  final Color ghostSecondaryHoverButtonColor;
-  @override
-  final Color ghostDangerHoverButtonColor;
-  @override
-  final Color ghostInfoHoverButtonColor;
-  @override
-  final Color ghostWarningHoverButtonColor;
+  final double lgButtonTextHeight;
 
   //Tag
 
@@ -319,20 +275,73 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   @override
   final double lgTagSpacing;
 
+  // Typography
+
+  // // Text Style
+  @override
+  final TextStyle displayTextStyle;
+  @override
+  final TextStyle h1TextStyle;
+  @override
+  final TextStyle h2TextStyle;
+  @override
+  final TextStyle h3TextStyle;
+  @override
+  final TextStyle h4TextStyle;
+  @override
+  final TextStyle h5TextStyle;
+  @override
+  final TextStyle h6TextStyle;
+  @override
+  final TextStyle linkTextStyle;
+  @override
+  final TextStyle codeTextStyle;
+  @override
+  final TextStyle quoteTextStyle;
+  @override
+  final TextStyle bodyTextStyle;
+  @override
+  final TextStyle captionTextStyle;
+
+  // // Text color
+  @override
+  final Color primaryTextColor;
+  @override
+  final Color secondaryTextColor;
+  @override
+  final Color successTextColor;
+  @override
+  final Color warningTextColor;
+  @override
+  final Color infoTextColor;
+  @override
+  final Color errorTextColor;
+  @override
+  final Color defaultTextColor;
+
   const ThemeToken({
-    required this.filledStandardButtonColor,
-    required this.filledPrimaryButtonColor,
-    required this.filledSecondaryButtonColor,
-    required this.filledDangerButtonColor,
-    required this.filledInfoButtonColor,
-    required this.filledWarningButtonColor,
-    required this.outlineBackgroundColor,
-    required this.outlineStandardBorderButtonColor,
-    required this.outlinePrimaryBorderButtonColor,
-    required this.outlineSecondaryBorderButtonColor,
-    required this.outlineDangerBorderButtonColor,
-    required this.outlineInfoBorderButtonColor,
-    required this.outlineWarningBorderButtonColor,
+    // Button
+    required this.standardButtonColor,
+    required this.primaryButtonColor,
+    required this.secondaryButtonColor,
+    required this.dangerButtonColor,
+    required this.infoButtonColor,
+    required this.warningButtonColor,
+    required this.standardFilledHoverButtonColor,
+    required this.primaryFilledHoverButtonColor,
+    required this.secondaryFilledHoverButtonColor,
+    required this.dangerFilledHoverButtonColor,
+    required this.infoFilledHoverButtonColor,
+    required this.warningFilledHoverButtonColor,
+    required this.standardButtonTextColor,
+    required this.primaryButtonTextColor,
+    required this.secondaryButtonTextColor,
+    required this.dangerButtonTextColor,
+    required this.infoButtonTextColor,
+    required this.warningButtonTextColor,
+    required this.smButtonTextHeight,
+    required this.rgButtonTextHeight,
+    required this.lgButtonTextHeight,
     required this.smButtonHeight,
     required this.smButtonPadding,
     required this.rgButtonHeight,
@@ -348,44 +357,13 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.smButtonIconSize,
     required this.rgButtonIconSize,
     required this.lgButtonIconSize,
-    required this.filledStandardButtonIconColor,
-    required this.filledPrimaryButtonIconColor,
-    required this.filledSecondaryButtonIconColor,
-    required this.filledDangerButtonIconColor,
-    required this.filledInfoButtonIconColor,
-    required this.filledWarningButtonIconColor,
-    required this.ghostStandardButtonIconColor,
-    required this.ghostPrimaryButtonIconColor,
-    required this.ghostSecondaryButtonIconColor,
-    required this.ghostDangerButtonIconColor,
-    required this.ghostInfoButtonIconColor,
-    required this.ghostWarningButtonIconColor,
-    required this.filledDisabledButtonColor,
-    required this.ghostDisabledButtonColor,
-    required this.outlinedDisabledButtonColor,
-    required this.outlinedDisabledBorderButtonColor,
-    required this.disabledIconButtonColor,
-    required this.smButtonTextStyle,
-    required this.rgButtonTextStyle,
-    required this.lgButtonTextStyle,
-    required this.filledStandardHoverButtonColor,
-    required this.filledPrimaryHoverButtonColor,
-    required this.filledSecondaryHoverButtonColor,
-    required this.filledDangerHoverButtonColor,
-    required this.filledInfoHoverButtonColor,
-    required this.filledWarningHoverButtonColor,
-    required this.outlineStandardHoverButtonColor,
-    required this.outlinePrimaryHoverButtonColor,
-    required this.outlineSecondaryHoverButtonColor,
-    required this.outlineDangerHoverButtonColor,
-    required this.outlineInfoHoverButtonColor,
-    required this.outlineWarningHoverButtonColor,
-    required this.ghostStandardHoverButtonColor,
-    required this.ghostPrimaryHoverButtonColor,
-    required this.ghostSecondaryHoverButtonColor,
-    required this.ghostDangerHoverButtonColor,
-    required this.ghostInfoHoverButtonColor,
-    required this.ghostWarningHoverButtonColor,
+    required this.disabledButtonColor,
+    required this.standardHoverButtonColor,
+    required this.primaryHoverButtonColor,
+    required this.secondaryHoverButtonColor,
+    required this.warningHoverButtonColor,
+    required this.dangerHoverButtonColor,
+    required this.infoHoverButtonColor,
     required this.primaryCardBackgroundColor,
     required this.secondaryCardBackgroundColor,
     required this.dangerCardBackgroundColor,
@@ -453,5 +431,81 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.lgTagSpacing,
     required this.smTagSpacing,
     required this.rgTagSpacing,
+    required this.primaryTextColor,
+    required this.secondaryTextColor,
+    required this.successTextColor,
+    required this.warningTextColor,
+    required this.infoTextColor,
+    required this.errorTextColor,
+    required this.disabledTextColor,
+    required this.defaultTextColor,
+    required this.displayTextStyle,
+    required this.bodyTextStyle,
+    required this.h1TextStyle,
+    required this.h2TextStyle,
+    required this.h3TextStyle,
+    required this.h4TextStyle,
+    required this.h5TextStyle,
+    required this.h6TextStyle,
+    required this.quoteTextStyle,
+    required this.codeTextStyle,
+    required this.linkTextStyle,
+    required this.captionTextStyle,
   });
+
+  ThemeToken copyWithColors({
+    Color? primary,
+    Color? secondary,
+    Color? success,
+    Color? warning,
+    Color? info,
+    Color? error,
+  }) {
+    return copyWith(
+      // Card
+      // Background color
+      primaryCardBackgroundColor: primary?.lighten(80),
+      secondaryCardBackgroundColor: secondary?.lighten(80),
+      successCardBackgroundColor: success?.lighten(80),
+      warningCardBackgroundColor: warning?.lighten(80),
+      dangerCardBackgroundColor: error?.lighten(80),
+
+      // // Border Color
+      primaryCardBorderColor: primary?.lighten(40),
+      secondaryCardBorderColor: secondary?.lighten(40),
+      successCardBorderColor: success?.lighten(40),
+      warningCardBorderColor: warning?.lighten(40),
+      dangerCardBorderColor: error?.lighten(40),
+
+      // Button
+      // // Background color
+      primaryButtonColor: primary,
+      secondaryButtonColor: secondary,
+      warningButtonColor: warning,
+      infoButtonColor: info,
+      dangerButtonColor: error,
+
+      // // Hover colors(outline, ghost)
+      primaryHoverButtonColor: primary?.lighten(90),
+      secondaryHoverButtonColor: secondary?.lighten(90),
+      warningHoverButtonColor: warning?.lighten(90),
+      infoHoverButtonColor: info?.lighten(90),
+      dangerHoverButtonColor: error?.lighten(90),
+
+      // // Hover colors(filled)
+      primaryFilledHoverButtonColor: primary?.darken(20),
+      secondaryFilledHoverButtonColor: secondary?.darken(20),
+      warningFilledHoverButtonColor: warning?.darken(20),
+      infoFilledHoverButtonColor: info?.darken(20),
+      dangerFilledHoverButtonColor: error?.darken(20),
+
+      // typography
+      primaryTextColor: primary,
+      secondaryTextColor: secondary,
+      successTextColor: success,
+      warningTextColor: warning,
+      infoTextColor: info,
+      errorTextColor: error,
+    );
+  }
 }
