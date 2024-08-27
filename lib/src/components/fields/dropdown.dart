@@ -331,8 +331,11 @@ class MDDropdown<T> extends MDFormBuilderField<T> {
                       child: Row(
                         children: [
                           Button(
-                            variant: ButtonVariant.ghost,
-                            size: ButtonSize.sm,
+                            decoration: ButtonDecoration(
+                              context: state.context,
+                              variant: ButtonVariant.ghost,
+                              size: ButtonSize.sm,
+                            ),
                             icon: PhosphorIconsRegular.x,
                             onTap: () {
                               state.didChange(null);

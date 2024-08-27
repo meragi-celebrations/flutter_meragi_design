@@ -15,36 +15,45 @@ class _CardDetailsState extends State<CardDetails> {
       appBar: AppBar(
         title: const Text("Cards"),
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            MDCard(
+            const MDCard(
               header: Text("Default Card"),
               body: Text("Body"),
               footer: Text("Footer"),
             ),
             MDCard(
-              type: CardType.primary,
-              body: Text("Primary Just the Body"),
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.primary,
+              ),
+              body: const Text("Primary Just the Body"),
             ),
             MDCard(
-              type: CardType.danger,
-              body: Text("Danger Body without header"),
-              footer: Text("Footer"),
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.danger,
+              ),
+              body: const Text("Danger Body without header"),
+              footer: const Text("Footer"),
             ),
             MDCard(
-              type: CardType.success,
-              header: Text("success Card"),
-              body: Text("This is a large Card"),
-              footer: Text("Footer"),
-              size: CardSize.lg,
+              decoration: CardDecoration(
+                  context: context, type: CardType.success, size: CardSize.lg),
+              header: const Text("success Card"),
+              body: const Text("This is a large Card"),
+              footer: const Text("Footer"),
             ),
             MDCard(
-              type: CardType.warning,
-              header: Text("warning Card"),
-              body: Text(
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.warning,
+                size: CardSize.sm,
+              ),
+              header: const Text("warning Card"),
+              body: const Text(
                   "Small Card with Body without footer and the alignment is start"),
-              size: CardSize.sm,
               alignment: CrossAxisAlignment.start,
             ),
           ],

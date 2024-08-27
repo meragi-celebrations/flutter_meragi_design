@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       token: isPlatform([MeragiPlatform.android, MeragiPlatform.ios])
           ? light
           : lightWide.copyWithColors(
-              primary: Colors.deepPurple,
+              primary: Colors.lime,
               success: Colors.green,
               error: Colors.redAccent,
               warning: Colors.orange,

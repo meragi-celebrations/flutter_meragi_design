@@ -384,8 +384,11 @@ class MDTextField extends MDFormBuilderField<String> {
 
             Widget? finalSuffix = (state.value != null && isClearable)
                 ? Button(
-                    variant: ButtonVariant.ghost,
-                    size: ButtonSize.sm,
+                    decoration: ButtonDecoration(
+                      context: state.context,
+                      variant: ButtonVariant.ghost,
+                      size: ButtonSize.sm,
+                    ),
                     icon: PhosphorIconsRegular.x,
                     onTap: () {
                       state.didChange(null);

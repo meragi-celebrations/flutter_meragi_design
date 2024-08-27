@@ -47,25 +47,34 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                             child: Column(
                               children: [
                                 Button(
-                                  variant: variant,
-                                  type: type,
-                                  size: size,
+                                  decoration: ButtonDecoration(
+                                    context: context,
+                                    variant: variant,
+                                    type: type,
+                                    size: size,
+                                  ),
                                   onTap: () {},
                                   icon: Icons.filter,
                                   child: Text(type.name),
                                 ),
                                 const SizedBox(height: 10),
                                 Button.dropdown(
-                                  variant: variant,
-                                  type: type,
-                                  size: size,
+                                  decoration: ButtonDecoration(
+                                    context: context,
+                                    variant: variant,
+                                    type: type,
+                                    size: size,
+                                  ),
                                   onTap: () {},
                                   icon: Icons.filter,
                                   menuChildren: [
                                     Button(
-                                      variant: variant,
-                                      type: type,
-                                      size: size,
+                                      decoration: ButtonDecoration(
+                                        context: context,
+                                        variant: variant,
+                                        type: type,
+                                        size: size,
+                                      ),
                                       onTap: () {},
                                       icon: Icons.filter,
                                       child: Text(type.name),
@@ -95,8 +104,11 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                             return Column(
                               children: [
                                 Button(
-                                  variant: variant,
-                                  type: type,
+                                  decoration: ButtonDecoration(
+                                    context: context,
+                                    variant: variant,
+                                    type: type,
+                                  ),
                                   onTap: () {
                                     isLoading.value = !value;
                                   },
@@ -121,8 +133,11 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                                     );
                                   },
                                   menuChildren: const [],
-                                  variant: variant,
-                                  type: type,
+                                  decoration: ButtonDecoration(
+                                    context: context,
+                                    variant: variant,
+                                    type: type,
+                                  ),
                                   onTap: () {
                                     isLoading.value = !value;
                                   },
@@ -133,12 +148,15 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                                       "Loading custom indicator (click)"),
                                 ),
                                 Button(
-                                  variant: variant,
-                                  type: type,
+                                  decoration: ButtonDecoration(
+                                    context: context,
+                                    variant: variant,
+                                    type: type,
+                                    size: ButtonSize.sm,
+                                  ),
                                   onTap: () {},
                                   icon: Icons.image,
                                   isLoading: value,
-                                  size: ButtonSize.sm,
                                 )
                               ],
                             );
