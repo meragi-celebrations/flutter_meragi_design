@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 enum MeragiPlatform {
@@ -47,4 +48,19 @@ bool isPlatform(List<MeragiPlatform> platforms) {
   }
   // If none of the platforms are enabled, return false
   return false;
+}
+
+bool isMobile = isPlatform([MeragiPlatform.android, MeragiPlatform.ios]);
+
+bool isMobileWeb = kIsWeb && isMobile;
+
+class ScreenUtil {
+  BuildContext context;
+
+  ScreenUtil(this.context);
+
+  bool get isSm => MediaQuery.of(context).size.width < 500; // phone
+  bool get isMd => MediaQuery.of(context).size.width < 800; // tablet
+  bool get isLg => MediaQuery.of(context).size.width < 1200; // desktop
+  bool get isXl => MediaQuery.of(context).size.width >= 1200; // everything
 }
