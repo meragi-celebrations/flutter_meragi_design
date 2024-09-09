@@ -22,11 +22,18 @@ abstract class BaseText extends StatelessWidget {
   /// The type of text (e.g. primary, secondary, etc.)
   final TextType type;
 
+  /// The maximum number of lines
+  final int? maxLines;
+
   final TextStyle? style;
 
   /// Constructor for BaseText
   const BaseText(
-      {Key? key, required this.text, this.type = TextType.standard, this.style})
+      {Key? key,
+      required this.text,
+      this.type = TextType.standard,
+      this.maxLines,
+      this.style})
       : super(key: key);
 
   /// Get the text style for this text widget
@@ -64,6 +71,7 @@ abstract class BaseText extends StatelessWidget {
             color: _getTextColor(type, token),
           )
           .merge(style),
+      maxLines: maxLines,
     );
   }
 }
@@ -71,12 +79,19 @@ abstract class BaseText extends StatelessWidget {
 /// Display text widget
 class DisplayText extends BaseText {
   /// Constructor for DisplayText
-  const DisplayText(
-      {Key? key,
-      required String text,
-      TextType type = TextType.standard,
-      TextStyle? style})
-      : super(key: key, text: text, type: type, style: style);
+  const DisplayText({
+    Key? key,
+    required String text,
+    TextType type = TextType.standard,
+    TextStyle? style,
+    int? maxLines,
+  }) : super(
+          key: key,
+          text: text,
+          type: type,
+          style: style,
+          maxLines: maxLines,
+        );
 
   @override
   TextStyle textStyle(BuildContext context) =>
@@ -86,12 +101,19 @@ class DisplayText extends BaseText {
 /// H1 text widget
 class H1 extends BaseText {
   /// Constructor for H1
-  const H1(
-      {Key? key,
-      required String text,
-      TextType type = TextType.standard,
-      TextStyle? style})
-      : super(key: key, text: text, type: type, style: style);
+  const H1({
+    Key? key,
+    required String text,
+    TextType type = TextType.standard,
+    TextStyle? style,
+    int? maxLines,
+  }) : super(
+          key: key,
+          text: text,
+          type: type,
+          style: style,
+          maxLines: maxLines,
+        );
 
   @override
   TextStyle textStyle(BuildContext context) =>
@@ -106,11 +128,13 @@ class H2 extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -126,11 +150,13 @@ class H3 extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -146,11 +172,13 @@ class H4 extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -166,11 +194,13 @@ class H5 extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -186,11 +216,13 @@ class H6 extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -206,11 +238,13 @@ class BodyText extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -226,11 +260,13 @@ class CaptionText extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -246,11 +282,13 @@ class LinkText extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -266,11 +304,13 @@ class QuoteText extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override
@@ -286,11 +326,13 @@ class CodeText extends BaseText {
     required String text,
     TextType type = TextType.standard,
     TextStyle? style,
+    int? maxLines,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
+          maxLines: maxLines,
         );
 
   @override

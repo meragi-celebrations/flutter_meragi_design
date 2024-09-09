@@ -13,7 +13,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return MDScaffold(
       appBar: AppBar(
         title: const Text("Buttons"),
       ),
