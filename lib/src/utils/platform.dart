@@ -60,7 +60,9 @@ class ScreenUtil {
   ScreenUtil(this.context);
 
   bool get isSm => MediaQuery.of(context).size.width < 500; // phone
-  bool get isMd => MediaQuery.of(context).size.width < 800; // tablet
-  bool get isLg => MediaQuery.of(context).size.width < 1200; // desktop
+  bool get isMd => (MediaQuery.of(context).size.width < 800 && MediaQuery.of(context).size.width >= 500); // tablet
+  bool get isLg => (MediaQuery.of(context).size.width < 1200 && MediaQuery.of(context).size.width >= 800); // desktop
   bool get isXl => MediaQuery.of(context).size.width >= 1200; // everything
+
+  bool get isSmMd => isSm || isMd;
 }
