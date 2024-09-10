@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
+import 'package:flutter_meragi_design/src/theme/style.dart';
 
-enum TagType { defaultType, primary, secondary, danger, success, warning }
+enum TagType { defaultType, primary, secondary, danger, success, warning, info }
 
 enum TagSize { sm, rg, lg }
 
@@ -10,204 +9,229 @@ class MDTag extends StatelessWidget {
   final Widget? body;
   final String? text;
   final IconData? icon;
-  final TagType type;
-  final TagSize size;
+  final TagDecoration? decoration;
 
   const MDTag({
     super.key,
     this.body,
     this.text,
     this.icon,
-    this.type = TagType.defaultType,
-    this.size = TagSize.rg,
+    this.decoration,
   });
-
-  Color backgroundColor(ThemeToken token) {
-    switch (type) {
-      case TagType.primary:
-        return token.primaryTagBackgroundColor;
-      case TagType.secondary:
-        return token.secondaryTagBackgroundColor;
-      case TagType.danger:
-        return token.dangerTagBackgroundColor;
-      case TagType.success:
-        return token.successTagBackgroundColor;
-      case TagType.warning:
-        return token.warningTagBackgroundColor;
-      default:
-        return token.defaultTagBackgroundColor;
-    }
-  }
-
-  Color borderColor(ThemeToken token) {
-    switch (type) {
-      case TagType.primary:
-        return token.primaryTagBorderColor;
-      case TagType.secondary:
-        return token.secondaryTagBorderColor;
-      case TagType.danger:
-        return token.dangerTagBorderColor;
-      case TagType.success:
-        return token.successTagBorderColor;
-      case TagType.warning:
-        return token.warningTagBorderColor;
-      default:
-        return token.defaultTagBorderColor;
-    }
-  }
-
-  EdgeInsets padding(ThemeToken token) {
-    switch (size) {
-      case TagSize.sm:
-        return token.smTagPadding;
-      case TagSize.rg:
-        return token.rgTagPadding;
-      case TagSize.lg:
-        return token.lgTagPadding;
-    }
-  }
-
-  double borderRadius(ThemeToken token) {
-    switch (size) {
-      case TagSize.sm:
-        return token.smTagBorderRadius;
-      case TagSize.rg:
-        return token.rgTagBorderRadius;
-      case TagSize.lg:
-        return token.lgTagBorderRadius;
-    }
-  }
-
-  double iconSize(ThemeToken token) {
-    switch (size) {
-      case TagSize.sm:
-        return token.smTagIconSize;
-      case TagSize.rg:
-        return token.rgTagIconSize;
-      case TagSize.lg:
-        return token.lgTagIconSize;
-    }
-  }
-
-  Color iconColor(ThemeToken token) {
-    switch (type) {
-      case TagType.primary:
-        return token.primaryTagIconColor;
-      case TagType.secondary:
-        return token.secondaryTagIconColor;
-      case TagType.danger:
-        return token.dangerTagIconColor;
-      case TagType.success:
-        return token.successTagIconColor;
-      case TagType.warning:
-        return token.warningTagIconColor;
-      default:
-        return token.defaultTagIconColor;
-    }
-  }
-
-  double textHeight(ThemeToken token) {
-    switch (size) {
-      case TagSize.sm:
-        return token.smTagTextHeight;
-      case TagSize.rg:
-        return token.rgTagTextHeight;
-      case TagSize.lg:
-        return token.lgTagTextHeight;
-    }
-  }
-
-  double textSize(ThemeToken token) {
-    switch (size) {
-      case TagSize.sm:
-        return token.smTagTextSize;
-      case TagSize.rg:
-        return token.rgTagTextSize;
-      case TagSize.lg:
-        return token.lgTagTextSize;
-    }
-  }
-
-  FontWeight textWeight(ThemeToken token) {
-    switch (size) {
-      case TagSize.sm:
-        return token.smTagTextWeight;
-      case TagSize.rg:
-        return token.rgTagTextWeight;
-      case TagSize.lg:
-        return token.lgTagTextWeight;
-    }
-  }
-
-  Color textColor(ThemeToken token) {
-    switch (type) {
-      case TagType.primary:
-        return token.primaryTagTextColor;
-      case TagType.secondary:
-        return token.secondaryTagTextColor;
-      case TagType.danger:
-        return token.dangerTagTextColor;
-      case TagType.success:
-        return token.successTagTextColor;
-      case TagType.warning:
-        return token.warningTagTextColor;
-      default:
-        return token.defaultTagTextColor;
-    }
-  }
-
-  double spacing(ThemeToken token) {
-    switch (size) {
-      case TagSize.sm:
-        return token.smTagSpacing;
-      case TagSize.rg:
-        return token.rgTagSpacing;
-      case TagSize.lg:
-        return token.lgTagSpacing;
-    }
-  }
-
-  Widget finalBody(ThemeToken token) {
-    return body ??
-        Wrap(
-          direction: Axis.horizontal,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: spacing(token),
-          children: [
-            if (icon != null)
-              Icon(
-                icon,
-                size: iconSize(token),
-                color: iconColor(token),
-              ),
-            Text(
-              text!,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: textSize(token),
-                fontWeight: textWeight(token),
-                color: textColor(token),
-                height: textHeight(token),
-              ),
-            )
-          ],
-        );
-  }
 
   @override
   Widget build(BuildContext context) {
-    ThemeToken token = MeragiTheme.of(context).token;
+    TagDecoration finalTagDecoration = TagDecoration(
+      context: context,
+    ).merge(decoration);
+
     return Container(
-      padding: padding(token),
+      padding: finalTagDecoration.padding,
       decoration: BoxDecoration(
-        color: backgroundColor(token),
-        border: Border.all(
-          width: token.tagBorderWidth,
-          color: borderColor(token),
-        ),
-        borderRadius: BorderRadius.circular(borderRadius(token)),
+          color: finalTagDecoration.backgroundColor,
+          borderRadius: BorderRadius.circular(
+            finalTagDecoration.borderRadius,
+          ),
+          border: Border.all(
+            color: finalTagDecoration.borderColor,
+          )),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null)
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: finalTagDecoration.textColor,
+                  size: finalTagDecoration.iconSize,
+                ),
+                SizedBox(width: finalTagDecoration.spacing),
+              ],
+            ),
+          if (text != null)
+            Text(
+              text!,
+              style: TextStyle(
+                color: finalTagDecoration.textColor,
+                height: finalTagDecoration.textHeight,
+                fontSize: finalTagDecoration.textSize,
+                fontWeight: finalTagDecoration.textWeight,
+              ),
+            ),
+          if (body != null) body!,
+        ],
       ),
-      child: finalBody(token),
+    );
+  }
+}
+
+class TagDecoration extends Style {
+  final TagType type;
+  final TagSize size;
+  final Color? backgroundColorOverride;
+  final Color? textColorOverride;
+  final double? borderRadiusOverride;
+  final EdgeInsets? paddingOverride;
+  final double? iconSizeOverride;
+  final double? textSizeOverride;
+  final double? textHeightOverride;
+  final FontWeight? textWeightOverride;
+  final double? spacingOverride;
+
+  const TagDecoration({
+    required super.context,
+    this.type = TagType.defaultType,
+    this.size = TagSize.rg,
+    this.backgroundColorOverride,
+    this.textColorOverride,
+    this.borderRadiusOverride,
+    this.paddingOverride,
+    this.iconSizeOverride,
+    this.textSizeOverride,
+    this.textHeightOverride,
+    this.textWeightOverride,
+    this.spacingOverride,
+  });
+
+  @override
+  Map get styles => {
+        TagType.defaultType: {
+          'backgroundColor': token.defaultTagBackgroundColor,
+          'textColor': token.defaultTagTextColor,
+          'borderColor': token.defaultTagBorderColor,
+        },
+        TagType.primary: {
+          'backgroundColor': token.primaryTagBackgroundColor,
+          'textColor': token.primaryTagTextColor,
+          'borderColor': token.primaryTagBorderColor,
+        },
+        TagType.secondary: {
+          'backgroundColor': token.secondaryTagBackgroundColor,
+          'textColor': token.secondaryTagTextColor,
+          'borderColor': token.secondaryTagBorderColor,
+        },
+        TagType.danger: {
+          'backgroundColor': token.dangerTagBackgroundColor,
+          'textColor': token.dangerTagTextColor,
+          'borderColor': token.dangerTagBorderColor,
+        },
+        TagType.success: {
+          'backgroundColor': token.successTagBackgroundColor,
+          'textColor': token.successTagTextColor,
+          'borderColor': token.successTagBorderColor,
+        },
+        TagType.warning: {
+          'backgroundColor': token.warningTagBackgroundColor,
+          'textColor': token.warningTagTextColor,
+          'borderColor': token.warningTagBorderColor,
+        },
+        TagType.info: {
+          'backgroundColor': token.infoTagBackgroundColor,
+          'textColor': token.infoTagTextColor,
+          'borderColor': token.infoTagBorderColor,
+        },
+        TagSize.sm: {
+          'padding': token.smTagPadding,
+          'borderRadius': token.smTagBorderRadius,
+          'iconSize': token.smTagIconSize,
+          'textSize': token.smTagTextSize,
+          'textHeight': token.smTagTextHeight,
+          'textWeight': token.smTagTextWeight,
+          'spacing': token.smTagSpacing,
+        },
+        TagSize.rg: {
+          'padding': token.rgTagPadding,
+          'borderRadius': token.rgTagBorderRadius,
+          'iconSize': token.rgTagIconSize,
+          'textSize': token.rgTagTextSize,
+          'textHeight': token.rgTagTextHeight,
+          'textWeight': token.rgTagTextWeight,
+          'spacing': token.rgTagSpacing,
+        },
+        TagSize.lg: {
+          'padding': token.lgTagPadding,
+          'borderRadius': token.lgTagBorderRadius,
+          'iconSize': token.lgTagIconSize,
+          'textSize': token.lgTagTextSize,
+          'textHeight': token.lgTagTextHeight,
+          'textWeight': token.lgTagTextWeight,
+          'spacing': token.lgTagSpacing,
+        },
+      };
+
+  Color get backgroundColor =>
+      backgroundColorOverride ?? getStyle(type, "backgroundColor");
+
+  Color get textColor => textColorOverride ?? getStyle(type, "textColor");
+
+  Color get borderColor => getStyle(type, "borderColor");
+
+  double get borderRadius =>
+      borderRadiusOverride ?? getStyle(size, "borderRadius");
+
+  double get iconSize => iconSizeOverride ?? getStyle(size, "iconSize");
+
+  double get textSize => textSizeOverride ?? getStyle(size, "textSize");
+
+  double get textHeight => textHeightOverride ?? getStyle(size, "textHeight");
+
+  FontWeight get textWeight =>
+      textWeightOverride ?? getStyle(size, "textWeight");
+
+  double get spacing => spacingOverride ?? getStyle(size, "spacing");
+
+  EdgeInsets get padding => paddingOverride ?? getStyle(size, "padding");
+
+  TagDecoration copyWith({
+    BuildContext? context,
+    TagType? type,
+    TagSize? size,
+    Color? backgroundColorOverride,
+    Color? textColorOverride,
+    double? borderRadiusOverride,
+    EdgeInsets? paddingOverride,
+    double? iconSizeOverride,
+    double? textSizeOverride,
+    double? textHeightOverride,
+    FontWeight? textWeightOverride,
+    double? spacingOverride,
+  }) {
+    return TagDecoration(
+      context: context ?? this.context,
+      type: type ?? this.type,
+      size: size ?? this.size,
+      backgroundColorOverride:
+          backgroundColorOverride ?? this.backgroundColorOverride,
+      textColorOverride: textColorOverride ?? this.textColorOverride,
+      borderRadiusOverride: borderRadiusOverride ?? this.borderRadiusOverride,
+      paddingOverride: paddingOverride ?? this.paddingOverride,
+      iconSizeOverride: iconSizeOverride ?? this.iconSizeOverride,
+      textSizeOverride: textSizeOverride ?? this.textSizeOverride,
+      textHeightOverride: textHeightOverride ?? this.textHeightOverride,
+      textWeightOverride: textWeightOverride ?? this.textWeightOverride,
+      spacingOverride: spacingOverride ?? this.spacingOverride,
+    );
+  }
+
+  TagDecoration merge(TagDecoration? other) {
+    if (other == null) {
+      return this;
+    }
+    return TagDecoration(
+      context: other.context,
+      type: other.type,
+      size: other.size,
+      backgroundColorOverride:
+          other.backgroundColorOverride ?? backgroundColorOverride,
+      textColorOverride: other.textColorOverride ?? textColorOverride,
+      borderRadiusOverride: other.borderRadiusOverride ?? borderRadiusOverride,
+      paddingOverride: other.paddingOverride ?? paddingOverride,
+      iconSizeOverride: other.iconSizeOverride ?? iconSizeOverride,
+      textSizeOverride: other.textSizeOverride ?? textSizeOverride,
+      textHeightOverride: other.textHeightOverride ?? textHeightOverride,
+      textWeightOverride: other.textWeightOverride ?? textWeightOverride,
+      spacingOverride: other.spacingOverride ?? spacingOverride,
     );
   }
 }

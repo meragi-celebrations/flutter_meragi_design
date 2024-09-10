@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class MDDescription extends StatelessWidget {
-  final List<Map<String, Widget>> data;
+  final List<DescriptionItem> data;
   final int minColumns;
   final int maxColumns;
   final Axis direction;
@@ -40,8 +40,8 @@ class MDDescription extends StatelessWidget {
                 spacing: spacingBetweenKeyAndValue,
                 direction: direction,
                 children: [
-                  item['label']!,
-                  item['value']!,
+                  item.label,
+                  item.value,
                 ],
               ),
             );
@@ -50,4 +50,11 @@ class MDDescription extends StatelessWidget {
       },
     );
   }
+}
+
+class DescriptionItem {
+  final Widget label;
+  final Widget value;
+
+  const DescriptionItem({required this.label, required this.value});
 }

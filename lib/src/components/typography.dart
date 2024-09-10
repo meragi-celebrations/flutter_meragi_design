@@ -25,6 +25,9 @@ abstract class BaseText extends StatelessWidget {
   /// The maximum number of lines
   final int? maxLines;
 
+  /// How visual overflow should be handled.
+  final TextOverflow? overflow;
+
   final TextStyle? style;
 
   /// Constructor for BaseText
@@ -33,6 +36,7 @@ abstract class BaseText extends StatelessWidget {
       required this.text,
       this.type = TextType.standard,
       this.maxLines,
+      this.overflow,
       this.style})
       : super(key: key);
 
@@ -72,6 +76,7 @@ abstract class BaseText extends StatelessWidget {
           )
           .merge(style),
       maxLines: maxLines,
+      overflow: overflow,
     );
   }
 }
@@ -85,12 +90,14 @@ class DisplayText extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -107,12 +114,14 @@ class H1 extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -129,12 +138,14 @@ class H2 extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -151,12 +162,14 @@ class H3 extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -173,12 +186,14 @@ class H4 extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -195,12 +210,14 @@ class H5 extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -217,12 +234,14 @@ class H6 extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -239,12 +258,14 @@ class BodyText extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -261,12 +282,14 @@ class CaptionText extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -283,12 +306,14 @@ class LinkText extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -305,12 +330,14 @@ class QuoteText extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override
@@ -327,12 +354,14 @@ class CodeText extends BaseText {
     TextType type = TextType.standard,
     TextStyle? style,
     int? maxLines,
+    TextOverflow? overflow,
   }) : super(
           key: key,
           text: text,
           type: type,
           style: style,
           maxLines: maxLines,
+          overflow: overflow,
         );
 
   @override

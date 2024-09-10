@@ -21,11 +21,12 @@ class SplitController {
 }
 
 class MDScaffold extends StatelessWidget {
-  final AppBar? appBar;
+  final MDAppBar? appBar;
   final Widget? body;
   final Widget? leftChild;
   final Widget? rightChild;
   final SplitController? splitController;
+  final Widget? bottomNavigationBar;
 
   bool get isSplit => leftChild != null && rightChild != null;
 
@@ -33,6 +34,7 @@ class MDScaffold extends StatelessWidget {
     super.key,
     required this.body,
     this.appBar,
+    this.bottomNavigationBar,
   })  : leftChild = null,
         rightChild = null,
         splitController = null;
@@ -43,7 +45,41 @@ class MDScaffold extends StatelessWidget {
     required this.rightChild,
     this.splitController,
     this.appBar,
+    this.bottomNavigationBar,
   }) : body = null;
+
+  MDAppBar buildHeader(SplitController controller) {
+    MDAppBar workingAppBar = appBar ?? const MDAppBar();
+
+    if (isSplit) {
+      workingAppBar = workingAppBar.copyWith(
+        actions: [
+          ...(appBar?.actions ?? const []),
+          if (controller.showSplitButton.value)
+            ValueListenableBuilder<bool>(
+              valueListenable: controller.isSplitOpen,
+              builder: (context, value, _) {
+                return Button(
+                  decoration: ButtonDecoration(
+                    context: context,
+                    variant: ButtonVariant.ghost,
+                    type: ButtonType.primary,
+                  ),
+                  icon: !value
+                      ? PhosphorIconsFill.sidebarSimple
+                      : PhosphorIconsRegular.sidebarSimple,
+                  onTap: () {
+                    controller.toggleSplit();
+                  },
+                );
+              },
+            ),
+        ],
+      );
+    }
+
+    return workingAppBar;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,31 +88,22 @@ class MDScaffold extends StatelessWidget {
           initialIsSplitOpen: false,
           initialShowSplitButton: isSplit,
         );
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15 * .8),
-          topRight: Radius.circular(15 * .8),
-        ),
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(15 * .8),
+        topRight: Radius.circular(15 * .8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MDHeader(
-            splitController: controller,
-            appBar: appBar,
-          ),
-          Expanded(
-            child: body != null
-                ? body!
-                : MDSplitBody(
-                    splitController: controller,
-                    leftChild: leftChild!,
-                    rightChild: rightChild!,
-                  ),
-          )
-        ],
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: buildHeader(controller),
+        body: body != null
+            ? body!
+            : MDSplitBody(
+                splitController: controller,
+                leftChild: leftChild!,
+                rightChild: rightChild!,
+              ),
+        bottomNavigationBar: bottomNavigationBar,
       ),
     );
   }
@@ -161,59 +188,5 @@ class MDSplitBody extends StatelessWidget {
             ),
           );
         });
-  }
-}
-
-class MDHeader extends StatelessWidget {
-  final SplitController? splitController;
-  final AppBar? appBar;
-  const MDHeader({
-    super.key,
-    this.splitController,
-    this.appBar,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    AppBar finalAppBar = AppBar(
-      title: appBar?.title ?? const Text(''),
-      leading: appBar?.leading,
-      actions: [
-        ...(appBar?.actions ?? const []),
-        if (splitController != null && splitController!.showSplitButton.value)
-          ValueListenableBuilder<bool>(
-              valueListenable: splitController!.isSplitOpen,
-              builder: (context, value, _) {
-                return Button(
-                  decoration: ButtonDecoration(
-                    context: context,
-                    variant: ButtonVariant.ghost,
-                    type: ButtonType.primary,
-                  ),
-                  icon: !value
-                      ? PhosphorIconsFill.sidebarSimple
-                      : PhosphorIconsRegular.sidebarSimple,
-                  onTap: () {
-                    splitController!.toggleSplit();
-                  },
-                );
-              }),
-      ],
-      backgroundColor: Colors.deepPurple.shade100.withOpacity(.2),
-      toolbarHeight: 40,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(15 * .75)),
-      ),
-      elevation: 10,
-      centerTitle: appBar?.centerTitle,
-      bottom: appBar?.bottom,
-      flexibleSpace: appBar?.flexibleSpace,
-      leadingWidth: appBar?.leadingWidth,
-    );
-
-    return Container(
-      padding: const EdgeInsets.all(3),
-      child: finalAppBar,
-    );
   }
 }

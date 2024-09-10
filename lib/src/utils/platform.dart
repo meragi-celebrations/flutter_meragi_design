@@ -55,6 +55,8 @@ bool isDesktop = isPlatform(
 
 bool isMobile = isPlatform([MeragiPlatform.android, MeragiPlatform.ios]);
 
+bool isDesktopWeb = kIsWeb && isDesktop;
+
 bool isMobileWeb = kIsWeb && isMobile;
 
 class ScreenUtil {

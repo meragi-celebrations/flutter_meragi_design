@@ -11,9 +11,9 @@ class TypographyDetails extends StatefulWidget {
 class _TypographyDetailsState extends State<TypographyDetails> {
   @override
   Widget build(BuildContext context) {
-    return MDScaffold(
-      appBar: AppBar(title: const H3(text: "Typography")),
-      body: const SingleChildScrollView(
+    return const MDScaffold(
+      appBar: MDAppBar(title: H3(text: "Typography")),
+      body: SingleChildScrollView(
         child: Column(
           children: [
             DisplayText(text: "Display"),

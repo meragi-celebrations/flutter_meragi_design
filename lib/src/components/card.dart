@@ -27,6 +27,12 @@ class MDCard extends StatelessWidget {
       context: context,
     ).merge(decoration);
 
+    Divider divider = Divider(
+      height: finalCardDecoration.dividerHeight,
+      thickness: finalCardDecoration.dividerThickness,
+      color: finalCardDecoration.borderColor,
+    );
+
     return Container(
       width: double.infinity,
       padding: finalCardDecoration.padding,
@@ -35,17 +41,9 @@ class MDCard extends StatelessWidget {
         crossAxisAlignment: alignment,
         children: [
           header ?? const SizedBox.shrink(),
-          if (header != null)
-            Divider(
-              height: finalCardDecoration.dividerHeight,
-              thickness: finalCardDecoration.dividerThickness,
-            ),
+          if (header != null) divider,
           body,
-          if (footer != null)
-            Divider(
-              height: finalCardDecoration.dividerHeight,
-              thickness: finalCardDecoration.dividerThickness,
-            ),
+          if (footer != null) divider,
           footer ?? const SizedBox.shrink(),
         ],
       ),

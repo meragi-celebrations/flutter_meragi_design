@@ -80,12 +80,14 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   Color get dangerTagBackgroundColor;
   Color get successTagBackgroundColor;
   Color get warningTagBackgroundColor;
+  Color get infoTagBackgroundColor;
   Color get defaultTagBorderColor;
   Color get primaryTagBorderColor;
   Color get secondaryTagBorderColor;
   Color get dangerTagBorderColor;
   Color get successTagBorderColor;
   Color get warningTagBorderColor;
+  Color get infoTagBorderColor;
   EdgeInsets get smTagPadding;
   EdgeInsets get rgTagPadding;
   EdgeInsets get lgTagPadding;
@@ -108,15 +110,10 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   Color get dangerTagTextColor;
   Color get successTagTextColor;
   Color get warningTagTextColor;
+  Color get infoTagTextColor;
   double get smTagIconSize;
   double get rgTagIconSize;
   double get lgTagIconSize;
-  Color get defaultTagIconColor;
-  Color get primaryTagIconColor;
-  Color get secondaryTagIconColor;
-  Color get dangerTagIconColor;
-  Color get successTagIconColor;
-  Color get warningTagIconColor;
   double get smTagSpacing;
   double get rgTagSpacing;
   double get lgTagSpacing;
@@ -213,12 +210,14 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     Color? dangerTagBackgroundColor,
     Color? successTagBackgroundColor,
     Color? warningTagBackgroundColor,
+    Color? infoTagBackgroundColor,
     Color? defaultTagBorderColor,
     Color? primaryTagBorderColor,
     Color? secondaryTagBorderColor,
     Color? dangerTagBorderColor,
     Color? successTagBorderColor,
     Color? warningTagBorderColor,
+    Color? infoTagBorderColor,
     EdgeInsets? smTagPadding,
     EdgeInsets? rgTagPadding,
     EdgeInsets? lgTagPadding,
@@ -241,15 +240,10 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     Color? dangerTagTextColor,
     Color? successTagTextColor,
     Color? warningTagTextColor,
+    Color? infoTagTextColor,
     double? smTagIconSize,
     double? rgTagIconSize,
     double? lgTagIconSize,
-    Color? defaultTagIconColor,
-    Color? primaryTagIconColor,
-    Color? secondaryTagIconColor,
-    Color? dangerTagIconColor,
-    Color? successTagIconColor,
-    Color? warningTagIconColor,
     double? smTagSpacing,
     double? rgTagSpacing,
     double? lgTagSpacing,
@@ -379,6 +373,8 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           successTagBackgroundColor ?? this.successTagBackgroundColor,
       warningTagBackgroundColor:
           warningTagBackgroundColor ?? this.warningTagBackgroundColor,
+      infoTagBackgroundColor:
+          infoTagBackgroundColor ?? this.infoTagBackgroundColor,
       defaultTagBorderColor:
           defaultTagBorderColor ?? this.defaultTagBorderColor,
       primaryTagBorderColor:
@@ -390,6 +386,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           successTagBorderColor ?? this.successTagBorderColor,
       warningTagBorderColor:
           warningTagBorderColor ?? this.warningTagBorderColor,
+      infoTagBorderColor: infoTagBorderColor ?? this.infoTagBorderColor,
       smTagPadding: smTagPadding ?? this.smTagPadding,
       rgTagPadding: rgTagPadding ?? this.rgTagPadding,
       lgTagPadding: lgTagPadding ?? this.lgTagPadding,
@@ -413,16 +410,10 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       dangerTagTextColor: dangerTagTextColor ?? this.dangerTagTextColor,
       successTagTextColor: successTagTextColor ?? this.successTagTextColor,
       warningTagTextColor: warningTagTextColor ?? this.warningTagTextColor,
+      infoTagTextColor: infoTagTextColor ?? this.infoTagTextColor,
       smTagIconSize: smTagIconSize ?? this.smTagIconSize,
       rgTagIconSize: rgTagIconSize ?? this.rgTagIconSize,
       lgTagIconSize: lgTagIconSize ?? this.lgTagIconSize,
-      defaultTagIconColor: defaultTagIconColor ?? this.defaultTagIconColor,
-      primaryTagIconColor: primaryTagIconColor ?? this.primaryTagIconColor,
-      secondaryTagIconColor:
-          secondaryTagIconColor ?? this.secondaryTagIconColor,
-      dangerTagIconColor: dangerTagIconColor ?? this.dangerTagIconColor,
-      successTagIconColor: successTagIconColor ?? this.successTagIconColor,
-      warningTagIconColor: warningTagIconColor ?? this.warningTagIconColor,
       smTagSpacing: smTagSpacing ?? this.smTagSpacing,
       rgTagSpacing: rgTagSpacing ?? this.rgTagSpacing,
       lgTagSpacing: lgTagSpacing ?? this.lgTagSpacing,
@@ -578,6 +569,8 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           successTagBackgroundColor, other.successTagBackgroundColor, t)!,
       warningTagBackgroundColor: Color.lerp(
           warningTagBackgroundColor, other.warningTagBackgroundColor, t)!,
+      infoTagBackgroundColor:
+          Color.lerp(infoTagBackgroundColor, other.infoTagBackgroundColor, t)!,
       defaultTagBorderColor:
           Color.lerp(defaultTagBorderColor, other.defaultTagBorderColor, t)!,
       primaryTagBorderColor:
@@ -590,6 +583,8 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           Color.lerp(successTagBorderColor, other.successTagBorderColor, t)!,
       warningTagBorderColor:
           Color.lerp(warningTagBorderColor, other.warningTagBorderColor, t)!,
+      infoTagBorderColor:
+          Color.lerp(infoTagBorderColor, other.infoTagBorderColor, t)!,
       smTagPadding: t < 0.5 ? smTagPadding : other.smTagPadding,
       rgTagPadding: t < 0.5 ? rgTagPadding : other.rgTagPadding,
       lgTagPadding: t < 0.5 ? lgTagPadding : other.lgTagPadding,
@@ -618,21 +613,11 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           Color.lerp(successTagTextColor, other.successTagTextColor, t)!,
       warningTagTextColor:
           Color.lerp(warningTagTextColor, other.warningTagTextColor, t)!,
+      infoTagTextColor:
+          Color.lerp(infoTagTextColor, other.infoTagTextColor, t)!,
       smTagIconSize: t < 0.5 ? smTagIconSize : other.smTagIconSize,
       rgTagIconSize: t < 0.5 ? rgTagIconSize : other.rgTagIconSize,
       lgTagIconSize: t < 0.5 ? lgTagIconSize : other.lgTagIconSize,
-      defaultTagIconColor:
-          Color.lerp(defaultTagIconColor, other.defaultTagIconColor, t)!,
-      primaryTagIconColor:
-          Color.lerp(primaryTagIconColor, other.primaryTagIconColor, t)!,
-      secondaryTagIconColor:
-          Color.lerp(secondaryTagIconColor, other.secondaryTagIconColor, t)!,
-      dangerTagIconColor:
-          Color.lerp(dangerTagIconColor, other.dangerTagIconColor, t)!,
-      successTagIconColor:
-          Color.lerp(successTagIconColor, other.successTagIconColor, t)!,
-      warningTagIconColor:
-          Color.lerp(warningTagIconColor, other.warningTagIconColor, t)!,
       smTagSpacing: t < 0.5 ? smTagSpacing : other.smTagSpacing,
       rgTagSpacing: t < 0.5 ? rgTagSpacing : other.rgTagSpacing,
       lgTagSpacing: t < 0.5 ? lgTagSpacing : other.lgTagSpacing,
@@ -780,12 +765,14 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(dangerTagBackgroundColor, other.dangerTagBackgroundColor) &&
             const DeepCollectionEquality().equals(successTagBackgroundColor, other.successTagBackgroundColor) &&
             const DeepCollectionEquality().equals(warningTagBackgroundColor, other.warningTagBackgroundColor) &&
+            const DeepCollectionEquality().equals(infoTagBackgroundColor, other.infoTagBackgroundColor) &&
             const DeepCollectionEquality().equals(defaultTagBorderColor, other.defaultTagBorderColor) &&
             const DeepCollectionEquality().equals(primaryTagBorderColor, other.primaryTagBorderColor) &&
             const DeepCollectionEquality().equals(secondaryTagBorderColor, other.secondaryTagBorderColor) &&
             const DeepCollectionEquality().equals(dangerTagBorderColor, other.dangerTagBorderColor) &&
             const DeepCollectionEquality().equals(successTagBorderColor, other.successTagBorderColor) &&
             const DeepCollectionEquality().equals(warningTagBorderColor, other.warningTagBorderColor) &&
+            const DeepCollectionEquality().equals(infoTagBorderColor, other.infoTagBorderColor) &&
             const DeepCollectionEquality().equals(smTagPadding, other.smTagPadding) &&
             const DeepCollectionEquality().equals(rgTagPadding, other.rgTagPadding) &&
             const DeepCollectionEquality().equals(lgTagPadding, other.lgTagPadding) &&
@@ -808,15 +795,10 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(dangerTagTextColor, other.dangerTagTextColor) &&
             const DeepCollectionEquality().equals(successTagTextColor, other.successTagTextColor) &&
             const DeepCollectionEquality().equals(warningTagTextColor, other.warningTagTextColor) &&
+            const DeepCollectionEquality().equals(infoTagTextColor, other.infoTagTextColor) &&
             const DeepCollectionEquality().equals(smTagIconSize, other.smTagIconSize) &&
             const DeepCollectionEquality().equals(rgTagIconSize, other.rgTagIconSize) &&
             const DeepCollectionEquality().equals(lgTagIconSize, other.lgTagIconSize) &&
-            const DeepCollectionEquality().equals(defaultTagIconColor, other.defaultTagIconColor) &&
-            const DeepCollectionEquality().equals(primaryTagIconColor, other.primaryTagIconColor) &&
-            const DeepCollectionEquality().equals(secondaryTagIconColor, other.secondaryTagIconColor) &&
-            const DeepCollectionEquality().equals(dangerTagIconColor, other.dangerTagIconColor) &&
-            const DeepCollectionEquality().equals(successTagIconColor, other.successTagIconColor) &&
-            const DeepCollectionEquality().equals(warningTagIconColor, other.warningTagIconColor) &&
             const DeepCollectionEquality().equals(smTagSpacing, other.smTagSpacing) &&
             const DeepCollectionEquality().equals(rgTagSpacing, other.rgTagSpacing) &&
             const DeepCollectionEquality().equals(lgTagSpacing, other.lgTagSpacing) &&
@@ -916,12 +898,14 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(dangerTagBackgroundColor),
       const DeepCollectionEquality().hash(successTagBackgroundColor),
       const DeepCollectionEquality().hash(warningTagBackgroundColor),
+      const DeepCollectionEquality().hash(infoTagBackgroundColor),
       const DeepCollectionEquality().hash(defaultTagBorderColor),
       const DeepCollectionEquality().hash(primaryTagBorderColor),
       const DeepCollectionEquality().hash(secondaryTagBorderColor),
       const DeepCollectionEquality().hash(dangerTagBorderColor),
       const DeepCollectionEquality().hash(successTagBorderColor),
       const DeepCollectionEquality().hash(warningTagBorderColor),
+      const DeepCollectionEquality().hash(infoTagBorderColor),
       const DeepCollectionEquality().hash(smTagPadding),
       const DeepCollectionEquality().hash(rgTagPadding),
       const DeepCollectionEquality().hash(lgTagPadding),
@@ -944,15 +928,10 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(dangerTagTextColor),
       const DeepCollectionEquality().hash(successTagTextColor),
       const DeepCollectionEquality().hash(warningTagTextColor),
+      const DeepCollectionEquality().hash(infoTagTextColor),
       const DeepCollectionEquality().hash(smTagIconSize),
       const DeepCollectionEquality().hash(rgTagIconSize),
       const DeepCollectionEquality().hash(lgTagIconSize),
-      const DeepCollectionEquality().hash(defaultTagIconColor),
-      const DeepCollectionEquality().hash(primaryTagIconColor),
-      const DeepCollectionEquality().hash(secondaryTagIconColor),
-      const DeepCollectionEquality().hash(dangerTagIconColor),
-      const DeepCollectionEquality().hash(successTagIconColor),
-      const DeepCollectionEquality().hash(warningTagIconColor),
       const DeepCollectionEquality().hash(smTagSpacing),
       const DeepCollectionEquality().hash(rgTagSpacing),
       const DeepCollectionEquality().hash(lgTagSpacing),
@@ -1059,12 +1038,14 @@ extension ThemeTokenBuildContextProps on BuildContext {
   Color get dangerTagBackgroundColor => themeToken.dangerTagBackgroundColor;
   Color get successTagBackgroundColor => themeToken.successTagBackgroundColor;
   Color get warningTagBackgroundColor => themeToken.warningTagBackgroundColor;
+  Color get infoTagBackgroundColor => themeToken.infoTagBackgroundColor;
   Color get defaultTagBorderColor => themeToken.defaultTagBorderColor;
   Color get primaryTagBorderColor => themeToken.primaryTagBorderColor;
   Color get secondaryTagBorderColor => themeToken.secondaryTagBorderColor;
   Color get dangerTagBorderColor => themeToken.dangerTagBorderColor;
   Color get successTagBorderColor => themeToken.successTagBorderColor;
   Color get warningTagBorderColor => themeToken.warningTagBorderColor;
+  Color get infoTagBorderColor => themeToken.infoTagBorderColor;
   EdgeInsets get smTagPadding => themeToken.smTagPadding;
   EdgeInsets get rgTagPadding => themeToken.rgTagPadding;
   EdgeInsets get lgTagPadding => themeToken.lgTagPadding;
@@ -1087,15 +1068,10 @@ extension ThemeTokenBuildContextProps on BuildContext {
   Color get dangerTagTextColor => themeToken.dangerTagTextColor;
   Color get successTagTextColor => themeToken.successTagTextColor;
   Color get warningTagTextColor => themeToken.warningTagTextColor;
+  Color get infoTagTextColor => themeToken.infoTagTextColor;
   double get smTagIconSize => themeToken.smTagIconSize;
   double get rgTagIconSize => themeToken.rgTagIconSize;
   double get lgTagIconSize => themeToken.lgTagIconSize;
-  Color get defaultTagIconColor => themeToken.defaultTagIconColor;
-  Color get primaryTagIconColor => themeToken.primaryTagIconColor;
-  Color get secondaryTagIconColor => themeToken.secondaryTagIconColor;
-  Color get dangerTagIconColor => themeToken.dangerTagIconColor;
-  Color get successTagIconColor => themeToken.successTagIconColor;
-  Color get warningTagIconColor => themeToken.warningTagIconColor;
   double get smTagSpacing => themeToken.smTagSpacing;
   double get rgTagSpacing => themeToken.rgTagSpacing;
   double get lgTagSpacing => themeToken.lgTagSpacing;

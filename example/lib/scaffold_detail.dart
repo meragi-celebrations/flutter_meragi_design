@@ -12,7 +12,15 @@ class _ScaffoldDetailsState extends State<ScaffoldDetails> {
   @override
   Widget build(BuildContext context) {
     return const MDScaffold.split(
-      leftChild: Text("left"),
+      appBar: MDAppBar(
+        asPageHeader: true,
+        title: Text("Scaffold Details"),
+      ),
+      leftChild: MDScaffold(
+          appBar: MDAppBar(
+            title: Text("left"),
+          ),
+          body: Text("left")),
       rightChild: Text("right"),
     );
   }
