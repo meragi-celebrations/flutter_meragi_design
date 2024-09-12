@@ -13,14 +13,48 @@ enum ButtonType { standard, primary, secondary, danger, info, warning }
 
 enum ButtonSize { sm, rg, lg }
 
+/// A button widget that can be used to create a button with a given style.
+///
+/// The [Button] widget is a wrapper around a [GestureDetector] widget, which
+/// is used to detect tap events. The [Button] widget can be used to create
+/// both filled and outlined buttons.
+///
+/// The [Button] widget takes a [ButtonDecoration] object as its decoration
+/// parameter. The [ButtonDecoration] object is used to define the style of the
+/// button.
+///
+/// The [Button] widget also takes a [VoidCallback] as its onTap parameter. This
+/// callback is called when the button is tapped.
+///
+/// The [Button] widget can also be used to create a dropdown button.
+/// To create a dropdown button, the [Button.dropdown] constructor should be
+/// used. The [Button.dropdown] constructor takes a [MenuAnchorChildBuilder]
+/// as its builder parameter. The [MenuAnchorChildBuilder] is used to define
+/// the child of the dropdown button.
+///
+/// The [Button.dropdown] constructor also takes a list of [Widget]s as its
+/// menuChildren parameter. The [menuChildren] parameter is used to define the
+/// children of the dropdown menu.
 class Button extends StatefulWidget {
+  /// The callback that is called when the button is tapped.
   final VoidCallback? onTap;
+
+  /// The child of the button.
   final Widget? child;
+
+  /// The icon of the button.
   final IconData? icon;
+
+  /// Whether the button should expand to fill the available space.
   final bool expand;
+
+  /// Whether the button is currently loading.
   final bool isLoading;
+
+  /// The widget that is displayed when the button is loading.
   final Widget? loadingWidget;
 
+  /// The decoration of the button.
   final ButtonDecoration? decoration;
 
   const Button({
@@ -37,6 +71,8 @@ class Button extends StatefulWidget {
         _isDropdown = false,
         dividerColor = null;
 
+  /// Creates a dropdown button with the given decoration, onTap callback, child,
+  /// icon, and expand property.
   const Button.dropdown({
     super.key,
     this.onTap,
@@ -52,12 +88,16 @@ class Button extends StatefulWidget {
   })  : assert(builder != null),
         _isDropdown = true;
 
+  /// The builder of the dropdown menu.
   final MenuAnchorChildBuilder? builder;
+
+  /// The children of the dropdown menu.
   final List<Widget> menuChildren;
+
+  /// Whether the button is a dropdown button.
   final bool _isDropdown;
   bool get isDropdown => _isDropdown;
   final Color? dividerColor;
-
   @override
   State<Button> createState() => _ButtonState();
 }

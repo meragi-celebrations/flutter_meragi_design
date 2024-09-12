@@ -5,6 +5,18 @@ enum TagType { defaultType, primary, secondary, danger, success, warning, info }
 
 enum TagSize { sm, rg, lg }
 
+/// A tag widget that can be used to display a tag-like widget.
+///
+/// The [TagDecoration] class is used to customize the appearance of the tag.
+/// The [TagType] enum is used to specify the type of the tag.
+/// The [TagSize] enum is used to specify the size of the tag.
+///
+/// The [body] property can be used to specify the content of the tag.
+/// The [text] property can be used to specify the text of the tag.
+/// The [icon] property can be used to specify the icon of the tag.
+///
+/// The [isDetailed] method can be used to check if the tag is detailed.
+/// The [buildBody] method can be used to build the body of the tag.
 class MDTag extends StatelessWidget {
   final Widget? body;
   final String? text;
@@ -17,7 +29,79 @@ class MDTag extends StatelessWidget {
     this.text,
     this.icon,
     this.decoration,
-  });
+  })  : _title = null,
+        _value = null;
+
+  const MDTag.detailed({
+    super.key,
+    required String title,
+    required String value,
+    this.decoration,
+  })  : body = null,
+        text = null,
+        icon = null,
+        _title = title,
+        _value = value;
+
+  final String? _title;
+  final String? _value;
+
+  bool isDetailed() => _title != null && _value != null;
+
+  Widget buildBody(TagDecoration finalTagDecoration) {
+    var textStyle = TextStyle(
+      color: finalTagDecoration.textColor,
+      height: finalTagDecoration.textHeight,
+      fontSize: finalTagDecoration.textSize,
+      fontWeight: finalTagDecoration.textWeight,
+    );
+
+    if (isDetailed()) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _title!,
+            style: textStyle.copyWith(
+              fontSize: finalTagDecoration.textSize * .7,
+              height: 0,
+            ),
+          ),
+          Text(
+            _value!,
+            style: textStyle.copyWith(height: 0),
+          ),
+        ],
+      );
+    }
+
+    return (body != null)
+        ? body!
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null)
+                Row(
+                  children: [
+                    Icon(
+                      icon,
+                      color: finalTagDecoration.textColor,
+                      size: finalTagDecoration.iconSize,
+                    ),
+                    SizedBox(
+                      width: finalTagDecoration.spacing,
+                    ),
+                  ],
+                ),
+              if (text != null)
+                Text(
+                  text!,
+                  style: textStyle,
+                ),
+            ],
+          );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,37 +119,12 @@ class MDTag extends StatelessWidget {
           border: Border.all(
             color: finalTagDecoration.borderColor,
           )),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null)
-            Row(
-              children: [
-                Icon(
-                  icon,
-                  color: finalTagDecoration.textColor,
-                  size: finalTagDecoration.iconSize,
-                ),
-                SizedBox(width: finalTagDecoration.spacing),
-              ],
-            ),
-          if (text != null)
-            Text(
-              text!,
-              style: TextStyle(
-                color: finalTagDecoration.textColor,
-                height: finalTagDecoration.textHeight,
-                fontSize: finalTagDecoration.textSize,
-                fontWeight: finalTagDecoration.textWeight,
-              ),
-            ),
-          if (body != null) body!,
-        ],
-      ),
+      child: buildBody(finalTagDecoration),
     );
   }
 }
 
+/// A class for customizing the appearance of a tag.
 class TagDecoration extends Style {
   final TagType type;
   final TagSize size;

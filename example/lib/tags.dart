@@ -66,6 +66,14 @@ class _TagDetailsState extends State<TagDetails> {
                 type: TagType.info,
               ),
             ),
+            MDTag.detailed(
+              title: "Title",
+              value: "value",
+              decoration: TagDecoration(
+                context: context,
+                type: TagType.primary,
+              ),
+            )
           ],
         ),
       ),
