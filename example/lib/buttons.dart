@@ -13,9 +13,9 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Buttons"),
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text("Buttons"),
       ),
       body: ListView.builder(
         itemCount: ButtonVariant.values.length,
@@ -29,7 +29,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                 children: [
                   Text(
                     "${variant.name}",
-                    style: TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: 20),
                   ),
                 ],
               ),

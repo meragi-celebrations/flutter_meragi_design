@@ -15,24 +15,65 @@ class _TagDetailsState extends State<TagDetails> {
       appBar: AppBar(
         title: const Text("Tags"),
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            MDTag(text: "Default"),
-            MDTag(text: "Danger Large", size: TagSize.lg, type: TagType.danger),
+            const MDTag(text: "Default"),
             MDTag(
-                text: "Primary Small", type: TagType.primary, size: TagSize.sm),
+              text: "Danger Large",
+              decoration: TagDecoration(
+                  context: context, size: TagSize.lg, type: TagType.danger),
+            ),
             MDTag(
-                text: "Warning",
-                icon: Icons.currency_exchange_outlined,
-                type: TagType.warning),
-            MDTag(body: Text("Tag secondary"), type: TagType.secondary),
-            MDTag(body: Text("Custom body success"), type: TagType.success),
-            MDTag(text: "Just a string", type: TagType.success),
+              text: "Primary Small",
+              decoration: TagDecoration(
+                  context: context, type: TagType.primary, size: TagSize.sm),
+            ),
             MDTag(
-                text: "Text and Icon",
-                icon: Icons.check,
-                type: TagType.success),
+              text: "Warning",
+              icon: Icons.currency_exchange_outlined,
+              decoration: TagDecoration(
+                context: context,
+                type: TagType.warning,
+              ),
+            ),
+            MDTag(
+              body: Text("Tag secondary"),
+              decoration:
+                  TagDecoration(context: context, type: TagType.secondary),
+            ),
+            MDTag(
+              body: Text("Custom body success"),
+              decoration:
+                  TagDecoration(context: context, type: TagType.success),
+            ),
+            MDTag(
+              text: "Just a string",
+              decoration:
+                  TagDecoration(context: context, type: TagType.success),
+            ),
+            MDTag(
+              text: "Text and Icon",
+              icon: Icons.check,
+              decoration:
+                  TagDecoration(context: context, type: TagType.success),
+            ),
+            MDTag(
+              text: "Text and Icon",
+              icon: Icons.check,
+              decoration: TagDecoration(
+                context: context,
+                type: TagType.info,
+              ),
+            ),
+            MDTag.detailed(
+              title: "Title",
+              value: "value",
+              decoration: TagDecoration(
+                context: context,
+                type: TagType.primary,
+              ),
+            )
           ],
         ),
       ),

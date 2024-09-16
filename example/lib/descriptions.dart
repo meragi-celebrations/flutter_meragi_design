@@ -26,30 +26,34 @@ class _DescriptionDetailsState extends State<DescriptionDetails> {
               header: const Text("Min COlumn: 2, Max Column: 5, Horizontal"),
               body: const MDDescription(
                 data: [
-                  {
-                    'label': Text('Label 1'),
-                    'value': Text('Value 1'),
-                  },
-                  {
-                    'label': Text('Label 2'),
-                    'value': Text('Value 2'),
-                  },
-                  {
-                    'label': Text('Label 3'),
-                    'value': Text('Value 3'),
-                  },
-                  {
-                    'label': Text('Label 4'),
-                    'value': Text('Value 4'),
-                  },
-                  {
-                    'label': Text('Label 5'),
-                    'value': Text('Value 5'),
-                  },
-                  {
-                    'label': Text('Label 6'),
-                    'value': Text('Value 6'),
-                  },
+                  DescriptionItem(
+                    label: Text('Label 1'),
+                    value: Text('Value 1'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 2'),
+                    value: Text('Value 2'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 3'),
+                    value: Text('Value 3'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 4'),
+                    value: Text('Value 4'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 5'),
+                    value: Text('Value 5'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 6'),
+                    value: Text('Value 6'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 7'),
+                    value: Text('Value 7'),
+                  ),
                 ],
                 minColumns: 2,
                 maxColumns: 5,
@@ -63,30 +67,34 @@ class _DescriptionDetailsState extends State<DescriptionDetails> {
               header: const Text("Min COlumn: 2, Max Column: 5, Vertical"),
               body: const MDDescription(
                 data: [
-                  {
-                    'label': Text('Label 1'),
-                    'value': Text('Value 1'),
-                  },
-                  {
-                    'label': Text('Label 2'),
-                    'value': Text('Value 2'),
-                  },
-                  {
-                    'label': Text('Label 3'),
-                    'value': Text('Value 3'),
-                  },
-                  {
-                    'label': Text('Label 4'),
-                    'value': Text('Value 4'),
-                  },
-                  {
-                    'label': Text('Label 5'),
-                    'value': Text('Value 5'),
-                  },
-                  {
-                    'label': Text('Label 6'),
-                    'value': Text('Value 6'),
-                  },
+                  DescriptionItem(
+                    label: Text('Label 1'),
+                    value: Text('Value 1'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 2'),
+                    value: Text('Value 2'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 3'),
+                    value: Text('Value 3'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 4'),
+                    value: Text('Value 4'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 5'),
+                    value: Text('Value 5'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 6'),
+                    value: Text('Value 6'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 7'),
+                    value: Text('Value 7'),
+                  ),
                 ],
                 minColumns: 2,
                 maxColumns: 5,
@@ -101,30 +109,34 @@ class _DescriptionDetailsState extends State<DescriptionDetails> {
               header: const Text("Min COlumn: 1, Max Column: 3, Vertical"),
               body: const MDDescription(
                 data: [
-                  {
-                    'label': Text('Label 1'),
-                    'value': Text('Value 1'),
-                  },
-                  {
-                    'label': Text('Label 2'),
-                    'value': Text('Value 2'),
-                  },
-                  {
-                    'label': Text('Label 3'),
-                    'value': Text('Value 3'),
-                  },
-                  {
-                    'label': Text('Label 4'),
-                    'value': Text('Value 4'),
-                  },
-                  {
-                    'label': Text('Label 5'),
-                    'value': Text('Value 5'),
-                  },
-                  {
-                    'label': Text('Label 6'),
-                    'value': Text('Value 6'),
-                  },
+                  DescriptionItem(
+                    label: Text('Label 1'),
+                    value: Text('Value 1'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 2'),
+                    value: Text('Value 2'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 3'),
+                    value: Text('Value 3'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 4'),
+                    value: Text('Value 4'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 5'),
+                    value: Text('Value 5'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 6'),
+                    value: Text('Value 6'),
+                  ),
+                  DescriptionItem(
+                    label: Text('Label 7'),
+                    value: Text('Value 7'),
+                  ),
                 ],
                 minColumns: 1,
                 maxColumns: 3,

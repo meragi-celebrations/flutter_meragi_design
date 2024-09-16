@@ -179,6 +179,8 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final Color successTagBackgroundColor;
   @override
   final Color warningTagBackgroundColor;
+  @override
+  final Color infoTagBackgroundColor;
   // // Border Color
   @override
   final Color defaultTagBorderColor;
@@ -192,6 +194,8 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final Color successTagBorderColor;
   @override
   final Color warningTagBorderColor;
+  @override
+  final Color infoTagBorderColor;
 
   // // Padding
   @override
@@ -244,6 +248,8 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final Color successTagTextColor;
   @override
   final Color warningTagTextColor;
+  @override
+  final Color infoTagTextColor;
 
   // // Icon Size
   @override
@@ -252,20 +258,6 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final double rgTagIconSize;
   @override
   final double lgTagIconSize;
-
-  // // Icon Color
-  @override
-  final Color defaultTagIconColor;
-  @override
-  final Color primaryTagIconColor;
-  @override
-  final Color secondaryTagIconColor;
-  @override
-  final Color dangerTagIconColor;
-  @override
-  final Color successTagIconColor;
-  @override
-  final Color warningTagIconColor;
 
   // // Spacing
   @override
@@ -385,6 +377,8 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.cardBorderWidth,
     required this.cardDividerHeight,
     required this.cardDividerThickness,
+
+    // tag
     required this.defaultTagBackgroundColor,
     required this.primaryTagBackgroundColor,
     required this.secondaryTagBackgroundColor,
@@ -404,12 +398,6 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.smTagPadding,
     required this.rgTagPadding,
     required this.lgTagPadding,
-    required this.defaultTagIconColor,
-    required this.primaryTagIconColor,
-    required this.secondaryTagIconColor,
-    required this.dangerTagIconColor,
-    required this.successTagIconColor,
-    required this.warningTagIconColor,
     required this.smTagIconSize,
     required this.rgTagIconSize,
     required this.lgTagIconSize,
@@ -431,6 +419,9 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.lgTagSpacing,
     required this.smTagSpacing,
     required this.rgTagSpacing,
+    required this.infoTagBackgroundColor,
+    required this.infoTagBorderColor,
+    required this.infoTagTextColor,
     required this.primaryTextColor,
     required this.secondaryTextColor,
     required this.successTextColor,
