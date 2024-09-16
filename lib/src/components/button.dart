@@ -161,14 +161,11 @@ class _ButtonState extends State<Button> {
                                   : finalDecoration.buttonBackgroundColor
                               : finalDecoration.buttonDisabledColor
                           : null,
-                      border: widget.isDropdown
-                          ? null
-                          : finalDecoration.buttonBorder,
+                      border: widget.isDropdown ? null : finalDecoration.buttonBorder,
                       borderRadius: finalDecoration.borderRadius,
                     ),
                     child: Row(
-                      mainAxisSize:
-                          widget.expand ? MainAxisSize.max : MainAxisSize.min,
+                      mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (widget.isLoading) ...[
@@ -186,12 +183,9 @@ class _ButtonState extends State<Button> {
                           Icon(
                             widget.icon!,
                             size: finalDecoration.buttonIconSize,
-                            color: isEnabled
-                                ? finalDecoration.buttonTextColor
-                                : Colors.grey,
+                            color: isEnabled ? finalDecoration.buttonTextColor : Colors.grey,
                           ),
-                        if ((widget.icon != null || widget.isLoading) &&
-                            widget.child != null)
+                        if ((widget.icon != null || widget.isLoading) && widget.child != null)
                           SizedBox(width: finalDecoration.buttonSpaceBetween),
                         if (widget.child != null)
                           DefaultTextStyle.merge(
@@ -206,8 +200,7 @@ class _ButtonState extends State<Button> {
             );
             if (widget.isDropdown) {
               return Row(
-                mainAxisSize:
-                    widget.expand ? MainAxisSize.max : MainAxisSize.min,
+                mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   baseButton,
@@ -227,9 +220,7 @@ class _ButtonState extends State<Button> {
                             return SizedBox(
                               height: finalDecoration.buttonHeight,
                               width: finalDecoration.buttonHeight,
-                              child: widget.builder != null
-                                  ? widget.builder!(context, controller, child)
-                                  : null,
+                              child: widget.builder != null ? widget.builder!(context, controller, child) : null,
                             );
                           },
                         ),
@@ -374,8 +365,7 @@ class ButtonDecoration extends Style {
   }
 
   BorderRadius? get borderRadius {
-    return BorderRadius.circular(
-        borderRadiusOverride ?? getStyle(size, 'borderRadius'));
+    return BorderRadius.circular(borderRadiusOverride ?? getStyle(size, 'borderRadius'));
   }
 
   EdgeInsetsGeometry get buttonPadding {
@@ -461,14 +451,12 @@ class ButtonDecoration extends Style {
       spaceBetweenOverride: spaceBetweenOverride ?? this.spaceBetweenOverride,
       heightOverride: heightOverride ?? this.heightOverride,
       iconSizeOverride: iconSizeOverride ?? this.iconSizeOverride,
-      disabledColorOverride:
-          disabledColorOverride ?? this.disabledColorOverride,
+      disabledColorOverride: disabledColorOverride ?? this.disabledColorOverride,
       borderRadiusOverride: borderRadiusOverride ?? this.borderRadiusOverride,
       textColorOverride: textColorOverride ?? this.textColorOverride,
       textHeightOverride: textHeightOverride ?? this.textHeightOverride,
       paddingOverride: paddingOverride ?? this.paddingOverride,
-      disabledIconColorOverride:
-          disabledIconColorOverride ?? this.disabledIconColorOverride,
+      disabledIconColorOverride: disabledIconColorOverride ?? this.disabledIconColorOverride,
     );
   }
 

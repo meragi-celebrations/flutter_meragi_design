@@ -50,8 +50,7 @@ bool isPlatform(List<MeragiPlatform> platforms) {
   return false;
 }
 
-bool isDesktop = isPlatform(
-    [MeragiPlatform.linux, MeragiPlatform.windows, MeragiPlatform.macos]);
+bool isDesktop = isPlatform([MeragiPlatform.linux, MeragiPlatform.windows, MeragiPlatform.macos]);
 
 bool isMobile = isPlatform([MeragiPlatform.android, MeragiPlatform.ios]);
 

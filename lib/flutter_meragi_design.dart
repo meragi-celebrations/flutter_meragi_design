@@ -8,6 +8,7 @@ export 'src/components/card.dart';
 export 'src/components/description.dart';
 export 'src/components/fields/dropdown.dart';
 export 'src/components/fields/form_item.dart';
+export 'src/components/fields/list.dart';
 export 'src/components/fields/switch.dart';
 export 'src/components/fields/text_field.dart';
 export 'src/components/layout/app_bar.dart';
