@@ -6,6 +6,7 @@ import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
 class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
   final GetListBloc? listBloc;
   final List<MDCheckboxOption>? options;
+  final bool isMultiSelect;
   final MDCheckboxOption Function(dynamic item)? optionBuilder;
 
   MDFormCheckboxList({
@@ -22,6 +23,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
     super.focusNode,
     super.restorationId,
     this.options,
+    this.isMultiSelect = true,
   })  : listBloc = null,
         optionBuilder = null,
         super(
@@ -33,27 +35,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
                 children: [
                   ...options!.map(
                     (option) {
-                      return ValueListenableBuilder(
-                        valueListenable: state.setValues,
-                        builder: (context, selectedSet, _) {
-                          return ListTile(
-                            title: Text(option.name),
-                            dense: true,
-                            trailing: MDCheckbox(
-                              value: selectedSet.contains(option.value),
-                              onChanged: (value) {
-                                if (value ?? false) {
-                                  state.setValues.value.add(option.value);
-                                } else {
-                                  state.setValues.value.remove(option.value);
-                                }
-                                state.setValues.notifyListeners();
-                                field.didChange(state.setValues.value);
-                              },
-                            ),
-                          );
-                        },
-                      );
+                      return checkboxOption(state, option, field, isMultiSelect);
                     },
                   ),
                 ],
@@ -77,6 +59,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
     super.focusNode,
     super.restorationId,
     this.listBloc,
+    this.isMultiSelect = true,
     required this.optionBuilder,
   })  : options = null,
         super(
@@ -88,32 +71,43 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
               itemBuilder: (context, index) {
                 var item = listBloc.list.value[index];
                 MDCheckboxOption option = optionBuilder!(item);
-                return ValueListenableBuilder(
-                  valueListenable: state.setValues,
-                  builder: (context, selectedSet, _) {
-                    return ListTile(
-                      title: Text(option.name),
-                      dense: true,
-                      trailing: MDCheckbox(
-                        value: selectedSet.contains(option.value),
-                        onChanged: (value) {
-                          if (value ?? false) {
-                            state.setValues.value.add(option.value);
-                          } else {
-                            state.setValues.value.remove(option.value);
-                          }
-                          state.setValues.notifyListeners();
-                          field.didChange(state.setValues.value);
-                        },
-                      ),
-                    );
-                  },
-                );
+                return checkboxOption(state, option, field, isMultiSelect);
               },
             );
             return fieldWidget;
           },
         );
+
+  static ValueListenableBuilder<Set<String>> checkboxOption(
+      _MDFormCheckboxList state, MDCheckboxOption option, _MDFormCheckboxList field, bool isMultiSelect) {
+    return ValueListenableBuilder(
+      valueListenable: state.setValues,
+      builder: (context, selectedSet, _) {
+        return ListTile(
+          title: Text(option.name),
+          dense: true,
+          trailing: MDCheckbox(
+            value: selectedSet.contains(option.value),
+            shape: !isMultiSelect ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)) : null,
+            onChanged: (value) {
+              if (!isMultiSelect) {
+                state.setValues.value = {option.value};
+                field.didChange(state.setValues.value);
+                return;
+              }
+              if (value ?? false) {
+                state.setValues.value.add(option.value);
+              } else {
+                state.setValues.value.remove(option.value);
+              }
+              state.setValues.notifyListeners();
+              field.didChange(state.setValues.value);
+            },
+          ),
+        );
+      },
+    );
+  }
 
   @override
   MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> createState() => _MDFormCheckboxList();
@@ -193,6 +187,7 @@ class MDCheckbox extends StatelessWidget {
   final Color? checkColor;
   final bool tristate;
   final MaterialTapTargetSize? materialTapTargetSize;
+  final OutlinedBorder? shape;
   final MouseCursor? mouseCursor;
   final FocusNode? focusNode;
   final bool autofocus;
@@ -205,6 +200,7 @@ class MDCheckbox extends StatelessWidget {
     this.checkColor,
     this.tristate = false,
     this.materialTapTargetSize,
+    this.shape,
     this.mouseCursor,
     this.focusNode,
     this.autofocus = false,
@@ -219,6 +215,7 @@ class MDCheckbox extends StatelessWidget {
       checkColor: checkColor,
       tristate: tristate,
       materialTapTargetSize: materialTapTargetSize,
+      shape: shape,
       mouseCursor: mouseCursor,
       focusNode: focusNode,
       autofocus: autofocus,

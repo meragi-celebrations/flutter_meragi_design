@@ -31,8 +31,7 @@ class _FieldDetailsState extends State<FieldDetails> {
               child: MDTextField(
                 name: "name",
                 isClearable: true,
-                validator: FormBuilderValidators.compose(
-                    [FormBuilderValidators.required()]),
+                validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
                 errorBuilder: (error) {
                   return Text("This is error");
                 },
@@ -43,8 +42,7 @@ class _FieldDetailsState extends State<FieldDetails> {
               isGrid: true,
               child: MDTextField(
                 name: "name1",
-                validator: FormBuilderValidators.compose(
-                    [FormBuilderValidators.required()]),
+                validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
                 errorBuilder: (error) {
                   return Text("This is error");
                 },
@@ -62,8 +60,7 @@ class _FieldDetailsState extends State<FieldDetails> {
                       name: "dropdown",
                       isClearable: true,
                       initialValue: "b",
-                      validator: FormBuilderValidators.compose(
-                          [FormBuilderValidators.required()]),
+                      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
                       items: const ["a", "b", "c"].map((e) {
                         return DropdownMenuItem(
                           value: e,
@@ -80,8 +77,7 @@ class _FieldDetailsState extends State<FieldDetails> {
                     labelPosition: Axis.horizontal,
                     child: MDDropdown(
                       name: "dropdown2",
-                      validator: FormBuilderValidators.compose(
-                          [FormBuilderValidators.required()]),
+                      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
                       items: const [
                         "a",
                         "b",
@@ -125,8 +121,7 @@ class _FieldDetailsState extends State<FieldDetails> {
               isGrid: true,
               child: MDSwitch(
                 name: "switch",
-                validator: FormBuilderValidators.compose(
-                    [FormBuilderValidators.required()]),
+                validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
               ),
             ),
             Button(
