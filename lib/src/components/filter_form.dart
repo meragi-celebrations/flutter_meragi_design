@@ -28,6 +28,7 @@ class MDFilter {
 class MDFilterFormView extends StatefulWidget {
   final List<MDFormItem> formItems;
   final Function(List<MDFilter>) onFilterSubmit;
+  final MDFilter Function(String key, dynamic value) filterBuilder;
   final List<MDFilter> initialData;
   final GlobalKey<FormBuilderState> formKey;
   const MDFilterFormView({
@@ -35,6 +36,7 @@ class MDFilterFormView extends StatefulWidget {
     required this.formKey,
     required this.formItems,
     required this.onFilterSubmit,
+    required this.filterBuilder,
     this.initialData = const [],
   });
 
@@ -92,11 +94,12 @@ class _MDFilterFormViewState extends State<MDFilterFormView> {
               Map<String, dynamic> formValue = widget.formKey.currentState!.value;
               for (MapEntry<String, dynamic> data in formValue.entries) {
                 if (data.value != null) {
-                  filters.add(MDFilter(
-                    field: data.key,
-                    operator: "in",
-                    value: data.value.toList().join(","),
-                  ));
+                  // MDFilter(
+                  //   field: data.key,
+                  //   operator: "in",
+                  //   value: data.value.toList().join(","),
+                  // )
+                  filters.add(widget.filterBuilder(data.key, data.value));
                 }
               }
               widget.onFilterSubmit(filters);
