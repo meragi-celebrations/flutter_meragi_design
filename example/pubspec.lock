@@ -137,7 +137,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.5.0"
+    version: "1.7.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -404,6 +404,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  timelines_plus:
+    dependency: transitive
+    description:
+      name: timelines_plus
+      sha256: ad0d97a0ee21942ee749c603b117794eb97cc6788f0cadc7d76cf1bbb2c26fca
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   typed_data:
     dependency: transitive
     description:

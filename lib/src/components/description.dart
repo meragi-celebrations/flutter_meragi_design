@@ -47,14 +47,13 @@ class MDDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final columns = lerpDouble(minColumns.toDouble(), maxColumns.toDouble(),
-            (screenWidth / 800).clamp(0, 1))!
-        .toInt();
-
     return LayoutBuilder(
       builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final columns =
+            lerpDouble(minColumns.toDouble(), maxColumns.toDouble(), (screenWidth / 800).clamp(0, 1))!.toInt();
         final itemWidth = constraints.maxWidth / columns;
+        print("columns $columns $itemWidth");
 
         return Wrap(
           runSpacing: spacingBetweenItem,
@@ -64,6 +63,7 @@ class MDDescription extends StatelessWidget {
               child: Wrap(
                 spacing: spacingBetweenKeyAndValue,
                 direction: direction,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   item.label,
                   item.value,

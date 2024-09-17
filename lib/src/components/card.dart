@@ -44,8 +44,11 @@ class MDCard extends StatelessWidget {
     this.footer,
     this.alignment = CrossAxisAlignment.center,
     this.decoration,
+    this.elevation = 0,
   });
 
+  /// The elevation of the card
+  final double? elevation;
   @override
   Widget build(BuildContext context) {
     CardDecoration finalCardDecoration = CardDecoration(
@@ -61,8 +64,7 @@ class MDCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: finalCardDecoration.padding,
-      decoration: finalCardDecoration.decoration
-          .copyWith(boxShadow: kElevationToShadow[1]),
+      decoration: finalCardDecoration.decoration.copyWith(boxShadow: kElevationToShadow[elevation]),
       child: Column(
         crossAxisAlignment: alignment,
         children: [
@@ -165,12 +167,10 @@ class CardDecoration extends Style {
   EdgeInsets get padding => paddingOverride ?? getStyle(size, 'padding');
 
   /// The border radius of the card
-  double get borderRadius =>
-      borderRadiusOverride ?? getStyle(size, "BorderRadius");
+  double get borderRadius => borderRadiusOverride ?? getStyle(size, "BorderRadius");
 
   /// The background color of the card
-  Color get backgroundColor =>
-      backgroundColorOverride ?? getStyle(type, "backgroundColor");
+  Color get backgroundColor => backgroundColorOverride ?? getStyle(type, "backgroundColor");
 
   /// The border color of the card
   Color get borderColor => borderColorOverride ?? getStyle(type, "borderColor");
@@ -182,8 +182,7 @@ class CardDecoration extends Style {
   double get dividerHeight => dividerHeightOverride ?? token.cardDividerHeight;
 
   /// The divider thickness of the card
-  double get dividerThickness =>
-      dividerThicknessOverride ?? token.cardDividerThickness;
+  double get dividerThickness => dividerThicknessOverride ?? token.cardDividerThickness;
 
   /// The decoration of the card
   BoxDecoration get decoration {
@@ -214,13 +213,10 @@ class CardDecoration extends Style {
       context: context ?? this.context,
       type: type ?? this.type,
       size: size ?? this.size,
-      backgroundColorOverride:
-          backgroundColorOverride ?? this.backgroundColorOverride,
+      backgroundColorOverride: backgroundColorOverride ?? this.backgroundColorOverride,
       borderColorOverride: borderColorOverride ?? this.borderColorOverride,
-      dividerHeightOverride:
-          dividerHeightOverride ?? this.dividerHeightOverride,
-      dividerThicknessOverride:
-          dividerThicknessOverride ?? this.dividerThicknessOverride,
+      dividerHeightOverride: dividerHeightOverride ?? this.dividerHeightOverride,
+      dividerThicknessOverride: dividerThicknessOverride ?? this.dividerThicknessOverride,
       borderWidthOverride: borderWidthOverride ?? this.borderWidthOverride,
       paddingOverride: paddingOverride ?? this.paddingOverride,
       borderRadiusOverride: borderRadiusOverride ?? this.borderRadiusOverride,
@@ -236,13 +232,10 @@ class CardDecoration extends Style {
       context: other.context,
       type: other.type,
       size: other.size,
-      backgroundColorOverride:
-          other.backgroundColorOverride ?? backgroundColorOverride,
+      backgroundColorOverride: other.backgroundColorOverride ?? backgroundColorOverride,
       borderColorOverride: other.borderColorOverride ?? borderColorOverride,
-      dividerHeightOverride:
-          other.dividerHeightOverride ?? dividerHeightOverride,
-      dividerThicknessOverride:
-          other.dividerThicknessOverride ?? dividerThicknessOverride,
+      dividerHeightOverride: other.dividerHeightOverride ?? dividerHeightOverride,
+      dividerThicknessOverride: other.dividerThicknessOverride ?? dividerThicknessOverride,
       borderWidthOverride: other.borderWidthOverride ?? borderWidthOverride,
       paddingOverride: other.paddingOverride ?? paddingOverride,
       borderRadiusOverride: other.borderRadiusOverride ?? borderRadiusOverride,
