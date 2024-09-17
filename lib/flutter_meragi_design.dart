@@ -12,6 +12,7 @@ export 'src/components/fields/list.dart';
 export 'src/components/fields/switch.dart';
 export 'src/components/fields/text_field.dart';
 export 'src/components/filter_form.dart';
+export 'src/components/image.dart';
 export 'src/components/layout/app_bar.dart';
 export 'src/components/layout/base.dart';
 export 'src/components/layout/navigation_rail.dart';
