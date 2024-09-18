@@ -33,6 +33,7 @@ export 'src/extensions/number.dart';
 export 'src/theme/theme.dart';
 export 'src/theme/tokens/light.dart';
 export 'src/theme/tokens/light_wide.dart';
+export 'src/utils/debouncer.dart';
 export 'src/utils/multi_value_listenable_builder.dart';
 export 'src/utils/platform.dart';
 export 'src/utils/scroll_handler.dart';
