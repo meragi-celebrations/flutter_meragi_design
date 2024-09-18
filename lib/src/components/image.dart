@@ -1,5 +1,6 @@
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
 class MDNetworkImage extends StatelessWidget {
   // Constructor takes all the parameters of Image.network
@@ -75,49 +76,42 @@ class MDNetworkImage extends StatelessWidget {
     if (height != null) {
       formatterUrl = "$formatterUrl&height=$height";
     }
-    return MouseRegion(
-      cursor: preview ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: AbsorbPointer(
-        absorbing: !preview,
-        child: GestureDetector(
-          onTap: () {
-            // if (preview) {
-            showImageViewer(
-              context,
-              Image.network(urlForPreview).image,
-              useSafeArea: true,
-              swipeDismissible: false,
-              doubleTapZoomable: true,
-              backgroundColor: Colors.black54.withOpacity(.7),
-            );
-            // }
-          },
-          child: Image.network(
-            formatterUrl,
-            scale: scale,
-            width: width,
-            height: height,
-            color: color,
-            opacity: opacity,
-            colorBlendMode: colorBlendMode,
-            fit: fit,
-            alignment: alignment,
-            repeat: repeat,
-            centerSlice: centerSlice,
-            matchTextDirection: matchTextDirection,
-            gaplessPlayback: gaplessPlayback,
-            filterQuality: filterQuality,
-            isAntiAlias: isAntiAlias,
-            headers: headers,
-            cacheWidth: cacheWidth,
-            cacheHeight: cacheHeight,
-            loadingBuilder: loadingBuilder,
-            errorBuilder: errorBuilder,
-            semanticLabel: semanticLabel,
-            excludeFromSemantics: excludeFromSemantics,
-            frameBuilder: frameBuilder,
-          ),
-        ),
+    return MDGestureDetector(
+      isDisabled: !preview,
+      onTap: () {
+        showImageViewer(
+          context,
+          Image.network(urlForPreview).image,
+          useSafeArea: true,
+          swipeDismissible: false,
+          doubleTapZoomable: true,
+          backgroundColor: Colors.black54.withOpacity(.7),
+        );
+      },
+      child: Image.network(
+        formatterUrl,
+        scale: scale,
+        width: width,
+        height: height,
+        color: color,
+        opacity: opacity,
+        colorBlendMode: colorBlendMode,
+        fit: fit,
+        alignment: alignment,
+        repeat: repeat,
+        centerSlice: centerSlice,
+        matchTextDirection: matchTextDirection,
+        gaplessPlayback: gaplessPlayback,
+        filterQuality: filterQuality,
+        isAntiAlias: isAntiAlias,
+        headers: headers,
+        cacheWidth: cacheWidth,
+        cacheHeight: cacheHeight,
+        loadingBuilder: loadingBuilder,
+        errorBuilder: errorBuilder,
+        semanticLabel: semanticLabel,
+        excludeFromSemantics: excludeFromSemantics,
+        frameBuilder: frameBuilder,
       ),
     );
   }

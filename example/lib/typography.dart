@@ -39,17 +39,17 @@ class _TypographyDetailsState extends State<TypographyDetails> {
               style:
                   TextStyle(color: Colors.pink, backgroundColor: Colors.amber),
             ),
-            GestureDetector(
+            MDGestureDetector(
               onTap: () {
-                print("this was called");
+                print("helllo");
               },
               child: MDNetworkImage(
                 src:
                     "https://d1p55htxo8z8mf.cloudfront.net/vendor_profile_image/93ac05bb-356f-4ec3-8603-c141663f3fa6.jpg",
                 width: 250,
-                // preview: false,
+                preview: false,
               ),
-            )
+            ),
           ],
         ),
       ),
