@@ -11,7 +11,7 @@ class TypographyDetails extends StatefulWidget {
 class _TypographyDetailsState extends State<TypographyDetails> {
   @override
   Widget build(BuildContext context) {
-    return const MDScaffold(
+    return MDScaffold(
       appBar: MDAppBar(title: H3(text: "Typography")),
       body: SingleChildScrollView(
         child: Column(
@@ -39,11 +39,16 @@ class _TypographyDetailsState extends State<TypographyDetails> {
               style:
                   TextStyle(color: Colors.pink, backgroundColor: Colors.amber),
             ),
-            MDNetworkImage(
-              src:
-                  "https://d1p55htxo8z8mf.cloudfront.net/vendor_profile_image/93ac05bb-356f-4ec3-8603-c141663f3fa6.jpg",
-              width: 250,
-              // preview: false,
+            GestureDetector(
+              onTap: () {
+                print("this was called");
+              },
+              child: MDNetworkImage(
+                src:
+                    "https://d1p55htxo8z8mf.cloudfront.net/vendor_profile_image/93ac05bb-356f-4ec3-8603-c141663f3fa6.jpg",
+                width: 250,
+                // preview: false,
+              ),
             )
           ],
         ),

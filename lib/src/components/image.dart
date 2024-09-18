@@ -77,9 +77,11 @@ class MDNetworkImage extends StatelessWidget {
     }
     return MouseRegion(
       cursor: preview ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: GestureDetector(
-        onTap: () {
-          if (preview) {
+      child: AbsorbPointer(
+        absorbing: !preview,
+        child: GestureDetector(
+          onTap: () {
+            // if (preview) {
             showImageViewer(
               context,
               Image.network(urlForPreview).image,
@@ -88,32 +90,33 @@ class MDNetworkImage extends StatelessWidget {
               doubleTapZoomable: true,
               backgroundColor: Colors.black54.withOpacity(.7),
             );
-          }
-        },
-        child: Image.network(
-          formatterUrl,
-          scale: scale,
-          width: width,
-          height: height,
-          color: color,
-          opacity: opacity,
-          colorBlendMode: colorBlendMode,
-          fit: fit,
-          alignment: alignment,
-          repeat: repeat,
-          centerSlice: centerSlice,
-          matchTextDirection: matchTextDirection,
-          gaplessPlayback: gaplessPlayback,
-          filterQuality: filterQuality,
-          isAntiAlias: isAntiAlias,
-          headers: headers,
-          cacheWidth: cacheWidth,
-          cacheHeight: cacheHeight,
-          loadingBuilder: loadingBuilder,
-          errorBuilder: errorBuilder,
-          semanticLabel: semanticLabel,
-          excludeFromSemantics: excludeFromSemantics,
-          frameBuilder: frameBuilder,
+            // }
+          },
+          child: Image.network(
+            formatterUrl,
+            scale: scale,
+            width: width,
+            height: height,
+            color: color,
+            opacity: opacity,
+            colorBlendMode: colorBlendMode,
+            fit: fit,
+            alignment: alignment,
+            repeat: repeat,
+            centerSlice: centerSlice,
+            matchTextDirection: matchTextDirection,
+            gaplessPlayback: gaplessPlayback,
+            filterQuality: filterQuality,
+            isAntiAlias: isAntiAlias,
+            headers: headers,
+            cacheWidth: cacheWidth,
+            cacheHeight: cacheHeight,
+            loadingBuilder: loadingBuilder,
+            errorBuilder: errorBuilder,
+            semanticLabel: semanticLabel,
+            excludeFromSemantics: excludeFromSemantics,
+            frameBuilder: frameBuilder,
+          ),
         ),
       ),
     );
