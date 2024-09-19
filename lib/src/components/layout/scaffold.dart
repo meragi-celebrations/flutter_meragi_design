@@ -98,11 +98,14 @@ class MDScaffold extends StatelessWidget {
         appBar: buildHeader(controller),
         body: body != null
             ? body!
-            : MDSplitBody(
-                splitController: controller,
-                leftChild: leftChild!,
-                rightChild: rightChild!,
-              ),
+            : LayoutBuilder(builder: (context, constraints) {
+                return MDSplitBody(
+                  splitController: controller,
+                  leftChild: leftChild!,
+                  rightChild: rightChild!,
+                  maxWidth: constraints.maxWidth,
+                );
+              }),
         bottomNavigationBar: bottomNavigationBar,
       ),
     );
@@ -113,15 +116,19 @@ class MDSplitBody extends StatelessWidget {
   final Widget leftChild;
   final Widget rightChild;
   final SplitController splitController;
+  final double? maxWidth;
   const MDSplitBody({
     super.key,
     required this.leftChild,
     required this.rightChild,
     required this.splitController,
+    this.maxWidth,
   });
 
   @override
   Widget build(BuildContext context) {
+    double maxWidth = this.maxWidth ?? MediaQuery.of(context).size.width;
+
     return ValueListenableBuilder<bool>(
         valueListenable: splitController.isSplitOpen,
         builder: (context, maximized, _) {
@@ -142,8 +149,8 @@ class MDSplitBody extends StatelessWidget {
                 layout: DockingLayout(
                   root: DockingRow([
                     DockingItem(
-                      size: MediaQuery.of(context).size.width * .3,
-                      minimalSize: MediaQuery.of(context).size.width * .1,
+                      size: maxWidth * .3,
+                      minimalSize: maxWidth * .1,
                       widget: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 3),
                         decoration: BoxDecoration(
@@ -163,7 +170,7 @@ class MDSplitBody extends StatelessWidget {
                     ),
                     DockingItem(
                       maximized: maximized,
-                      minimalSize: MediaQuery.of(context).size.width * .5,
+                      minimalSize: maxWidth * .5,
                       widget: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 3),
                         decoration: BoxDecoration(

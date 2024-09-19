@@ -589,7 +589,45 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           },
-        )
+        ),
+        Story(
+          name: "Image",
+          builder: (context) => MDNetworkImage(
+            src: "https://picsum.photos/1008",
+            preview: context.knobs.boolean(
+              label: "Preview",
+              initial: true,
+            ),
+          ),
+        ),
+        Story(
+          name: "Tag",
+          builder: (context) => MDTag(
+            text: context.knobs.boolean(label: "Text", initial: true)
+                ? "Warehouse"
+                : null,
+            icon: context.knobs.boolean(label: "Icon", initial: true)
+                ? Icons.warehouse
+                : null,
+            decoration: TagDecoration(
+              context: context,
+              type: context.knobs.options(
+                label: "Type",
+                initial: TagType.defaultType,
+                options: TagType.values
+                    .map((e) => Option(label: e.name, value: e))
+                    .toList(),
+              ),
+              size: context.knobs.options(
+                label: "Size",
+                initial: TagSize.rg,
+                options: TagSize.values
+                    .map((e) => Option(label: e.name, value: e))
+                    .toList(),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
