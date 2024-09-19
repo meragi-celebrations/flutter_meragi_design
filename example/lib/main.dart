@@ -146,6 +146,8 @@ class Layout extends StatefulWidget {
 
 class _LayoutState extends State<Layout> {
   int _currentIndex = 0;
+  bool _isExpanded = true;
+
   @override
   Widget build(BuildContext context) {
     return MDLayout(
@@ -173,6 +175,12 @@ class _LayoutState extends State<Layout> {
         onDestinationSelected: (index) {
           setState(() {
             _currentIndex = index;
+          });
+        },
+        isExpanded: _isExpanded,
+        onExpandTap: () {
+          setState(() {
+            _isExpanded = !_isExpanded;
           });
         },
       ),
