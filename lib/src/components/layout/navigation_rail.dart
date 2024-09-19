@@ -77,7 +77,7 @@ class MDNavigationRail extends StatelessWidget {
               ),
             ),
             if (onExpandTap != null)
-              Button(
+              MDButton(
                 decoration: ButtonDecoration(
                   context: context,
                   variant: ButtonVariant.ghost,

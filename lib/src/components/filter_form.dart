@@ -68,30 +68,41 @@ class _MDFilterFormViewState extends State<MDFilterFormView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return MDScaffold(
+      appBar: MDAppBar(
+        asPageHeader: true,
         title: const Text("Filters"),
-        leading: IconButton(
-          icon: const Icon(PhosphorIconsBold.x),
-          onPressed: () => Navigator.pop(context),
+        leading: MDButton(
+          decoration: ButtonDecoration(
+              context: context,
+              variant: ButtonVariant.ghost,
+              type: ButtonType.danger),
+          icon: PhosphorIconsBold.x,
+          onTap: () => Navigator.pop(context),
         ),
         actions: [
-          Button(
-            decoration: ButtonDecoration(context: context, type: ButtonType.primary, variant: ButtonVariant.ghost),
+          MDButton(
+            decoration: ButtonDecoration(
+              context: context,
+              type: ButtonType.primary,
+              variant: ButtonVariant.ghost,
+            ),
             onTap: () {
               widget.formKey.currentState?.reset();
             },
             child: const Text("Clear"),
           ),
           const SizedBox(width: 10),
-          Button(
-            decoration: ButtonDecoration(context: context, type: ButtonType.primary),
+          MDButton(
+            decoration:
+                ButtonDecoration(context: context, type: ButtonType.primary),
             onTap: () {
               List<MDFilter> filters = [];
               if (!widget.formKey.currentState!.saveAndValidate()) {
                 return;
               }
-              Map<String, dynamic> formValue = widget.formKey.currentState!.value;
+              Map<String, dynamic> formValue =
+                  widget.formKey.currentState!.value;
               for (MapEntry<String, dynamic> data in formValue.entries) {
                 if (data.value != null) {
                   // MDFilter(

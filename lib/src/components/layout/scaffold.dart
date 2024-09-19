@@ -59,7 +59,7 @@ class MDScaffold extends StatelessWidget {
             ValueListenableBuilder<bool>(
               valueListenable: controller.isSplitOpen,
               builder: (context, value, _) {
-                return Button(
+                return MDButton(
                   decoration: ButtonDecoration(
                     context: context,
                     variant: ButtonVariant.ghost,

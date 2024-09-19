@@ -35,7 +35,8 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
                 children: [
                   ...options!.map(
                     (option) {
-                      return checkboxOption(state, option, field, isMultiSelect);
+                      return checkboxOption(
+                          state, option, field, isMultiSelect);
                     },
                   ),
                 ],
@@ -79,7 +80,10 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
         );
 
   static ValueListenableBuilder<Set<String>> checkboxOption(
-      _MDFormCheckboxList state, MDCheckboxOption option, _MDFormCheckboxList field, bool isMultiSelect) {
+      _MDFormCheckboxList state,
+      MDCheckboxOption option,
+      _MDFormCheckboxList field,
+      bool isMultiSelect) {
     return ValueListenableBuilder(
       valueListenable: state.setValues,
       builder: (context, selectedSet, _) {
@@ -88,12 +92,15 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
           dense: true,
           trailing: MDCheckbox(
             value: selectedSet.contains(option.value),
-            shape: !isMultiSelect ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)) : null,
+            shape: !isMultiSelect
+                ? RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))
+                : null,
             onChanged: (value) {
               if (!isMultiSelect) {
                 state.setValues.value = {option.value};
                 field.didChange(state.setValues.value);
-                return;
+                // return;
               }
               if (value ?? false) {
                 state.setValues.value.add(option.value);
@@ -104,16 +111,31 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
               field.didChange(state.setValues.value);
             },
           ),
+          onTap: () {
+            if (isMultiSelect) {
+              if (selectedSet.contains(option.value)) {
+                state.setValues.value.remove(option.value);
+              } else {
+                state.setValues.value.add(option.value);
+              }
+            } else {
+              state.setValues.value = {option.value};
+            }
+            state.setValues.notifyListeners();
+            field.didChange(state.setValues.value);
+          },
         );
       },
     );
   }
 
   @override
-  MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> createState() => _MDFormCheckboxList();
+  MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> createState() =>
+      _MDFormCheckboxList();
 }
 
-class _MDFormCheckboxList extends MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> {
+class _MDFormCheckboxList
+    extends MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> {
   PropertyNotifier<Set<String>> setValues = PropertyNotifier({});
 
   @override
@@ -175,7 +197,8 @@ class MDFormCheckbox extends MDFormBuilderField<bool> {
         );
 
   @override
-  MDFormBuilderFieldState<MDFormCheckbox, bool> createState() => _MDFormCheckbox();
+  MDFormBuilderFieldState<MDFormCheckbox, bool> createState() =>
+      _MDFormCheckbox();
 }
 
 class _MDFormCheckbox extends MDFormBuilderFieldState<MDFormCheckbox, bool> {}

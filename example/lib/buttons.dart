@@ -46,7 +46,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Column(
                               children: [
-                                Button(
+                                MDButton(
                                   decoration: ButtonDecoration(
                                     context: context,
                                     variant: variant,
@@ -58,7 +58,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                                   child: Text(type.name),
                                 ),
                                 const SizedBox(height: 10),
-                                Button.dropdown(
+                                MDButton.dropdown(
                                   decoration: ButtonDecoration(
                                     context: context,
                                     variant: variant,
@@ -68,7 +68,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                                   onTap: () {},
                                   icon: Icons.filter,
                                   menuChildren: [
-                                    Button(
+                                    MDButton(
                                       decoration: ButtonDecoration(
                                         context: context,
                                         variant: variant,
@@ -103,7 +103,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                           builder: (context, value, _) {
                             return Column(
                               children: [
-                                Button(
+                                MDButton(
                                   decoration: ButtonDecoration(
                                     context: context,
                                     variant: variant,
@@ -119,7 +119,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                Button.dropdown(
+                                MDButton.dropdown(
                                   builder: (context, controller, child) {
                                     return GestureDetector(
                                       onTap: () {
@@ -147,7 +147,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
                                   child: const Text(
                                       "Loading custom indicator (click)"),
                                 ),
-                                Button(
+                                MDButton(
                                   decoration: ButtonDecoration(
                                     context: context,
                                     variant: variant,

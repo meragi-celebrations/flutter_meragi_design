@@ -30,7 +30,7 @@ class MDLoadingIndicator extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         child ?? const SizedBox(),
-        if (child != null)
+        if (child != null && isLoading)
           Positioned.fill(
             child: Container(
               color: Colors.black.withOpacity(.4),
