@@ -92,9 +92,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // );
 
     return Storybook(
+      initialStory: "Data/Typography",
       stories: [
         Story(
-          name: "Typography",
+          name: "Data/Typography",
           builder: (context) {
             String textKnob = context.knobs.text(
                 label: "Text",
@@ -267,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "Description",
+          name: "Data/Description",
           builder: (context) {
             return MDDescription(
               direction: context.knobs.options(
@@ -297,7 +298,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: 'Card',
+          name: 'Data/Card',
           builder: (context) {
             return Column(
               children: [
@@ -344,7 +345,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "Loading Indicator",
+          name: "Helper/Loading Indicator",
           builder: (context) {
             return MDLoadingIndicator(
               color: Colors.black,
@@ -367,13 +368,13 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "Navigation Rail",
+          name: "Layout/Navigation Rail",
           builder: (context) {
             return const NavigationRailStory();
           },
         ),
         Story(
-          name: "Gesture Detector",
+          name: "Helper/Gesture Detector",
           builder: (context) {
             return MDGestureDetector(
               onTap: () {},
@@ -390,7 +391,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "App Bar",
+          name: "Layout/App Bar",
           builder: (context) {
             return Padding(
               padding: const EdgeInsets.all(8.0),
@@ -410,11 +411,11 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "Layout",
+          name: "Layout/Base",
           builder: (context) {
             return MDLayout(
               sider: MDNavigationRail(
-                destinations: [],
+                destinations: const [],
                 onDestinationSelected: (_) {},
               ),
               content: const MDScaffold(
@@ -424,11 +425,11 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "Split Scaffold",
+          name: "Layout/Split Scaffold",
           builder: (context) {
             return MDLayout(
               sider: MDNavigationRail(
-                destinations: [],
+                destinations: const [],
                 onDestinationSelected: (_) {},
               ),
               content: const MDScaffold.split(
@@ -498,11 +499,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 formKey: GlobalKey<FormBuilderState>(),
                 formItems: [
                   MDFormItem(
-                    label: Text("Text"),
+                    label: const Text("Text"),
                     child: MDTextField(name: "text"),
                   ),
                   MDFormItem(
-                    label: Text("Checkbox"),
+                    label: const Text("Checkbox"),
                     child: MDFormCheckboxList(
                       name: "text",
                       options: List.generate(
@@ -549,7 +550,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 children: [
                   MDFormItem(
-                    label: Text("Text"),
+                    label: const Text("Text"),
                     labelPosition: labelPostion,
                     isGrid: isGrid,
                     gridValues: gridValues,
@@ -561,13 +562,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   MDFormItem(
-                    label: Text("Checkbox"),
+                    label: const Text("Checkbox"),
                     labelPosition: labelPostion,
                     isGrid: isGrid,
                     gridValues: gridValues,
                     contentSpace: contentSpace,
                     child: MDFormCheckboxList(
-                      name: "text",
+                      name: "checkbox",
                       options: List.generate(
                         5,
                         (index) => MDCheckboxOption(
@@ -581,9 +582,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   MDButton(
                     onTap: () {
+                      print("save ${_formKey.currentState?.value}");
                       _formKey.currentState?.saveAndValidate();
                     },
-                    child: Text("Save"),
+                    child: const Text("Save"),
                   )
                 ],
               ),
@@ -591,7 +593,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "Image",
+          name: "Data/Image",
           builder: (context) => MDNetworkImage(
             src: "https://picsum.photos/1008",
             preview: context.knobs.boolean(
@@ -601,7 +603,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         Story(
-          name: "Tag",
+          name: "Data/Tag",
           builder: (context) => MDTag(
             text: context.knobs.boolean(label: "Text", initial: true)
                 ? "Warehouse"
@@ -627,6 +629,190 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+        ),
+        Story(
+          name: "Dialog/Alert Dialog",
+          builder: (context) {
+            String? title =
+                context.knobs.nullable.text(label: "Title", enabled: false);
+            String? okText = context.knobs.nullable.text(
+              label: "OK Text",
+              enabled: false,
+            );
+            String? cancelText = context.knobs.nullable.text(
+              label: "Cancel Text",
+              enabled: false,
+            );
+            String? backText = context.knobs.nullable.text(
+              label: "Back Text",
+              enabled: false,
+            );
+
+            bool showBack = context.knobs.boolean(
+              label: "Show Back",
+              initial: false,
+            );
+
+            bool isDestructive = context.knobs.boolean(
+              label: "Destructive",
+              initial: false,
+            );
+
+            CardType type = context.knobs.options(
+              label: "Type",
+              initial: CardType.defaultType,
+              options: CardType.values
+                  .map((e) => Option(label: e.name, value: e))
+                  .toList(),
+            );
+
+            return MDScaffold(
+                body: Center(
+              child: MDButton(
+                child: const Text("Show"),
+                onTap: () {
+                  showAlertDialog(
+                    context: context,
+                    builder: (context) {
+                      return MDAlertDialog(
+                        title: title,
+                        content: const Text("heelo"),
+                        okText: okText,
+                        cancelText: cancelText,
+                        backText: backText,
+                        onOk: () {},
+                        onBack: showBack ? () {} : null,
+                        isDestructive: isDestructive,
+                        type: type,
+                      );
+                    },
+                  );
+                },
+              ),
+            ));
+          },
+        ),
+        Story(
+          name: "Dialog/Drawer",
+          builder: (context) {
+            SlidePosition position = context.knobs.options(
+              label: "Position",
+              initial: SlidePosition.right,
+              options: SlidePosition.values
+                  .map((e) => Option(label: e.name, value: e))
+                  .toList(),
+            );
+            double width = context.knobs
+                .sliderInt(
+                  label: "Width",
+                  initial: 500,
+                  min: 300,
+                  max: 1000,
+                  divisions: 50,
+                )
+                .toDouble();
+            double height = context.knobs
+                .sliderInt(
+                  label: "Height",
+                  initial: 350,
+                  min: 300,
+                  max: 1000,
+                  divisions: 50,
+                )
+                .toDouble();
+            return MDScaffold(
+              body: Center(
+                child: MDButton(
+                  onTap: () {
+                    showSlidingDrawer(
+                      context: context,
+                      position: position,
+                      width: width,
+                      height: height,
+                      builder: (context) {
+                        return const MDCard(
+                            header: Row(
+                              children: [
+                                H4(
+                                  text: "Drawer",
+                                )
+                              ],
+                            ),
+                            body: BodyText(
+                              text: "Body",
+                            ));
+                      },
+                    );
+                  },
+                  child: const Text("Show"),
+                ),
+              ),
+            );
+          },
+        ),
+        Story(
+          name: 'Helper/Divider',
+          builder: (context) {
+            var rotateChild =
+                context.knobs.boolean(label: "Rotate Child", initial: false);
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Horizontal Dividers
+                  MDDivider(rotateChild: rotateChild),
+                  MDDivider(
+                    rotateChild: rotateChild,
+                    position: DividerPosition.start,
+                    child: const Text('Start Text'),
+                  ),
+                  const SizedBox(height: 20),
+                  const MDDivider(
+                    position: DividerPosition.center,
+                    color: Colors.red,
+                    child: Text('Center Text'),
+                  ),
+                  const SizedBox(height: 20),
+                  MDDivider(
+                    position: DividerPosition.end,
+                    rotateChild: rotateChild,
+                    child: const Text('End Text'),
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        MDDivider(
+                          direction: Axis.vertical,
+                          rotateChild: rotateChild,
+                        ),
+                        MDDivider(
+                          direction: Axis.vertical,
+                          rotateChild: rotateChild,
+                          position: DividerPosition.start,
+                          child: const Text('Top Text'),
+                        ),
+                        const SizedBox(width: 20),
+                        MDDivider(
+                          direction: Axis.vertical,
+                          rotateChild: rotateChild,
+                          position: DividerPosition.center,
+                          child: const Text('Middle Text'),
+                        ),
+                        const SizedBox(width: 20),
+                        MDDivider(
+                          direction: Axis.vertical,
+                          rotateChild: rotateChild,
+                          position: DividerPosition.end,
+                          child: const Text('Bottom Text'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ],
     );
@@ -719,16 +905,16 @@ List<Map<String, dynamic>> pages = [
   },
 ];
 
-class Layout extends StatefulWidget {
-  const Layout({
+class LayoutView extends StatefulWidget {
+  const LayoutView({
     super.key,
   });
 
   @override
-  State<Layout> createState() => _LayoutState();
+  State<LayoutView> createState() => _LayoutViewState();
 }
 
-class _LayoutState extends State<Layout> {
+class _LayoutViewState extends State<LayoutView> {
   int _currentIndex = 0;
   bool _isExpanded = true;
 

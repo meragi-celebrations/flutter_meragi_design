@@ -3,9 +3,12 @@ library flutter_meragi_design;
 export 'package:flutter_form_builder/flutter_form_builder.dart';
 export 'package:form_builder_validators/form_builder_validators.dart';
 
+export 'src/components/alert_dialog.dart';
 export 'src/components/button.dart';
 export 'src/components/card.dart';
 export 'src/components/description.dart';
+export 'src/components/divider.dart';
+export 'src/components/drawer.dart';
 export 'src/components/fields/dropdown.dart';
 export 'src/components/fields/form_item.dart';
 export 'src/components/fields/list.dart';
