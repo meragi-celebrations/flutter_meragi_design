@@ -131,8 +131,10 @@ class MDCarouselController {
     internalController = RawCarouselController(initialItem: initialIndex);
     internalController.addListener(() {
       int index = (internalController.position as CarouselPosition)
-          .getItemFromPixels(internalController.position.pixels,
-              internalController.position.viewportDimension)
+          .getItemFromPixels(
+            internalController.position.pixels,
+            internalController.position.viewportDimension,
+          )
           .round();
       currentIndex.value = index;
     });
@@ -142,10 +144,11 @@ class MDCarouselController {
 
   goTo(double index) {
     internalController.animateTo(
-        (internalController.position as CarouselPosition)
-            .getPixelsFromItem(index),
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn);
+      (internalController.position as CarouselPosition)
+          .getPixelsFromItem(index),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeIn,
+    );
   }
 
   nextPage() {
