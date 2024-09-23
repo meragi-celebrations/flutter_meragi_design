@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 ///
 /// The [height] and [width] parameters can be used to specify the size of the
 /// drawer.
-Future<T?> showSlidingDrawer<T>({
+Future<T?> showMDDrawer<T>({
   required BuildContext context,
   required WidgetBuilder builder,
   bool useRootNavigator = true,

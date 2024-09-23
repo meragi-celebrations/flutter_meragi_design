@@ -13,7 +13,7 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 /// Returns a [Future] that resolves to the value returned by the dialog's
 /// [Navigator.pop] function, or null if the dialog is dismissed without
 /// returning a value.
-Future<T?> showAlertDialog<T>({
+Future<T?> showMDAlertDialog<T>({
   required BuildContext context,
   required WidgetBuilder builder,
 }) {
