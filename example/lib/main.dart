@@ -814,6 +814,43 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           },
         ),
+        Story(
+            name: "Carousel",
+            builder: (context) {
+              return MDScaffold(
+                body: MDCarousel(
+                  showNavButtons: context.knobs.boolean(
+                    label: "Show Nav Buttons",
+                    initial: true,
+                  ),
+                  showPagination: context.knobs.boolean(
+                    label: "Show Pagination",
+                    initial: true,
+                  ),
+                  controller: MDCarouselController(
+                    itemExtent: context.knobs
+                        .sliderInt(
+                          label: "Width",
+                          initial: 200,
+                          min: 200,
+                          max: 500,
+                          divisions: 50,
+                        )
+                        .toDouble(),
+                  ),
+                  children: List.generate(
+                    25,
+                    (e) => Container(
+                      color: Colors.amber,
+                      // width: 200,
+                      child: MDNetworkImage(
+                          src: "https://picsum.photos/id/${e}/500/500",
+                          fit: BoxFit.cover),
+                    ),
+                  ),
+                ),
+              );
+            })
       ],
     );
   }
