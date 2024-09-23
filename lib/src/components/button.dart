@@ -15,18 +15,18 @@ enum ButtonSize { sm, rg, lg }
 
 /// A button widget that can be used to create a button with a given style.
 ///
-/// The [Button] widget is a wrapper around a [GestureDetector] widget, which
-/// is used to detect tap events. The [Button] widget can be used to create
+/// The [MDButton] widget is a wrapper around a [GestureDetector] widget, which
+/// is used to detect tap events. The [MDButton] widget can be used to create
 /// both filled and outlined buttons.
 ///
-/// The [Button] widget takes a [ButtonDecoration] object as its decoration
+/// The [MDButton] widget takes a [ButtonDecoration] object as its decoration
 /// parameter. The [ButtonDecoration] object is used to define the style of the
 /// button.
 ///
-/// The [Button] widget also takes a [VoidCallback] as its onTap parameter. This
+/// The [MDButton] widget also takes a [VoidCallback] as its onTap parameter. This
 /// callback is called when the button is tapped.
 ///
-/// The [Button] widget can also be used to create a dropdown button.
+/// The [MDButton] widget can also be used to create a dropdown button.
 /// To create a dropdown button, the [Button.dropdown] constructor should be
 /// used. The [Button.dropdown] constructor takes a [MenuAnchorChildBuilder]
 /// as its builder parameter. The [MenuAnchorChildBuilder] is used to define
@@ -35,7 +35,7 @@ enum ButtonSize { sm, rg, lg }
 /// The [Button.dropdown] constructor also takes a list of [Widget]s as its
 /// menuChildren parameter. The [menuChildren] parameter is used to define the
 /// children of the dropdown menu.
-class Button extends StatefulWidget {
+class MDButton extends StatefulWidget {
   /// The callback that is called when the button is tapped.
   final VoidCallback? onTap;
 
@@ -57,7 +57,7 @@ class Button extends StatefulWidget {
   /// The decoration of the button.
   final ButtonDecoration? decoration;
 
-  const Button({
+  const MDButton({
     super.key,
     this.onTap,
     this.icon,
@@ -73,7 +73,7 @@ class Button extends StatefulWidget {
 
   /// Creates a dropdown button with the given decoration, onTap callback, child,
   /// icon, and expand property.
-  const Button.dropdown({
+  const MDButton.dropdown({
     super.key,
     this.onTap,
     this.icon,
@@ -99,10 +99,10 @@ class Button extends StatefulWidget {
   bool get isDropdown => _isDropdown;
   final Color? dividerColor;
   @override
-  State<Button> createState() => _ButtonState();
+  State<MDButton> createState() => _MDButtonState();
 }
 
-class _ButtonState extends State<Button> {
+class _MDButtonState extends State<MDButton> {
   late final ButtonStateController _stateController;
 
   @override
@@ -161,11 +161,14 @@ class _ButtonState extends State<Button> {
                                   : finalDecoration.buttonBackgroundColor
                               : finalDecoration.buttonDisabledColor
                           : null,
-                      border: widget.isDropdown ? null : finalDecoration.buttonBorder,
+                      border: widget.isDropdown
+                          ? null
+                          : finalDecoration.buttonBorder,
                       borderRadius: finalDecoration.borderRadius,
                     ),
                     child: Row(
-                      mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
+                      mainAxisSize:
+                          widget.expand ? MainAxisSize.max : MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (widget.isLoading) ...[
@@ -183,9 +186,12 @@ class _ButtonState extends State<Button> {
                           Icon(
                             widget.icon!,
                             size: finalDecoration.buttonIconSize,
-                            color: isEnabled ? finalDecoration.buttonTextColor : Colors.grey,
+                            color: isEnabled
+                                ? finalDecoration.buttonTextColor
+                                : Colors.grey,
                           ),
-                        if ((widget.icon != null || widget.isLoading) && widget.child != null)
+                        if ((widget.icon != null || widget.isLoading) &&
+                            widget.child != null)
                           SizedBox(width: finalDecoration.buttonSpaceBetween),
                         if (widget.child != null)
                           DefaultTextStyle.merge(
@@ -200,7 +206,8 @@ class _ButtonState extends State<Button> {
             );
             if (widget.isDropdown) {
               return Row(
-                mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
+                mainAxisSize:
+                    widget.expand ? MainAxisSize.max : MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   baseButton,
@@ -220,7 +227,9 @@ class _ButtonState extends State<Button> {
                             return SizedBox(
                               height: finalDecoration.buttonHeight,
                               width: finalDecoration.buttonHeight,
-                              child: widget.builder != null ? widget.builder!(context, controller, child) : null,
+                              child: widget.builder != null
+                                  ? widget.builder!(context, controller, child)
+                                  : null,
                             );
                           },
                         ),
@@ -365,7 +374,8 @@ class ButtonDecoration extends Style {
   }
 
   BorderRadius? get borderRadius {
-    return BorderRadius.circular(borderRadiusOverride ?? getStyle(size, 'borderRadius'));
+    return BorderRadius.circular(
+        borderRadiusOverride ?? getStyle(size, 'borderRadius'));
   }
 
   EdgeInsetsGeometry get buttonPadding {
@@ -451,12 +461,14 @@ class ButtonDecoration extends Style {
       spaceBetweenOverride: spaceBetweenOverride ?? this.spaceBetweenOverride,
       heightOverride: heightOverride ?? this.heightOverride,
       iconSizeOverride: iconSizeOverride ?? this.iconSizeOverride,
-      disabledColorOverride: disabledColorOverride ?? this.disabledColorOverride,
+      disabledColorOverride:
+          disabledColorOverride ?? this.disabledColorOverride,
       borderRadiusOverride: borderRadiusOverride ?? this.borderRadiusOverride,
       textColorOverride: textColorOverride ?? this.textColorOverride,
       textHeightOverride: textHeightOverride ?? this.textHeightOverride,
       paddingOverride: paddingOverride ?? this.paddingOverride,
-      disabledIconColorOverride: disabledIconColorOverride ?? this.disabledIconColorOverride,
+      disabledIconColorOverride:
+          disabledIconColorOverride ?? this.disabledIconColorOverride,
     );
   }
 

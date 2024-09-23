@@ -76,8 +76,6 @@ class _MDFormItemState extends State<MDFormItem> {
           workingError = BodyText(text: error ?? "", type: TextType.error);
         });
       }
-
-      print("Eroor for dynaminc, ${error}");
     };
 
     FormItemStyle finalStyle = FormItemStyle().merge(widget.style);

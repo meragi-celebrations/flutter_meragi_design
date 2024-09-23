@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:flutter_meragi_design/src/extensions/list.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class MDNavigationRail extends StatefulWidget {
+class MDNavigationRail extends StatelessWidget {
   final List<MDNavigationRailDestination> destinations;
   final int selectedIndex;
   final Function(int index) onDestinationSelected;
   final Widget? logo;
   final Widget? expandedLogo;
+  final bool isExpanded;
+  final Function()? onExpandTap;
 
   const MDNavigationRail({
     super.key,
@@ -17,19 +18,9 @@ class MDNavigationRail extends StatefulWidget {
     this.selectedIndex = 0,
     this.logo,
     this.expandedLogo,
+    this.isExpanded = false,
+    this.onExpandTap,
   });
-
-  @override
-  State<MDNavigationRail> createState() => _MDNavigationRailState();
-}
-
-class _MDNavigationRailState extends State<MDNavigationRail> {
-  bool _isExpanded = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +29,7 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
       color: const Color(0xfff1f0f5),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        width: _isExpanded ? 250 : 65,
+        width: isExpanded ? 250 : 65,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -48,58 +39,56 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (widget.logo != null)
+            if (logo != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 50),
-                child: (widget.expandedLogo != null)
+                child: (expandedLogo != null)
                     ? Row(
                         children: [
                           Expanded(
                             child: AnimatedCrossFade(
                               duration: const Duration(milliseconds: 300),
-                              crossFadeState: _isExpanded
+                              crossFadeState: isExpanded
                                   ? CrossFadeState.showSecond
                                   : CrossFadeState.showFirst,
-                              firstChild: widget.logo!,
-                              secondChild: widget.expandedLogo!,
+                              firstChild: logo!,
+                              secondChild: expandedLogo!,
                             ),
                           ),
                         ],
                       )
-                    : widget.logo!,
+                    : logo!,
               ),
             Expanded(
               child: ListView(
                 physics: const ClampingScrollPhysics(),
-                children: widget.destinations
+                children: destinations
                     .map((destination) {
-                      int index = widget.destinations.indexOf(destination);
+                      int index = destinations.indexOf(destination);
                       return NavigationItem(
-                          destination: destination,
-                          rail: widget,
-                          index: index,
-                          isExpanded: _isExpanded);
+                        destination: destination,
+                        rail: this,
+                        index: index,
+                        isExpanded: isExpanded,
+                      );
                     })
                     .toList()
                     .withSpaceBetween(height: 10),
               ),
             ),
-            Button(
-              decoration: ButtonDecoration(
-                context: context,
-                variant: ButtonVariant.ghost,
-                type: ButtonType.primary,
-              ),
-              expand: true,
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              icon: _isExpanded
-                  ? PhosphorIconsRegular.caretLeft
-                  : PhosphorIconsRegular.caretRight,
-            )
+            if (onExpandTap != null)
+              MDButton(
+                decoration: ButtonDecoration(
+                  context: context,
+                  variant: ButtonVariant.ghost,
+                  type: ButtonType.primary,
+                ),
+                expand: true,
+                onTap: onExpandTap,
+                icon: isExpanded
+                    ? PhosphorIconsRegular.caretLeft
+                    : PhosphorIconsRegular.caretRight,
+              )
           ],
         ),
       ),

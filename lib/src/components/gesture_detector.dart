@@ -1,9 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+/// A modified [GestureDetector] which can be disabled and show a disabled
+/// cursor.
+///
+/// If [isDisabled] is true, this widget will not respond to any gestures and
+/// will show a disabled cursor.
+///
+/// If [showDisabledCursor] is true, this widget will show a disabled cursor,
+/// even if [isDisabled] is false.
 class MDGestureDetector extends GestureDetector {
+  /// If true, this widget will not respond to any gestures and will show a
+  /// disabled cursor.
   final bool isDisabled;
-  final bool showDisabledCursor;
 
   MDGestureDetector({
     Key? key,
@@ -39,7 +48,6 @@ class MDGestureDetector extends GestureDetector {
     HitTestBehavior? behavior,
     bool excludeFromSemantics = false,
     this.isDisabled = false,
-    this.showDisabledCursor = false,
   }) : super(
           key: key,
           child: child,
@@ -81,10 +89,14 @@ class MDGestureDetector extends GestureDetector {
       child: super.build(context),
     );
 
+    // If isDisabled is true, this widget will not respond to any gestures and
+    // will show a disabled cursor.
     if (isDisabled) {
       return absorbing;
     }
 
+    // If showDisabledCursor is true, this widget will show a disabled cursor,
+    // even if isDisabled is false.
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: absorbing,

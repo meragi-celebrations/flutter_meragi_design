@@ -383,7 +383,7 @@ class MDTextField extends MDFormBuilderField<String> {
             );
 
             Widget? finalSuffix = (state.value != null && isClearable)
-                ? Button(
+                ? MDButton(
                     decoration: ButtonDecoration(
                       context: state.context,
                       variant: ButtonVariant.ghost,

@@ -78,7 +78,7 @@ class _CrudMainState extends State<CrudMain> {
       body: Column(
         children: [
           const Text("Get One"),
-          Button(
+          MDButton(
             decoration: ButtonDecoration(
               context: context,
               type: ButtonType.primary,
@@ -111,7 +111,7 @@ class _CrudMainState extends State<CrudMain> {
             ],
           ),
           const Text("Get List"),
-          Button(
+          MDButton(
             decoration: ButtonDecoration(
               context: context,
               type: ButtonType.primary,
