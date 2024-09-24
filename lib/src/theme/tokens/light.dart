@@ -34,8 +34,7 @@ ThemeToken light = ThemeToken(
   //Card
   defaultCardBackgroundColor: Colors.white,
   primaryCardBackgroundColor: Colors.deepPurple.shade100.withOpacity(.3),
-  secondaryCardBackgroundColor:
-      Colors.deepPurpleAccent.shade100.withOpacity(.3),
+  secondaryCardBackgroundColor: Colors.deepPurpleAccent.shade100.withOpacity(.3),
   dangerCardBackgroundColor: Colors.redAccent.shade100.withOpacity(.3),
   successCardBackgroundColor: Colors.green.shade100.withOpacity(.3),
   warningCardBackgroundColor: Colors.orange.shade100.withOpacity(.3),
@@ -45,9 +44,9 @@ ThemeToken light = ThemeToken(
   dangerCardBorderColor: Colors.redAccent,
   successCardBorderColor: Colors.green,
   warningCardBorderColor: Colors.orange,
-  smCardPadding: const EdgeInsets.all(6),
-  rgCardPadding: const EdgeInsets.all(8),
-  lgCardPadding: const EdgeInsets.all(10),
+  smCardPadding: const EdgeInsets.all(18),
+  rgCardPadding: const EdgeInsets.all(20),
+  lgCardPadding: const EdgeInsets.all(25),
   smCardBorderRadius: 6,
   rgCardBorderRadius: 6,
   lgCardBorderRadius: 8,
@@ -107,11 +106,9 @@ ThemeToken light = ThemeToken(
   bodyTextStyle: const TextStyle(fontSize: 14),
   h6TextStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
   captionTextStyle: const TextStyle(fontSize: 10, color: Colors.grey),
-  codeTextStyle: const TextStyle(
-      fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
+  codeTextStyle: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
   quoteTextStyle: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-  linkTextStyle: const TextStyle(
-      fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
+  linkTextStyle: const TextStyle(fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
   standardHoverButtonColor: Colors.deepPurple[100]!.withOpacity(0.7),
   primaryHoverButtonColor: Colors.deepPurple.withOpacity(0.7),
   secondaryHoverButtonColor: Colors.deepPurpleAccent[100]!.withOpacity(0.7),
