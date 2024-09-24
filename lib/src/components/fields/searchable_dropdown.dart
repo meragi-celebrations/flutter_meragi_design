@@ -66,8 +66,11 @@ class _SelectDropdownState extends State<SelectDropdown> {
         widget.getListBloc.requestState,
       ],
       builder: (context, _) {
-        List<DropdownMenuEntry> data = widget.getListBloc.list.value.map((e) => widget.optionBuilder(e)).toList();
-        bool loadingList = widget.getListBloc.requestState.value == RequestState.loading;
+        List<DropdownMenuEntry> data = widget.getListBloc.list.value
+            .map((e) => widget.optionBuilder(e))
+            .toList();
+        bool loadingList =
+            widget.getListBloc.requestState.value == RequestState.loading;
         return LayoutBuilder(
           builder: (context, constraints) {
             return DropdownMenu(
@@ -82,9 +85,24 @@ class _SelectDropdownState extends State<SelectDropdown> {
               label: Text(widget.label ?? ""),
               enableFilter: false,
               requestFocusOnTap: widget.requestFocusOnTap,
-              trailingIcon: loadingList ? const MDLoadingIndicator(color: Colors.deepPurple) : null,
-              selectedTrailingIcon: loadingList ? const MDLoadingIndicator(color: Colors.deepPurple) : null,
-              inputDecorationTheme: widget.decoration,
+              trailingIcon: loadingList
+                  ? const MDLoadingIndicator(color: Colors.deepPurple)
+                  : null,
+              selectedTrailingIcon: loadingList
+                  ? const MDLoadingIndicator(color: Colors.deepPurple)
+                  : null,
+              inputDecorationTheme: InputDecorationTheme(
+                isDense: true,
+                constraints: const BoxConstraints(maxHeight: 38, minHeight: 38),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               errorText: widget.errorText,
               helperText: widget.helperText,
               menuHeight: 300,
@@ -240,15 +258,6 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
                 }
               },
               initialValue: state.initialValue,
-              decoration: InputDecorationTheme(
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(),
-                errorBorder: OutlineInputBorder(),
-                disabledBorder: OutlineInputBorder(),
-              ),
-              // errorText: state.decoration.errorText,
-              // helperText: state.decoration.helperText,
               width: width,
               shouldMakeInitialCall: shouldMakeInitialCall,
               requestFocusOnTap: requestFocusOnTap,
@@ -257,7 +266,9 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
         );
 
   @override
-  MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> createState() => _MDSearchableDropdownState();
+  MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> createState() =>
+      _MDSearchableDropdownState();
 }
 
-class _MDSearchableDropdownState<T, U> extends MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> {}
+class _MDSearchableDropdownState<T, U>
+    extends MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> {}

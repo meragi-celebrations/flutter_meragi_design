@@ -1,5 +1,6 @@
 import 'package:example/buttons.dart';
 import 'package:example/cards.dart';
+import 'package:example/crud/repo.dart';
 import 'package:example/crud_main.dart';
 import 'package:example/descriptions.dart';
 import 'package:example/fields.dart';
@@ -97,12 +98,16 @@ class _MyHomePageState extends State<MyHomePage> {
         Story(
           name: "Data/Typography",
           builder: (context) {
-            String textKnob = context.knobs.text(label: "Text", initial: "The quick brown fox jumps over the lazy dog");
+            String textKnob = context.knobs.text(
+                label: "Text",
+                initial: "The quick brown fox jumps over the lazy dog");
 
             TextType type = context.knobs.options(
               label: "Type",
               initial: TextType.primary,
-              options: TextType.values.map((e) => Option(label: e.name, value: e)).toList(),
+              options: TextType.values
+                  .map((e) => Option(label: e.name, value: e))
+                  .toList(),
             );
             return Column(
               children: [
@@ -167,25 +172,35 @@ class _MyHomePageState extends State<MyHomePage> {
                 type: context.knobs.options(
                   label: "Button Type",
                   initial: ButtonType.primary,
-                  options: ButtonType.values.map((e) => Option(label: e.name, value: e)).toList(),
+                  options: ButtonType.values
+                      .map((e) => Option(label: e.name, value: e))
+                      .toList(),
                 ),
                 size: context.knobs.options(
                   label: "Button Size",
                   initial: ButtonSize.rg,
-                  options: ButtonSize.values.map((e) => Option(label: e.name, value: e)).toList(),
+                  options: ButtonSize.values
+                      .map((e) => Option(label: e.name, value: e))
+                      .toList(),
                 ),
                 variant: context.knobs.options(
                   label: "Button Variant",
                   initial: ButtonVariant.filled,
-                  options: ButtonVariant.values.map((e) => Option(label: e.name, value: e)).toList(),
+                  options: ButtonVariant.values
+                      .map((e) => Option(label: e.name, value: e))
+                      .toList(),
                 ),
               ),
               onTap: () {},
-              icon: context.knobs.boolean(label: "Show Icon", initial: true) ? Icons.import_contacts : null,
-              isLoading: context.knobs.boolean(label: "Is Loading", initial: false),
+              icon: context.knobs.boolean(label: "Show Icon", initial: true)
+                  ? Icons.import_contacts
+                  : null,
+              isLoading:
+                  context.knobs.boolean(label: "Is Loading", initial: false),
               child: context.knobs.boolean(label: "Show Child", initial: true)
                   ? Text(
-                      context.knobs.text(label: "Label text", initial: "Button"),
+                      context.knobs
+                          .text(label: "Label text", initial: "Button"),
                     )
                   : null,
             );
@@ -200,22 +215,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 type: context.knobs.options(
                   label: "Button Type",
                   initial: ButtonType.primary,
-                  options: ButtonType.values.map((e) => Option(label: e.name, value: e)).toList(),
+                  options: ButtonType.values
+                      .map((e) => Option(label: e.name, value: e))
+                      .toList(),
                 ),
                 size: context.knobs.options(
                   label: "Button Size",
                   initial: ButtonSize.rg,
-                  options: ButtonSize.values.map((e) => Option(label: e.name, value: e)).toList(),
+                  options: ButtonSize.values
+                      .map((e) => Option(label: e.name, value: e))
+                      .toList(),
                 ),
                 variant: context.knobs.options(
                   label: "Button Variant",
                   initial: ButtonVariant.filled,
-                  options: ButtonVariant.values.map((e) => Option(label: e.name, value: e)).toList(),
+                  options: ButtonVariant.values
+                      .map((e) => Option(label: e.name, value: e))
+                      .toList(),
                 ),
               ),
               onTap: () {},
-              icon: context.knobs.boolean(label: "Show Icon", initial: true) ? Icons.import_contacts : null,
-              isLoading: context.knobs.boolean(label: "Is Loading", initial: false),
+              icon: context.knobs.boolean(label: "Show Icon", initial: true)
+                  ? Icons.import_contacts
+                  : null,
+              isLoading:
+                  context.knobs.boolean(label: "Is Loading", initial: false),
               menuChildren: [
                 MDButton(
                   onTap: () {},
@@ -237,7 +261,8 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: context.knobs.boolean(label: "Show Child", initial: true)
                   ? Text(
-                      context.knobs.text(label: "Label text", initial: "Button"),
+                      context.knobs
+                          .text(label: "Label text", initial: "Button"),
                     )
                   : null,
             );
@@ -255,13 +280,20 @@ class _MyHomePageState extends State<MyHomePage> {
               direction: context.knobs.options(
                 label: "Direction",
                 initial: Axis.horizontal,
-                options: Axis.values.map((e) => Option(label: e.name, value: e)).toList(),
+                options: Axis.values
+                    .map((e) => Option(label: e.name, value: e))
+                    .toList(),
               ),
-              spacingBetweenItem: context.knobs.sliderInt(label: "Space Between Item", initial: 5).toDouble(),
-              spacingBetweenKeyAndValue:
-                  context.knobs.sliderInt(label: "Space Between Key and Value", initial: 3).toDouble(),
-              minColumns: context.knobs.sliderInt(label: "Min columns", initial: 1),
-              maxColumns: context.knobs.sliderInt(label: "Max columns", initial: 3),
+              spacingBetweenItem: context.knobs
+                  .sliderInt(label: "Space Between Item", initial: 5)
+                  .toDouble(),
+              spacingBetweenKeyAndValue: context.knobs
+                  .sliderInt(label: "Space Between Key and Value", initial: 3)
+                  .toDouble(),
+              minColumns:
+                  context.knobs.sliderInt(label: "Min columns", initial: 1),
+              maxColumns:
+                  context.knobs.sliderInt(label: "Max columns", initial: 3),
               data: List.generate(
                   context.knobs.sliderInt(label: "Item Count", initial: 8),
                   (index) => DescriptionItem(
@@ -282,25 +314,34 @@ class _MyHomePageState extends State<MyHomePage> {
                     alignment: context.knobs.options(
                       label: "Alignment",
                       initial: CrossAxisAlignment.center,
-                      options: CrossAxisAlignment.values.map((e) => Option(label: e.name, value: e)).toList(),
+                      options: CrossAxisAlignment.values
+                          .map((e) => Option(label: e.name, value: e))
+                          .toList(),
                     ),
                     decoration: CardDecoration(
                       context: context,
                       type: context.knobs.options(
                         label: "Card Type",
                         initial: CardType.primary,
-                        options: CardType.values.map((e) => Option(label: e.name, value: e)).toList(),
+                        options: CardType.values
+                            .map((e) => Option(label: e.name, value: e))
+                            .toList(),
                       ),
                       size: context.knobs.options(
                         label: "Card Size",
                         initial: CardSize.rg,
-                        options: CardSize.values.map((e) => Option(label: e.name, value: e)).toList(),
+                        options: CardSize.values
+                            .map((e) => Option(label: e.name, value: e))
+                            .toList(),
                       ),
                     ),
-                    header:
-                        context.knobs.boolean(label: "Show Header", initial: true) ? const H2(text: "Header") : null,
+                    header: context.knobs
+                            .boolean(label: "Show Header", initial: true)
+                        ? const H2(text: "Header")
+                        : null,
                     body: const BodyText(text: "Body"),
-                    footer: context.knobs.boolean(label: "Show footer", initial: true)
+                    footer: context.knobs
+                            .boolean(label: "Show footer", initial: true)
                         ? const BodyText(text: "Footer")
                         : null,
                   ),
@@ -314,9 +355,14 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context) {
             return MDLoadingIndicator(
               color: Colors.black,
-              radius: context.knobs.sliderInt(label: "Radius", initial: 20).toDouble(),
-              strokeWidth: context.knobs.sliderInt(label: "Stroke Width", initial: 2).toDouble(),
-              isLoading: context.knobs.boolean(label: "Is Loading", initial: true),
+              radius: context.knobs
+                  .sliderInt(label: "Radius", initial: 20)
+                  .toDouble(),
+              strokeWidth: context.knobs
+                  .sliderInt(label: "Stroke Width", initial: 2)
+                  .toDouble(),
+              isLoading:
+                  context.knobs.boolean(label: "Is Loading", initial: true),
               child: context.knobs.boolean(label: "Show child", initial: false)
                   ? Container(
                       height: 200,
@@ -404,7 +450,8 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context) {
             return MDTextField(
               name: "text",
-              isClearable: context.knobs.boolean(label: "Is Clearable", initial: true),
+              isClearable:
+                  context.knobs.boolean(label: "Is Clearable", initial: true),
               onChanged: (_) {},
             );
           },
@@ -420,7 +467,8 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context) {
             return MDDropdown(
               name: "drowpdown",
-              isClearable: context.knobs.boolean(label: "Is Clearable", initial: true),
+              isClearable:
+                  context.knobs.boolean(label: "Is Clearable", initial: true),
               items: List.generate(
                 5,
                 (index) => DropdownMenuItem(
@@ -487,9 +535,12 @@ class _MyHomePageState extends State<MyHomePage> {
             Axis labelPostion = context.knobs.options(
               label: "Label Position",
               initial: Axis.vertical,
-              options: Axis.values.map((e) => Option(label: e.name, value: e)).toList(),
+              options: Axis.values
+                  .map((e) => Option(label: e.name, value: e))
+                  .toList(),
             );
-            bool isGrid = context.knobs.boolean(label: "Is Grid", initial: false);
+            bool isGrid =
+                context.knobs.boolean(label: "Is Grid", initial: false);
             GridLayoutValues gridValues = GridLayoutValues(
               context.knobs.sliderInt(label: "Label Flex", initial: 1),
               context.knobs.sliderInt(label: "Field Flex", initial: 9),
@@ -512,7 +563,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     contentSpace: contentSpace,
                     child: MDTextField(
                       name: "text",
-                      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
+                      validator: FormBuilderValidators.compose(
+                          [FormBuilderValidators.required()]),
                     ),
                   ),
                   MDFormItem(
@@ -530,7 +582,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           index.toString(),
                         ),
                       ),
-                      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
+                      validator: FormBuilderValidators.compose(
+                          [FormBuilderValidators.required()]),
                     ),
                   ),
                   MDButton(
@@ -558,19 +611,27 @@ class _MyHomePageState extends State<MyHomePage> {
         Story(
           name: "Data/Tag",
           builder: (context) => MDTag(
-            text: context.knobs.boolean(label: "Text", initial: true) ? "Warehouse" : null,
-            icon: context.knobs.boolean(label: "Icon", initial: true) ? Icons.warehouse : null,
+            text: context.knobs.boolean(label: "Text", initial: true)
+                ? "Warehouse"
+                : null,
+            icon: context.knobs.boolean(label: "Icon", initial: true)
+                ? Icons.warehouse
+                : null,
             decoration: TagDecoration(
               context: context,
               type: context.knobs.options(
                 label: "Type",
                 initial: TagType.defaultType,
-                options: TagType.values.map((e) => Option(label: e.name, value: e)).toList(),
+                options: TagType.values
+                    .map((e) => Option(label: e.name, value: e))
+                    .toList(),
               ),
               size: context.knobs.options(
                 label: "Size",
                 initial: TagSize.rg,
-                options: TagSize.values.map((e) => Option(label: e.name, value: e)).toList(),
+                options: TagSize.values
+                    .map((e) => Option(label: e.name, value: e))
+                    .toList(),
               ),
             ),
           ),
@@ -578,7 +639,8 @@ class _MyHomePageState extends State<MyHomePage> {
         Story(
           name: "Dialog/Alert Dialog",
           builder: (context) {
-            String? title = context.knobs.nullable.text(label: "Title", enabled: false);
+            String? title =
+                context.knobs.nullable.text(label: "Title", enabled: false);
             String? okText = context.knobs.nullable.text(
               label: "OK Text",
               enabled: false,
@@ -605,7 +667,9 @@ class _MyHomePageState extends State<MyHomePage> {
             CardType type = context.knobs.options(
               label: "Type",
               initial: CardType.defaultType,
-              options: CardType.values.map((e) => Option(label: e.name, value: e)).toList(),
+              options: CardType.values
+                  .map((e) => Option(label: e.name, value: e))
+                  .toList(),
             );
 
             return MDScaffold(
@@ -640,7 +704,9 @@ class _MyHomePageState extends State<MyHomePage> {
             SlidePosition position = context.knobs.options(
               label: "Position",
               initial: SlidePosition.right,
-              options: SlidePosition.values.map((e) => Option(label: e.name, value: e)).toList(),
+              options: SlidePosition.values
+                  .map((e) => Option(label: e.name, value: e))
+                  .toList(),
             );
             double width = context.knobs
                 .sliderInt(
@@ -693,7 +759,8 @@ class _MyHomePageState extends State<MyHomePage> {
         Story(
           name: 'Helper/Divider',
           builder: (context) {
-            var rotateChild = context.knobs.boolean(label: "Rotate Child", initial: false);
+            var rotateChild =
+                context.knobs.boolean(label: "Rotate Child", initial: false);
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -782,7 +849,52 @@ class _MyHomePageState extends State<MyHomePage> {
                     (e) => Container(
                       color: Colors.amber,
                       // width: 200,
-                      child: MDNetworkImage(src: "https://picsum.photos/id/${e}/500/500", fit: BoxFit.cover),
+                      child: MDNetworkImage(
+                          src: "https://picsum.photos/id/${e}/500/500",
+                          fit: BoxFit.cover),
+                    ),
+                  ),
+                ),
+              );
+            }),
+        Story(
+            name: "Form/Fields/Date Picker",
+            builder: (context) {
+              return MDScaffold(
+                body: Center(
+                  child: Center(
+                    child: MDButton(
+                      onTap: () {
+                        showMDDaterPicker(
+                          context: context,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2025),
+                        );
+                      },
+                      child: const Text("Open Date Picker"),
+                    ),
+                  ),
+                ),
+              );
+            }),
+        Story(
+            name: "Searchable Dropdown",
+            builder: (context) {
+              var getListBloc = GetListBloc<TodoModel>(
+                url: "https://jsonplaceholder.typicode.com/todos/",
+                repo: ExampleRepo(),
+                fromJson: TodoModel.staticFromJson,
+              );
+              return MDScaffold(
+                body: Center(
+                  child: Center(
+                    child: MDSearchableDropdown<int, TodoModel>(
+                      name: "todo",
+                      getListBloc: getListBloc,
+                      optionBuilder: (e) => DropdownMenuEntry(
+                        label: e.title!,
+                        value: e.id!,
+                      ),
                     ),
                   ),
                 ),
@@ -823,27 +935,60 @@ class _NavigationRailStoryState extends State<NavigationRailStory> {
             });
           },
           isExpanded: _isExpanded,
-          onExpandTap: context.knobs.boolean(label: "Show Expand Button", initial: true)
-              ? () {
-                  setState(() {
-                    _isExpanded = !_isExpanded;
-                  });
-                }
-              : null),
+          onExpandTap:
+              context.knobs.boolean(label: "Show Expand Button", initial: true)
+                  ? () {
+                      setState(() {
+                        _isExpanded = !_isExpanded;
+                      });
+                    }
+                  : null),
       content: const MDScaffold(body: Text("this is content")),
     );
   }
 }
 
 List<Map<String, dynamic>> pages = [
-  {"icon": const Icon(Icons.add_box), "label": "Scaffold", "widget": const ScaffoldDetails()},
-  {"icon": const Icon(Icons.text_fields), "label": "Typography", "widget": const TypographyDetails()},
-  {"icon": const Icon(Icons.text_fields), "label": "Buttons", "widget": const ButtonsDetails()},
-  {"icon": const Icon(Icons.text_fields), "label": "Cards", "widget": const CardDetails()},
-  {"icon": const Icon(Icons.text_fields), "label": "Tags", "widget": const TagDetails()},
-  {"icon": const Icon(Icons.text_fields), "label": "Description", "widget": const DescriptionDetails()},
-  {"icon": const Icon(Icons.text_fields), "label": "Fields", "widget": const FieldDetails()},
-  {"icon": const Icon(Icons.text_fields), "label": "Crud", "widget": const CrudMain()},
+  {
+    "icon": const Icon(Icons.add_box),
+    "label": "Scaffold",
+    "widget": const ScaffoldDetails()
+  },
+  {
+    "icon": const Icon(Icons.text_fields),
+    "label": "Typography",
+    "widget": const TypographyDetails()
+  },
+  {
+    "icon": const Icon(Icons.text_fields),
+    "label": "Buttons",
+    "widget": const ButtonsDetails()
+  },
+  {
+    "icon": const Icon(Icons.text_fields),
+    "label": "Cards",
+    "widget": const CardDetails()
+  },
+  {
+    "icon": const Icon(Icons.text_fields),
+    "label": "Tags",
+    "widget": const TagDetails()
+  },
+  {
+    "icon": const Icon(Icons.text_fields),
+    "label": "Description",
+    "widget": const DescriptionDetails()
+  },
+  {
+    "icon": const Icon(Icons.text_fields),
+    "label": "Fields",
+    "widget": const FieldDetails()
+  },
+  {
+    "icon": const Icon(Icons.text_fields),
+    "label": "Crud",
+    "widget": const CrudMain()
+  },
 ];
 
 class LayoutView extends StatefulWidget {
@@ -916,10 +1061,22 @@ class _SegmentedButtonStoryState extends State<SegmentedButtonStory> {
   Widget build(BuildContext context) {
     return MDSegmentedButton<Calendar>(
       segments: const <ButtonSegment<Calendar>>[
-        ButtonSegment<Calendar>(value: Calendar.day, label: Text('Day'), icon: Icon(Icons.calendar_view_day)),
-        ButtonSegment<Calendar>(value: Calendar.week, label: Text('Week'), icon: Icon(Icons.calendar_view_week)),
-        ButtonSegment<Calendar>(value: Calendar.month, label: Text('Month'), icon: Icon(Icons.calendar_view_month)),
-        ButtonSegment<Calendar>(value: Calendar.year, label: Text('Year'), icon: Icon(Icons.calendar_today)),
+        ButtonSegment<Calendar>(
+            value: Calendar.day,
+            label: Text('Day'),
+            icon: Icon(Icons.calendar_view_day)),
+        ButtonSegment<Calendar>(
+            value: Calendar.week,
+            label: Text('Week'),
+            icon: Icon(Icons.calendar_view_week)),
+        ButtonSegment<Calendar>(
+            value: Calendar.month,
+            label: Text('Month'),
+            icon: Icon(Icons.calendar_view_month)),
+        ButtonSegment<Calendar>(
+            value: Calendar.year,
+            label: Text('Year'),
+            icon: Icon(Icons.calendar_today)),
       ],
       selected: <Calendar>{calendarView},
       onSelectionChanged: (Set<Calendar> newSelection) {

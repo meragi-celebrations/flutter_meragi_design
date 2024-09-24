@@ -5,7 +5,9 @@ class ExampleRepo extends MDRepository {
   Dio dio = Dio();
 
   @override
-  Future create(String url, {Map<String, dynamic> data = const {}, Map<String, dynamic> files = const {}}) {
+  Future create(String url,
+      {Map<String, dynamic> data = const {},
+      Map<String, dynamic> files = const {}}) {
     // TODO: implement create
     throw UnimplementedError();
   }
@@ -24,17 +26,20 @@ class ExampleRepo extends MDRepository {
 
   @override
   Future<ListResponse> getList(String url,
-      {List<Map<String, String>> filters = const [], List<Map<String, String>> sorters = const []}) async {
+      {List<Map<String, String>> filters = const [],
+      List<Map<String, String>> sorters = const []}) async {
     Response res = await dio.get(url);
     if (res.statusCode == 200) {
       var rData = res.data;
-      return ListResponse(count: rData['count'], url: url, result: rData['results']);
+      print(rData);
+      return ListResponse(count: rData.length, url: url, result: rData);
     }
     return ListResponse(count: 0, url: url, result: []);
   }
 
   @override
-  Future getOne(String url, id, {List<Map<String, String>> filters = const []}) async {
+  Future getOne(String url, id,
+      {List<Map<String, String>> filters = const []}) async {
     Response res = await dio.get("$url/$id");
     if (res.statusCode == 200) {
       var rData = res.data;
