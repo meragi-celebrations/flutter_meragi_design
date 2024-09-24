@@ -878,7 +878,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }),
         Story(
-            name: "Searchable Dropdown",
+            name: "Form/Fields/Searchable Dropdown",
             builder: (context) {
               var getListBloc = GetListBloc<TodoModel>(
                 url: "https://jsonplaceholder.typicode.com/todos/",
