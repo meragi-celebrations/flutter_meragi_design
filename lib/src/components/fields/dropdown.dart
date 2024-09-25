@@ -280,7 +280,7 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
                     state.enabled ? (T? value) => state.didChange(value) : null,
                 buttonStyleData: ButtonStyleData(
                   height: 38,
-                  overlayColor: MaterialStateProperty.all(
+                  overlayColor: WidgetStatePropertyAll(
                       Colors.deepPurple.withOpacity(0.1)),
                   decoration: BoxDecoration(
                     border: state.isFocused
@@ -298,14 +298,14 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  scrollbarTheme: ScrollbarThemeData(
-                    radius: const Radius.circular(40),
-                    thickness: MaterialStateProperty.all(6),
-                    thumbVisibility: MaterialStateProperty.all(true),
+                  scrollbarTheme: const ScrollbarThemeData(
+                    radius: Radius.circular(40),
+                    thickness: WidgetStatePropertyAll(6),
+                    thumbVisibility: WidgetStatePropertyAll(true),
                   ),
                 ),
                 menuItemStyleData: MenuItemStyleData(
-                  overlayColor: MaterialStateProperty.all(
+                  overlayColor: WidgetStatePropertyAll(
                       Colors.deepPurple.withOpacity(0.1)),
                 ),
                 isExpanded: isExpanded,

@@ -1,5 +1,6 @@
 import 'package:example/buttons.dart';
 import 'package:example/cards.dart';
+import 'package:example/crud/repo.dart';
 import 'package:example/crud_main.dart';
 import 'package:example/descriptions.dart';
 import 'package:example/fields.dart';
@@ -676,7 +677,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: MDButton(
                 child: const Text("Show"),
                 onTap: () {
-                  showAlertDialog(
+                  showMDAlertDialog(
                     context: context,
                     builder: (context) {
                       return MDAlertDialog(
@@ -729,7 +730,7 @@ class _MyHomePageState extends State<MyHomePage> {
               body: Center(
                 child: MDButton(
                   onTap: () {
-                    showSlidingDrawer(
+                    showMDDrawer(
                       context: context,
                       position: position,
                       width: width,
@@ -851,6 +852,49 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: MDNetworkImage(
                           src: "https://picsum.photos/id/${e}/500/500",
                           fit: BoxFit.cover),
+                    ),
+                  ),
+                ),
+              );
+            }),
+        Story(
+            name: "Form/Fields/Date Picker",
+            builder: (context) {
+              return MDScaffold(
+                body: Center(
+                  child: Center(
+                    child: MDButton(
+                      onTap: () {
+                        showMDDaterPicker(
+                          context: context,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2025),
+                        );
+                      },
+                      child: const Text("Open Date Picker"),
+                    ),
+                  ),
+                ),
+              );
+            }),
+        Story(
+            name: "Form/Fields/Searchable Dropdown",
+            builder: (context) {
+              var getListBloc = GetListBloc<TodoModel>(
+                url: "https://jsonplaceholder.typicode.com/todos/",
+                repo: ExampleRepo(),
+                fromJson: TodoModel.staticFromJson,
+              );
+              return MDScaffold(
+                body: Center(
+                  child: Center(
+                    child: MDSearchableDropdown<int, TodoModel>(
+                      name: "todo",
+                      getListBloc: getListBloc,
+                      optionBuilder: (e) => DropdownMenuEntry(
+                        label: e.title!,
+                        value: e.id!,
+                      ),
                     ),
                   ),
                 ),
