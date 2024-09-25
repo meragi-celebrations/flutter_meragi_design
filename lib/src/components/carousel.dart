@@ -3,23 +3,35 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/raw_carousel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+class CarouselItem {
+  final Widget child;
+  final Widget? previewChild;
+  const CarouselItem({required this.child, this.previewChild});
+}
+
 class MDCarousel extends StatelessWidget {
-  final List<Widget> children;
+  final List<CarouselItem> children;
   final MDCarouselController? controller;
 
   final bool showNavButtons;
   final bool showPagination;
   final bool itemSnapping;
   final void Function(int)? onTap;
+  final bool preview;
+  final ShapeBorder? shape;
+  final Widget Function(Widget child)? buildChild;
 
   const MDCarousel({
     super.key,
-    required this.children,
     this.controller,
+    this.onTap,
+    this.shape,
+    this.buildChild,
     this.showNavButtons = true,
     this.showPagination = true,
     this.itemSnapping = false,
-    this.onTap,
+    this.preview = false,
+    required this.children,
   });
 
   @override
@@ -32,9 +44,23 @@ class MDCarousel extends StatelessWidget {
           controller: effectiveController.internalController,
           itemExtent: effectiveController.itemExtent,
           shrinkExtent: effectiveController.itemExtent,
-          onTap: onTap,
+          shape: shape,
+          onTap: onTap ??
+              (preview
+                  ? (index) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => MDCarouselPreview(
+                          parentController: effectiveController,
+                          initialIndex: index,
+                          children: children,
+                        ),
+                      );
+                    }
+                  : null),
           itemSnapping: itemSnapping,
-          children: children,
+          buildChild: buildChild,
+          children: children.map((e) => e.child).toList(),
         ),
         if (showNavButtons)
           Positioned.fill(
@@ -83,6 +109,105 @@ class MDCarousel extends StatelessWidget {
               effectiveController: effectiveController,
             ),
           )
+      ],
+    );
+  }
+}
+
+class MDCarouselPreview extends StatefulWidget {
+  const MDCarouselPreview({
+    super.key,
+    this.initialIndex = 0,
+    required this.children,
+    required this.parentController,
+  });
+
+  final List<CarouselItem> children;
+  final MDCarouselController parentController;
+  final int initialIndex;
+
+  @override
+  State<MDCarouselPreview> createState() => _MDCarouselPreviewState();
+}
+
+class _MDCarouselPreviewState extends State<MDCarouselPreview> {
+  int _currentIndex = 0;
+
+  late MDCarouselController thumbnailController;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+
+    thumbnailController = MDCarouselController(
+      initialIndex: widget.initialIndex,
+      itemExtent: 100,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              flex: 9,
+              child: widget.children[_currentIndex].previewChild ??
+                  widget.children[_currentIndex].child,
+            ),
+            Expanded(
+              flex: 1,
+              child: MDCarousel(
+                controller: thumbnailController,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                showPagination: false,
+                buildChild: (child) {
+                  int childIndex =
+                      widget.children.indexWhere((i) => i.child == child);
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: (_currentIndex == childIndex)
+                          ? Border.all(
+                              width: 5,
+                              color: Colors.white,
+                            )
+                          : null,
+                    ),
+                    child: child,
+                  );
+                },
+                onTap: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  widget.parentController.goTo(index.toDouble());
+                },
+                children: widget.children,
+              ),
+            ),
+          ],
+        ),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: MDButton(
+            decoration: ButtonDecoration(
+                context: context,
+                variant: ButtonVariant.ghost,
+                type: ButtonType.standard,
+                size: ButtonSize.lg,
+                iconSizeOverride: 30),
+            icon: PhosphorIconsRegular.x,
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
       ],
     );
   }
@@ -143,6 +268,7 @@ class MDCarouselController {
   }
 
   goTo(double index) {
+    currentIndex.value = index.toInt();
     internalController.animateTo(
       (internalController.position as CarouselPosition)
           .getPixelsFromItem(index),

@@ -51,6 +51,7 @@ class RawCarouselView extends StatefulWidget {
     this.scrollDirection = Axis.horizontal,
     this.reverse = false,
     this.onTap,
+    this.buildChild,
     required this.itemExtent,
     required this.children,
   });
@@ -148,6 +149,8 @@ class RawCarouselView extends StatefulWidget {
 
   /// The child widgets for the carousel.
   final List<Widget> children;
+
+  final Widget Function(Widget child)? buildChild;
 
   @override
   State<RawCarouselView> createState() => _RawCarouselViewState();
@@ -268,7 +271,9 @@ class _RawCarouselViewState extends State<RawCarouselView> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: <Widget>[
-                            widget.children.elementAt(index),
+                            widget.buildChild
+                                    ?.call(widget.children.elementAt(index)) ??
+                                widget.children.elementAt(index),
                             if (widget.onTap != null)
                               Material(
                                 color: Colors.transparent,

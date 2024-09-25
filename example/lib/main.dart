@@ -833,6 +833,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     label: "Show Pagination",
                     initial: true,
                   ),
+                  preview: context.knobs.boolean(
+                    label: "Preview",
+                    initial: false,
+                  ),
                   controller: MDCarouselController(
                     itemExtent: context.knobs
                         .sliderInt(
@@ -846,12 +850,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   children: List.generate(
                     25,
-                    (e) => Container(
-                      color: Colors.amber,
-                      // width: 200,
+                    (e) => CarouselItem(
                       child: MDNetworkImage(
-                          src: "https://picsum.photos/id/${e}/500/500",
-                          fit: BoxFit.cover),
+                        src: "https://picsum.photos/id/${e}/300",
+                        fit: BoxFit.cover,
+                      ),
+                      previewChild: MDZoomableImage(
+                        image: MDNetworkImage(
+                          src: "https://picsum.photos/id/${e}/300",
+                          preview: false,
+                        ),
+                      ),
                     ),
                   ),
                 ),

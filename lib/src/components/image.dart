@@ -116,3 +116,17 @@ class MDNetworkImage extends StatelessWidget {
     );
   }
 }
+
+class MDZoomableImage extends StatelessWidget {
+  final Widget image;
+
+  const MDZoomableImage({super.key, required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return EasyImageView.imageWidget(
+      image,
+      doubleTapZoomable: true,
+    );
+  }
+}
