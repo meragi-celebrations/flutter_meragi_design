@@ -13,6 +13,7 @@ export 'src/components/drawer.dart';
 export 'src/components/fields/date_picker.dart';
 export 'src/components/fields/dropdown.dart';
 export 'src/components/fields/form_item.dart';
+export 'src/components/fields/html_editor.dart';
 export 'src/components/fields/list.dart';
 export 'src/components/fields/searchable_dropdown.dart';
 export 'src/components/fields/switch.dart';
