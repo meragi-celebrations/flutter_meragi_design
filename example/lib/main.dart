@@ -887,29 +887,93 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }),
         Story(
-            name: "Form/Fields/Searchable Dropdown",
-            builder: (context) {
-              var getListBloc = GetListBloc<TodoModel>(
-                url: "https://jsonplaceholder.typicode.com/todos/",
-                repo: ExampleRepo(),
-                fromJson: TodoModel.staticFromJson,
-              );
-              return MDScaffold(
-                body: Center(
-                  child: Center(
-                    child: MDSearchableDropdown<int, TodoModel>(
-                      name: "todo",
-                      getListBloc: getListBloc,
-                      optionBuilder: (e) => DropdownMenuEntry(
-                        label: e.title!,
-                        value: e.id!,
-                      ),
+          name: "Form/Fields/Searchable Dropdown",
+          builder: (context) {
+            var getListBloc = GetListBloc<TodoModel>(
+              url: "https://jsonplaceholder.typicode.com/todos/",
+              repo: ExampleRepo(),
+              fromJson: TodoModel.staticFromJson,
+            );
+            return MDScaffold(
+              body: Center(
+                child: Center(
+                  child: MDSearchableDropdown<int, TodoModel>(
+                    name: "todo",
+                    getListBloc: getListBloc,
+                    optionBuilder: (e) => DropdownMenuEntry(
+                      label: e.title!,
+                      value: e.id!,
                     ),
                   ),
                 ),
-              );
-            })
+              ),
+            );
+          },
+        ),
+        Story(
+          name: "Moodboard",
+          builder: (context) {
+            return MoodboardStory();
+          },
+        ),
       ],
+    );
+  }
+}
+
+class MoodboardStory extends StatefulWidget {
+  MoodboardStory({super.key});
+
+  @override
+  State<MoodboardStory> createState() => _MoodboardStoryState();
+}
+
+class _MoodboardStoryState extends State<MoodboardStory> {
+  final List<String> images = [
+    'https://d1p55htxo8z8mf.cloudfront.net/product/11013/59a659a8-8f6a-457a-905f-c36316343a06.jpg',
+    "https://d1p55htxo8z8mf.cloudfront.net/product/10011/3618c085-ae85-4dea-8441-34ef1cb93c2d.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/10011/dbfff9ee-a114-47a3-b0dd-198b78bf9773.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/7936/41d87583-6182-4796-82dc-68a2a895e7a6.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/321/11962e0b-a039-4f64-b172-484be70f83ad.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/384/8b2a3c47-fdbb-413d-8e8f-1730e9c7c200.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/767/14a52fb7-90b1-48b5-9a25-34dc814d17ff.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/13591/dc40ebdf-f4e3-486d-85e3-5a8b0c4bc7c0.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/771/8c340059-6325-468b-9a0b-752fbed7dd3e.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/771/f7d9304d-833c-4c68-9857-4fdc228ffb57.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/29858/8ca21f98-c797-4f91-a987-e4f2c9906309.jpg",
+    'https://d1p55htxo8z8mf.cloudfront.net/product/11013/59a659a8-8f6a-457a-905f-c36316343a06.jpg',
+    "https://d1p55htxo8z8mf.cloudfront.net/product/10011/3618c085-ae85-4dea-8441-34ef1cb93c2d.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/10011/dbfff9ee-a114-47a3-b0dd-198b78bf9773.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/7936/41d87583-6182-4796-82dc-68a2a895e7a6.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/321/11962e0b-a039-4f64-b172-484be70f83ad.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/384/8b2a3c47-fdbb-413d-8e8f-1730e9c7c200.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/767/14a52fb7-90b1-48b5-9a25-34dc814d17ff.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/13591/dc40ebdf-f4e3-486d-85e3-5a8b0c4bc7c0.jpg",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/771/8c340059-6325-468b-9a0b-752fbed7dd3e.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/771/f7d9304d-833c-4c68-9857-4fdc228ffb57.png",
+    "https://d1p55htxo8z8mf.cloudfront.net/product/29858/8ca21f98-c797-4f91-a987-e4f2c9906309.jpg"
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      body: MDMoodboard(
+        // constraints: BoxConstraints(maxWidth: maxWidth),
+        fillGaps: true,
+        children: images
+            .map(
+              (i) => MDMoodboardItem(
+                childrenCount: images.length,
+                child: MDNetworkImage(src: i),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 }
