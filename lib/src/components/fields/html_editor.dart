@@ -25,72 +25,89 @@ class MDHtmlEditor extends MDFormBuilderField<String> {
   }) : super(
           builder: (FormFieldState<String?> field) {
             final state = field as _MDHtmlEditor;
-            return SizedBox(
-              height: size?.height ?? 300,
+
+            double height = size?.height ?? 300;
+
+            return Container(
+              height: height,
               width: size?.width ?? 500,
-              child: Column(
-                children: [
-                  QuillSimpleToolbar(
-                    controller: state.controller,
-                    configurations: const QuillSimpleToolbarConfigurations(
-                      toolbarIconAlignment: WrapAlignment.start,
-                      toolbarIconCrossAlignment: WrapCrossAlignment.start,
-                      showBoldButton: true,
-                      showLink: true,
-                      showListBullets: true,
-                      showListNumbers: true,
-                      showFontSize: true,
-                      showUnderLineButton: true,
-                      multiRowsDisplay: false,
-                      showAlignmentButtons: false,
-                      showBackgroundColorButton: false,
-                      showCenterAlignment: false,
-                      showClearFormat: false,
-                      showClipboardCopy: false,
-                      showCodeBlock: false,
-                      showDirection: false,
-                      showDividers: false,
-                      showFontFamily: false,
-                      showInlineCode: false,
-                      showIndent: false,
-                      showClipboardCut: false,
-                      showClipboardPaste: false,
-                      showColorButton: false,
-                      showHeaderStyle: false,
-                      showItalicButton: true,
-                      showJustifyAlignment: false,
-                      showLeftAlignment: false,
-                      showLineHeightButton: false,
-                      showListCheck: false,
-                      showQuote: false,
-                      showRedo: false,
-                      showRightAlignment: false,
-                      showSearchButton: false,
-                      showSmallButton: false,
-                      showStrikeThrough: false,
-                      showSubscript: false,
-                      showSuperscript: false,
-                      showUndo: false,
-                    ),
-                  ),
-                  Expanded(
-                    child: QuillEditor.basic(
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(7.5),
+                child: Column(
+                  children: [
+                    QuillSimpleToolbar(
                       controller: state.controller,
-                      configurations: const QuillEditorConfigurations(),
+                      configurations: const QuillSimpleToolbarConfigurations(
+                        toolbarIconAlignment: WrapAlignment.start,
+                        toolbarIconCrossAlignment: WrapCrossAlignment.start,
+                        showBoldButton: true,
+                        showLink: true,
+                        showListBullets: true,
+                        showListNumbers: true,
+                        showFontSize: true,
+                        showUnderLineButton: true,
+                        multiRowsDisplay: false,
+                        showAlignmentButtons: false,
+                        showBackgroundColorButton: false,
+                        showCenterAlignment: false,
+                        showClearFormat: false,
+                        showClipboardCopy: false,
+                        showCodeBlock: false,
+                        showDirection: false,
+                        showDividers: false,
+                        showFontFamily: false,
+                        showInlineCode: false,
+                        showIndent: false,
+                        showClipboardCut: false,
+                        showClipboardPaste: false,
+                        showColorButton: false,
+                        showHeaderStyle: false,
+                        showItalicButton: true,
+                        showJustifyAlignment: false,
+                        showLeftAlignment: false,
+                        showLineHeightButton: false,
+                        showListCheck: false,
+                        showQuote: false,
+                        showRedo: false,
+                        showRightAlignment: false,
+                        showSearchButton: false,
+                        showSmallButton: false,
+                        showStrikeThrough: false,
+                        showSubscript: false,
+                        showSuperscript: false,
+                        showUndo: false,
+                      ),
                     ),
-                  )
-                ],
+                    Expanded(
+                      child: QuillEditor.basic(
+                        focusNode: state.focusNode,
+                        controller: state.controller,
+                        configurations: QuillEditorConfigurations(
+                          showCursor: true,
+                          minHeight: height,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             );
           },
         );
 
   @override
-  MDFormBuilderFieldState<MDHtmlEditor, String> createState() => _MDHtmlEditor();
+  MDFormBuilderFieldState<MDHtmlEditor, String> createState() =>
+      _MDHtmlEditor();
 }
 
 class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
   late final QuillController controller;
+  late final FocusNode focusNode;
 
   @override
   void initState() {
@@ -102,6 +119,8 @@ class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
     controller.changes.listen((event) {
       didChange(_deltaToHtml());
     });
+
+    focusNode = widget.focusNode ?? FocusNode();
   }
 
   @override
