@@ -887,28 +887,37 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }),
         Story(
-            name: "Form/Fields/Searchable Dropdown",
-            builder: (context) {
-              var getListBloc = GetListBloc<TodoModel>(
-                url: "https://jsonplaceholder.typicode.com/todos/",
-                repo: ExampleRepo(),
-                fromJson: TodoModel.staticFromJson,
-              );
-              return MDScaffold(
-                body: Center(
-                  child: Center(
-                    child: MDSearchableDropdown<int, TodoModel>(
-                      name: "todo",
-                      getListBloc: getListBloc,
-                      optionBuilder: (e) => DropdownMenuEntry(
-                        label: e.title!,
-                        value: e.id!,
-                      ),
+          name: "Form/Fields/Searchable Dropdown",
+          builder: (context) {
+            var getListBloc = GetListBloc<TodoModel>(
+              url: "https://jsonplaceholder.typicode.com/todos/",
+              repo: ExampleRepo(),
+              fromJson: TodoModel.staticFromJson,
+            );
+            return MDScaffold(
+              body: Center(
+                child: Center(
+                  child: MDSearchableDropdown<int, TodoModel>(
+                    name: "todo",
+                    getListBloc: getListBloc,
+                    optionBuilder: (e) => DropdownMenuEntry(
+                      label: e.title!,
+                      value: e.id!,
                     ),
                   ),
                 ),
-              );
-            })
+              ),
+            );
+          },
+        ),
+        Story(
+          name: "Form/Fields/HTML Editor",
+          builder: (context) {
+            return MDScaffold(
+              body: Center(child: MDHtmlEditor(name: "html")),
+            );
+          },
+        )
       ],
     );
   }

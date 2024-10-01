@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/raw_carousel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -144,6 +145,19 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
       initialIndex: widget.initialIndex,
       itemExtent: 100,
     );
+
+    ServicesBinding.instance.keyboard.addHandler(_handleKeyboardEvent);
+  }
+
+  bool _handleKeyboardEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+        previewGoTo(_currentIndex - 1);
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+        previewGoTo(_currentIndex + 1);
+      }
+    }
+    return false;
   }
 
   @override
@@ -182,10 +196,7 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
                   );
                 },
                 onTap: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                  widget.parentController.goTo(index.toDouble());
+                  previewGoTo(index);
                 },
                 children: widget.children,
               ),
@@ -197,11 +208,12 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
           right: 0,
           child: MDButton(
             decoration: ButtonDecoration(
-                context: context,
-                variant: ButtonVariant.ghost,
-                type: ButtonType.standard,
-                size: ButtonSize.lg,
-                iconSizeOverride: 30),
+              context: context,
+              variant: ButtonVariant.ghost,
+              type: ButtonType.standard,
+              size: ButtonSize.lg,
+              iconSizeOverride: 30,
+            ),
             icon: PhosphorIconsRegular.x,
             onTap: () {
               Navigator.of(context).pop();
@@ -210,6 +222,13 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
         ),
       ],
     );
+  }
+
+  void previewGoTo(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    widget.parentController.goTo(index.toDouble());
   }
 }
 
