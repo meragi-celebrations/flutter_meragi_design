@@ -845,11 +845,13 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "Moodboard",
+          name: "Form/Fields/HTML Editor",
           builder: (context) {
-            return MoodboardStory();
+            return MDScaffold(
+              body: Center(child: MDHtmlEditor(name: "html")),
+            );
           },
-        ),
+        )
       ],
     );
   }
