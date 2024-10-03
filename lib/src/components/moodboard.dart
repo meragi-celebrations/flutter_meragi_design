@@ -8,11 +8,7 @@ class MDMoodboard extends StatelessWidget {
   final List<Widget> children;
   final BoxConstraints? constraints;
   final bool fillGaps;
-  const MDMoodboard(
-      {super.key,
-      required this.children,
-      this.constraints,
-      this.fillGaps = false});
+  const MDMoodboard({super.key, required this.children, this.constraints, this.fillGaps = false});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +56,7 @@ class _MDMoodboardItemState extends State<MDMoodboardItem> {
     maxWidth = widget.maxParentWidth;
     double minCol = 4;
     double maxCol = 8;
-    minCol = math.max(4, (widget.childrenCount / 25) * 8);
+    minCol = math.max(2, (widget.childrenCount / 25) * 8);
     maxCol = math.min(8, (widget.childrenCount / 25) * 8 + 4);
     columns = getResponsiveColumnCount(maxWidth, minCol, maxCol);
     itemWidth = maxWidth / columns;
@@ -69,7 +65,9 @@ class _MDMoodboardItemState extends State<MDMoodboardItem> {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: itemWidth),
+      constraints: BoxConstraints(
+        maxWidth: itemWidth,
+      ),
       child: widget.child,
     );
   }

@@ -48,11 +48,11 @@ class MDScaffold extends StatelessWidget {
     this.bottomNavigationBar,
   }) : body = null;
 
-  MDAppBar buildHeader(SplitController controller) {
-    MDAppBar workingAppBar = appBar ?? const MDAppBar();
+  MDAppBar? buildHeader(SplitController controller) {
+    MDAppBar? workingAppBar = appBar;
 
     if (isSplit) {
-      workingAppBar = workingAppBar.copyWith(
+      workingAppBar = workingAppBar?.copyWith(
         actions: [
           ...(appBar?.actions ?? const []),
           if (controller.showSplitButton.value)
@@ -65,9 +65,7 @@ class MDScaffold extends StatelessWidget {
                     variant: ButtonVariant.ghost,
                     type: ButtonType.primary,
                   ),
-                  icon: !value
-                      ? PhosphorIconsFill.sidebarSimple
-                      : PhosphorIconsRegular.sidebarSimple,
+                  icon: !value ? PhosphorIconsFill.sidebarSimple : PhosphorIconsRegular.sidebarSimple,
                   onTap: () {
                     controller.toggleSplit();
                   },

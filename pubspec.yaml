@@ -1,6 +1,6 @@
 name: flutter_meragi_design
 description: Meragi Design System For Flutter
-version: 2.1.0
+version: 2.3.0
 homepage: "meragi.com"
 
 environment:
@@ -31,6 +31,13 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   theme_tailor: ^3.0.1
   build_runner: ^2.4.8
+
+dependency_overrides:
+  flutter_keyboard_visibility_web:
+    git:
+      url: https://github.com/raldhafiri/flutter_keyboard_visibility.git
+      ref: master
+      path: flutter_keyboard_visibility_web
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
