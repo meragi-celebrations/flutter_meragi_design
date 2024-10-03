@@ -26,6 +26,7 @@ export 'src/components/layout/base.dart';
 export 'src/components/layout/navigation_rail.dart';
 export 'src/components/layout/scaffold.dart';
 export 'src/components/loading_widget.dart';
+export 'src/components/moodboard.dart';
 export 'src/components/segmented_button.dart';
 export 'src/components/tag.dart';
 export 'src/components/typography.dart';
