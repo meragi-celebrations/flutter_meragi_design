@@ -11,6 +11,7 @@ class MDList<T> extends StatelessWidget {
   final List<Listenable>? listenables;
   final RequestState? requestState;
   final List<T>? list;
+  final bool isSliver;
 
   const MDList({
     super.key,
@@ -21,7 +22,9 @@ class MDList<T> extends StatelessWidget {
     this.requestState,
     this.list,
     this.listenables,
-  })  : assert(listBloc != null || (requestState != null && list != null && listenables != null)),
+    this.isSliver = false,
+  })  : assert(listBloc != null ||
+            (requestState != null && list != null && listenables != null)),
         tileBuilder = null,
         timelineTheme = null;
 
@@ -36,8 +39,10 @@ class MDList<T> extends StatelessWidget {
     this.requestState,
     this.list,
     this.listenables,
-  })  : assert(listBloc != null || (requestState != null && list != null && listenables != null)),
+  })  : assert(listBloc != null ||
+            (requestState != null && list != null && listenables != null)),
         itemBuilder = null,
+        isSliver = false,
         separatorBuilder = null;
 
   bool get isTimeline => tileBuilder != null;
@@ -92,11 +97,18 @@ class MDList<T> extends StatelessWidget {
           );
         }
 
-        return ListView.separated(
-          itemCount: list.length,
-          itemBuilder: itemBuilder!,
-          separatorBuilder: separatorBuilder ?? (_, __) => const SizedBox(),
-        );
+        return isSliver
+            ? SliverList.separated(
+                itemCount: list.length,
+                itemBuilder: itemBuilder!,
+                separatorBuilder:
+                    separatorBuilder ?? (_, __) => const SizedBox())
+            : ListView.separated(
+                itemCount: list.length,
+                itemBuilder: itemBuilder!,
+                separatorBuilder:
+                    separatorBuilder ?? (_, __) => const SizedBox(),
+              );
       },
     );
   }

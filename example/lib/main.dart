@@ -551,6 +551,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   initial: 3,
                 )
                 .toDouble();
+            var getListBloc = GetListBloc<TodoModel>(
+              url: "https://jsonplaceholder.typicode.com/todos/",
+              repo: ExampleRepo(),
+              fromJson: TodoModel.staticFromJson,
+            );
             return FormBuilder(
               key: _formKey,
               child: Column(
@@ -586,10 +591,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           [FormBuilderValidators.required()]),
                     ),
                   ),
+                  MDSearchableDropdown<int, TodoModel>(
+                    name: "select",
+                    getListBloc: getListBloc,
+                    optionBuilder: (e) => MDDropdownMenuEntry(
+                      label: e.title!,
+                      value: e.id!,
+                    ),
+                  ),
                   MDButton(
                     onTap: () {
-                      print("save ${_formKey.currentState?.value}");
                       _formKey.currentState?.saveAndValidate();
+                      print("save ${_formKey.currentState?.value}");
                     },
                     child: const Text("Save"),
                   )
@@ -894,15 +907,24 @@ class _MyHomePageState extends State<MyHomePage> {
               repo: ExampleRepo(),
               fromJson: TodoModel.staticFromJson,
             );
+
+            GlobalKey<FormBuilderState> _key = GlobalKey();
+
             return MDScaffold(
               body: Center(
                 child: Center(
-                  child: MDSearchableDropdown<int, TodoModel>(
-                    name: "todo",
-                    getListBloc: getListBloc,
-                    optionBuilder: (e) => DropdownMenuEntry(
-                      label: e.title!,
-                      value: e.id!,
+                  child: FormBuilder(
+                    key: _key,
+                    onChanged: () {
+                      print("form changed, ${_key.currentState?.value}");
+                    },
+                    child: MDSearchableDropdown<int, TodoModel>(
+                      name: "select",
+                      getListBloc: getListBloc,
+                      optionBuilder: (e) => MDDropdownMenuEntry(
+                        label: e.title!,
+                        value: e.id!,
+                      ),
                     ),
                   ),
                 ),
@@ -915,6 +937,21 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context) {
             return MDScaffold(
               body: Center(child: MDHtmlEditor(name: "html")),
+            );
+          },
+        ),
+        Story(
+          name: "new dropdown",
+          builder: (context) {
+            return MDScaffold(
+              body: Center(
+                child: MDDropdownMenu(
+                  dropdownMenuEntries: List.generate(
+                    5,
+                    (e) => MDDropdownMenuEntry(label: "Item $e", value: e),
+                  ),
+                ),
+              ),
             );
           },
         )
