@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
 import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
 
 class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
@@ -35,8 +36,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
                 children: [
                   ...options!.map(
                     (option) {
-                      return checkboxOption(
-                          state, option, field, isMultiSelect);
+                      return checkboxOption(state, option, field, isMultiSelect);
                     },
                   ),
                 ],
@@ -80,10 +80,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
         );
 
   static ValueListenableBuilder<Set<String>> checkboxOption(
-      _MDFormCheckboxList state,
-      MDCheckboxOption option,
-      _MDFormCheckboxList field,
-      bool isMultiSelect) {
+      _MDFormCheckboxList state, MDCheckboxOption option, _MDFormCheckboxList field, bool isMultiSelect) {
     return ValueListenableBuilder(
       valueListenable: state.setValues,
       builder: (context, selectedSet, _) {
@@ -92,10 +89,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
           dense: true,
           trailing: MDCheckbox(
             value: selectedSet.contains(option.value),
-            shape: !isMultiSelect
-                ? RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10))
-                : null,
+            shape: !isMultiSelect ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)) : null,
             onChanged: (value) {
               if (!isMultiSelect) {
                 state.setValues.value = {option.value};
@@ -130,12 +124,10 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
   }
 
   @override
-  MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> createState() =>
-      _MDFormCheckboxList();
+  MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> createState() => _MDFormCheckboxList();
 }
 
-class _MDFormCheckboxList
-    extends MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> {
+class _MDFormCheckboxList extends MDFormBuilderFieldState<MDFormCheckboxList, Set<String>> {
   PropertyNotifier<Set<String>> setValues = PropertyNotifier({});
 
   @override
@@ -197,14 +189,13 @@ class MDFormCheckbox extends MDFormBuilderField<bool> {
         );
 
   @override
-  MDFormBuilderFieldState<MDFormCheckbox, bool> createState() =>
-      _MDFormCheckbox();
+  MDFormBuilderFieldState<MDFormCheckbox, bool> createState() => _MDFormCheckbox();
 }
 
 class _MDFormCheckbox extends MDFormBuilderFieldState<MDFormCheckbox, bool> {}
 
 class MDCheckbox extends StatelessWidget {
-  final bool value;
+  final bool? value;
   final ValueChanged<bool?>? onChanged;
   final Color? activeColor;
   final Color? checkColor;
@@ -214,6 +205,7 @@ class MDCheckbox extends StatelessWidget {
   final MouseCursor? mouseCursor;
   final FocusNode? focusNode;
   final bool autofocus;
+  final BorderSide? side;
 
   const MDCheckbox({
     Key? key,
@@ -227,10 +219,12 @@ class MDCheckbox extends StatelessWidget {
     this.mouseCursor,
     this.focusNode,
     this.autofocus = false,
+    this.side,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    ThemeToken token = MeragiTheme.of(context).token;
     return Checkbox(
       value: value,
       onChanged: onChanged,
@@ -238,10 +232,14 @@ class MDCheckbox extends StatelessWidget {
       checkColor: checkColor,
       tristate: tristate,
       materialTapTargetSize: materialTapTargetSize,
-      shape: shape,
+      shape: shape ??
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
       mouseCursor: mouseCursor,
       focusNode: focusNode,
       autofocus: autofocus,
+      side: side ?? BorderSide(width: 1, color: token.primaryButtonColor),
     );
   }
 }
