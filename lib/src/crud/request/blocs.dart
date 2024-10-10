@@ -83,7 +83,7 @@ class GetListBloc<T> extends BaseBloc<T> {
     return url! + Uri(queryParameters: data).query;
   }
 
-  get() async {
+  Future<void> get() async {
     try {
       List<Map<String, String>> filters = [];
       List<Map<String, String>> sorters = [];
@@ -181,44 +181,44 @@ class GetListBloc<T> extends BaseBloc<T> {
     pageSize.value = newPageSize;
   }
 
-  nextPage() {
+  Future<void> nextPage() async {
     if (currentPage.value < totalPages.value) {
       currentPage.value++;
     }
-    get();
+    await get();
   }
 
-  previousPage() {
+  Future<void> previousPage() async {
     if (currentPage.value > 1) {
       currentPage.value--;
     }
-    get();
+    await get();
   }
 
-  goToPage(int page) {
+  Future<void> goToPage(int page) async {
     if (page > totalPages.value) {
       return;
     }
     currentPage.value = page;
-    get();
+    await get();
   }
 
-  onPageSizeChanged(int value) {
+  Future<void> onPageSizeChanged(int value) async {
     pageSize.value = value;
     currentPage.value = 1;
-    get();
+    await get();
   }
 
   togglePagination(bool value) {
     isPaginationEnabled.value = value;
   }
 
-  reset() {
+  Future<void> reset() async {
     currentPage.value = 1;
     totalPages.value = 1;
     list.value.clear();
     list.notifyListeners();
-    get();
+    await get();
   }
 }
 
@@ -264,7 +264,7 @@ class GetOneBloc<T> extends BaseBloc<T> {
     return url + Uri(queryParameters: data).query;
   }
 
-  get({String? customUrl}) async {
+  Future<void> get({String? customUrl}) async {
     try {
       String key = getKey(customUrl ?? "$url${id.value}", customFilters);
 
@@ -314,7 +314,7 @@ class CreateBloc<T> extends BaseBloc<T> {
   ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
-  mutate(Map<String, dynamic> data, {Map<String, dynamic> dataFiles = const {}, String? url}) async {
+  Future<void> mutate(Map<String, dynamic> data, {Map<String, dynamic> dataFiles = const {}, String? url}) async {
     String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
@@ -349,7 +349,7 @@ class UpdateBloc<T> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  mutate(dynamic id, Map<String, dynamic> data, {String? url}) async {
+  Future<void> mutate(dynamic id, Map<String, dynamic> data, {String? url}) async {
     String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
@@ -388,7 +388,7 @@ class DeleteBloc<T> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  mutate(dynamic id, {String? url}) async {
+  Future<void> mutate(dynamic id, {String? url}) async {
     String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
