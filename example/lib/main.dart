@@ -271,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Story(
             name: "Button/Segmented",
             builder: (context) {
-              return SegmentedButtonStory();
+              return const SegmentedButtonStory();
             }),
         Story(
           name: "Data/Description",
@@ -941,20 +941,42 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: "new dropdown",
+          name: "Enhanced Widget",
           builder: (context) {
+            WidgetStatesController _controller = WidgetStatesController();
+
             return MDScaffold(
               body: Center(
-                child: MDDropdownMenu(
-                  dropdownMenuEntries: List.generate(
-                    5,
-                    (e) => MDDropdownMenuEntry(label: "Item $e", value: e),
-                  ),
+                child: MDWidget(
+                  statesController: _controller,
+                  mouseCursor: MDWidgetStateResolver<MouseCursor>({
+                    WidgetState.hovered: SystemMouseCursors.click,
+                    "default": SystemMouseCursors.basic
+                  }).resolveWith(),
+                  builder: (context, states) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: MDWidgetStateResolver<Color>({
+                          WidgetState.hovered: Colors.red,
+                          WidgetState.pressed: Colors.yellow,
+                          WidgetState.focused: Colors.green,
+                          "default": Colors.blue
+                        }).resolve(states),
+                      ),
+                      child: const BodyText(text: "Hello"),
+                    );
+                  },
                 ),
               ),
             );
           },
-        )
+        ),
+        Story(
+          name: 'List',
+          builder: (context) {
+            return ListStory();
+          },
+        ),
       ],
     );
   }
@@ -1142,6 +1164,47 @@ class _SegmentedButtonStoryState extends State<SegmentedButtonStory> {
           calendarView = newSelection.first;
         });
       },
+    );
+  }
+}
+
+class ListStory extends StatefulWidget {
+  const ListStory({super.key});
+
+  @override
+  State<ListStory> createState() => _ListStoryState();
+}
+
+class _ListStoryState extends State<ListStory> {
+  late GetListBloc<TodoModel> getListBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    getListBloc = GetListBloc<TodoModel>(
+      url: "https://jsonplaceholder.typicode.com/todos/",
+      repo: ExampleRepo(),
+      fromJson: TodoModel.staticFromJson,
+    );
+    getListBloc.get();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      body: MDList(
+        listBloc: getListBloc,
+        itemBuilder: (context, index) {
+          FocusNode focusNode = FocusNode();
+          return MDListTile(
+            focusNode: focusNode,
+            onTap: () {
+              focusNode.requestFocus();
+            },
+            child: Text(getListBloc.list.value[index].title ?? ""),
+          );
+        },
+      ),
     );
   }
 }
