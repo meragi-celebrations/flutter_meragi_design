@@ -534,6 +534,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
                     ),
                   ),
+                  MDFormItem(
+                    label: const Text("Checkbox"),
+                    labelPosition: labelPostion,
+                    isGrid: isGrid,
+                    gridValues: gridValues,
+                    contentSpace: contentSpace,
+                    child: MDFormCheckbox(
+                      name: "checkbox",
+                      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
+                    ),
+                  ),
                   MDButton(
                     onTap: () {
                       print("save ${_formKey.currentState?.value}");
