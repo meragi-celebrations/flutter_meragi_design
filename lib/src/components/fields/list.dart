@@ -157,8 +157,6 @@ class _MDFormCheckboxList extends MDFormBuilderFieldState<MDFormCheckboxList, Se
 }
 
 class MDFormCheckbox extends MDFormBuilderField<bool> {
-  final bool value;
-
   MDFormCheckbox({
     super.key,
     required super.name,
@@ -172,12 +170,11 @@ class MDFormCheckbox extends MDFormBuilderField<bool> {
     super.onReset,
     super.focusNode,
     super.restorationId,
-    required this.value,
   }) : super(
           builder: (FormFieldState<bool?> field) {
-            final state = field as MDFormCheckbox;
+            final state = field as _MDFormCheckboxState;
             final fieldWidget = MDCheckbox(
-              value: value,
+              value: state.value,
               onChanged: state.enabled
                   ? (value) {
                       field.didChange(value);
@@ -189,10 +186,10 @@ class MDFormCheckbox extends MDFormBuilderField<bool> {
         );
 
   @override
-  MDFormBuilderFieldState<MDFormCheckbox, bool> createState() => _MDFormCheckbox();
+  MDFormBuilderFieldState<MDFormCheckbox, bool> createState() => _MDFormCheckboxState();
 }
 
-class _MDFormCheckbox extends MDFormBuilderFieldState<MDFormCheckbox, bool> {}
+class _MDFormCheckboxState extends MDFormBuilderFieldState<MDFormCheckbox, bool> {}
 
 class MDCheckbox extends StatelessWidget {
   final bool? value;
