@@ -26,7 +26,7 @@ class ExampleRepo extends MDRepository {
 
   @override
   Future<ListResponse> getList(String url,
-      {List<Map<String, String>> filters = const [],
+      {List<MDFilter> filters = const [],
       List<Map<String, String>> sorters = const []}) async {
     Response res = await dio.get(url);
     if (res.statusCode == 200) {

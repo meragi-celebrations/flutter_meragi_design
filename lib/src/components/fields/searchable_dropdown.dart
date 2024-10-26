@@ -47,7 +47,7 @@ class _SelectDropdownState extends State<SelectDropdown> {
     controller.addListener(() {
       if (controller.text.isNotEmpty) {
         widget.getListBloc.addFilters([
-          {"field": "search", "operator": "eq", "value": controller.text}
+          MDFilter(field: "search", operator: "eq", value: controller.text)
         ]);
         widget.getListBloc.reset();
       }

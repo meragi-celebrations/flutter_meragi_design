@@ -11,6 +11,7 @@ export 'src/components/description.dart';
 export 'src/components/divider.dart';
 export 'src/components/drawer.dart';
 export 'src/components/fields/date_picker.dart';
+export 'src/components/fields/date_range_picker.dart';
 export 'src/components/fields/dropdown.dart';
 export 'src/components/fields/form_item.dart';
 export 'src/components/fields/html_editor.dart';
