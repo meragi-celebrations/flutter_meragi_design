@@ -110,7 +110,12 @@ class _MDFilterFormViewState extends State<MDFilterFormView> {
                   //   operator: "in",
                   //   value: data.value.toList().join(","),
                   // )
-                  filters.add(widget.filterBuilder(data.key, data.value));
+                  filters.add(
+                    widget.filterBuilder(
+                      data.key,
+                      data.value.toList().join(","),
+                    ),
+                  );
                 }
               }
               widget.onFilterSubmit(filters);

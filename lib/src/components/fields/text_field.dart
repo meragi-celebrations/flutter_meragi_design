@@ -396,6 +396,11 @@ class MDTextField extends MDFormBuilderField<String> {
                   )
                 : null;
 
+            TextStyle finalPlaceholderStyle = placeholderStyle ??
+                const TextStyle(
+                  color: Colors.grey,
+                );
+
             final fieldWidget = CupertinoTextField(
               restorationId: restorationId,
               controller: state._effectiveController,
@@ -420,7 +425,7 @@ class MDTextField extends MDFormBuilderField<String> {
               autocorrect: autocorrect,
               enableSuggestions: enableSuggestions,
               placeholder: placeholder,
-              placeholderStyle: placeholderStyle,
+              placeholderStyle: finalPlaceholderStyle,
               maxLengthEnforcement: maxLengthEnforcement,
               maxLines: maxLines,
               minLines: minLines,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/extensions/box_decoration.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 
@@ -11,6 +12,7 @@ class MDList<T> extends StatelessWidget {
   final List<Listenable>? listenables;
   final RequestState? requestState;
   final List<T>? list;
+  final bool isSliver;
 
   const MDList({
     super.key,
@@ -21,7 +23,9 @@ class MDList<T> extends StatelessWidget {
     this.requestState,
     this.list,
     this.listenables,
-  })  : assert(listBloc != null || (requestState != null && list != null && listenables != null)),
+    this.isSliver = false,
+  })  : assert(listBloc != null ||
+            (requestState != null && list != null && listenables != null)),
         tileBuilder = null,
         timelineTheme = null;
 
@@ -36,8 +40,10 @@ class MDList<T> extends StatelessWidget {
     this.requestState,
     this.list,
     this.listenables,
-  })  : assert(listBloc != null || (requestState != null && list != null && listenables != null)),
+  })  : assert(listBloc != null ||
+            (requestState != null && list != null && listenables != null)),
         itemBuilder = null,
+        isSliver = false,
         separatorBuilder = null;
 
   bool get isTimeline => tileBuilder != null;
@@ -92,10 +98,122 @@ class MDList<T> extends StatelessWidget {
           );
         }
 
-        return ListView.separated(
-          itemCount: list.length,
-          itemBuilder: itemBuilder!,
-          separatorBuilder: separatorBuilder ?? (_, __) => const SizedBox(),
+        return isSliver
+            ? SliverList.separated(
+                itemCount: list.length,
+                itemBuilder: itemBuilder!,
+                separatorBuilder:
+                    separatorBuilder ?? (_, __) => const SizedBox())
+            : ListView.separated(
+                itemCount: list.length,
+                itemBuilder: itemBuilder!,
+                separatorBuilder:
+                    separatorBuilder ?? (_, __) => const SizedBox(),
+              );
+      },
+    );
+  }
+}
+
+class MDListTile extends StatefulWidget {
+  const MDListTile({
+    super.key,
+    required this.child,
+    this.focusNode,
+    this.onFocusChange,
+    this.onTap,
+    this.onSecondaryTap,
+    this.onDoubleTap,
+    this.onEnter,
+    this.decoration,
+    this.statesController,
+    this.isSelected = false,
+  });
+
+  final Widget child;
+  final FocusNode? focusNode;
+  final ValueChanged<bool>? onFocusChange;
+  final VoidCallback? onTap;
+  final VoidCallback? onSecondaryTap;
+  final VoidCallback? onDoubleTap;
+  final VoidCallback? onEnter;
+  final WidgetStateProperty<BoxDecoration>? decoration;
+  final WidgetStatesController? statesController;
+  final bool isSelected;
+
+  @override
+  State<MDListTile> createState() => _MDListTileState();
+}
+
+class _MDListTileState extends State<MDListTile> {
+  late WidgetStatesController _statesController;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _statesController = widget.statesController ?? WidgetStatesController();
+    _focusNode = widget.focusNode ?? FocusNode();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const padding = EdgeInsets.all(12);
+    final borderRadius = BorderRadius.circular(10);
+
+    _statesController.update(WidgetState.selected, widget.isSelected);
+
+    BoxDecoration baseDecoration = BoxDecoration(
+      borderRadius: borderRadius,
+      color: Colors.white,
+    );
+
+    WidgetStateProperty<BoxDecoration> stateDecoration = widget.decoration ??
+        MDWidgetStateResolver<BoxDecoration>({
+          WidgetState.hovered: BoxDecoration(
+            color: Colors.deepPurple.shade100.withOpacity(.05),
+          ),
+          WidgetState.focused: BoxDecoration(
+              color: Colors.deepPurple.shade100.withOpacity(.05),
+              border: Border.all(
+                color: Colors.deepPurple.shade100,
+              )),
+          WidgetState.selected: BoxDecoration(
+              color: Colors.deepPurple.shade100.withOpacity(.2),
+              border: Border.all(
+                color: Colors.deepPurple.shade100,
+              )),
+          "default": baseDecoration,
+        }).resolveWith();
+
+    return MDWidget(
+      focusNode: _focusNode,
+      onFocusChange: widget.onFocusChange,
+      statesController: _statesController,
+      onTap: () {
+        _focusNode.requestFocus();
+        widget.onTap?.call();
+      },
+      onSecondaryTap: widget.onSecondaryTap,
+      onDoubleTap: () {
+        _focusNode.requestFocus();
+        widget.onDoubleTap?.call();
+      },
+      onEnter: widget.onEnter ?? widget.onTap,
+      mouseCursor: MDWidgetStateResolver<MouseCursor>({
+        WidgetState.hovered: (widget.onTap != null)
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
+        "default": SystemMouseCursors.basic
+      }).resolveWith(),
+      builder: (context, states) {
+        return Container(
+          padding: padding,
+          decoration: baseDecoration.merge(stateDecoration.resolve(states)),
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            child: widget.child,
+          ),
         );
       },
     );

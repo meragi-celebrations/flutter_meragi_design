@@ -36,7 +36,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
                 children: [
                   ...options!.map(
                     (option) {
-                      return checkboxOption(state, option, field, isMultiSelect);
+                      return checkboxOption(state, option, field, isMultiSelect, onChanged);
                     },
                   ),
                 ],
@@ -72,7 +72,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
               itemBuilder: (context, index) {
                 var item = listBloc.list.value[index];
                 MDCheckboxOption option = optionBuilder!(item);
-                return checkboxOption(state, option, field, isMultiSelect);
+                return checkboxOption(state, option, field, isMultiSelect, onChanged);
               },
             );
             return fieldWidget;
@@ -80,7 +80,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
         );
 
   static ValueListenableBuilder<Set<String>> checkboxOption(
-      _MDFormCheckboxList state, MDCheckboxOption option, _MDFormCheckboxList field, bool isMultiSelect) {
+      _MDFormCheckboxList state, MDCheckboxOption option, _MDFormCheckboxList field, bool isMultiSelect, Function(Set<String>? value)? onChanged) {
     return ValueListenableBuilder(
       valueListenable: state.setValues,
       builder: (context, selectedSet, _) {
@@ -94,18 +94,20 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
               if (!isMultiSelect) {
                 state.setValues.value = {option.value};
                 field.didChange(state.setValues.value);
-                // return;
-              }
-              if (value ?? false) {
-                state.setValues.value.add(option.value);
               } else {
-                state.setValues.value.remove(option.value);
+                if (value ?? false) {
+                  state.setValues.value.add(option.value);
+                } else {
+                  state.setValues.value.remove(option.value);
+                }
+                state.setValues.notifyListeners();
+                field.didChange(state.setValues.value);
               }
-              state.setValues.notifyListeners();
-              field.didChange(state.setValues.value);
+              // onChanged!(state.setValues.value);
             },
           ),
           onTap: () {
+            // Handle tap interaction based on multi-select
             if (isMultiSelect) {
               if (selectedSet.contains(option.value)) {
                 state.setValues.value.remove(option.value);
@@ -134,17 +136,20 @@ class _MDFormCheckboxList extends MDFormBuilderFieldState<MDFormCheckboxList, Se
   void initState() {
     super.initState();
     if (widget.listBloc != null) {
-      widget.listBloc?.get();
+      widget.listBloc?.reset();
     }
+    // Ensure that the initial value is correctly set for each checkbox list independently
     if (value != null) {
       setValues.value = value!;
+    } else {
+      setValues.value = widget.initialValue ?? {};
     }
   }
 
   @override
   void reset() {
     super.reset();
-    setValues.value = {};
+    setValues.value = widget.initialValue ?? {};
   }
 
   @override
