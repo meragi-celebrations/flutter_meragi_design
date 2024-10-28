@@ -271,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Story(
             name: "Button/Segmented",
             builder: (context) {
-              return SegmentedButtonStory();
+              return const SegmentedButtonStory();
             }),
         Story(
           name: "Data/Description",
@@ -568,6 +568,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   initial: 3,
                 )
                 .toDouble();
+            var getListBloc = GetListBloc<TodoModel>(
+              url: "https://jsonplaceholder.typicode.com/todos/",
+              repo: ExampleRepo(),
+              fromJson: TodoModel.staticFromJson,
+            );
             return FormBuilder(
               key: _formKey,
               child: Column(
@@ -603,6 +608,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           [FormBuilderValidators.required()]),
                     ),
                   ),
+                  MDSearchableDropdown<int, TodoModel>(
+                    name: "select",
+                    getListBloc: getListBloc,
+                    optionBuilder: (e) => MDDropdownMenuEntry(
+                      label: e.title!,
+                      value: e.id!,
+                    ),
+                  ),
                   MDFormItem(
                     label: const Text("Checkbox"),
                     labelPosition: labelPostion,
@@ -616,8 +629,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   MDButton(
                     onTap: () {
-                      print("save ${_formKey.currentState?.value}");
                       _formKey.currentState?.saveAndValidate();
+                      print("save ${_formKey.currentState?.value}");
                     },
                     child: const Text("Save"),
                   )
@@ -942,15 +955,24 @@ class _MyHomePageState extends State<MyHomePage> {
               repo: ExampleRepo(),
               fromJson: TodoModel.staticFromJson,
             );
+
+            GlobalKey<FormBuilderState> _key = GlobalKey();
+
             return MDScaffold(
               body: Center(
                 child: Center(
-                  child: MDSearchableDropdown<int, TodoModel>(
-                    name: "todo",
-                    getListBloc: getListBloc,
-                    optionBuilder: (e) => DropdownMenuEntry(
-                      label: e.title!,
-                      value: e.id!,
+                  child: FormBuilder(
+                    key: _key,
+                    onChanged: () {
+                      print("form changed, ${_key.currentState?.value}");
+                    },
+                    child: MDSearchableDropdown<int, TodoModel>(
+                      name: "select",
+                      getListBloc: getListBloc,
+                      optionBuilder: (e) => MDDropdownMenuEntry(
+                        label: e.title!,
+                        value: e.id!,
+                      ),
                     ),
                   ),
                 ),
@@ -965,7 +987,44 @@ class _MyHomePageState extends State<MyHomePage> {
               body: Center(child: MDHtmlEditor(name: "html")),
             );
           },
-        )
+        ),
+        Story(
+          name: "Enhanced Widget",
+          builder: (context) {
+            WidgetStatesController _controller = WidgetStatesController();
+
+            return MDScaffold(
+              body: Center(
+                child: MDWidget(
+                  statesController: _controller,
+                  mouseCursor: MDWidgetStateResolver<MouseCursor>({
+                    WidgetState.hovered: SystemMouseCursors.click,
+                    "default": SystemMouseCursors.basic
+                  }).resolveWith(),
+                  builder: (context, states) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: MDWidgetStateResolver<Color>({
+                          WidgetState.hovered: Colors.red,
+                          WidgetState.pressed: Colors.yellow,
+                          WidgetState.focused: Colors.green,
+                          "default": Colors.blue
+                        }).resolve(states),
+                      ),
+                      child: const BodyText(text: "Hello"),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+        Story(
+          name: 'List',
+          builder: (context) {
+            return ListStory();
+          },
+        ),
       ],
     );
   }
@@ -1210,6 +1269,47 @@ class _SegmentedButtonStoryState extends State<SegmentedButtonStory> {
           calendarView = newSelection.first;
         });
       },
+    );
+  }
+}
+
+class ListStory extends StatefulWidget {
+  const ListStory({super.key});
+
+  @override
+  State<ListStory> createState() => _ListStoryState();
+}
+
+class _ListStoryState extends State<ListStory> {
+  late GetListBloc<TodoModel> getListBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    getListBloc = GetListBloc<TodoModel>(
+      url: "https://jsonplaceholder.typicode.com/todos/",
+      repo: ExampleRepo(),
+      fromJson: TodoModel.staticFromJson,
+    );
+    getListBloc.get();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      body: MDList(
+        listBloc: getListBloc,
+        itemBuilder: (context, index) {
+          FocusNode focusNode = FocusNode();
+          return MDListTile(
+            focusNode: focusNode,
+            onTap: () {
+              focusNode.requestFocus();
+            },
+            child: Text(getListBloc.list.value[index].title ?? ""),
+          );
+        },
+      ),
     );
   }
 }

@@ -95,8 +95,6 @@ class MDGestureDetector extends GestureDetector {
       return absorbing;
     }
 
-    // If showDisabledCursor is true, this widget will show a disabled cursor,
-    // even if isDisabled is false.
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: absorbing,
