@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class SelectDropdown<T, U> extends StatefulWidget {
   final num? initialValue;
@@ -17,6 +18,7 @@ class SelectDropdown<T, U> extends StatefulWidget {
   final MDDropdownMenuEntry<T> Function(dynamic item) optionBuilder;
   final FocusNode? focusNode;
   final TextEditingController? controller;
+  final bool canClear;
 
   const SelectDropdown({
     super.key,
@@ -33,6 +35,7 @@ class SelectDropdown<T, U> extends StatefulWidget {
     this.width,
     this.focusNode,
     this.controller,
+    this.canClear = false,
   });
 
   @override
@@ -62,6 +65,10 @@ class _SelectDropdownState extends State<SelectDropdown> {
     // if (widget.shouldMakeInitialCall) {
     //   bloc.getList();
     // }
+    controller = widget.controller ?? TextEditingController();
+    if (widget.initialValue != null) {
+      controller.text = widget.initialValue.toString();
+    }
   }
 
   @override
@@ -81,6 +88,7 @@ class _SelectDropdownState extends State<SelectDropdown> {
           builder: (context, constraints) {
             return MDDropdownMenu(
               controller: controller,
+              initialSelection: widget.initialValue,
               dropdownMenuEntries: data,
               onSelected: (value) {
                 if (widget.onSelected != null) {
@@ -93,7 +101,21 @@ class _SelectDropdownState extends State<SelectDropdown> {
               focusNode: widget.focusNode,
               trailingIcon: loadingList
                   ? const MDLoadingIndicator(color: Colors.deepPurple)
-                  : null,
+                  : (widget.canClear && controller.text.isNotEmpty)
+                      ? MDButton(
+                          icon: PhosphorIconsBold.x,
+                          decoration: ButtonDecoration(
+                            context: context,
+                            type: ButtonType.standard,
+                            variant: ButtonVariant.ghost,
+                            size: ButtonSize.sm,
+                          ),
+                          onTap: () {
+                            controller.clear();
+                            widget.onSelected!.call(null);
+                          },
+                        )
+                      : null,
               selectedTrailingIcon: loadingList
                   ? const MDLoadingIndicator(color: Colors.deepPurple)
                   : null,
@@ -216,6 +238,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
   final double? width;
   final bool shouldMakeInitialCall;
   final bool requestFocusOnTap;
+  final bool canClear;
 
   MDSearchableDropdown({
     super.key,
@@ -236,6 +259,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
     this.width,
     this.shouldMakeInitialCall = false,
     this.requestFocusOnTap = true,
+    this.canClear = false,
   }) : super(
           builder: (FormFieldState<T?> field) {
             final state = field as _MDSearchableDropdownState;
@@ -258,6 +282,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
               width: width,
               shouldMakeInitialCall: shouldMakeInitialCall,
               requestFocusOnTap: requestFocusOnTap,
+              canClear: canClear,
             );
           },
         );
@@ -274,10 +299,12 @@ class _MDSearchableDropdownState<T, U>
   final TextEditingController controller = TextEditingController();
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-
     focusNode = widget.focusNode ?? FocusNode();
+    if (widget.initialValue != null) {
+      controller.text = widget.initialValue.toString();
+    }
   }
 
   @override

@@ -38,7 +38,7 @@ Future<T?> showMDDrawer<T>({
     pageBuilder: (context, _, __) {
       Widget page = builder(context);
       page = themes.wrap(page);
-      return SlidingDrawer(
+      return MDSlidingDrawer(
         position: position,
         height: height,
         width: width,
@@ -76,13 +76,13 @@ Future<T?> showMDDrawer<T>({
 ///
 /// The [height] and [width] parameters can be used to specify the size of the
 /// drawer.
-class SlidingDrawer extends StatelessWidget {
+class MDSlidingDrawer extends StatelessWidget {
   final SlidePosition position;
   final Widget child;
   final double? height;
   final double? width;
 
-  const SlidingDrawer({
+  const MDSlidingDrawer({
     Key? key,
     required this.child,
     this.position = SlidePosition.right,
