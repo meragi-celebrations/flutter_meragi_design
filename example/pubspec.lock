@@ -257,7 +257,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.3.2"
+    version: "3.0.0"
   flutter_quill:
     dependency: transitive
     description:
