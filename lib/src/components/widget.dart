@@ -6,6 +6,7 @@ class MDWidget extends StatefulWidget {
     super.key,
     required this.builder,
     this.statesController,
+    this.child,
     this.canRequestFocus = true,
     this.autofocus = false,
     this.onFocusChange,
@@ -17,7 +18,8 @@ class MDWidget extends StatefulWidget {
     this.focusNode,
   });
 
-  final Widget Function(BuildContext context, Set<WidgetState> states) builder;
+  final Widget Function(BuildContext context, Set<WidgetState> states, Widget? child) builder;
+  final Widget? child;
   final WidgetStatesController? statesController;
   final bool canRequestFocus;
   final bool autofocus;
@@ -46,7 +48,7 @@ class _MDWidgetState extends State<MDWidget> {
     print("dhinka chika ${statesController}");
 
     statesController.addListener(() {
-      print("statesController ${statesController.value}");
+      print("statesController ${statesController} ${statesController.value}");
     });
   }
 
@@ -77,38 +79,41 @@ class _MDWidgetState extends State<MDWidget> {
       },
       canRequestFocus: widget.canRequestFocus,
       child: ValueListenableBuilder(
-          valueListenable: statesController,
-          builder: (context, states, _) {
-            return MouseRegion(
-              cursor: widget.mouseCursor?.resolve(statesController.value) ??
-                  MouseCursor.defer,
-              onEnter: (event) {
-                statesController.update(WidgetState.hovered, true);
+        valueListenable: statesController,
+        builder: (context, states, child) {
+          return MouseRegion(
+            cursor: widget.mouseCursor?.resolve(statesController.value) ?? MouseCursor.defer,
+            onEnter: (event) {
+              statesController.update(WidgetState.hovered, true);
+              statesController.update(WidgetState.focused, true);
+            },
+            onExit: (event) {
+              statesController.update(WidgetState.hovered, false);
+              statesController.update(WidgetState.focused, false);
+            },
+            child: GestureDetector(
+              onTap: () {
+                widget.onTap?.call();
               },
-              onExit: (event) {
-                statesController.update(WidgetState.hovered, false);
+              onSecondaryTap: () {
+                widget.onSecondaryTap?.call();
               },
-              child: GestureDetector(
-                onTap: () {
-                  widget.onTap?.call();
-                },
-                onSecondaryTap: () {
-                  widget.onSecondaryTap?.call();
-                },
-                onTapDown: (_) {
-                  statesController.update(WidgetState.pressed, true);
-                },
-                onTapUp: (_) {
-                  statesController.update(WidgetState.pressed, false);
-                },
-                onTapCancel: () {
-                  statesController.update(WidgetState.pressed, false);
-                },
-                onDoubleTap: widget.onDoubleTap,
-                child: widget.builder(context, states),
-              ),
-            );
-          }),
+              onTapDown: (_) {
+                statesController.update(WidgetState.pressed, true);
+              },
+              onTapUp: (_) {
+                statesController.update(WidgetState.pressed, false);
+              },
+              onTapCancel: () {
+                statesController.update(WidgetState.pressed, false);
+              },
+              onDoubleTap: widget.onDoubleTap,
+              child: widget.builder(context, states, child),
+            ),
+          );
+        },
+        child: widget.child,
+      ),
     );
   }
 }
