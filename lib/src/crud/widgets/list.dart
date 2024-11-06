@@ -24,8 +24,7 @@ class MDList<T> extends StatelessWidget {
     this.list,
     this.listenables,
     this.isSliver = false,
-  })  : assert(listBloc != null ||
-            (requestState != null && list != null && listenables != null)),
+  })  : assert(listBloc != null || (requestState != null && list != null && listenables != null)),
         tileBuilder = null,
         timelineTheme = null;
 
@@ -40,8 +39,7 @@ class MDList<T> extends StatelessWidget {
     this.requestState,
     this.list,
     this.listenables,
-  })  : assert(listBloc != null ||
-            (requestState != null && list != null && listenables != null)),
+  })  : assert(listBloc != null || (requestState != null && list != null && listenables != null)),
         itemBuilder = null,
         isSliver = false,
         separatorBuilder = null;
@@ -102,13 +100,11 @@ class MDList<T> extends StatelessWidget {
             ? SliverList.separated(
                 itemCount: list.length,
                 itemBuilder: itemBuilder!,
-                separatorBuilder:
-                    separatorBuilder ?? (_, __) => const SizedBox())
+                separatorBuilder: separatorBuilder ?? (_, __) => const SizedBox())
             : ListView.separated(
                 itemCount: list.length,
                 itemBuilder: itemBuilder!,
-                separatorBuilder:
-                    separatorBuilder ?? (_, __) => const SizedBox(),
+                separatorBuilder: separatorBuilder ?? (_, __) => const SizedBox(),
               );
       },
     );
@@ -201,12 +197,10 @@ class _MDListTileState extends State<MDListTile> {
       },
       onEnter: widget.onEnter ?? widget.onTap,
       mouseCursor: MDWidgetStateResolver<MouseCursor>({
-        WidgetState.hovered: (widget.onTap != null)
-            ? SystemMouseCursors.click
-            : SystemMouseCursors.basic,
+        WidgetState.hovered: (widget.onTap != null) ? SystemMouseCursors.click : SystemMouseCursors.basic,
         "default": SystemMouseCursors.basic
       }).resolveWith(),
-      builder: (context, states) {
+      builder: (context, states, _) {
         return Container(
           padding: padding,
           decoration: baseDecoration.merge(stateDecoration.resolve(states)),

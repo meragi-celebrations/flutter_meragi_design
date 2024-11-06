@@ -4,6 +4,7 @@ class MDWidgetStateResolver<T> {
   final Map<dynamic, T> propertyMap;
 
   List<WidgetState> clickablePriority = [
+    WidgetState.hovered,
     WidgetState.pressed,
     WidgetState.selected,
     WidgetState.focused,
@@ -11,12 +12,10 @@ class MDWidgetStateResolver<T> {
     WidgetState.error,
     WidgetState.disabled,
     WidgetState.scrolledUnder,
-    WidgetState.hovered
   ];
 
   MDWidgetStateResolver(this.propertyMap)
-      : assert(propertyMap.containsKey("default"),
-            "The propertyMap must contains a key called 'default'");
+      : assert(propertyMap.containsKey("default"), "The propertyMap must contains a key called 'default'");
 
   WidgetStateProperty<T> resolveWith() {
     return WidgetStateProperty.resolveWith<T>((states) {

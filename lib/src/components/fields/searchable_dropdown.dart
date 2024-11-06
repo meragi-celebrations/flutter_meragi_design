@@ -15,6 +15,7 @@ class SelectDropdown<T, U> extends StatefulWidget {
   final bool requestFocusOnTap;
   final InputDecorationTheme? decoration;
   final GetListBloc<U> getListBloc;
+  final GetOneBloc<U>? getOneBloc;
   final MDDropdownMenuEntry<T> Function(dynamic item) optionBuilder;
   final FocusNode? focusNode;
   final TextEditingController? controller;
@@ -24,6 +25,7 @@ class SelectDropdown<T, U> extends StatefulWidget {
     super.key,
     required this.getListBloc,
     this.initialValue,
+    this.getOneBloc,
     required this.onSelected,
     this.label,
     this.errorText,
@@ -36,28 +38,31 @@ class SelectDropdown<T, U> extends StatefulWidget {
     this.focusNode,
     this.controller,
     this.canClear = false,
-  });
+  }) : assert(!(initialValue != null && getOneBloc == null), "GetOneBloc cant be null if initialValue is not null");
 
   @override
   State<SelectDropdown> createState() => _SelectDropdownState();
 }
 
 class _SelectDropdownState extends State<SelectDropdown> {
-  // late final SelectDropdownBloc bloc;
-
   late TextEditingController controller;
 
   @override
   void initState() {
-    // bloc = SelectDropdownBloc(widget.url, context.read<CRUDRepository>(), widget.model, selected: widget.initialValue);
     super.initState();
-    widget.getListBloc.get();
+    widget.getListBloc.reset();
+    if (widget.initialValue != null) {
+      widget.getOneBloc!.onSuccess = (data) {
+        widget.getListBloc.list.value.add(data);
+        widget.getListBloc.list.notifyListeners();
+      };
+      widget.getOneBloc!.id.value = widget.initialValue.toString();
+      widget.getOneBloc!.get();
+    }
     controller = widget.controller ?? TextEditingController();
     controller.addListener(() {
       if (controller.text.isNotEmpty) {
-        widget.getListBloc.addFilters([
-          MDFilter(field: "search", operator: "eq", value: controller.text)
-        ]);
+        widget.getListBloc.addFilters([MDFilter(field: "search", operator: "eq", value: controller.text)]);
         widget.getListBloc.reset();
       }
     });
@@ -66,9 +71,6 @@ class _SelectDropdownState extends State<SelectDropdown> {
     //   bloc.getList();
     // }
     controller = widget.controller ?? TextEditingController();
-    if (widget.initialValue != null) {
-      controller.text = widget.initialValue.toString();
-    }
   }
 
   @override
@@ -79,11 +81,8 @@ class _SelectDropdownState extends State<SelectDropdown> {
         widget.getListBloc.requestState,
       ],
       builder: (context, _) {
-        List<MDDropdownMenuEntry> data = widget.getListBloc.list.value
-            .map((e) => widget.optionBuilder(e))
-            .toList();
-        bool loadingList =
-            widget.getListBloc.requestState.value == RequestState.loading;
+        List<MDDropdownMenuEntry> data = widget.getListBloc.list.value.map((e) => widget.optionBuilder(e)).toList();
+        bool loadingList = widget.getListBloc.requestState.value == RequestState.loading;
         return LayoutBuilder(
           builder: (context, constraints) {
             return MDDropdownMenu(
@@ -116,9 +115,7 @@ class _SelectDropdownState extends State<SelectDropdown> {
                           },
                         )
                       : null,
-              selectedTrailingIcon: loadingList
-                  ? const MDLoadingIndicator(color: Colors.deepPurple)
-                  : null,
+              selectedTrailingIcon: loadingList ? const MDLoadingIndicator(color: Colors.deepPurple) : null,
               inputDecorationTheme: widget.decoration,
               errorText: widget.errorText,
               helperText: widget.helperText,
@@ -233,6 +230,7 @@ abstract class SelectBaseModel {
 
 class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
   final GetListBloc<U> getListBloc;
+  final GetOneBloc<U>? getOneBloc;
   final MDDropdownMenuEntry<T> Function(dynamic item) optionBuilder;
   final ValueChanged? onSelected;
   final double? width;
@@ -244,6 +242,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
     super.key,
     required super.name,
     required this.getListBloc,
+    this.getOneBloc,
     required this.optionBuilder,
     super.validator,
     super.initialValue,
@@ -263,6 +262,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
   }) : super(
           builder: (FormFieldState<T?> field) {
             final state = field as _MDSearchableDropdownState;
+            print("state.initialValue: ${state.initialValue.runtimeType}");
 
             return SelectDropdown<T, U>(
               getListBloc: getListBloc,
@@ -279,6 +279,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
                 }
               },
               initialValue: state.initialValue,
+              getOneBloc: getOneBloc,
               width: width,
               shouldMakeInitialCall: shouldMakeInitialCall,
               requestFocusOnTap: requestFocusOnTap,
@@ -288,12 +289,10 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
         );
 
   @override
-  MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> createState() =>
-      _MDSearchableDropdownState();
+  MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> createState() => _MDSearchableDropdownState();
 }
 
-class _MDSearchableDropdownState<T, U>
-    extends MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> {
+class _MDSearchableDropdownState<T, U> extends MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> {
   late final FocusNode focusNode;
 
   final TextEditingController controller = TextEditingController();
@@ -302,9 +301,9 @@ class _MDSearchableDropdownState<T, U>
   void initState() {
     super.initState();
     focusNode = widget.focusNode ?? FocusNode();
-    if (widget.initialValue != null) {
-      controller.text = widget.initialValue.toString();
-    }
+    // if (widget.initialValue != null) {
+    //   controller.text = widget.initialValue.toString();
+    // }
   }
 
   @override
