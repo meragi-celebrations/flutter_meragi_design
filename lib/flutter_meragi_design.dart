@@ -51,3 +51,4 @@ export 'src/utils/multi_value_listenable_builder.dart';
 export 'src/utils/platform.dart';
 export 'src/utils/scroll_handler.dart';
 export 'src/utils/widget_state.dart';
+export 'src/components/modal.dart';

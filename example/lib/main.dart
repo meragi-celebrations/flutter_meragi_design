@@ -732,6 +732,19 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
+          name: "Dialog/Modal",
+          builder: (context) => MDScaffold(
+            body: Center(
+              child: MDButton(
+                onTap: () {
+                  _showCustomModal(context);
+                },
+                child: const Text("Show Modal"),
+              ),
+            ),
+          ),
+        ),
+        Story(
           name: 'Helper/Divider',
           builder: (context) {
             var rotateChild = context.knobs.boolean(label: "Rotate Child", initial: false);
@@ -960,6 +973,43 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     );
   }
+}
+
+void _showCustomModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return MDModal(
+        header: ModalHeader(
+          title: 'Modal Title',
+          description: 'This is an optional description.',
+          icon: Icons.info,
+          onClose: () {
+            // Handle close action
+            Navigator.of(context).pop();
+          },
+        ),
+        bodyContent: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Main content goes here.',
+          ),
+        ),
+        footer: ModalFooter(
+          onDone: () {
+            // Handle done action
+            Navigator.of(context).pop();
+          },
+          onCancel: () {
+            // Handle cancel action
+            Navigator.of(context).pop();
+          },
+          doneButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
+        ),
+      );
+    },
+  );
 }
 
 class MoodboardStory extends StatefulWidget {
