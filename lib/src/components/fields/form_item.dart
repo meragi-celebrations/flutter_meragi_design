@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:flutter_meragi_design/src/utils/shortcut_activators.dart';
 
 class GridLayoutValues {
   final int labelFlex;
@@ -78,31 +79,27 @@ class _MDFormItemState extends State<MDFormItem> {
       }
     };
 
-    FormItemStyle finalStyle = FormItemStyle().merge(widget.style);
+    FormItemStyle finalStyle = const FormItemStyle().merge(widget.style);
 
-    Widget space = SizedBox(
-        height: widget.contentSpace ?? 3.0, width: widget.contentSpace ?? 3.0);
-    return Container(
-      decoration: finalStyle.decoration,
-      child: widget.isGrid
-          ? GridLayout(
-              label: widget.label,
-              space: space,
-              error: workingError,
-              gridValues: widget.gridValues ?? const GridLayoutValues(1, 9),
-              child: widget.child,
-            )
-          : widget.labelPosition == Axis.horizontal
-              ? RowLayout(
-                  label: widget.label,
-                  space: space,
-                  error: workingError,
-                  child: widget.child)
-              : ColumnLayout(
-                  label: widget.label,
-                  space: space,
-                  error: workingError,
-                  child: widget.child),
+    Widget space = SizedBox(height: widget.contentSpace ?? 3.0, width: widget.contentSpace ?? 3.0);
+    return Shortcuts(
+      shortcuts: <ShortcutActivator, Intent>{
+        AnyKeyActivator(): const DoNothingAndStopPropagationTextIntent(),
+      },
+      child: Container(
+        decoration: finalStyle.decoration,
+        child: widget.isGrid
+            ? GridLayout(
+                label: widget.label,
+                space: space,
+                error: workingError,
+                gridValues: widget.gridValues ?? const GridLayoutValues(1, 9),
+                child: widget.child,
+              )
+            : widget.labelPosition == Axis.horizontal
+                ? RowLayout(label: widget.label, space: space, error: workingError, child: widget.child)
+                : ColumnLayout(label: widget.label, space: space, error: workingError, child: widget.child),
+      ),
     );
   }
 }
@@ -150,9 +147,7 @@ class GridLayout extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             SizedBox(
-              height:
-                  (MeragiTheme.of(context).token.bodyTextStyle.fontSize ?? 1) *
-                      1.4,
+              height: (MeragiTheme.of(context).token.bodyTextStyle.fontSize ?? 1) * 1.4,
             ),
             AnimatedOpacity(
               opacity: error != null ? 1.0 : 0.0,
@@ -196,9 +191,7 @@ class RowLayout extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             SizedBox(
-              height:
-                  (MeragiTheme.of(context).token.bodyTextStyle.fontSize ?? 1) *
-                      1.4,
+              height: (MeragiTheme.of(context).token.bodyTextStyle.fontSize ?? 1) * 1.4,
             ),
             if (error != null) error!
           ],
@@ -232,9 +225,7 @@ class ColumnLayout extends StatelessWidget {
         child,
         Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           SizedBox(
-            height:
-                (MeragiTheme.of(context).token.bodyTextStyle.fontSize ?? 1) *
-                    1.4,
+            height: (MeragiTheme.of(context).token.bodyTextStyle.fontSize ?? 1) * 1.4,
           ),
           if (error != null) error!
         ]),

@@ -272,6 +272,8 @@ class MDTextField extends MDFormBuilderField<String> {
   /// {@macro flutter.widgets.editableText.contentInsertionConfiguration}
   final ContentInsertionConfiguration? contentInsertionConfiguration;
 
+  final Widget? suffix;
+
   /// Show an clear button to clear the current text entry.
   ///
   /// If `true`, a clear button will appear on the right side of the text field,
@@ -343,6 +345,7 @@ class MDTextField extends MDFormBuilderField<String> {
     this.placeholder,
     this.placeholderStyle,
     this.isClearable = false,
+    this.suffix,
   })  : assert(maxLines == null || maxLines > 0),
         assert(minLines == null || minLines > 0),
         assert(
@@ -353,8 +356,7 @@ class MDTextField extends MDFormBuilderField<String> {
           !expands || (maxLines == null && minLines == null),
           'minLines and maxLines must be null when expands is true.',
         ),
-        assert(!obscureText || maxLines == 1,
-            'Obscured fields cannot be multiline.'),
+        assert(!obscureText || maxLines == 1, 'Obscured fields cannot be multiline.'),
         assert(maxLength == null || maxLength > 0),
         // Assert the following instead of setting it directly to avoid surprising the user by silently changing the value they set.
         assert(
@@ -382,19 +384,20 @@ class MDTextField extends MDFormBuilderField<String> {
               border: Border.all(color: Colors.deepPurple),
             );
 
-            Widget? finalSuffix = (state.value != null && isClearable)
-                ? MDButton(
-                    decoration: ButtonDecoration(
-                      context: state.context,
-                      variant: ButtonVariant.ghost,
-                      size: ButtonSize.sm,
-                    ),
-                    icon: PhosphorIconsRegular.x,
-                    onTap: () {
-                      state.didChange(null);
-                    },
-                  )
-                : null;
+            Widget? finalSuffix = suffix ??
+                ((state.value != null && isClearable)
+                    ? MDButton(
+                        decoration: ButtonDecoration(
+                          context: state.context,
+                          variant: ButtonVariant.ghost,
+                          size: ButtonSize.sm,
+                        ),
+                        icon: PhosphorIconsRegular.x,
+                        onTap: () {
+                          state.didChange(null);
+                        },
+                      )
+                    : null);
 
             TextStyle finalPlaceholderStyle = placeholderStyle ??
                 const TextStyle(
@@ -475,14 +478,11 @@ class MDTextField extends MDFormBuilderField<String> {
   }
 
   @override
-  MDFormBuilderFieldState<MDTextField, String> createState() =>
-      _FormBuilderCupertinoTextFieldState();
+  MDFormBuilderFieldState<MDTextField, String> createState() => _FormBuilderCupertinoTextFieldState();
 }
 
-class _FormBuilderCupertinoTextFieldState
-    extends MDFormBuilderFieldState<MDTextField, String> {
-  TextEditingController? get _effectiveController =>
-      widget.controller ?? _controller;
+class _FormBuilderCupertinoTextFieldState extends MDFormBuilderFieldState<MDTextField, String> {
+  TextEditingController? get _effectiveController => widget.controller ?? _controller;
 
   TextEditingController? _controller;
 
