@@ -57,21 +57,35 @@ class MDList<T> extends StatelessWidget {
         RequestState state = this.requestState ?? listBloc!.requestState.value;
 
         if (state == RequestState.loading) {
-          return const Center(
+          Widget loadingIndicator = const Center(
             child: MDLoadingIndicator(
               color: Colors.deepPurple,
             ),
           );
+          if (isSliver) {
+            return SliverFillRemaining(
+              child: loadingIndicator,
+            );
+          } else {
+            return loadingIndicator;
+          }
         }
 
         if (list.isEmpty) {
-          return Center(
+          Widget emptyWidget = Center(
             child: Icon(
               PhosphorIconsBold.empty,
               size: 300,
               color: Colors.deepPurple.shade100.withOpacity(.2),
             ),
           );
+          if (isSliver) {
+            return SliverFillRemaining(
+              child: emptyWidget,
+            );
+          } else {
+            return emptyWidget;
+          }
         }
 
         if (isTimeline) {
@@ -162,13 +176,14 @@ class _MDListTileState extends State<MDListTile> {
     BoxDecoration baseDecoration = BoxDecoration(
       borderRadius: borderRadius,
       color: Colors.white,
+      border: Border.all(color: Colors.white),
     );
 
     WidgetStateProperty<BoxDecoration> stateDecoration = widget.decoration ??
         MDWidgetStateResolver<BoxDecoration>({
-          WidgetState.hovered: BoxDecoration(
-            color: Colors.deepPurple.shade100.withOpacity(.05),
-          ),
+          // WidgetState.hovered: BoxDecoration(
+          //   color: Colors.deepPurple.shade100.withOpacity(.05),
+          // ),
           WidgetState.focused: BoxDecoration(
               color: Colors.deepPurple.shade100.withOpacity(.05),
               border: Border.all(
@@ -200,16 +215,17 @@ class _MDListTileState extends State<MDListTile> {
         WidgetState.hovered: (widget.onTap != null) ? SystemMouseCursors.click : SystemMouseCursors.basic,
         "default": SystemMouseCursors.basic
       }).resolveWith(),
-      builder: (context, states, _) {
+      builder: (context, states, child) {
         return Container(
           padding: padding,
           decoration: baseDecoration.merge(stateDecoration.resolve(states)),
           child: AnimatedSize(
             duration: const Duration(milliseconds: 300),
-            child: widget.child,
+            child: child,
           ),
         );
       },
+      child: widget.child,
     );
   }
 }

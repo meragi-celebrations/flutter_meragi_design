@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
 /// Displays an alert dialog with a custom content.
@@ -86,69 +87,85 @@ class MDAlertDialog extends StatelessWidget {
       type: type ?? CardType.defaultType,
     );
 
-    return Center(
-      child: SizedBox(
-        width: width,
-        height: height,
-        child: MDCard(
-          alignment: CrossAxisAlignment.start,
-          decoration: cardDecoration,
-          header: Row(
-            children: [H4(text: title ?? "Alert")],
-          ),
-          body: content,
-          footer: Row(
-            mainAxisAlignment: (onBack == null)
-                ? MainAxisAlignment.end
-                : MainAxisAlignment.spaceBetween,
-            children: [
-              MDButton(
-                decoration: ButtonDecoration(
-                  context: context,
-                  type: ButtonType.standard,
-                ),
-                onTap: onCancel ??
-                    () {
-                      Navigator.pop(context);
-                    },
-                child: Text(cancelText ?? "Cancel"),
+    return Shortcuts(
+      shortcuts: {
+        const SingleActivator(LogicalKeyboardKey.escape): VoidCallbackIntent(
+          () => handleOnCancel(context),
+        ),
+        const SingleActivator(LogicalKeyboardKey.enter): VoidCallbackIntent(
+          () {
+            handleOnOk();
+          },
+        ),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Center(
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: MDCard(
+              alignment: CrossAxisAlignment.start,
+              decoration: cardDecoration,
+              header: Row(
+                children: [H4(text: title ?? "Alert")],
               ),
-              const SizedBox(
-                width: 5,
-              ),
-              Row(
+              body: content,
+              footer: Row(
+                mainAxisAlignment: (onBack == null) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
                 children: [
-                  (onBack != null)
-                      ? Row(
-                          children: [
-                            MDButton(
-                              decoration: ButtonDecoration(
-                                context: context,
-                                type: ButtonType.standard,
-                              ),
-                              onTap: onBack ?? () {},
-                              child: Text(backText ?? "Back"),
-                            ),
-                            const SizedBox(width: 5),
-                          ],
-                        )
-                      : const SizedBox.shrink(),
                   MDButton(
                     decoration: ButtonDecoration(
                       context: context,
-                      type: isDestructive
-                          ? ButtonType.danger
-                          : ButtonType.primary,
+                      type: ButtonType.standard,
                     ),
-                    onTap: onOk ?? () {},
-                    child: Text(okText ?? (onBack != null ? "Next" : "OK")),
+                    onTap: () => handleOnCancel(context),
+                    child: Text(cancelText ?? "Cancel"),
                   ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Row(
+                    children: [
+                      (onBack != null)
+                          ? Row(
+                              children: [
+                                MDButton(
+                                  decoration: ButtonDecoration(
+                                    context: context,
+                                    type: ButtonType.standard,
+                                  ),
+                                  onTap: onBack ?? () {},
+                                  child: Text(backText ?? "Back"),
+                                ),
+                                const SizedBox(width: 5),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                      MDButton(
+                        decoration: ButtonDecoration(
+                          context: context,
+                          type: isDestructive ? ButtonType.danger : ButtonType.primary,
+                        ),
+                        onTap: handleOnOk,
+                        child: Text(okText ?? (onBack != null ? "Next" : "OK")),
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
+              ),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void handleOnOk() {
+    onOk?.call();
+  }
+
+  void handleOnCancel(BuildContext context) {
+    onCancel ?? Navigator.pop(context);
   }
 }

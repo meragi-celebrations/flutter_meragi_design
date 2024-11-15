@@ -53,25 +53,26 @@ class MDScaffold extends StatelessWidget {
 
     if (isSplit) {
       workingAppBar = workingAppBar?.copyWith(
+        leading: controller.showSplitButton.value
+            ? ValueListenableBuilder<bool>(
+                valueListenable: controller.isSplitOpen,
+                builder: (context, value, _) {
+                  return MDButton(
+                    decoration: ButtonDecoration(
+                      context: context,
+                      variant: ButtonVariant.ghost,
+                      type: ButtonType.primary,
+                    ),
+                    icon: !value ? PhosphorIconsFill.sidebarSimple : PhosphorIconsRegular.sidebarSimple,
+                    onTap: () {
+                      controller.toggleSplit();
+                    },
+                  );
+                },
+              )
+            : null,
         actions: [
           ...(appBar?.actions ?? const []),
-          if (controller.showSplitButton.value)
-            ValueListenableBuilder<bool>(
-              valueListenable: controller.isSplitOpen,
-              builder: (context, value, _) {
-                return MDButton(
-                  decoration: ButtonDecoration(
-                    context: context,
-                    variant: ButtonVariant.ghost,
-                    type: ButtonType.primary,
-                  ),
-                  icon: !value ? PhosphorIconsFill.sidebarSimple : PhosphorIconsRegular.sidebarSimple,
-                  onTap: () {
-                    controller.toggleSplit();
-                  },
-                );
-              },
-            ),
         ],
       );
     }
