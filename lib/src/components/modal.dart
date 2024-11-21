@@ -210,6 +210,8 @@ class ModalFooter extends StatelessWidget {
   final VoidCallback? onCancel;
   final String doneButtonText;
   final String? cancelButtonText;
+  final bool? doneLoading;
+  final bool? cancelLoading;
 
   const ModalFooter({
     Key? key,
@@ -217,6 +219,8 @@ class ModalFooter extends StatelessWidget {
     this.onCancel,
     this.doneButtonText = 'Done',
     this.cancelButtonText,
+    this.doneLoading = false,
+    this.cancelLoading = false,
   }) : super(key: key);
 
   @override
@@ -228,7 +232,8 @@ class ModalFooter extends StatelessWidget {
         children: [
           if (cancelButtonText != null)
             MDButton(
-              onTap: onCancel ?? () => Navigator.of(context).pop(),
+              onTap: cancelLoading ?? false ? null : onCancel ?? () => Navigator.of(context).pop(),
+              isLoading: cancelLoading ?? false,
               decoration: ButtonDecoration(
                 context: context,
                 variant: ButtonVariant.ghost,
@@ -238,12 +243,13 @@ class ModalFooter extends StatelessWidget {
             ),
           const SizedBox(width: 8.0),
           MDButton(
-            onTap: onDone,
+            onTap: doneLoading ?? false ? null : onDone,
             decoration: ButtonDecoration(
               context: context,
               variant: ButtonVariant.filled,
               type: ButtonType.primary,
             ),
+            isLoading: doneLoading ?? false,
             child: Text(doneButtonText),
           ),
         ],
