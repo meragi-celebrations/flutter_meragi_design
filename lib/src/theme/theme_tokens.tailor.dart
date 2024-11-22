@@ -136,6 +136,16 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   Color get infoTextColor;
   Color get errorTextColor;
   Color get defaultTextColor;
+  Color get navigationRailBackgroundColor;
+  EdgeInsets get navigationRailcontentPadding;
+  double get navigationRailCollapsedWidth;
+  double get navigationRailExpandedWidth;
+  Color get navigationRailDestinationSelectedColor;
+  Color get navigationRailDestinationSelectedHoverColor;
+  Color get navigationRailDestinationNonSelectedHoverColor;
+  Color get navigationRailDestinationNonSelectedColor;
+  BorderRadius get navigationRailBorderRadius;
+  Duration get navigationRailAnimationDuration;
 
   @override
   ThemeToken copyWith({
@@ -266,6 +276,16 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     Color? infoTextColor,
     Color? errorTextColor,
     Color? defaultTextColor,
+    Color? navigationRailBackgroundColor,
+    EdgeInsets? navigationRailcontentPadding,
+    double? navigationRailCollapsedWidth,
+    double? navigationRailExpandedWidth,
+    Color? navigationRailDestinationSelectedColor,
+    Color? navigationRailDestinationSelectedHoverColor,
+    Color? navigationRailDestinationNonSelectedHoverColor,
+    Color? navigationRailDestinationNonSelectedColor,
+    BorderRadius? navigationRailBorderRadius,
+    Duration? navigationRailAnimationDuration,
   }) {
     return ThemeToken(
       defaultCardBackgroundColor:
@@ -436,6 +456,30 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       infoTextColor: infoTextColor ?? this.infoTextColor,
       errorTextColor: errorTextColor ?? this.errorTextColor,
       defaultTextColor: defaultTextColor ?? this.defaultTextColor,
+      navigationRailBackgroundColor:
+          navigationRailBackgroundColor ?? this.navigationRailBackgroundColor,
+      navigationRailcontentPadding:
+          navigationRailcontentPadding ?? this.navigationRailcontentPadding,
+      navigationRailCollapsedWidth:
+          navigationRailCollapsedWidth ?? this.navigationRailCollapsedWidth,
+      navigationRailExpandedWidth:
+          navigationRailExpandedWidth ?? this.navigationRailExpandedWidth,
+      navigationRailDestinationSelectedColor:
+          navigationRailDestinationSelectedColor ??
+              this.navigationRailDestinationSelectedColor,
+      navigationRailDestinationSelectedHoverColor:
+          navigationRailDestinationSelectedHoverColor ??
+              this.navigationRailDestinationSelectedHoverColor,
+      navigationRailDestinationNonSelectedHoverColor:
+          navigationRailDestinationNonSelectedHoverColor ??
+              this.navigationRailDestinationNonSelectedHoverColor,
+      navigationRailDestinationNonSelectedColor:
+          navigationRailDestinationNonSelectedColor ??
+              this.navigationRailDestinationNonSelectedColor,
+      navigationRailBorderRadius:
+          navigationRailBorderRadius ?? this.navigationRailBorderRadius,
+      navigationRailAnimationDuration: navigationRailAnimationDuration ??
+          this.navigationRailAnimationDuration,
     );
   }
 
@@ -647,6 +691,39 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       errorTextColor: Color.lerp(errorTextColor, other.errorTextColor, t)!,
       defaultTextColor:
           Color.lerp(defaultTextColor, other.defaultTextColor, t)!,
+      navigationRailBackgroundColor: Color.lerp(navigationRailBackgroundColor,
+          other.navigationRailBackgroundColor, t)!,
+      navigationRailcontentPadding: t < 0.5
+          ? navigationRailcontentPadding
+          : other.navigationRailcontentPadding,
+      navigationRailCollapsedWidth: t < 0.5
+          ? navigationRailCollapsedWidth
+          : other.navigationRailCollapsedWidth,
+      navigationRailExpandedWidth: t < 0.5
+          ? navigationRailExpandedWidth
+          : other.navigationRailExpandedWidth,
+      navigationRailDestinationSelectedColor: Color.lerp(
+          navigationRailDestinationSelectedColor,
+          other.navigationRailDestinationSelectedColor,
+          t)!,
+      navigationRailDestinationSelectedHoverColor: Color.lerp(
+          navigationRailDestinationSelectedHoverColor,
+          other.navigationRailDestinationSelectedHoverColor,
+          t)!,
+      navigationRailDestinationNonSelectedHoverColor: Color.lerp(
+          navigationRailDestinationNonSelectedHoverColor,
+          other.navigationRailDestinationNonSelectedHoverColor,
+          t)!,
+      navigationRailDestinationNonSelectedColor: Color.lerp(
+          navigationRailDestinationNonSelectedColor,
+          other.navigationRailDestinationNonSelectedColor,
+          t)!,
+      navigationRailBorderRadius: t < 0.5
+          ? navigationRailBorderRadius
+          : other.navigationRailBorderRadius,
+      navigationRailAnimationDuration: t < 0.5
+          ? navigationRailAnimationDuration
+          : other.navigationRailAnimationDuration,
     );
   }
 
@@ -820,7 +897,17 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(warningTextColor, other.warningTextColor) &&
             const DeepCollectionEquality().equals(infoTextColor, other.infoTextColor) &&
             const DeepCollectionEquality().equals(errorTextColor, other.errorTextColor) &&
-            const DeepCollectionEquality().equals(defaultTextColor, other.defaultTextColor));
+            const DeepCollectionEquality().equals(defaultTextColor, other.defaultTextColor) &&
+            const DeepCollectionEquality().equals(navigationRailBackgroundColor, other.navigationRailBackgroundColor) &&
+            const DeepCollectionEquality().equals(navigationRailcontentPadding, other.navigationRailcontentPadding) &&
+            const DeepCollectionEquality().equals(navigationRailCollapsedWidth, other.navigationRailCollapsedWidth) &&
+            const DeepCollectionEquality().equals(navigationRailExpandedWidth, other.navigationRailExpandedWidth) &&
+            const DeepCollectionEquality().equals(navigationRailDestinationSelectedColor, other.navigationRailDestinationSelectedColor) &&
+            const DeepCollectionEquality().equals(navigationRailDestinationSelectedHoverColor, other.navigationRailDestinationSelectedHoverColor) &&
+            const DeepCollectionEquality().equals(navigationRailDestinationNonSelectedHoverColor, other.navigationRailDestinationNonSelectedHoverColor) &&
+            const DeepCollectionEquality().equals(navigationRailDestinationNonSelectedColor, other.navigationRailDestinationNonSelectedColor) &&
+            const DeepCollectionEquality().equals(navigationRailBorderRadius, other.navigationRailBorderRadius) &&
+            const DeepCollectionEquality().equals(navigationRailAnimationDuration, other.navigationRailAnimationDuration));
   }
 
   @override
@@ -954,6 +1041,20 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(infoTextColor),
       const DeepCollectionEquality().hash(errorTextColor),
       const DeepCollectionEquality().hash(defaultTextColor),
+      const DeepCollectionEquality().hash(navigationRailBackgroundColor),
+      const DeepCollectionEquality().hash(navigationRailcontentPadding),
+      const DeepCollectionEquality().hash(navigationRailCollapsedWidth),
+      const DeepCollectionEquality().hash(navigationRailExpandedWidth),
+      const DeepCollectionEquality()
+          .hash(navigationRailDestinationSelectedColor),
+      const DeepCollectionEquality()
+          .hash(navigationRailDestinationSelectedHoverColor),
+      const DeepCollectionEquality()
+          .hash(navigationRailDestinationNonSelectedHoverColor),
+      const DeepCollectionEquality()
+          .hash(navigationRailDestinationNonSelectedColor),
+      const DeepCollectionEquality().hash(navigationRailBorderRadius),
+      const DeepCollectionEquality().hash(navigationRailAnimationDuration),
     ]);
   }
 }
@@ -1094,4 +1195,24 @@ extension ThemeTokenBuildContextProps on BuildContext {
   Color get infoTextColor => themeToken.infoTextColor;
   Color get errorTextColor => themeToken.errorTextColor;
   Color get defaultTextColor => themeToken.defaultTextColor;
+  Color get navigationRailBackgroundColor =>
+      themeToken.navigationRailBackgroundColor;
+  EdgeInsets get navigationRailcontentPadding =>
+      themeToken.navigationRailcontentPadding;
+  double get navigationRailCollapsedWidth =>
+      themeToken.navigationRailCollapsedWidth;
+  double get navigationRailExpandedWidth =>
+      themeToken.navigationRailExpandedWidth;
+  Color get navigationRailDestinationSelectedColor =>
+      themeToken.navigationRailDestinationSelectedColor;
+  Color get navigationRailDestinationSelectedHoverColor =>
+      themeToken.navigationRailDestinationSelectedHoverColor;
+  Color get navigationRailDestinationNonSelectedHoverColor =>
+      themeToken.navigationRailDestinationNonSelectedHoverColor;
+  Color get navigationRailDestinationNonSelectedColor =>
+      themeToken.navigationRailDestinationNonSelectedColor;
+  BorderRadius get navigationRailBorderRadius =>
+      themeToken.navigationRailBorderRadius;
+  Duration get navigationRailAnimationDuration =>
+      themeToken.navigationRailAnimationDuration;
 }

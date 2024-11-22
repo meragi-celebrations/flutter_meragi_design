@@ -136,4 +136,16 @@ ThemeToken light = ThemeToken(
   infoTagBackgroundColor: Colors.blue.withOpacity(.3),
   infoTagBorderColor: Colors.blue.shade100.withOpacity(.3),
   infoTagTextColor: Colors.blue,
+
+  //navigationRail
+  navigationRailBackgroundColor: Colors.white,
+  navigationRailCollapsedWidth: 65,
+  navigationRailExpandedWidth: 250,
+  navigationRailcontentPadding: const EdgeInsets.all(15),
+  navigationRailDestinationSelectedColor: Colors.deepPurpleAccent.shade100.withOpacity(.3),
+  navigationRailDestinationNonSelectedHoverColor: Colors.deepPurple[100]!.withOpacity(0.7),
+  navigationRailDestinationNonSelectedColor: Colors.deepPurple.shade100.withOpacity(0.2),
+  navigationRailDestinationSelectedHoverColor: Colors.deepPurple[200]!.withOpacity(0.7),
+  navigationRailBorderRadius: const BorderRadius.all(Radius.circular(12)),
+  navigationRailAnimationDuration: const Duration(milliseconds: 150),
 );
