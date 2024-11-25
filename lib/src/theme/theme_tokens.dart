@@ -330,6 +330,8 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final BorderRadius navigationRailBorderRadius;
   @override
   final Duration navigationRailAnimationDuration;
+  @override
+  final List<BoxShadow> navigationRailBoxShadow;
 
   const ThemeToken({
     // Button
@@ -474,6 +476,7 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.navigationRailDestinationNonSelectedHoverColor,
     required this.navigationRailBorderRadius,
     required this.navigationRailAnimationDuration,
+    required this.navigationRailBoxShadow,
   });
 
   ThemeToken copyWithColors({

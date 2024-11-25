@@ -56,10 +56,7 @@ class MDNavigationRail extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: finalDecoration.backgroundColor,
                         borderRadius: finalDecoration.borderRadius,
-                        boxShadow: const [
-                          BoxShadow(
-                              blurRadius: 12, spreadRadius: 3, color: Color(0xFFCFCFD2), blurStyle: BlurStyle.normal)
-                        ]),
+                        boxShadow: finalDecoration.boxShadow),
                     padding: finalDecoration.contentPadding,
                     child: builder != null
                         ? builder!.call(context, value.isExpanded)
@@ -278,12 +275,7 @@ class MDNavigationRailEmpty extends StatelessWidget {
       height: double.infinity,
       width: finalDecoration.collapsedWidth - 8,
       margin: const EdgeInsets.only(top: 8, right: 8, bottom: 8),
-      decoration: BoxDecoration(
-          color: finalDecoration.backgroundColor,
-          borderRadius: finalDecoration.borderRadius,
-          boxShadow: const [
-            BoxShadow(blurRadius: 12, spreadRadius: 3, color: Color(0xFFCFCFD2), blurStyle: BlurStyle.normal)
-          ]),
+      decoration: BoxDecoration(color: finalDecoration.backgroundColor, borderRadius: finalDecoration.borderRadius),
     );
   }
 }

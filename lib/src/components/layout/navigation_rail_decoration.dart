@@ -10,11 +10,13 @@ class MDNavigationRailDecoration extends Style {
     final double? collapseWidthOverride,
     final double? expandedWidthOverride,
     final Duration? animationDurationOverride,
+    final List<BoxShadow>? boxShadowOverride,
   })  : _contentPaddingOverride = contentPaddingOverride,
         _backgroundColorOverride = backgroundColorOverride,
         _borderRadiusOverride = borderRadiusOverride,
         _collapseWidthOverride = collapseWidthOverride,
         _expandedWidthOverride = expandedWidthOverride,
+        _boxShadowOverride = boxShadowOverride,
         _animationDurationOverride = animationDurationOverride;
 
   final EdgeInsets? _contentPaddingOverride;
@@ -23,6 +25,7 @@ class MDNavigationRailDecoration extends Style {
   final double? _collapseWidthOverride;
   final double? _expandedWidthOverride;
   final Duration? _animationDurationOverride;
+  final List<BoxShadow>? _boxShadowOverride;
 
   EdgeInsets get contentPadding => _contentPaddingOverride ?? token.navigationRailcontentPadding;
 
@@ -36,6 +39,8 @@ class MDNavigationRailDecoration extends Style {
 
   Duration get animationDuration => _animationDurationOverride ?? token.navigationRailAnimationDuration;
 
+  List<BoxShadow> get boxShadow => _boxShadowOverride ?? token.navigationRailBoxShadow;
+
   MDNavigationRailDecoration copyWith({
     final EdgeInsets? contentPaddingOverride,
     final Color? backgroundColorOverride,
@@ -43,6 +48,7 @@ class MDNavigationRailDecoration extends Style {
     final double? collapseWidthOverride,
     final double? expandedWidthOverride,
     final Duration? animationDurationOverride,
+    final List<BoxShadow>? boxShadowOverride,
   }) {
     return MDNavigationRailDecoration(
       context: context,
@@ -52,6 +58,7 @@ class MDNavigationRailDecoration extends Style {
       collapseWidthOverride: collapseWidthOverride ?? collapsedWidth,
       expandedWidthOverride: expandedWidthOverride ?? expandedWidth,
       animationDurationOverride: animationDurationOverride ?? animationDuration,
+      boxShadowOverride: boxShadowOverride ?? boxShadow,
     );
   }
 
@@ -66,6 +73,7 @@ class MDNavigationRailDecoration extends Style {
       collapseWidthOverride: other.collapsedWidth,
       expandedWidthOverride: other.expandedWidth,
       animationDurationOverride: other.animationDuration,
+      boxShadowOverride: other.boxShadow,
     );
   }
 }

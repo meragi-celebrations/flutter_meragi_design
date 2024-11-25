@@ -148,4 +148,7 @@ ThemeToken light = ThemeToken(
   navigationRailDestinationSelectedHoverColor: Colors.deepPurple[200]!.withOpacity(0.7),
   navigationRailBorderRadius: const BorderRadius.all(Radius.circular(12)),
   navigationRailAnimationDuration: const Duration(milliseconds: 150),
+  navigationRailBoxShadow: const [
+    BoxShadow(blurRadius: 12, spreadRadius: 3, color: Color(0xFFCFCFD2), blurStyle: BlurStyle.normal)
+  ],
 );

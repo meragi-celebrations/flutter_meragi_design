@@ -146,6 +146,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   Color get navigationRailDestinationNonSelectedColor;
   BorderRadius get navigationRailBorderRadius;
   Duration get navigationRailAnimationDuration;
+  List<BoxShadow> get navigationRailBoxShadow;
 
   @override
   ThemeToken copyWith({
@@ -286,6 +287,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     Color? navigationRailDestinationNonSelectedColor,
     BorderRadius? navigationRailBorderRadius,
     Duration? navigationRailAnimationDuration,
+    List<BoxShadow>? navigationRailBoxShadow,
   }) {
     return ThemeToken(
       defaultCardBackgroundColor:
@@ -480,6 +482,8 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           navigationRailBorderRadius ?? this.navigationRailBorderRadius,
       navigationRailAnimationDuration: navigationRailAnimationDuration ??
           this.navigationRailAnimationDuration,
+      navigationRailBoxShadow:
+          navigationRailBoxShadow ?? this.navigationRailBoxShadow,
     );
   }
 
@@ -724,6 +728,8 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       navigationRailAnimationDuration: t < 0.5
           ? navigationRailAnimationDuration
           : other.navigationRailAnimationDuration,
+      navigationRailBoxShadow:
+          t < 0.5 ? navigationRailBoxShadow : other.navigationRailBoxShadow,
     );
   }
 
@@ -907,7 +913,8 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(navigationRailDestinationNonSelectedHoverColor, other.navigationRailDestinationNonSelectedHoverColor) &&
             const DeepCollectionEquality().equals(navigationRailDestinationNonSelectedColor, other.navigationRailDestinationNonSelectedColor) &&
             const DeepCollectionEquality().equals(navigationRailBorderRadius, other.navigationRailBorderRadius) &&
-            const DeepCollectionEquality().equals(navigationRailAnimationDuration, other.navigationRailAnimationDuration));
+            const DeepCollectionEquality().equals(navigationRailAnimationDuration, other.navigationRailAnimationDuration) &&
+            const DeepCollectionEquality().equals(navigationRailBoxShadow, other.navigationRailBoxShadow));
   }
 
   @override
@@ -1055,6 +1062,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           .hash(navigationRailDestinationNonSelectedColor),
       const DeepCollectionEquality().hash(navigationRailBorderRadius),
       const DeepCollectionEquality().hash(navigationRailAnimationDuration),
+      const DeepCollectionEquality().hash(navigationRailBoxShadow),
     ]);
   }
 }
@@ -1215,4 +1223,6 @@ extension ThemeTokenBuildContextProps on BuildContext {
       themeToken.navigationRailBorderRadius;
   Duration get navigationRailAnimationDuration =>
       themeToken.navigationRailAnimationDuration;
+  List<BoxShadow> get navigationRailBoxShadow =>
+      themeToken.navigationRailBoxShadow;
 }
