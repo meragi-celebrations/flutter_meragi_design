@@ -53,3 +53,6 @@ export 'src/utils/platform.dart';
 export 'src/utils/scroll_handler.dart';
 export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
+export 'src/components/layout/navigation_rail_controller.dart';
+export 'src/components/layout/navigation_rail_decoration.dart';
+export 'src/components/layout/navigation_rail_destination_decoration.dart';

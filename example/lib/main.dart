@@ -1078,18 +1078,42 @@ class NavigationRailStory extends StatefulWidget {
 
 class _NavigationRailStoryState extends State<NavigationRailStory> {
   int _selectedIndex = 0;
-  bool _isExpanded = false;
+  late final MDNavigationRailController controller;
+  late final MDNavigationRailDestinationDecoration decoration;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = MDNavigationRailController(isHoverable: true);
+    decoration = MDNavigationRailDestinationDecoration(
+      context: context,
+      selectedColorOverride: Colors.deepPurple.shade100.withOpacity(.5),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    controller.setExpandedButton(context.knobs.boolean(label: "Show Expand Button", initial: true));
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MDLayout(
       sider: MDNavigationRail(
+          controller: controller,
           destinations: List.generate(
             context.knobs.sliderInt(label: "Items", initial: 4),
             (index) => MDNavigationRailDestination(
-              icon: const Icon(Icons.list),
+              icon: const Icon(Icons.list, color: Colors.black),
               label: 'Item $index',
-              selectedColor: Colors.deepPurple.shade100.withOpacity(.5),
+              decoration: decoration,
             ),
           ),
           selectedIndex: _selectedIndex,
@@ -1098,14 +1122,7 @@ class _NavigationRailStoryState extends State<NavigationRailStory> {
               _selectedIndex = index;
             });
           },
-          isExpanded: _isExpanded,
-          onExpandTap: context.knobs.boolean(label: "Show Expand Button", initial: true)
-              ? () {
-                  setState(() {
-                    _isExpanded = !_isExpanded;
-                  });
-                }
-              : null),
+          onExpandTap: () {}),
       content: const MDScaffold(body: Text("this is content")),
     );
   }
@@ -1132,6 +1149,15 @@ class LayoutView extends StatefulWidget {
 }
 
 class _LayoutViewState extends State<LayoutView> {
+  late final MDNavigationRailDestinationDecoration decoration;
+
+  @override
+  void initState() {
+    super.initState();
+    decoration = MDNavigationRailDestinationDecoration(
+        context: context, selectedColorOverride: Colors.deepPurple.shade100.withOpacity(.5));
+  }
+
   int _currentIndex = 0;
   bool _isExpanded = true;
 
@@ -1155,7 +1181,7 @@ class _LayoutViewState extends State<LayoutView> {
               (item) => MDNavigationRailDestination(
                 icon: item['icon'],
                 label: item['label'],
-                selectedColor: Colors.deepPurple.shade100.withOpacity(.5),
+                decoration: decoration,
               ),
             )
             .toList(),
@@ -1165,7 +1191,6 @@ class _LayoutViewState extends State<LayoutView> {
             _currentIndex = index;
           });
         },
-        isExpanded: _isExpanded,
         onExpandTap: () {
           setState(() {
             _isExpanded = !_isExpanded;
