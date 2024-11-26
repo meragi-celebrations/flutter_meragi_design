@@ -37,8 +37,7 @@ class MDFormBuilderField<T> extends FormBuilderField<T> {
       MDFormBuilderFieldState<MDFormBuilderField<T>, T>();
 }
 
-class MDFormBuilderFieldState<F extends MDFormBuilderField<T>, T>
-    extends FormBuilderFieldState<F, T> {
+class MDFormBuilderFieldState<F extends MDFormBuilderField<T>, T> extends FormBuilderFieldState<F, T> {
   bool isFocused = false;
 
   @override
@@ -46,9 +45,11 @@ class MDFormBuilderFieldState<F extends MDFormBuilderField<T>, T>
     super.initState();
 
     effectiveFocusNode.addListener(() {
-      setState(() {
-        isFocused = effectiveFocusNode.hasFocus;
-      });
+      if (mounted) {
+        setState(() {
+          isFocused = effectiveFocusNode.hasFocus;
+        });
+      }
     });
   }
 
