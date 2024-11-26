@@ -227,17 +227,20 @@ class _NavigationItemState extends State<_NavigationItem> {
                   else
                     widget.destination.icon,
                   Expanded(
-                    child: AnimatedCrossFade(
-                      crossFadeState: widget._isExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                      duration: const Duration(milliseconds: 300),
-                      firstChild: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: BodyText(
-                          text: widget.destination.label,
-                          maxLines: 1,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: AnimatedCrossFade(
+                        crossFadeState: widget._isExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                        duration: const Duration(milliseconds: 300),
+                        firstChild: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: BodyText(
+                            text: widget.destination.label,
+                            maxLines: 1,
+                          ),
                         ),
+                        secondChild: const BodyText(text: ""),
                       ),
-                      secondChild: const BodyText(text: ""),
                     ),
                   )
                 ],
