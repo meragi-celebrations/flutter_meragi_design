@@ -46,11 +46,15 @@ class SelectDropdown<T, U> extends StatefulWidget {
 
 class _SelectDropdownState extends State<SelectDropdown> {
   late TextEditingController controller;
-
+  final Debounce _debounce = Debounce(const Duration(milliseconds: 400));
+  String prevText = "";
   @override
   void initState() {
     super.initState();
-    widget.getListBloc.reset();
+    if (widget.shouldMakeInitialCall) {
+      widget.getListBloc.reset();
+    }
+
     if (widget.initialValue != null) {
       widget.getOneBloc!.onSuccess = (data) {
         widget.getListBloc.list.value.add(data);
@@ -61,15 +65,14 @@ class _SelectDropdownState extends State<SelectDropdown> {
     }
     controller = widget.controller ?? TextEditingController();
     controller.addListener(() {
-      if (controller.text.isNotEmpty) {
-        widget.getListBloc.addFilters([MDFilter(field: "search", operator: "eq", value: controller.text)]);
-        widget.getListBloc.reset();
-      }
+      _debounce(() {
+        if (controller.text.isNotEmpty && prevText != controller.text) {
+          widget.getListBloc.addFilters([MDFilter(field: "search", operator: "eq", value: controller.text)]);
+          widget.getListBloc.reset();
+        }
+        prevText = controller.text;
+      });
     });
-    // bloc.customFilters.addAll(widget.urlParams);
-    // if (widget.shouldMakeInitialCall) {
-    //   bloc.getList();
-    // }
     controller = widget.controller ?? TextEditingController();
   }
 
@@ -133,93 +136,6 @@ class _SelectDropdownState extends State<SelectDropdown> {
     super.dispose();
   }
 }
-
-// class SelectDropdownBloc<T extends SelectBaseModel> {
-//   final String url;
-//   final num? selected;
-//   final T model;
-//   final CRUDRepository _repo;
-//   PropertyNotifier<List<T>> data = PropertyNotifier([]);
-//   TextEditingController controller = TextEditingController();
-//
-//   SelectDropdownBloc(this.url, this._repo, this.model, {this.selected}) {
-//     if (selected != null) {
-//       getSelectedDetail(selected!);
-//     }
-//   }
-//
-//   ValueNotifier<bool> loadingList = ValueNotifier(false);
-//   ValueNotifier<bool> loadingValue = ValueNotifier(false);
-//   List<Map<String, String>> customFilters = [];
-//
-//   getList({String? query}) async {
-//     try {
-//       if (loadingList.value) {
-//         return;
-//       }
-//       loadingList.value = true;
-//       List<Map<String, String>> filters = [];
-//       if (query != null) {
-//         filters.add({
-//           "field": "search",
-//           "operator": "eq",
-//           "value": query,
-//         });
-//       }
-//       filters.addAll(customFilters);
-//       var res = await _repo.getList(url, filters: filters);
-//       data.value = List.from(((res ?? []) as List).map((e) => model.fromJsonToBaseModel(e)));
-//     } catch (e, s) {
-//       debugPrint("$e");
-//       debugPrintStack(stackTrace: s);
-//     } finally {
-//       loadingList.value = false;
-//     }
-//   }
-//
-//   ValueNotifier<T?> selectedData = ValueNotifier(null);
-//
-//   getSelectedDetail(num id) async {
-//     try {
-//       if (loadingValue.value) {
-//         return;
-//       }
-//       loadingValue.value = true;
-//       var res = await _repo.retrieveData("$url$id/");
-//       selectedData.value = model.fromJsonToBaseModel(res) as T?;
-//       if (selectedData.value != null) {
-//         if (data.value.where((e) => selectedData.value?.id == e.id).toList().isEmpty) {
-//           data.value.add(selectedData.value!);
-//           data.notifyListeners();
-//         }
-//         controller.text = selectedData.value?.name ?? "";
-//       }
-//     } catch (e, s) {
-//       debugPrint("$e");
-//       debugPrintStack(stackTrace: s);
-//     } finally {
-//       loadingValue.value = false;
-//     }
-//   }
-//
-//   Timer? _debounceTimer;
-//   String checkingQuery = '';
-//
-//   search(String query) async {
-//     try {
-//       if (_debounceTimer != null && _debounceTimer!.isActive) {
-//         _debounceTimer!.cancel();
-//       }
-//       _debounceTimer = Timer(const Duration(milliseconds: 350), () async {
-//         checkingQuery = query;
-//         getList(query: query);
-//       });
-//     } catch (e, s) {
-//       debugPrint("$e");
-//       debugPrintStack(stackTrace: s);
-//     }
-//   }
-// }
 
 abstract class SelectBaseModel {
   late num? id;
