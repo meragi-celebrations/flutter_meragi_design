@@ -6,8 +6,7 @@ import '../extensions/colors.dart';
 part 'theme_tokens.tailor.dart';
 
 @TailorMixin()
-class ThemeToken extends ThemeExtension<ThemeToken>
-    with _$ThemeTokenTailorMixin {
+class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin {
   //Card
 
   // //Background Color
@@ -532,6 +531,15 @@ class ThemeToken extends ThemeExtension<ThemeToken>
       warningTextColor: warning,
       infoTextColor: info,
       errorTextColor: error,
+
+      //navigationRail
+      navigationRailDestinationSelectedColor: primary,
+      navigationRailDestinationSelectedHoverColor: primary,
+      navigationRailDestinationNonSelectedHoverColor: primary?.lighten(50),
+      navigationRailDestinationNonSelectedColor: primary?.lighten(95),
+      // navigationRailBorderRadius,
+      // navigationRailAnimationDuration,
+      // navigationRailBoxShadow,
     );
   }
 }
