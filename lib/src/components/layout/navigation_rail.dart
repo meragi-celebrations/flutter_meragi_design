@@ -3,7 +3,7 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
-class MDNavigationRail extends StatelessWidget {
+class MDNavigationRail extends StatefulWidget {
   final List<MDNavigationRailDestination>? destinations;
   final int selectedIndex;
   final Function(int index)? onDestinationSelected;
@@ -31,46 +31,73 @@ class MDNavigationRail extends StatelessWidget {
             "Please ensure that you provider destinations or builder but not both. Make sure that both parameters are not null. Also if you are providing the destinations, please ensure that onDestinations is also present");
 
   @override
+  State<MDNavigationRail> createState() => _MDNavigationRailState();
+}
+
+class _MDNavigationRailState extends State<MDNavigationRail> {
+  late final MDNavigationRailController controller;
+
+  @override
+  void initState() {
+    controller = widget.controller ?? MDNavigationRailController();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    MDNavigationRailDecoration finalDecoration = MDNavigationRailDecoration(context: context).merge(decoration);
-    return ChangeNotifierProvider<MDNavigationRailController>(
-        create: (context) => controller ?? MDNavigationRailController(),
-        builder: (context, child) {
-          var mdController = context.read<MDNavigationRailController>();
-          return MouseRegion(
-            onExit: (event) {
-              if (mdController.isExpanded && mdController.isHoverable) {
-                mdController.close();
-              }
+    MDNavigationRailDecoration finalDecoration = MDNavigationRailDecoration(context: context).merge(widget.decoration);
+    return ChangeNotifierProvider<MDNavigationRailController>.value(
+      value: controller,
+      builder: (context, child) {
+        var mdController = context.read<MDNavigationRailController>();
+        return MouseRegion(
+          onExit: (event) {
+            if (mdController.isExpanded && mdController.isHoverable) {
+              mdController.close();
+            }
+          },
+          onEnter: (event) {
+            if (!mdController.isExpanded && mdController.isHoverable) {
+              mdController.open();
+            }
+          },
+          child: Consumer<MDNavigationRailController>(
+            builder: (context, value, child) {
+              return AnimatedContainer(
+                duration: finalDecoration.animationDuration,
+                width: value.isExpanded ? finalDecoration.expandedWidth : finalDecoration.collapsedWidth,
+                decoration: BoxDecoration(
+                    color: finalDecoration.backgroundColor,
+                    borderRadius: finalDecoration.borderRadius,
+                    boxShadow: finalDecoration.boxShadow),
+                padding: finalDecoration.contentPadding,
+                child: widget.builder != null
+                    ? widget.builder!.call(context, value.isExpanded)
+                    : _MDNavigationContent(
+                        logo: widget.logo,
+                        expandedLogo: widget.expandedLogo,
+                        destinations: widget.destinations!,
+                        onExpandTap: widget.onExpandTap,
+                        value: value,
+                        selectedIndex: widget.selectedIndex,
+                        onDestinationSelected: (index) {
+                          widget.onDestinationSelected?.call(index);
+                        },
+                      ),
+              );
             },
-            onEnter: (event) {
-              if (!mdController.isExpanded && mdController.isHoverable) {
-                mdController.open();
-              }
-            },
-            child: Consumer<MDNavigationRailController>(
-              builder: (context, value, child) {
-                return AnimatedContainer(
-                    duration: finalDecoration.animationDuration,
-                    width: value.isExpanded ? finalDecoration.expandedWidth : finalDecoration.collapsedWidth,
-                    decoration: BoxDecoration(
-                        color: finalDecoration.backgroundColor,
-                        borderRadius: finalDecoration.borderRadius,
-                        boxShadow: finalDecoration.boxShadow),
-                    padding: finalDecoration.contentPadding,
-                    child: builder != null
-                        ? builder!.call(context, value.isExpanded)
-                        : _MDNavigationContent(
-                            logo: logo,
-                            expandedLogo: expandedLogo,
-                            destinations: destinations!,
-                            onExpandTap: onExpandTap,
-                            value: value,
-                            widget: this));
-              },
-            ),
-          );
-        });
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    if (widget.controller == null) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 }
 
@@ -81,15 +108,17 @@ class _MDNavigationContent extends StatelessWidget {
     required this.destinations,
     required this.onExpandTap,
     required this.value,
-    required this.widget,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
   });
 
   final Widget? logo;
   final Widget? expandedLogo;
   final List<MDNavigationRailDestination> destinations;
   final Function()? onExpandTap;
+  final Function(int) onDestinationSelected;
   final MDNavigationRailController value;
-  final MDNavigationRail widget;
+  final int selectedIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -123,9 +152,10 @@ class _MDNavigationContent extends StatelessWidget {
                   int index = destinations.indexOf(destination);
                   return _NavigationItem(
                     destination: destination,
-                    rail: widget,
+                    selectedIndex: selectedIndex,
                     index: index,
                     isExpanded: value.isExpanded,
+                    onDestinationSelected: onDestinationSelected,
                   );
                 })
                 .toList()
@@ -158,13 +188,15 @@ class _MDNavigationContent extends StatelessWidget {
 class _NavigationItem extends StatefulWidget {
   const _NavigationItem({
     required this.destination,
-    required this.rail,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
     required this.index,
     required bool isExpanded,
   }) : _isExpanded = isExpanded;
 
   final MDNavigationRailDestination destination;
-  final MDNavigationRail rail;
+  final int selectedIndex;
+  final Function(int) onDestinationSelected;
   final int index;
   final bool _isExpanded;
 
@@ -184,7 +216,7 @@ class _NavigationItemState extends State<_NavigationItem> {
 
   @override
   Widget build(BuildContext context) {
-    bool isSelected = widget.index == widget.rail.selectedIndex;
+    bool isSelected = widget.index == widget.selectedIndex;
 
     return MouseRegion(
       onEnter: (event) {
@@ -200,7 +232,7 @@ class _NavigationItemState extends State<_NavigationItem> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          widget.rail.onDestinationSelected!.call(widget.index);
+          widget.onDestinationSelected.call(widget.index);
         },
         child: TooltipVisibility(
           visible: !widget._isExpanded,
