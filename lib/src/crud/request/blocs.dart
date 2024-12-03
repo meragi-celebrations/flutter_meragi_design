@@ -1,10 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:flutter_meragi_design/src/crud/request/cache.dart';
-import 'package:flutter_meragi_design/src/crud/request/enums.dart';
-import 'package:flutter_meragi_design/src/crud/request/model.dart';
-import 'package:flutter_meragi_design/src/crud/request/repo.dart';
 import 'package:flutter_meragi_design/src/utils/property_notifier.dart';
 import 'package:flutter_meragi_design/src/utils/qs.dart';
 
@@ -39,11 +35,9 @@ class GetListBloc<T> extends BaseBloc<T> {
   });
 
   //#region -List
-  PropertyNotifier<ListResponse<List<T>>?> pageResponse =
-      PropertyNotifier(null);
+  PropertyNotifier<ListResponse<List<T>>?> pageResponse = PropertyNotifier(null);
   PropertyNotifier<List<T>> list = PropertyNotifier([]);
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<int> currentPage = ValueNotifier(1);
   ValueNotifier<int> totalPages = ValueNotifier(1);
   ValueNotifier<int> totalCount = ValueNotifier(0);
@@ -56,8 +50,7 @@ class GetListBloc<T> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  addFilters(List<MDFilter> newFilters,
-      {ListFilterAddType type = ListFilterAddType.append}) {
+  addFilters(List<MDFilter> newFilters, {ListFilterAddType type = ListFilterAddType.append}) {
     if (type == ListFilterAddType.reset) {
       customFilters = [];
     }
@@ -68,7 +61,10 @@ class GetListBloc<T> extends BaseBloc<T> {
     customFilters.removeAt(index);
   }
 
-  addSorter(Map<String, String> newSorter) {
+  addSorter(Map<String, String> newSorter, {ListFilterAddType type = ListFilterAddType.append}) {
+    if (type == ListFilterAddType.reset) {
+      customSorters = [];
+    }
     customSorters.add(newSorter);
   }
 
@@ -98,10 +94,8 @@ class GetListBloc<T> extends BaseBloc<T> {
       List<MDFilter> filters = [];
       List<Map<String, String>> sorters = [];
       if (isPaginationEnabled.value) {
-        filters.add(MDFilter(
-            field: "page", operator: "eq", value: "${currentPage.value}"));
-        filters.add(MDFilter(
-            field: "page_size", operator: "eq", value: "${pageSize.value}"));
+        filters.add(MDFilter(field: "page", operator: "eq", value: "${currentPage.value}"));
+        filters.add(MDFilter(field: "page_size", operator: "eq", value: "${pageSize.value}"));
       }
 
       filters.addAll(customFilters);
@@ -114,22 +108,18 @@ class GetListBloc<T> extends BaseBloc<T> {
 
       if (cachedResponse == null) {
         if (isInfinite) {
-          requestState.value = currentPage.value > 1
-              ? RequestState.paginating
-              : RequestState.loading;
+          requestState.value = currentPage.value > 1 ? RequestState.paginating : RequestState.loading;
         } else {
           requestState.value = RequestState.loading;
         }
       } else {
         requestState.value = RequestState.fetching;
-        ListResponse cacheResponseInList =
-            ListResponse.fromJson(cachedResponse, cachedResponse["results"]);
+        ListResponse cacheResponseInList = ListResponse.fromJson(cachedResponse, cachedResponse["results"]);
         this.handleResponse(cacheResponseInList, cached: true);
         list.notifyListeners();
       }
 
-      ListResponse res =
-          await repo.getList(url!, filters: filters, sorters: sorters);
+      ListResponse res = await repo.getList(url!, filters: filters, sorters: sorters);
 
       cache.put(key, res.toJson());
 
@@ -153,11 +143,9 @@ class GetListBloc<T> extends BaseBloc<T> {
 
   void handleResponse(ListResponse response, {bool cached = false}) {
     if (isPaginationEnabled.value) {
-      List<T> listData =
-          List.from(((response.result ?? []) as List).map((e) => fromJson(e)));
+      List<T> listData = List.from(((response.result ?? []) as List).map((e) => fromJson(e)));
       pageResponse.value = ListResponse.fromJson(response.toJson(), listData);
-      debugPrint(
-          "pageResponse ${pageResponse.value?.count} ${pageResponse.value?.url}");
+      debugPrint("pageResponse ${pageResponse.value?.count} ${pageResponse.value?.url}");
       if (isInfinite) {
         //if result is cached then we need to remove previous results, if not then we need to remove last page results
         if (cached) {
@@ -170,8 +158,7 @@ class GetListBloc<T> extends BaseBloc<T> {
         } else {
           Map<String, int>? urlQueueData = urlCallQueue[response.url];
           if (urlQueueData != null) {
-            list.value.removeRange(
-                urlQueueData['startIndex']!, urlQueueData['endIndex']!);
+            list.value.removeRange(urlQueueData['startIndex']!, urlQueueData['endIndex']!);
             list.value.addAll(listData);
             urlCallQueue.remove(response.url);
           } else {
@@ -181,12 +168,10 @@ class GetListBloc<T> extends BaseBloc<T> {
       } else {
         list.value = listData;
       }
-      totalPages.value =
-          ((pageResponse.value?.count ?? 0) / pageSize.value).ceil();
+      totalPages.value = ((pageResponse.value?.count ?? 0) / pageSize.value).ceil();
       totalCount.value = pageResponse.value?.count.toInt() ?? 0;
     } else {
-      list.value =
-          List.from(((response.result ?? []) as List).map((e) => fromJson(e)));
+      list.value = List.from(((response.result ?? []) as List).map((e) => fromJson(e)));
     }
   }
 
@@ -250,8 +235,7 @@ class GetOneBloc<T> extends BaseBloc<T> {
     }
   }
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
   List<Map<String, String>> customFilters = [];
 
@@ -259,8 +243,7 @@ class GetOneBloc<T> extends BaseBloc<T> {
 
   RequestCache cache = RequestCache();
 
-  addFilters(List<Map<String, String>> newFilters,
-      {ListFilterAddType type = ListFilterAddType.append}) {
+  addFilters(List<Map<String, String>> newFilters, {ListFilterAddType type = ListFilterAddType.append}) {
     if (type == ListFilterAddType.reset) {
       customFilters = [];
     }
@@ -326,12 +309,10 @@ class CreateBloc<T> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
-  Future<void> mutate(Map<String, dynamic> data,
-      {Map<String, dynamic> dataFiles = const {}, String? url}) async {
+  Future<void> mutate(Map<String, dynamic> data, {Map<String, dynamic> dataFiles = const {}, String? url}) async {
     String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
@@ -361,14 +342,12 @@ class UpdateBloc<T> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
   RequestCache cache = RequestCache();
 
-  Future<void> mutate(dynamic id, Map<String, dynamic> data,
-      {String? url}) async {
+  Future<void> mutate(dynamic id, Map<String, dynamic> data, {String? url}) async {
     String finalUrl = url ?? this.url ?? "";
     try {
       requestState.value = RequestState.loading;
@@ -402,8 +381,7 @@ class DeleteBloc<T> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState =
-      PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
   RequestCache cache = RequestCache();
