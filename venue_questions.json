@@ -1,0 +1,22 @@
+[
+    {
+        "type": "text",
+        "value": null,
+        "id": "1",
+        "options": {
+            "question": "What is your name",
+            "labelText": "Name",
+            "hintText": "Enter your name"
+        }
+    },
+    {
+        "type": "text",
+        "value": "0",
+        "id": "2",
+        "options": {
+            "question": "What is your age",
+            "labelText": "age",
+            "hintText": "Enter your age"
+        }
+    }
+]
