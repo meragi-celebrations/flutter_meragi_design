@@ -60,6 +60,7 @@ export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
 export 'src/components/json/json_data_manager.dart';
 export 'src/components/json/json_interface.dart';
-export 'src/components/json/json_md_text_field.dart';
+export 'src/components/json/json_widgets/json_md_text_field.dart';
+export 'src/components/json/json_widgets/json_md_dropdown.dart';
 export 'src/components/json/json_util.dart';
 export 'src/components/json/json_widget_map.dart';

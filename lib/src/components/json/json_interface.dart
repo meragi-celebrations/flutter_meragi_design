@@ -1,79 +1,72 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:flutter_meragi_design/src/components/json/json_data_manager.dart';
-import 'package:flutter_meragi_design/src/components/json/json_util.dart';
-import 'package:flutter_meragi_design/src/components/json/json_widget_map.dart';
 
-abstract class JsonWidget<T extends JsonController, W extends JsonWidgetState>
-    extends StatefulWidget with JsonSetters, JsonControllerMixin<T, W> {
+abstract class JsonWidget<T extends JsonController, W extends JsonWidgetState> extends StatefulWidget
+    with JsonSetters, JsonControllerMixin<T, W> {
   const JsonWidget({super.key});
-
-  /// When doing setter override, make sure to add the entries by
-  /// calling ```super.setters()``` into the map so that map from 
-  /// the abstract widgets can also be added
-  @override
-  @mustCallSuper
-  Map<String, Function(String? p1)> setters() {
-    return {
-      "value": (value) => controller.value = value,
-      "labelText": (value) => controller.options?.labelText = value,
-      "question": (value) => controller.options?.question = value,
-      "id": (value) => controller.options?.id = value
-    };
-  }
 }
 
 abstract class JsonWidgetState<T extends JsonControllerMixin> extends State<T> {
   Widget buildWidget(BuildContext context);
 
   @override
+  @nonVirtual
   Widget build(BuildContext context) {
     Widget rtn = buildWidget(context);
     return rtn;
   }
 }
 
-/// Make sure that you are initiating this ```JsonController```
-/// in the constructor of the ```JsonWidget```
-abstract class JsonController {
-  Options? options;
+abstract class JsonController<T extends Options> {
+  T options;
   String? value;
+
+  JsonController(this.options);
+
+  @nonVirtual
+  Map<String, Function(dynamic)> baseSetters() => {
+        "value": (value) => this.value = value,
+        "labelText": (value) => options.labelText = value,
+        "question": (value) => options.question = value,
+        "id": (value) => options.id = value
+      };
 }
 
 mixin JsonSetters {
-  Map<String, Function(String?)> setters();
+  Map<String, Function(dynamic)> setters();
 
+  @mustCallSuper
   void setProperty(MapEntry<String, dynamic> setterEntry) {
-    Function(String?)? func = setters()[setterEntry.key];
-    if (func != null && this is JsonControllerMixin) {
-      func.call(setterEntry.value);
+    if (this is JsonControllerMixin) {
+      Function(dynamic)? func =
+          (this as JsonControllerMixin).controller.baseSetters()[setterEntry.key] ?? setters()[setterEntry.key];
+      if (func != null) {
+        func.call(setterEntry.value);
+      }
     }
   }
 }
 
-mixin JsonControllerMixin<T extends JsonController, W extends State>
-    on StatefulWidget {
+mixin JsonControllerMixin<T extends JsonController, W extends State> on StatefulWidget {
   T get controller;
 }
 
-abstract class JsonStatelessWidget<T extends JsonController>
-    extends StatelessWidget with JsonSetters {
+abstract class JsonStatelessWidget<T extends JsonController> extends StatelessWidget with JsonSetters {
   const JsonStatelessWidget({super.key});
 }
 
-/// Make sure that you are initiating this [Options] in the constructor of the [JsonController]
 abstract class Options {
   String? question;
   String? labelText;
   String? id;
+  Options({this.question, this.id, this.labelText});
 }
 
 class JsonData {
   final List _json;
   final GlobalKey<FormBuilderState> _formKey;
-  const JsonData(
-      {required final List json,
-      required final GlobalKey<FormBuilderState> formKey})
+  const JsonData({required final List json, required final GlobalKey<FormBuilderState> formKey})
       : _json = json,
         _formKey = formKey;
 
@@ -85,39 +78,39 @@ class JsonData {
     for (Map<String, dynamic> jsonWidget in _json) {
       String jsonWidgetType = (jsonWidget["type"] as String).trim();
       Map<String, dynamic> widgetRegistryPropertiesMap = {};
+      Map<String, dynamic> others = {};
       for (var jsonWidgetProperty in jsonWidget.entries) {
         if (jsonWidgetProperty.key == "type") {
-          widgetRegistryPropertiesMap
-              .addAll({ParsedJsonEnum.widget.name: jsonMap[jsonWidgetType]!});
+          widgetRegistryPropertiesMap.addAll({ParsedJsonEnum.widget.name: jsonMap[jsonWidgetType]!});
         } else if (jsonWidgetProperty.key == "options") {
-          widgetRegistryPropertiesMap
-              .addAll({ParsedJsonEnum.options.name: jsonWidget["options"]!});
-        } else if (jsonWidgetProperty.key == "options") {
-          widgetRegistryPropertiesMap
-              .addAll({ParsedJsonEnum.value.name: jsonWidget["value"]!});
+          widgetRegistryPropertiesMap.addAll({ParsedJsonEnum.options.name: jsonWidget["options"]!});
+        } else if (jsonWidgetProperty.key == "value") {
+          widgetRegistryPropertiesMap.addAll({ParsedJsonEnum.value.name: jsonWidget["value"]});
         } else {
-          widgetRegistryPropertiesMap.addAll({
-            ParsedJsonEnum.others.name: {
-              jsonWidgetProperty.key: jsonWidgetProperty.value
-            }
-          });
+          others.addAll({jsonWidgetProperty.key: jsonWidgetProperty.value});
         }
       }
+      widgetRegistryPropertiesMap.addAll({ParsedJsonEnum.others.name: others});
       parsedJson.add(widgetRegistryPropertiesMap);
     }
     return parsedJson;
   }
+
+  Map<String, dynamic> initialValueMap() {
+    final Map<String, dynamic> initialValue = {};
+    for (Map<String, dynamic> jsonWidget in _json) {
+      initialValue.addAll({jsonWidget["id"]: jsonWidget["value"]});
+    }
+    return initialValue;
+  }
 }
 
 class JsonRootWidget extends StatelessWidget {
-  const JsonRootWidget(
-      {super.key, required this.jsonData, required this.formKey});
+  const JsonRootWidget({super.key, required this.jsonData});
   final JsonData jsonData;
-  final GlobalKey<FormBuilderState> formKey;
 
   @override
-  Widget build(BuildContext context) =>
-      JsonDataManager(jsonData: jsonData, child: const _JsonRootWidget());
+  Widget build(BuildContext context) => JsonDataManager(jsonData: jsonData, child: const _JsonRootWidget());
 }
 
 class _JsonRootWidget extends StatefulWidget {
@@ -129,19 +122,19 @@ class _JsonRootWidget extends StatefulWidget {
 
 class _JsonRootWidgetState extends State<_JsonRootWidget> {
   final List<Widget> _widgets = [];
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _widgets.addAll(JsonUtil.buildWidgetChildren(
-        JsonDataManager.of(context).jsonData.parseJson()));
+    _widgets.addAll(JsonUtil.buildWidgetChildren(JsonDataManager.of(context).jsonData.parseJson()));
   }
 
   @override
   Widget build(BuildContext context) {
     return FormBuilder(
       key: JsonDataManager.of(context).jsonData.formKey,
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, children: _widgets),
+      initialValue: JsonDataManager.of(context).jsonData.initialValueMap(),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: _widgets),
     );
   }
 }
