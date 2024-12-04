@@ -6,8 +6,7 @@ import '../extensions/colors.dart';
 part 'theme_tokens.tailor.dart';
 
 @TailorMixin()
-class ThemeToken extends ThemeExtension<ThemeToken>
-    with _$ThemeTokenTailorMixin {
+class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin {
   //Card
 
   // //Background Color
@@ -310,6 +309,28 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   final Color errorTextColor;
   @override
   final Color defaultTextColor;
+  @override
+  final Color navigationRailBackgroundColor;
+  @override
+  final EdgeInsets navigationRailcontentPadding;
+  @override
+  final double navigationRailCollapsedWidth;
+  @override
+  final double navigationRailExpandedWidth;
+  @override
+  final Color navigationRailDestinationSelectedColor;
+  @override
+  final Color navigationRailDestinationSelectedHoverColor;
+  @override
+  final Color navigationRailDestinationNonSelectedHoverColor;
+  @override
+  final Color navigationRailDestinationNonSelectedColor;
+  @override
+  final BorderRadius navigationRailBorderRadius;
+  @override
+  final Duration navigationRailAnimationDuration;
+  @override
+  final List<BoxShadow> navigationRailBoxShadow;
 
   const ThemeToken({
     // Button
@@ -442,6 +463,19 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.codeTextStyle,
     required this.linkTextStyle,
     required this.captionTextStyle,
+
+    //navigationRail
+    required this.navigationRailBackgroundColor,
+    required this.navigationRailCollapsedWidth,
+    required this.navigationRailExpandedWidth,
+    required this.navigationRailcontentPadding,
+    required this.navigationRailDestinationSelectedColor,
+    required this.navigationRailDestinationSelectedHoverColor,
+    required this.navigationRailDestinationNonSelectedColor,
+    required this.navigationRailDestinationNonSelectedHoverColor,
+    required this.navigationRailBorderRadius,
+    required this.navigationRailAnimationDuration,
+    required this.navigationRailBoxShadow,
   });
 
   ThemeToken copyWithColors({
@@ -497,6 +531,15 @@ class ThemeToken extends ThemeExtension<ThemeToken>
       warningTextColor: warning,
       infoTextColor: info,
       errorTextColor: error,
+
+      //navigationRail
+      navigationRailDestinationSelectedColor: primary,
+      navigationRailDestinationSelectedHoverColor: primary,
+      navigationRailDestinationNonSelectedHoverColor: primary?.lighten(50),
+      navigationRailDestinationNonSelectedColor: primary?.lighten(95),
+      // navigationRailBorderRadius,
+      // navigationRailAnimationDuration,
+      // navigationRailBoxShadow,
     );
   }
 }
