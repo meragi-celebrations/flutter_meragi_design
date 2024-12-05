@@ -10,6 +10,7 @@ class MDNavigationRail extends StatefulWidget {
   final Function(BuildContext context, bool isExpanded)? builder;
   final Widget? logo;
   final Widget? expandedLogo;
+  final Widget? trailing;
   final Function()? onExpandTap;
   final MDNavigationRailController? controller;
   final MDNavigationRailDecoration? decoration;
@@ -25,6 +26,7 @@ class MDNavigationRail extends StatefulWidget {
     this.onExpandTap,
     this.controller,
     this.decoration,
+    this.trailing,
   }) : assert(
             destinations == null && builder != null ||
                 destinations != null && builder == null && onDestinationSelected != null,
@@ -80,6 +82,7 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
                         onExpandTap: widget.onExpandTap,
                         value: value,
                         selectedIndex: widget.selectedIndex,
+                        trailing: widget.trailing,
                         onDestinationSelected: (index) {
                           widget.onDestinationSelected?.call(index);
                         },
@@ -110,6 +113,7 @@ class _MDNavigationContent extends StatelessWidget {
     required this.value,
     required this.selectedIndex,
     required this.onDestinationSelected,
+    this.trailing,
   });
 
   final Widget? logo;
@@ -118,6 +122,7 @@ class _MDNavigationContent extends StatelessWidget {
   final Function()? onExpandTap;
   final Function(int) onDestinationSelected;
   final MDNavigationRailController value;
+  final Widget? trailing;
   final int selectedIndex;
 
   @override
@@ -162,6 +167,7 @@ class _MDNavigationContent extends StatelessWidget {
                 .withSpaceBetween(height: 10),
           ),
         ),
+        if (trailing != null) trailing!,
         if (value.expandedButton)
           MDButton(
             decoration: ButtonDecoration(
