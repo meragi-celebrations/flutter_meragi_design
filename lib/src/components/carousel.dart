@@ -37,8 +37,7 @@ class MDCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MDCarouselController effectiveController =
-        controller ?? MDCarouselController();
+    MDCarouselController effectiveController = controller ?? MDCarouselController();
     return Stack(
       children: [
         RawCarouselView(
@@ -152,9 +151,13 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
   bool _handleKeyboardEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-        previewGoTo(_currentIndex - 1);
+        if (_currentIndex > 0) {
+          previewGoTo(_currentIndex - 1);
+        }
       } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-        previewGoTo(_currentIndex + 1);
+        if (_currentIndex < widget.children.length - 1) {
+          previewGoTo(_currentIndex + 1);
+        }
       }
     }
     return false;
@@ -169,8 +172,7 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
           children: [
             Expanded(
               flex: 9,
-              child: widget.children[_currentIndex].previewChild ??
-                  widget.children[_currentIndex].child,
+              child: widget.children[_currentIndex].previewChild ?? widget.children[_currentIndex].child,
             ),
             Expanded(
               flex: 1,
@@ -181,8 +183,7 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
                 ),
                 showPagination: false,
                 buildChild: (child) {
-                  int childIndex =
-                      widget.children.indexWhere((i) => i.child == child);
+                  int childIndex = widget.children.indexWhere((i) => i.child == child);
                   return Container(
                     decoration: BoxDecoration(
                       border: (_currentIndex == childIndex)
@@ -225,10 +226,12 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
   }
 
   void previewGoTo(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-    widget.parentController.goTo(index.toDouble());
+    if (index >= 0 && index < widget.children.length) {
+      setState(() {
+        _currentIndex = index;
+      });
+      widget.parentController.goTo(index.toDouble());
+    }
   }
 }
 
@@ -289,8 +292,7 @@ class MDCarouselController {
   goTo(double index) {
     currentIndex.value = index.toInt();
     internalController.animateTo(
-      (internalController.position as CarouselPosition)
-          .getPixelsFromItem(index),
+      (internalController.position as CarouselPosition).getPixelsFromItem(index),
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeIn,
     );
