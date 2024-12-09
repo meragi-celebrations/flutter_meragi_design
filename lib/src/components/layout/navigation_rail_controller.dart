@@ -8,7 +8,7 @@ class MDNavigationRailController extends ChangeNotifier implements ValueListenab
   MDNavigationRailController({
     final bool isExpanded = false,
     final bool isHoverable = false,
-    final bool expandedButton = true,
+    final bool expandedButton = false,
   })  : _isHoverable = isHoverable,
         _isExpanded = isExpanded,
         _expandedButton = expandedButton;
@@ -34,7 +34,15 @@ class MDNavigationRailController extends ChangeNotifier implements ValueListenab
     if (notifyListener) notifyListeners();
   }
 
-  void setExpandedButton(bool newValue, {bool notifyListener = true}) {
+  void setExpandedButton(bool newValue,
+      {bool notifyListener = true,
+
+      /// Useful for case if you are using [MDNavigationRail.builder]
+      /// This will wrap your builder with [Expanded], [Flexible], or nothing.
+      /// This is because it wraps [setExpandedButton] and [MDNavigationRail.builder] into
+      /// a column which may or may not break the layout if you are using some scroll widgets like
+      /// [SingleChildScrollView] or [CustomScrollView]
+      BuilderFlexType type = BuilderFlexType.expanded}) {
     if (_expandedButton == newValue) return;
 
     _expandedButton = newValue;
@@ -44,3 +52,5 @@ class MDNavigationRailController extends ChangeNotifier implements ValueListenab
   @override
   bool get value => _isExpanded;
 }
+
+enum BuilderFlexType { expanded, flexible, none }

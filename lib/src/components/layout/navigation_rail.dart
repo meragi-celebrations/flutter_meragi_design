@@ -7,13 +7,22 @@ class MDNavigationRail extends StatefulWidget {
   final List<MDNavigationRailDestination>? destinations;
   final int selectedIndex;
   final Function(int index)? onDestinationSelected;
-  final Function(BuildContext context, bool isExpanded)? builder;
+  final Widget Function(BuildContext context, bool isExpanded)? builder;
   final Widget? logo;
   final Widget? expandedLogo;
   final Widget? trailing;
   final Function()? onExpandTap;
   final MDNavigationRailController? controller;
   final MDNavigationRailDecoration? decoration;
+
+  /// Used only if you are using [Builder].
+  /// It wraps your builder with [Expanded] or [Flexible]
+  /// It only does this if [MDNavigationRailController.expandedButton] is ```true``` or [trailing] is true (or both)
+  final BuilderFlexType type;
+
+  /// This puts the [trailing] widget on top of ```MDNavigationRailController.expandedButton``` widget.
+  /// Provided that [trailing] is given and ```MDNavigationRailController.expandedButton = true```
+  final bool trailingFirst;
 
   const MDNavigationRail({
     super.key,
@@ -27,6 +36,8 @@ class MDNavigationRail extends StatefulWidget {
     this.controller,
     this.decoration,
     this.trailing,
+    this.type = BuilderFlexType.expanded,
+    this.trailingFirst = true,
   }) : assert(
             destinations == null && builder != null ||
                 destinations != null && builder == null && onDestinationSelected != null,
@@ -43,6 +54,47 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
   void initState() {
     controller = widget.controller ?? MDNavigationRailController();
     super.initState();
+  }
+
+  List<Widget>? _build(MDNavigationRailController controller) => widget.trailing != null
+      ? controller.expandedButton
+          ? widget.trailingFirst
+              ? [widget.trailing!, expandedButton(controller)]
+              : [expandedButton(controller), widget.trailing!]
+          : [widget.trailing!]
+      : controller.expandedButton
+          ? [expandedButton(controller)]
+          : null;
+
+  Widget expandedButton(MDNavigationRailController controller) {
+    return MDButton(
+      decoration: ButtonDecoration(
+        context: context,
+        variant: ButtonVariant.outline,
+        type: ButtonType.secondary,
+      ),
+      expand: true,
+      onTap: () {
+        if (controller.isExpanded) {
+          controller.close();
+        } else {
+          controller.open();
+        }
+        widget.onExpandTap?.call();
+      },
+      icon: controller.isExpanded ? PhosphorIconsRegular.caretLeft : PhosphorIconsRegular.caretRight,
+    );
+  }
+
+  Widget _wrapAroundChild(BuilderFlexType type, Widget child) {
+    switch (type) {
+      case BuilderFlexType.expanded:
+        return Expanded(child: child);
+      case BuilderFlexType.flexible:
+        return Flexible(child: child);
+      case BuilderFlexType.none:
+        return child;
+    }
   }
 
   @override
@@ -74,7 +126,15 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
                     boxShadow: finalDecoration.boxShadow),
                 padding: finalDecoration.contentPadding,
                 child: widget.builder != null
-                    ? widget.builder!.call(context, value.isExpanded)
+                    ? _build(controller) != null
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _wrapAroundChild(widget.type, widget.builder!.call(context, value.isExpanded)),
+                              ..._build(controller)!
+                            ],
+                          )
+                        : widget.builder!.call(context, value.isExpanded)
                     : _MDNavigationContent(
                         logo: widget.logo,
                         expandedLogo: widget.expandedLogo,
