@@ -66,6 +66,32 @@ class _MDFilterFormViewState extends State<MDFilterFormView> {
     return initialData;
   }
 
+  /// Standardizes filter values into a consistent format
+  MDFilter buildFilter(String key, dynamic value) {
+    try {
+      Set<dynamic> valueSet;
+      if (value is String) {
+        valueSet = value.split(',').toSet();
+      } else if (value is Set) {
+        valueSet = value;
+      } else if (value is List) {
+        valueSet = value.toSet();
+      } else {
+        debugPrint('Unexpected value type: ${value.runtimeType} for key: $key');
+        valueSet = {value};
+      }
+
+      return widget.filterBuilder(
+        key,
+        valueSet.join(","),
+      );
+    } catch (e, stackTrace) {
+      debugPrint('Error building filter - Key: $key, Value: $value');
+      debugPrint('Error: $e\n$stackTrace');
+      rethrow;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MDScaffold(
@@ -73,10 +99,7 @@ class _MDFilterFormViewState extends State<MDFilterFormView> {
         asPageHeader: true,
         title: const Text("Filters"),
         leading: MDButton(
-          decoration: ButtonDecoration(
-              context: context,
-              variant: ButtonVariant.ghost,
-              type: ButtonType.danger),
+          decoration: ButtonDecoration(context: context, variant: ButtonVariant.ghost, type: ButtonType.danger),
           icon: PhosphorIconsBold.x,
           onTap: () => Navigator.pop(context),
         ),
@@ -88,38 +111,45 @@ class _MDFilterFormViewState extends State<MDFilterFormView> {
               variant: ButtonVariant.ghost,
             ),
             onTap: () {
-              widget.formKey.currentState?.reset();
+              try {
+                widget.formKey.currentState?.reset();
+              } catch (e) {
+                debugPrint('Error resetting form: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Error clearing filters')),
+                );
+              }
             },
             child: const Text("Clear"),
           ),
           const SizedBox(width: 10),
           MDButton(
-            decoration:
-                ButtonDecoration(context: context, type: ButtonType.primary),
+            decoration: ButtonDecoration(context: context, type: ButtonType.primary),
             onTap: () {
-              List<MDFilter> filters = [];
-              if (!widget.formKey.currentState!.saveAndValidate()) {
-                return;
-              }
-              Map<String, dynamic> formValue =
-                  widget.formKey.currentState!.value;
-              for (MapEntry<String, dynamic> data in formValue.entries) {
-                if (data.value != null) {
-                  // MDFilter(
-                  //   field: data.key,
-                  //   operator: "in",
-                  //   value: data.value.toList().join(","),
-                  // )
-                  filters.add(
-                    widget.filterBuilder(
-                      data.key,
-                      data.value.toList().join(","),
-                    ),
-                  );
+              try {
+                if (!widget.formKey.currentState!.saveAndValidate()) {
+                  debugPrint('Form validation failed');
+                  return;
                 }
+
+                List<MDFilter> filters = [];
+                Map<String, dynamic> formValue = widget.formKey.currentState!.value;
+
+                for (MapEntry<String, dynamic> data in formValue.entries) {
+                  if (data.value != null) {
+                    debugPrint(
+                        'Processing filter - Key: ${data.key}, Value: ${data.value}, Type: ${data.value.runtimeType}');
+                    filters.add(buildFilter(data.key, data.value));
+                  }
+                }
+                widget.onFilterSubmit(filters);
+                Navigator.pop(context);
+              } catch (e, stackTrace) {
+                debugPrint('Error applying filters: $e\n$stackTrace');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error applying filters: $e')),
+                );
               }
-              widget.onFilterSubmit(filters);
-              Navigator.pop(context);
             },
             child: const Text("Apply"),
           ),
