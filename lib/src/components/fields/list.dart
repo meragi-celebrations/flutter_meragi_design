@@ -23,12 +23,12 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
     super.onReset,
     super.focusNode,
     super.restorationId,
-    this.options,
+    required this.options,
     this.isMultiSelect = true,
   })  : listBloc = null,
         optionBuilder = null,
         super(
-          builder: (FormFieldState<Set?> field) {
+          builder: (FormFieldState<Set<String>?> field) {
             final state = field as _MDFormCheckboxList;
 
             final fieldWidget = SingleChildScrollView(
@@ -36,7 +36,7 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
                 children: [
                   ...options!.map(
                     (option) {
-                      return checkboxOption(state, option, field, isMultiSelect, onChanged);
+                      return _checkboxOption(state, option, field, isMultiSelect, onChanged);
                     },
                   ),
                 ],
@@ -72,15 +72,15 @@ class MDFormCheckboxList extends MDFormBuilderField<Set<String>> {
               itemBuilder: (context, index) {
                 var item = listBloc.list.value[index];
                 MDCheckboxOption option = optionBuilder!(item);
-                return checkboxOption(state, option, field, isMultiSelect, onChanged);
+                return _checkboxOption(state, option, field, isMultiSelect, onChanged);
               },
             );
             return fieldWidget;
           },
         );
 
-  static ValueListenableBuilder<Set<String>> checkboxOption(
-      _MDFormCheckboxList state, MDCheckboxOption option, _MDFormCheckboxList field, bool isMultiSelect, Function(Set<String>? value)? onChanged) {
+  static ValueListenableBuilder<Set<String>> _checkboxOption(_MDFormCheckboxList state, MDCheckboxOption option,
+      _MDFormCheckboxList field, bool isMultiSelect, Function(Set<String>? value)? onChanged) {
     return ValueListenableBuilder(
       valueListenable: state.setValues,
       builder: (context, selectedSet, _) {

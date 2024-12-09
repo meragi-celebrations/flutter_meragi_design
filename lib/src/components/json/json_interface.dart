@@ -20,7 +20,7 @@ abstract class JsonWidgetState<T extends JsonControllerMixin> extends State<T> {
 
 abstract class JsonController<T extends Options> {
   T options;
-  String? value;
+  dynamic value;
 
   JsonController(this.options);
 
@@ -84,8 +84,6 @@ class JsonData {
           widgetRegistryPropertiesMap.addAll({ParsedJsonEnum.widget.name: jsonMap[jsonWidgetType]!});
         } else if (jsonWidgetProperty.key == "options") {
           widgetRegistryPropertiesMap.addAll({ParsedJsonEnum.options.name: jsonWidget["options"]!});
-        } else if (jsonWidgetProperty.key == "value") {
-          widgetRegistryPropertiesMap.addAll({ParsedJsonEnum.value.name: jsonWidget["value"]});
         } else {
           others.addAll({jsonWidgetProperty.key: jsonWidgetProperty.value});
         }
@@ -99,7 +97,17 @@ class JsonData {
   Map<String, dynamic> initialValueMap() {
     final Map<String, dynamic> initialValue = {};
     for (Map<String, dynamic> jsonWidget in _json) {
-      initialValue.addAll({jsonWidget["id"]: jsonWidget["value"]});
+      if (jsonWidget["type"] == JsonMdDropdown.inputType && jsonWidget["options"]["multiSelect"] == true) {
+        initialValue.addAll({
+          jsonWidget["id"]: jsonWidget["value"] != null
+              ? (jsonWidget["value"] is List)
+                  ? (jsonWidget["value"] as List).cast<String>().toSet()
+                  : <String>{jsonWidget["value"]}
+              : null
+        });
+      } else {
+        initialValue.addAll({jsonWidget["id"]: jsonWidget["value"]});
+      }
     }
     return initialValue;
   }
