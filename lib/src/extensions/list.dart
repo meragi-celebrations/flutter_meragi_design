@@ -12,7 +12,7 @@ extension ListSpaceBetweenExtension on List<Widget> {
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Divider(
               color: Color(0xFFE9E9E9),
-              height: 0.8,
+              height: 0.5,
               thickness: 0.8,
             ),
           )}) =>
