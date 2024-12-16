@@ -137,6 +137,7 @@ class TagDecoration extends Style {
   final double? textHeightOverride;
   final FontWeight? textWeightOverride;
   final double? spacingOverride;
+  final Color? borderColorOverride;
 
   const TagDecoration({
     required super.context,
@@ -151,6 +152,7 @@ class TagDecoration extends Style {
     this.textHeightOverride,
     this.textWeightOverride,
     this.spacingOverride,
+    this.borderColorOverride,
   });
 
   @override
@@ -219,15 +221,13 @@ class TagDecoration extends Style {
         },
       };
 
-  Color get backgroundColor =>
-      backgroundColorOverride ?? getStyle(type, "backgroundColor");
+  Color get backgroundColor => backgroundColorOverride ?? getStyle(type, "backgroundColor");
 
   Color get textColor => textColorOverride ?? getStyle(type, "textColor");
 
-  Color get borderColor => getStyle(type, "borderColor");
+  Color get borderColor => borderColorOverride ?? getStyle(type, "borderColor");
 
-  double get borderRadius =>
-      borderRadiusOverride ?? getStyle(size, "borderRadius");
+  double get borderRadius => borderRadiusOverride ?? getStyle(size, "borderRadius");
 
   double get iconSize => iconSizeOverride ?? getStyle(size, "iconSize");
 
@@ -235,8 +235,7 @@ class TagDecoration extends Style {
 
   double get textHeight => textHeightOverride ?? getStyle(size, "textHeight");
 
-  FontWeight get textWeight =>
-      textWeightOverride ?? getStyle(size, "textWeight");
+  FontWeight get textWeight => textWeightOverride ?? getStyle(size, "textWeight");
 
   double get spacing => spacingOverride ?? getStyle(size, "spacing");
 
@@ -255,13 +254,14 @@ class TagDecoration extends Style {
     double? textHeightOverride,
     FontWeight? textWeightOverride,
     double? spacingOverride,
+    Color? borderColorOverride,
   }) {
     return TagDecoration(
       context: context ?? this.context,
       type: type ?? this.type,
       size: size ?? this.size,
-      backgroundColorOverride:
-          backgroundColorOverride ?? this.backgroundColorOverride,
+      borderColorOverride: borderColorOverride ?? this.borderColorOverride,
+      backgroundColorOverride: backgroundColorOverride ?? this.backgroundColorOverride,
       textColorOverride: textColorOverride ?? this.textColorOverride,
       borderRadiusOverride: borderRadiusOverride ?? this.borderRadiusOverride,
       paddingOverride: paddingOverride ?? this.paddingOverride,
@@ -281,8 +281,8 @@ class TagDecoration extends Style {
       context: other.context,
       type: other.type,
       size: other.size,
-      backgroundColorOverride:
-          other.backgroundColorOverride ?? backgroundColorOverride,
+      borderColorOverride: other.borderColorOverride ?? borderColorOverride,
+      backgroundColorOverride: other.backgroundColorOverride ?? backgroundColorOverride,
       textColorOverride: other.textColorOverride ?? textColorOverride,
       borderRadiusOverride: other.borderRadiusOverride ?? borderRadiusOverride,
       paddingOverride: other.paddingOverride ?? paddingOverride,

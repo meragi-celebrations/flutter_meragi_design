@@ -82,19 +82,27 @@ class MDSectionTile extends StatelessWidget {
   final List<Widget>? actions;
   final EdgeInsets? padding;
   final VoidCallback? onTap;
-  const MDSectionTile({super.key, this.leading, this.actions, this.padding, required this.child, this.onTap});
+  final EdgeInsets leadingPadding;
+  const MDSectionTile({
+    super.key,
+    this.leading,
+    this.actions,
+    this.padding,
+    required this.child,
+    this.onTap,
+    this.leadingPadding = const EdgeInsets.only(right: 10),
+  });
 
   @override
   Widget build(BuildContext context) {
     return MDGestureDetector(
       onTap: onTap,
       child: Container(
-        padding: padding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: padding ?? const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (leading != null) leading!,
-            if (leading != null) SizedBox(width: 10),
+            if (leading != null) Padding(padding: leadingPadding, child: leading),
             Expanded(child: child),
             if (actions != null) ...actions!,
           ],
