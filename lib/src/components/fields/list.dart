@@ -208,7 +208,12 @@ class MDCheckbox extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final BorderSide? side;
-
+  final WidgetStateProperty<Color?>? fillColor;
+  final bool isError;
+  final Color? focusColor;
+  final Color? hoverColor;
+  final WidgetStateProperty<Color?>? overlayColor;
+  final VisualDensity? visualDensity;
   const MDCheckbox({
     Key? key,
     required this.value,
@@ -222,6 +227,12 @@ class MDCheckbox extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.side,
+    this.fillColor,
+    this.isError = false,
+    this.focusColor,
+    this.hoverColor,
+    this.overlayColor,
+    this.visualDensity,
   }) : super(key: key);
 
   @override
@@ -242,6 +253,12 @@ class MDCheckbox extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus,
       side: side ?? BorderSide(width: 1, color: token.primaryButtonColor),
+      fillColor: fillColor,
+      isError: isError,
+      focusColor: focusColor,
+      hoverColor: hoverColor,
+      overlayColor: overlayColor,
+      visualDensity: visualDensity,
     );
   }
 }
