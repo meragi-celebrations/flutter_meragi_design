@@ -12,8 +12,7 @@ enum MeragiPlatform {
   linux,
 }
 
-int getResponsiveColumnCount(double maxWidth, num min, num max,
-    {num breakpoint = 1200}) {
+int getResponsiveColumnCount(double maxWidth, num min, num max, {num breakpoint = 1200}) {
   if (breakpoint <= 0 || min <= 0 || max < min) {
     throw "kya kar rha h be!";
   }
@@ -60,8 +59,7 @@ bool isPlatform(List<MeragiPlatform> platforms) {
   return false;
 }
 
-bool isDesktop = isPlatform(
-    [MeragiPlatform.linux, MeragiPlatform.windows, MeragiPlatform.macos]);
+bool isDesktop = isPlatform([MeragiPlatform.linux, MeragiPlatform.windows, MeragiPlatform.macos]);
 
 bool isMobile = isPlatform([MeragiPlatform.android, MeragiPlatform.ios]);
 
@@ -71,15 +69,15 @@ bool isMobileWeb = kIsWeb && isMobile;
 
 class ScreenUtil {
   BuildContext context;
+  final BoxConstraints? constraints;
+  ScreenUtil(this.context, {this.constraints});
 
-  ScreenUtil(this.context);
-
-  bool get isSm => MediaQuery.of(context).size.width < 500; // phone
-  bool get isMd => (MediaQuery.of(context).size.width < 800 &&
-      MediaQuery.of(context).size.width >= 500); // tablet
-  bool get isLg => (MediaQuery.of(context).size.width < 1200 &&
-      MediaQuery.of(context).size.width >= 800); // desktop
-  bool get isXl => MediaQuery.of(context).size.width >= 1200; // everything
+  bool get isSm => maxWidth < 500; // phone
+  bool get isMd => (maxWidth < 800 && maxWidth >= 500); // tablet
+  bool get isLg => (maxWidth < 1200 && maxWidth >= 800); // desktop
+  bool get isXl => maxWidth >= 1200; // everything
 
   bool get isSmMd => isSm || isMd;
+
+  double get maxWidth => (constraints?.maxWidth ?? MediaQuery.of(context).size.width);
 }
