@@ -31,7 +31,7 @@ class MDHtmlEditor extends MDFormBuilderField<String> {
             return Container(
               height: height,
               width: size?.width ?? 500,
-              padding: EdgeInsets.all(2),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(10),
@@ -101,8 +101,7 @@ class MDHtmlEditor extends MDFormBuilderField<String> {
         );
 
   @override
-  MDFormBuilderFieldState<MDHtmlEditor, String> createState() =>
-      _MDHtmlEditor();
+  MDFormBuilderFieldState<MDHtmlEditor, String> createState() => _MDHtmlEditor();
 }
 
 class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
@@ -121,6 +120,15 @@ class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
     });
 
     focusNode = widget.focusNode ?? FocusNode();
+  }
+
+  @override
+  void didChange(String? value) {
+    super.didChange(value);
+
+    if (controller.document != Document.fromHtml(value!)) {
+      controller.document = Document.fromHtml(value);
+    }
   }
 
   @override
