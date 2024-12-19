@@ -2,29 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
 
+/// A form field that builds a list of form fields.
+///
+/// This class extends [MDFormBuilderField] with a type parameter of [List].
+/// It is used to create a form field that can handle a list of values.
 class MDFormListField extends MDFormBuilderField<List> {
   final Widget Function(int index, Function remove) formBuilder;
   final Widget Function(List<Widget> forms, Function add) wrapperBuilder;
   final int extra;
 
   /// Creates On/Off Cupertino switch field
-  MDFormListField(
-      {super.key,
-      required name,
-      super.validator,
-      super.initialValue,
-      super.onChanged,
-      super.valueTransformer,
-      super.enabled,
-      super.onSaved,
-      super.autovalidateMode,
-      super.onReset,
-      super.focusNode,
-      super.restorationId,
-      required this.formBuilder,
-      required this.wrapperBuilder,
-      this.extra = 0})
-      : super(
+  MDFormListField({
+    super.key,
+    required name,
+    super.validator,
+    super.initialValue,
+    super.onChanged,
+    super.valueTransformer,
+    super.enabled,
+    super.onSaved,
+    super.autovalidateMode,
+    super.onReset,
+    super.focusNode,
+    super.restorationId,
+    required this.formBuilder,
+    required this.wrapperBuilder,
+    this.extra = 0,
+  }) : super(
           name: name,
           builder: (field) {
             final state = field as _MDFormListFieldState;
@@ -126,8 +130,6 @@ class _MDFormListFieldState
       GlobalKey<FormBuilderState> key = form.key as GlobalKey<FormBuilderState>;
       key.currentState?.save();
     }
-
-    print("forms $forms");
   }
 
   @override
@@ -148,6 +150,17 @@ class _MDFormListFieldState
     super.dispose();
   }
 
+  /// Updates the form value at the specified index and triggers a change notification.
+  ///
+  /// This method retrieves the current form value from the form at the given index,
+  /// updates the list of form values, and calls `didChange` to notify listeners of the change.
+  ///
+  /// If the index is greater than or equal to the length of the current list of values,
+  /// the new form value is added to the list. Otherwise, the form value at the specified
+  /// index is replaced with the new form value.
+  ///
+  /// Args:
+  ///   index (int): The index of the form to update.
   void didChangeFor(int index) {
     List currentValue = List.from(value ?? <dynamic>[]);
 
