@@ -2,16 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
 
-/// A form field that builds a list of form fields.
+/// A dynamic list field that allows adding and deleting individual forms.
 ///
-/// This class extends [MDFormBuilderField] with a type parameter of [List].
-/// It is used to create a form field that can handle a list of values.
+/// The `MDFormListField` class extends `MDFormBuilderField<List>` and provides
+/// functionality to dynamically manage a list of forms. It supports adding and
+/// removing forms, and initializes the forms using the provided `initialValue`
+/// or the `extra` parameter.
+///
+/// The `formBuilder` function is used to build each form widget for a given
+/// index, and the `wrapperBuilder` function wraps the list of form widgets and
+/// provides a function to add a new form.
+///
+/// The `onIndividualFormChange` callback is triggered when an individual form
+/// changes, providing the index of the form and the new value.
+///
+/// The `MDFormListField` class also overrides methods to save, reset, and
+/// dispose the forms.
+///
 class MDFormListField extends MDFormBuilderField<List> {
+  /// A function that builds a form widget for a given index and provides a
+  /// function to remove the form.
+  ///
+  /// [index] - The index of the form to be built.
+  /// [remove] - A function to remove the form.
   final Widget Function(int index, Function remove) formBuilder;
+
+  /// A function that wraps a list of form widgets and provides a function to
+  /// add a new form.
+  ///
+  /// [forms] - The list of form widgets to be wrapped.
+  /// [add] - A function to add a new form.
   final Widget Function(List<Widget> forms, Function add) wrapperBuilder;
+
+  /// The number of extra forms that will be rendered.
   final int extra;
+
+  /// A callback function that is triggered when an individual form changes.
+  ///
+  /// [index] - The index of the form that changed.
+  /// [newValue] - The new value of the form, which can be null.
   final Function(int index, Map<String, dynamic>? newValue)?
       onIndividualFormChange;
+
+  /// A callback function that is triggered when a form is added.
+  final Function(int index)? onAdded;
+
+  /// A callback function that is triggered when a form is removed.
+  final Function(int index)? onRemoved;
 
   /// Creates On/Off Cupertino switch field
   MDFormListField({
@@ -31,6 +68,8 @@ class MDFormListField extends MDFormBuilderField<List> {
     required this.wrapperBuilder,
     this.extra = 0,
     this.onIndividualFormChange,
+    this.onAdded,
+    this.onRemoved,
   }) : super(
           name: name,
           builder: (field) {
@@ -91,6 +130,10 @@ class _MDFormListFieldState
     setState(() {});
 
     didChangeFor(length);
+
+    if (widget.onAdded != null) {
+      widget.onAdded!(length);
+    }
   }
 
   /// Removes a form at the specified index from the list of forms.
@@ -109,6 +152,10 @@ class _MDFormListFieldState
     forms.remove(index);
 
     setState(() {});
+
+    if (widget.onRemoved != null) {
+      widget.onRemoved!(index);
+    }
   }
 
   @override
