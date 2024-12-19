@@ -10,6 +10,8 @@ class MDFormListField extends MDFormBuilderField<List> {
   final Widget Function(int index, Function remove) formBuilder;
   final Widget Function(List<Widget> forms, Function add) wrapperBuilder;
   final int extra;
+  final Function(int index, Map<String, dynamic>? newValue)?
+      onIndividualFormChange;
 
   /// Creates On/Off Cupertino switch field
   MDFormListField({
@@ -28,6 +30,7 @@ class MDFormListField extends MDFormBuilderField<List> {
     required this.formBuilder,
     required this.wrapperBuilder,
     this.extra = 0,
+    this.onIndividualFormChange,
   }) : super(
           name: name,
           builder: (field) {
@@ -68,16 +71,7 @@ class _MDFormListFieldState
       Map<String, dynamic> formInitialValue =
           i < (initialValue?.length ?? 0) ? (initialValue?[i] ?? {}) : {};
 
-      var globalKey = GlobalKey<FormBuilderState>();
-
-      forms[i] = FormBuilder(
-        key: globalKey,
-        initialValue: formInitialValue,
-        child: widget.formBuilder(i, remove),
-        onChanged: () {
-          didChangeFor(i);
-        },
-      );
+      forms[i] = _createFormBuilder(i, formInitialValue);
 
       tempValue.add(formInitialValue);
     }
@@ -92,13 +86,7 @@ class _MDFormListFieldState
   void add() {
     int length = counter++;
 
-    forms[length] = FormBuilder(
-      key: GlobalKey<FormBuilderState>(),
-      child: widget.formBuilder(length, remove),
-      onChanged: () {
-        didChangeFor(length);
-      },
-    );
+    forms[length] = _createFormBuilder(length, {});
 
     setState(() {});
 
@@ -176,5 +164,37 @@ class _MDFormListFieldState
     }
 
     didChange(currentValue);
+  }
+
+  /// Creates a form builder widget for the given index and initial value.
+  ///
+  /// This method generates a form builder widget based on the provided index
+  /// and initial value map. It is used to dynamically create form fields
+  /// within a list.
+  ///
+  /// Parameters:
+  /// - `index` (`int`): The index of the form field in the list.
+  /// - `initialValue` (`Map<String, dynamic>`): A map containing the initial
+  ///   values for the form fields.
+  ///
+  /// Returns:
+  /// - `Widget`: A widget representing the form builder for the specified index
+  ///   and initial value.
+  Widget _createFormBuilder(int index, Map<String, dynamic> initialValue,
+      {GlobalKey<FormBuilderState>? key}) {
+    var globalKey = key ?? GlobalKey<FormBuilderState>();
+
+    return FormBuilder(
+      key: globalKey,
+      initialValue: initialValue,
+      child: widget.formBuilder(index, remove),
+      onChanged: () {
+        if (widget.onIndividualFormChange != null) {
+          widget.onIndividualFormChange!(
+              index, globalKey.currentState?.instantValue);
+        }
+        didChangeFor(index);
+      },
+    );
   }
 }
