@@ -14,6 +14,10 @@ class MDGestureDetector extends GestureDetector {
   /// disabled cursor.
   final bool isDisabled;
 
+  void Function(PointerEnterEvent)? onEnter;
+  void Function(PointerExitEvent)? onExit;
+  void Function(PointerHoverEvent)? onHover;
+
   MDGestureDetector({
     Key? key,
     Widget? child,
@@ -47,6 +51,9 @@ class MDGestureDetector extends GestureDetector {
     GestureDragCancelCallback? onPanCancel,
     HitTestBehavior? behavior,
     bool excludeFromSemantics = false,
+    this.onEnter,
+    this.onExit,
+    this.onHover,
     this.isDisabled = false,
   }) : super(
           key: key,
@@ -97,6 +104,9 @@ class MDGestureDetector extends GestureDetector {
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
+      onEnter: onEnter,
+      onExit: onExit,
+      onHover: onHover,
       child: absorbing,
     );
   }

@@ -25,14 +25,7 @@ class MyApp extends StatelessWidget {
     return MeragiTheme(
       token: isPlatform([MeragiPlatform.android, MeragiPlatform.ios])
           ? light
-          : lightWide.copyWithColors(
-              primary: Colors.deepPurple,
-              success: Colors.green,
-              error: Colors.redAccent,
-              warning: Colors.orange,
-              info: Colors.blue,
-              secondary: Colors.deepPurpleAccent.shade100,
-            ),
+          : lightWide_v2,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Meragi Design',
@@ -1044,6 +1037,25 @@ class _MyHomePageState extends State<MyHomePage> {
           name: 'Form List',
           builder: (context) {
             return FormListStory();
+          },
+        ),
+        Story(
+          name: 'Calendar',
+          builder: (context) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MDEditor(
+                initialText: '''# This is markdown''',
+                readOnly: context.knobs.boolean(
+                  label: "Read Only",
+                  initial: false,
+                ),
+                isExpanded: context.knobs.boolean(
+                  label: "Is Expanded",
+                  initial: false,
+                ),
+              ),
+            );
           },
         )
       ],

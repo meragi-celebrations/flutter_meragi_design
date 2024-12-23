@@ -2,6 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
 
 ThemeToken light = ThemeToken(
+  // Standard Properties
+  primaryColor: Colors.deepPurple,
+  secondaryColor: Colors.deepPurpleAccent,
+  tertiaryColor: Colors.deepPurple.shade100,
+  errorColor: Colors.redAccent,
+  successColor: Colors.green,
+  warningColor: Colors.orange,
+  infoColor: Colors.blue,
+  padding: 15.0,
+  radius: 6.0,
+  borderColor: Colors.grey.shade200,
+
   standardButtonColor: Colors.deepPurple[100]!,
   primaryButtonColor: Colors.deepPurple,
   secondaryButtonColor: Colors.deepPurpleAccent[100]!,
@@ -34,7 +46,8 @@ ThemeToken light = ThemeToken(
   //Card
   defaultCardBackgroundColor: Colors.white,
   primaryCardBackgroundColor: Colors.deepPurple.shade100.withOpacity(.3),
-  secondaryCardBackgroundColor: Colors.deepPurpleAccent.shade100.withOpacity(.3),
+  secondaryCardBackgroundColor:
+      Colors.deepPurpleAccent.shade100.withOpacity(.3),
   dangerCardBackgroundColor: Colors.redAccent.shade100.withOpacity(.3),
   successCardBackgroundColor: Colors.green.shade100.withOpacity(.3),
   warningCardBackgroundColor: Colors.orange.shade100.withOpacity(.3),
@@ -106,9 +119,11 @@ ThemeToken light = ThemeToken(
   bodyTextStyle: const TextStyle(fontSize: 14),
   h6TextStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
   captionTextStyle: const TextStyle(fontSize: 10, color: Colors.grey),
-  codeTextStyle: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
+  codeTextStyle: const TextStyle(
+      fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
   quoteTextStyle: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-  linkTextStyle: const TextStyle(fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
+  linkTextStyle: const TextStyle(
+      fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
   standardHoverButtonColor: Colors.deepPurple[100]!.withOpacity(0.7),
   primaryHoverButtonColor: Colors.deepPurple.withOpacity(0.7),
   secondaryHoverButtonColor: Colors.deepPurpleAccent[100]!.withOpacity(0.7),
@@ -142,13 +157,21 @@ ThemeToken light = ThemeToken(
   navigationRailCollapsedWidth: 65,
   navigationRailExpandedWidth: 250,
   navigationRailcontentPadding: const EdgeInsets.all(15),
-  navigationRailDestinationSelectedColor: Colors.deepPurpleAccent.shade100.withOpacity(.3),
-  navigationRailDestinationNonSelectedHoverColor: Colors.deepPurple[100]!.withOpacity(0.7),
-  navigationRailDestinationNonSelectedColor: Colors.deepPurple.shade100.withOpacity(0.2),
-  navigationRailDestinationSelectedHoverColor: Colors.deepPurple[200]!.withOpacity(0.7),
+  navigationRailDestinationSelectedColor:
+      Colors.deepPurpleAccent.shade100.withOpacity(.3),
+  navigationRailDestinationNonSelectedHoverColor:
+      Colors.deepPurple[100]!.withOpacity(0.7),
+  navigationRailDestinationNonSelectedColor:
+      Colors.deepPurple.shade100.withOpacity(0.2),
+  navigationRailDestinationSelectedHoverColor:
+      Colors.deepPurple[200]!.withOpacity(0.7),
   navigationRailBorderRadius: const BorderRadius.all(Radius.circular(12)),
   navigationRailAnimationDuration: const Duration(milliseconds: 150),
   navigationRailBoxShadow: const [
-    BoxShadow(blurRadius: 12, spreadRadius: 3, color: Color(0xFFCFCFD2), blurStyle: BlurStyle.normal)
+    BoxShadow(
+        blurRadius: 12,
+        spreadRadius: 3,
+        color: Color(0xFFCFCFD2),
+        blurStyle: BlurStyle.normal)
   ],
 );

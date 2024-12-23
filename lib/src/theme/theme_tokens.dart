@@ -6,7 +6,8 @@ import '../extensions/colors.dart';
 part 'theme_tokens.tailor.dart';
 
 @TailorMixin()
-class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin {
+class ThemeToken extends ThemeExtension<ThemeToken>
+    with _$ThemeTokenTailorMixin {
   //Card
 
   // //Background Color
@@ -24,17 +25,17 @@ class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin
   final Color warningCardBackgroundColor;
   // // Border Color
   @override
-  final Color defaultCardBorderColor;
+  late final Color defaultCardBorderColor;
   @override
-  final Color primaryCardBorderColor;
+  late final Color primaryCardBorderColor;
   @override
-  final Color secondaryCardBorderColor;
+  late final Color secondaryCardBorderColor;
   @override
-  final Color dangerCardBorderColor;
+  late final Color dangerCardBorderColor;
   @override
-  final Color successCardBorderColor;
+  late final Color successCardBorderColor;
   @override
-  final Color warningCardBorderColor;
+  late final Color warningCardBorderColor;
 
   // // Padding
   @override
@@ -332,7 +333,31 @@ class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin
   @override
   final List<BoxShadow> navigationRailBoxShadow;
 
-  const ThemeToken({
+  // Standard properties
+  @override
+  final Color primaryColor;
+  @override
+  final Color secondaryColor;
+  @override
+  final Color tertiaryColor;
+  @override
+  final double padding;
+  @override
+  final double radius;
+
+  @override
+  final Color successColor;
+  @override
+  final Color warningColor;
+  @override
+  final Color infoColor;
+  @override
+  final Color errorColor;
+
+  @override
+  final Color borderColor;
+
+  ThemeToken({
     // Button
     required this.standardButtonColor,
     required this.primaryButtonColor,
@@ -383,12 +408,12 @@ class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin
     required this.successCardBackgroundColor,
     required this.warningCardBackgroundColor,
     required this.defaultCardBackgroundColor,
-    required this.defaultCardBorderColor,
-    required this.dangerCardBorderColor,
-    required this.successCardBorderColor,
-    required this.warningCardBorderColor,
-    required this.primaryCardBorderColor,
-    required this.secondaryCardBorderColor,
+    defaultCardBorderColor,
+    dangerCardBorderColor,
+    successCardBorderColor,
+    warningCardBorderColor,
+    primaryCardBorderColor,
+    secondaryCardBorderColor,
     required this.lgCardPadding,
     required this.rgCardPadding,
     required this.smCardPadding,
@@ -476,17 +501,48 @@ class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin
     required this.navigationRailBorderRadius,
     required this.navigationRailAnimationDuration,
     required this.navigationRailBoxShadow,
-  });
+
+    // Standard Properties
+    required this.primaryColor,
+    required this.secondaryColor,
+    required this.tertiaryColor,
+    required this.padding,
+    required this.radius,
+
+    // Additional colors
+    required this.successColor,
+    required this.warningColor,
+    required this.infoColor,
+    required this.errorColor,
+    required this.borderColor,
+  }) {
+    this.defaultCardBorderColor = defaultCardBorderColor ?? borderColor;
+    this.primaryCardBorderColor = primaryCardBorderColor ?? primaryColor;
+    this.secondaryCardBorderColor = secondaryCardBorderColor ?? secondaryColor;
+    this.dangerCardBorderColor = dangerCardBorderColor ?? errorColor;
+    this.successCardBorderColor = successCardBorderColor ?? successColor;
+    this.warningCardBorderColor = warningCardBorderColor ?? warningColor;
+  }
 
   ThemeToken copyWithColors({
     Color? primary,
     Color? secondary,
+    Color? tertiary,
     Color? success,
     Color? warning,
     Color? info,
     Color? error,
   }) {
     return copyWith(
+      // Standard Properties
+      primaryColor: primary ?? primaryColor,
+      secondaryColor: secondary ?? secondaryColor,
+      tertiaryColor: tertiary ?? tertiaryColor,
+      successColor: success ?? successColor,
+      warningColor: warning ?? warningColor,
+      infoColor: info ?? infoColor,
+      errorColor: error ?? errorColor,
+
       // Card
       // Background color
       primaryCardBackgroundColor: primary?.lighten(80),
