@@ -211,9 +211,11 @@ class GetListBloc<T> extends BaseBloc<T> {
     isPaginationEnabled.value = value;
   }
 
-  Future<void> reset() async {
-    currentPage.value = 1;
-    totalPages.value = 1;
+  Future<void> reset({bool fullRefresh = true}) async {
+    if (fullRefresh) {
+      currentPage.value = 1;
+      totalPages.value = 1;
+    }
     list.value.clear();
     list.notifyListeners();
     await get();
