@@ -9,6 +9,7 @@ class MDModal extends StatelessWidget {
   final double widthFactor;
   final bool showCloseButton;
   final CardDecoration? decoration;
+  final EdgeInsets bodyPadding;
 
   const MDModal._({
     Key? key,
@@ -18,6 +19,7 @@ class MDModal extends StatelessWidget {
     this.showCloseButton = true,
     this.widthFactor = 0.5,
     this.decoration,
+    this.bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
   }) : super(key: key);
 
   // Default constructor (medium size)
@@ -29,6 +31,7 @@ class MDModal extends StatelessWidget {
     bool showCloseButton = true,
     double widthFactor = 0.5,
     CardDecoration? decoration,
+    final EdgeInsets bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
   }) {
     return MDModal._(
       key: key,
@@ -38,6 +41,7 @@ class MDModal extends StatelessWidget {
       showCloseButton: showCloseButton,
       widthFactor: widthFactor, // Default to medium size: 50% of screen width
       decoration: decoration,
+      bodyPadding: bodyPadding,
     );
   }
   //
@@ -101,14 +105,7 @@ class MDModal extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               header,
-              const SizedBox(height: 22.0),
-              SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: body,
-                ),
-              ),
-              const SizedBox(height: 16.0),
+              Expanded(child: Padding(padding: bodyPadding, child: SingleChildScrollView(child: body))),
               footer,
             ],
           ),
