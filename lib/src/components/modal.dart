@@ -105,7 +105,7 @@ class MDModal extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               header,
-              Expanded(child: Padding(padding: bodyPadding, child: SingleChildScrollView(child: body))),
+              Flexible(child: Padding(padding: bodyPadding, child: SingleChildScrollView(child: body))),
               footer,
             ],
           ),
