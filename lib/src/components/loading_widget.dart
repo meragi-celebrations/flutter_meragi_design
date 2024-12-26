@@ -28,6 +28,16 @@ class MDLoadingIndicator extends StatelessWidget {
   /// Whether the loading indicator is displayed or not
   final bool isLoading;
 
+  /// If non-null, the value of this progress indicator.
+  ///
+  /// A value of 0.0 means no progress and 1.0 means that progress is complete.
+  /// The value will be clamped to be in the range 0.0-1.0.
+  ///
+  /// If null, this progress indicator is indeterminate, which means the
+  /// indicator displays a predetermined animation that does not indicate how
+  /// much actual progress is being made.
+  final double? value;
+
   /// Creates a new [MDLoadingIndicator] widget with the given properties
   const MDLoadingIndicator({
     Key? key,
@@ -36,6 +46,7 @@ class MDLoadingIndicator extends StatelessWidget {
     this.strokeWidth = 2,
     this.child,
     this.isLoading = true,
+    this.value,
   }) : super(key: key);
 
   @override
@@ -47,6 +58,7 @@ class MDLoadingIndicator extends StatelessWidget {
       child: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(color),
         strokeWidth: strokeWidth,
+        value: value,
       ),
     );
 
