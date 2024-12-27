@@ -1,5 +1,4 @@
 import 'package:easy_image_viewer/easy_image_viewer.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
@@ -100,7 +99,7 @@ class MDNetworkImage extends StatelessWidget {
           backgroundColor: Colors.black54.withOpacity(.7),
         );
       },
-      child: kIsWeb
+      child: isPlatform([MeragiPlatform.web])
           ? MDImage(
               imageProvider: NetworkImage(formatterUrl),
               scale: scale,
