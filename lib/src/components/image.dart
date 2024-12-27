@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:easy_image_viewer/easy_image_viewer.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
@@ -57,6 +54,11 @@ class MDNetworkImage extends StatelessWidget {
   final Map<String, String>? headers;
   final int? cacheWidth;
   final int? cacheHeight;
+
+  /// ```isLoading``` is used only for flutter web, for other platforms it will always be null. You can use the ```loadingProgress``` instead.
+  ///
+  ///  ```loadingProgress``` will always be null for flutter web canvas.
+  /// You can use the ```isLoading``` instead in flutter web
   final Widget Function(BuildContext context, Widget child, ImageChunkEvent? loadingProgress, bool? isLoading)?
       loadingBuilder;
   final ImageErrorWidgetBuilder? errorBuilder;
@@ -97,7 +99,7 @@ class MDNetworkImage extends StatelessWidget {
           backgroundColor: Colors.black54.withOpacity(.7),
         );
       },
-      child: kIsWeb
+      child: isPlatform([MeragiPlatform.web])
           ? MDImage(
               imageProvider: NetworkImage(formatterUrl),
               scale: scale,
@@ -117,8 +119,8 @@ class MDNetworkImage extends StatelessWidget {
                     return isLoading!
                         ? ConstrainedBox(
                             constraints: const BoxConstraints(minHeight: 200, minWidth: 200),
-                            child: const Center(
-                                child: MDLoadingIndicator(strokeWidth: 3.5, radius: 40, color: Color(0xFFFF5F68))),
+                            child: Center(
+                                child: MDLoadingIndicator(color: MeragiTheme.of(context).token.primaryButtonColor)),
                           )
                         : child;
                   },
@@ -146,7 +148,7 @@ class MDNetworkImage extends StatelessWidget {
               cacheHeight: cacheHeight,
               loadingBuilder: (context, child, loadingProgress) {
                 if (loadingBuilder != null) {
-                  loadingBuilder!.call(context, child, loadingProgress, null);
+                  return loadingBuilder!.call(context, child, loadingProgress, null);
                 }
                 if (loadingProgress == null) {
                   return child;
@@ -155,9 +157,7 @@ class MDNetworkImage extends StatelessWidget {
                   constraints: const BoxConstraints(minHeight: 200, minWidth: 200),
                   child: Center(
                       child: MDLoadingIndicator(
-                          strokeWidth: 3.5,
-                          radius: 40,
-                          color: const Color(0xFFFF5F68),
+                          color: MeragiTheme.of(context).token.primaryButtonColor,
                           value: loadingProgress.expectedTotalBytes != null
                               ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                               : null)),
@@ -238,47 +238,68 @@ class MDImage extends StatefulWidget {
 
 class _MDImageState extends State<MDImage> {
   ImageStream? _imageStream;
-  final completer = Completer<(ImageInfo, bool)>();
+  late ValueNotifier<((ImageInfo, bool)?, _ImageRequestState)> imageRequestState;
 
-  void _updateOnImage(ImageInfo info, bool synchronousCall) {
-    if (!completer.isCompleted) {
-      completer.complete((info, synchronousCall));
+  @override
+  void initState() {
+    super.initState();
+    imageRequestState = ValueNotifier((null, _ImageRequestState.loading));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _getImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant MDImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.imageProvider != oldWidget.imageProvider) {
+      _getImage();
     }
   }
 
-  void _errorImage(Object exception, StackTrace? stackTrace) {
-    completer.completeError(exception, stackTrace);
+  void _updateOnImage(ImageInfo info, bool synchronousCall) {
+    imageRequestState.value.$1?.$1.dispose();
+    imageRequestState.value = ((info, synchronousCall), _ImageRequestState.complete);
   }
 
-  Future<(ImageInfo, bool)> getImage() async {
+  void _errorImage(Object error, StackTrace? stackTrace) {
+    imageRequestState.value.$1?.$1.dispose();
+    imageRequestState.value = (null, _ImageRequestState.error);
+  }
+
+  void _getImage() {
     final oldStream = _imageStream;
     var newStream = widget.imageProvider.resolve(createLocalImageConfiguration(context));
-    if (oldStream?.key != newStream.key) {
+    if (newStream.key != oldStream?.key) {
+      imageRequestState.value = (imageRequestState.value.$1, _ImageRequestState.loading);
       final listener = ImageStreamListener(_updateOnImage, onError: _errorImage);
       oldStream?.removeListener(listener);
       newStream.addListener(listener);
       _imageStream = newStream;
     }
-    return completer.future;
   }
 
   @override
   void dispose() {
+    imageRequestState.value.$1?.$1.dispose();
     _imageStream?.removeListener(ImageStreamListener(_updateOnImage, onError: _errorImage));
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<(ImageInfo, bool)>(
-        future: getImage(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return widget.errorBuilder?.call(context, snapshot.error!, snapshot.stackTrace) ?? const SizedBox.shrink();
+    return ValueListenableBuilder(
+        valueListenable: imageRequestState,
+        builder: (context, ref, child) {
+          if (ref.$2 == _ImageRequestState.error) {
+            return widget.errorBuilder?.call(context, "Unable to load Image", null) ?? const SizedBox.shrink();
           }
           Widget result = RawImage(
-            image: snapshot.data?.$1.image,
-            scale: snapshot.data?.$1.scale ?? 1,
+            image: ref.$1?.$1.image,
+            scale: ref.$1?.$1.scale ?? 1,
             width: widget.width,
             height: widget.height,
             color: widget.color,
@@ -293,17 +314,15 @@ class _MDImageState extends State<MDImage> {
             isAntiAlias: widget.isAntiAlias,
           );
           if (widget.loadingBuilder != null) {
-            result = widget.loadingBuilder!(
-                context, result, null, snapshot.connectionState == ConnectionState.waiting && !completer.isCompleted);
+            result = widget.loadingBuilder!(context, result, null, ref.$2 == _ImageRequestState.loading);
           }
           if (widget.frameBuilder != null) {
-            result = widget.frameBuilder!(
-                context,
-                result,
-                snapshot.connectionState == ConnectionState.waiting && !completer.isCompleted ? null : 1,
-                snapshot.hasData ? snapshot.data!.$2 : false);
+            result = widget.frameBuilder!(context, result, ref.$2 == _ImageRequestState.loading ? null : 1,
+                ref.$1?.$2 != null ? ref.$1!.$2 : false);
           }
           return result;
         });
   }
 }
+
+enum _ImageRequestState { loading, error, complete }
