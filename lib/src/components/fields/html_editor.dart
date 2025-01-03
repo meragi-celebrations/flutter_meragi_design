@@ -115,19 +115,21 @@ class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
     if (value != null) {
       controller.document = Document.fromHtml(value!);
     }
-    controller.changes.listen((event) {
-      didChange(_deltaToHtml());
-    });
+    // controller.changes.listen((event) {
+    //   print("controller.changes $event");
+    //   didChange(_deltaToHtml());
+    // });
 
     focusNode = widget.focusNode ?? FocusNode();
   }
 
   @override
   void didChange(String? value) {
+    print("HERE $value");
     super.didChange(value);
 
     if (controller.document != Document.fromHtml(value!)) {
-      controller.document = Document.fromHtml(value);
+      controller.setContents(Document.fromHtml(value).toDelta());
     }
   }
 
@@ -135,6 +137,12 @@ class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void save() {
+    super.save();
+    didChange(_deltaToHtml());
   }
 
   String _deltaToHtml() {
