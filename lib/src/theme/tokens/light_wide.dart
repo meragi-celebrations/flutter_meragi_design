@@ -23,3 +23,13 @@ ThemeToken lightWide = light.copyWith(
   lgButtonTextHeight: 16,
   disabledButtonColor: Colors.grey,
 );
+
+ThemeToken lightWide_v2 = lightWide
+    .copyWithColors(
+      primary: Color(0xFFFF5F68),
+      secondary: Colors.black,
+      tertiary: Colors.grey,
+    )
+    .copyWith(
+      secondaryButtonTextColor: Colors.white,
+    );

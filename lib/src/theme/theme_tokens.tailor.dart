@@ -147,6 +147,16 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   BorderRadius get navigationRailBorderRadius;
   Duration get navigationRailAnimationDuration;
   List<BoxShadow> get navigationRailBoxShadow;
+  Color get primaryColor;
+  Color get secondaryColor;
+  Color get tertiaryColor;
+  double get padding;
+  double get radius;
+  Color get successColor;
+  Color get warningColor;
+  Color get infoColor;
+  Color get errorColor;
+  Color get borderColor;
 
   @override
   ThemeToken copyWith({
@@ -288,6 +298,16 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     BorderRadius? navigationRailBorderRadius,
     Duration? navigationRailAnimationDuration,
     List<BoxShadow>? navigationRailBoxShadow,
+    Color? primaryColor,
+    Color? secondaryColor,
+    Color? tertiaryColor,
+    double? padding,
+    double? radius,
+    Color? successColor,
+    Color? warningColor,
+    Color? infoColor,
+    Color? errorColor,
+    Color? borderColor,
   }) {
     return ThemeToken(
       defaultCardBackgroundColor:
@@ -484,6 +504,16 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           this.navigationRailAnimationDuration,
       navigationRailBoxShadow:
           navigationRailBoxShadow ?? this.navigationRailBoxShadow,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
+      tertiaryColor: tertiaryColor ?? this.tertiaryColor,
+      padding: padding ?? this.padding,
+      radius: radius ?? this.radius,
+      successColor: successColor ?? this.successColor,
+      warningColor: warningColor ?? this.warningColor,
+      infoColor: infoColor ?? this.infoColor,
+      errorColor: errorColor ?? this.errorColor,
+      borderColor: borderColor ?? this.borderColor,
     );
   }
 
@@ -730,6 +760,16 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           : other.navigationRailAnimationDuration,
       navigationRailBoxShadow:
           t < 0.5 ? navigationRailBoxShadow : other.navigationRailBoxShadow,
+      primaryColor: Color.lerp(primaryColor, other.primaryColor, t)!,
+      secondaryColor: Color.lerp(secondaryColor, other.secondaryColor, t)!,
+      tertiaryColor: Color.lerp(tertiaryColor, other.tertiaryColor, t)!,
+      padding: t < 0.5 ? padding : other.padding,
+      radius: t < 0.5 ? radius : other.radius,
+      successColor: Color.lerp(successColor, other.successColor, t)!,
+      warningColor: Color.lerp(warningColor, other.warningColor, t)!,
+      infoColor: Color.lerp(infoColor, other.infoColor, t)!,
+      errorColor: Color.lerp(errorColor, other.errorColor, t)!,
+      borderColor: Color.lerp(borderColor, other.borderColor, t)!,
     );
   }
 
@@ -914,7 +954,17 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(navigationRailDestinationNonSelectedColor, other.navigationRailDestinationNonSelectedColor) &&
             const DeepCollectionEquality().equals(navigationRailBorderRadius, other.navigationRailBorderRadius) &&
             const DeepCollectionEquality().equals(navigationRailAnimationDuration, other.navigationRailAnimationDuration) &&
-            const DeepCollectionEquality().equals(navigationRailBoxShadow, other.navigationRailBoxShadow));
+            const DeepCollectionEquality().equals(navigationRailBoxShadow, other.navigationRailBoxShadow) &&
+            const DeepCollectionEquality().equals(primaryColor, other.primaryColor) &&
+            const DeepCollectionEquality().equals(secondaryColor, other.secondaryColor) &&
+            const DeepCollectionEquality().equals(tertiaryColor, other.tertiaryColor) &&
+            const DeepCollectionEquality().equals(padding, other.padding) &&
+            const DeepCollectionEquality().equals(radius, other.radius) &&
+            const DeepCollectionEquality().equals(successColor, other.successColor) &&
+            const DeepCollectionEquality().equals(warningColor, other.warningColor) &&
+            const DeepCollectionEquality().equals(infoColor, other.infoColor) &&
+            const DeepCollectionEquality().equals(errorColor, other.errorColor) &&
+            const DeepCollectionEquality().equals(borderColor, other.borderColor));
   }
 
   @override
@@ -1063,6 +1113,16 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(navigationRailBorderRadius),
       const DeepCollectionEquality().hash(navigationRailAnimationDuration),
       const DeepCollectionEquality().hash(navigationRailBoxShadow),
+      const DeepCollectionEquality().hash(primaryColor),
+      const DeepCollectionEquality().hash(secondaryColor),
+      const DeepCollectionEquality().hash(tertiaryColor),
+      const DeepCollectionEquality().hash(padding),
+      const DeepCollectionEquality().hash(radius),
+      const DeepCollectionEquality().hash(successColor),
+      const DeepCollectionEquality().hash(warningColor),
+      const DeepCollectionEquality().hash(infoColor),
+      const DeepCollectionEquality().hash(errorColor),
+      const DeepCollectionEquality().hash(borderColor),
     ]);
   }
 }
@@ -1225,4 +1285,14 @@ extension ThemeTokenBuildContextProps on BuildContext {
       themeToken.navigationRailAnimationDuration;
   List<BoxShadow> get navigationRailBoxShadow =>
       themeToken.navigationRailBoxShadow;
+  Color get primaryColor => themeToken.primaryColor;
+  Color get secondaryColor => themeToken.secondaryColor;
+  Color get tertiaryColor => themeToken.tertiaryColor;
+  double get padding => themeToken.padding;
+  double get radius => themeToken.radius;
+  Color get successColor => themeToken.successColor;
+  Color get warningColor => themeToken.warningColor;
+  Color get infoColor => themeToken.infoColor;
+  Color get errorColor => themeToken.errorColor;
+  Color get borderColor => themeToken.borderColor;
 }
