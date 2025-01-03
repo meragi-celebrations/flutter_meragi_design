@@ -8,6 +8,8 @@ class MDModal extends StatelessWidget {
   final ModalFooter footer;
   final double widthFactor;
   final bool showCloseButton;
+  final CardDecoration? decoration;
+  final EdgeInsets bodyPadding;
 
   const MDModal._({
     Key? key,
@@ -16,6 +18,8 @@ class MDModal extends StatelessWidget {
     required this.footer,
     this.showCloseButton = true,
     this.widthFactor = 0.5,
+    this.decoration,
+    this.bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
   }) : super(key: key);
 
   // Default constructor (medium size)
@@ -26,6 +30,8 @@ class MDModal extends StatelessWidget {
     required ModalFooter footer,
     bool showCloseButton = true,
     double widthFactor = 0.5,
+    CardDecoration? decoration,
+    final EdgeInsets bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
   }) {
     return MDModal._(
       key: key,
@@ -34,52 +40,57 @@ class MDModal extends StatelessWidget {
       body: bodyContent,
       showCloseButton: showCloseButton,
       widthFactor: widthFactor, // Default to medium size: 50% of screen width
+      decoration: decoration,
+      bodyPadding: bodyPadding,
     );
   }
-
-  // Factory constructor for small modal
-  factory MDModal.sm({
-    Key? key,
-    required ModalHeader header,
-    required Widget bodyContent,
-    required ModalFooter footer,
-    bool showCloseButton = true,
-  }) {
-    return MDModal._(
-      key: key,
-      header: header,
-      footer: footer,
-      body: bodyContent,
-      showCloseButton: showCloseButton,
-      widthFactor: 0.4, // Small size: 40% of screen width
-    );
-  }
-
-  // Factory constructor for large modal
-  factory MDModal.lg({
-    Key? key,
-    required ModalHeader header,
-    required Widget bodyContent,
-    required ModalFooter footer,
-    bool showCloseButton = true,
-  }) {
-    return MDModal._(
-      key: key,
-      header: header,
-      footer: footer,
-      body: bodyContent,
-      showCloseButton: showCloseButton,
-      widthFactor: 0.8, // Large size: 80% of screen width
-    );
-  }
+  //
+  // // Factory constructor for small modal
+  // factory MDModal.sm({
+  //   Key? key,
+  //   required ModalHeader header,
+  //   required Widget bodyContent,
+  //   required ModalFooter footer,
+  //   bool showCloseButton = true,
+  //   CardDecoration? decoration,
+  // }) {
+  //   return MDModal._(
+  //     key: key,
+  //     header: header,
+  //     footer: footer,
+  //     body: bodyContent,
+  //     showCloseButton: showCloseButton,
+  //     widthFactor: 0.4, // Small size: 40% of screen width
+  //     decoration: decoration,
+  //   );
+  // }
+  //
+  // // Factory constructor for large modal
+  // factory MDModal.lg({
+  //   Key? key,
+  //   required ModalHeader header,
+  //   required Widget bodyContent,
+  //   required ModalFooter footer,
+  //   bool showCloseButton = true,
+  // }) {
+  //   return MDModal._(
+  //     key: key,
+  //     header: header,
+  //     footer: footer,
+  //     body: bodyContent,
+  //     showCloseButton: showCloseButton,
+  //     widthFactor: 0.8, // Large size: 80% of screen width
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double modalWidth = screenWidth * widthFactor;
+    CardDecoration decoration = CardDecoration(context: context).merge(this.decoration);
 
     return Dialog(
-      backgroundColor: MeragiTheme.of(context).token.defaultCardBackgroundColor,
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
@@ -94,16 +105,7 @@ class MDModal extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               header,
-              const SizedBox(height: 22.0),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: body,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16.0),
+              Flexible(child: Padding(padding: bodyPadding, child: SingleChildScrollView(child: body))),
               footer,
             ],
           ),
@@ -129,6 +131,8 @@ class ModalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MDModal? modal = context.findAncestorWidgetOfExactType<MDModal>();
+    CardDecoration? decoration = modal?.decoration;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -141,7 +145,7 @@ class ModalHeader extends StatelessWidget {
               height: 50,
               padding: const EdgeInsets.all(8.0).copyWith(left: 100.0, top: 14.0),
               decoration: BoxDecoration(
-                  color: MeragiTheme.of(context).token.primaryCardBackgroundColor,
+                  color: decoration?.backgroundColor ?? MeragiTheme.of(context).token.primaryCardBackgroundColor,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(12.0),
                     topRight: Radius.circular(12.0),
@@ -149,7 +153,7 @@ class ModalHeader extends StatelessWidget {
               child: Text(
                 title,
                 style: MeragiTheme.of(context).token.h3TextStyle.copyWith(
-                      color: MeragiTheme.of(context).token.primaryTextColor,
+                      color: decoration?.backgroundColor.darken(80) ?? MeragiTheme.of(context).token.primaryTextColor,
                     ),
               ),
             ),
@@ -161,7 +165,8 @@ class ModalHeader extends StatelessWidget {
                   child: Text(
                     description!,
                     style: MeragiTheme.of(context).token.h5TextStyle.copyWith(
-                          color: MeragiTheme.of(context).token.defaultTextColor,
+                          color:
+                              decoration?.backgroundColor.darken(50) ?? MeragiTheme.of(context).token.defaultTextColor,
                         ),
                   ),
                 ),
@@ -181,12 +186,13 @@ class ModalHeader extends StatelessWidget {
                 color: Colors.white,
                 width: 3.0,
               ),
-              color: MeragiTheme.of(context).token.primaryCardBackgroundColor.withOpacity(0.6),
+              color: decoration?.backgroundColor ??
+                  MeragiTheme.of(context).token.primaryCardBackgroundColor.withOpacity(0.6),
             ),
             child: Icon(
               icon ?? PhosphorIconsRegular.info, // Default icon
               size: 28,
-              color: MeragiTheme.of(context).token.primaryButtonColor,
+              color: decoration?.backgroundColor.darken(50) ?? MeragiTheme.of(context).token.primaryButtonColor,
             ),
           ),
         ),
@@ -247,7 +253,7 @@ class ModalFooter extends StatelessWidget {
             decoration: ButtonDecoration(
               context: context,
               variant: ButtonVariant.filled,
-              type: ButtonType.primary,
+              type: ButtonType.secondary,
             ),
             isLoading: doneLoading ?? false,
             child: Text(doneButtonText),

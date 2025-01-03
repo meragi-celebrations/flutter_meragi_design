@@ -31,7 +31,7 @@ class MDHtmlEditor extends MDFormBuilderField<String> {
             return Container(
               height: height,
               width: size?.width ?? 500,
-              padding: EdgeInsets.all(2),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(10),
@@ -101,8 +101,7 @@ class MDHtmlEditor extends MDFormBuilderField<String> {
         );
 
   @override
-  MDFormBuilderFieldState<MDHtmlEditor, String> createState() =>
-      _MDHtmlEditor();
+  MDFormBuilderFieldState<MDHtmlEditor, String> createState() => _MDHtmlEditor();
 }
 
 class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
@@ -116,17 +115,34 @@ class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
     if (value != null) {
       controller.document = Document.fromHtml(value!);
     }
-    controller.changes.listen((event) {
-      didChange(_deltaToHtml());
-    });
+    // controller.changes.listen((event) {
+    //   print("controller.changes $event");
+    //   didChange(_deltaToHtml());
+    // });
 
     focusNode = widget.focusNode ?? FocusNode();
+  }
+
+  @override
+  void didChange(String? value) {
+    print("HERE $value");
+    super.didChange(value);
+
+    if (controller.document != Document.fromHtml(value!)) {
+      controller.setContents(Document.fromHtml(value).toDelta());
+    }
   }
 
   @override
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void save() {
+    super.save();
+    didChange(_deltaToHtml());
   }
 
   String _deltaToHtml() {
