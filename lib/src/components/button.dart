@@ -163,7 +163,9 @@ class _MDButtonState extends State<MDButton> {
                           : null,
                       border: widget.isDropdown
                           ? null
-                          : finalDecoration.buttonBorder,
+                          : isEnabled
+                              ? finalDecoration.buttonBorder
+                              : null,
                       borderRadius: finalDecoration.borderRadius,
                     ),
                     child: Row(
@@ -195,7 +197,8 @@ class _MDButtonState extends State<MDButton> {
                           SizedBox(width: finalDecoration.buttonSpaceBetween),
                         if (widget.child != null)
                           DefaultTextStyle.merge(
-                            style: finalDecoration.buttonTextStyle,
+                            style: finalDecoration.buttonTextStyle.copyWith(
+                                color: isEnabled ? null : Colors.grey),
                             child: widget.child!,
                           ),
                       ],
