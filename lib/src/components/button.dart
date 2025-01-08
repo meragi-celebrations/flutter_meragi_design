@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/theme/style.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
 import 'package:flutter_meragi_design/src/utils/button_state_controller.dart';
@@ -190,7 +191,9 @@ class _MDButtonState extends State<MDButton> {
                             size: finalDecoration.buttonIconSize,
                             color: isEnabled
                                 ? finalDecoration.buttonTextColor
-                                : Colors.grey,
+                                : MeragiTheme.of(context)
+                                    .token
+                                    .disabledTextColor,
                           ),
                         if ((widget.icon != null || widget.isLoading) &&
                             widget.child != null)
@@ -198,7 +201,11 @@ class _MDButtonState extends State<MDButton> {
                         if (widget.child != null)
                           DefaultTextStyle.merge(
                             style: finalDecoration.buttonTextStyle.copyWith(
-                                color: isEnabled ? null : Colors.grey),
+                                color: isEnabled
+                                    ? null
+                                    : MeragiTheme.of(context)
+                                        .token
+                                        .disabledTextColor),
                             child: widget.child!,
                           ),
                       ],
