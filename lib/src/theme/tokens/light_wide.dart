@@ -21,7 +21,7 @@ ThemeToken lightWide = light.copyWith(
   smButtonTextHeight: 12,
   rgButtonTextHeight: 14,
   lgButtonTextHeight: 16,
-  disabledButtonColor: Colors.grey,
+  disabledButtonColor: const Color.fromARGB(255, 242, 242, 242),
 );
 
 ThemeToken lightWide_v2 = lightWide
