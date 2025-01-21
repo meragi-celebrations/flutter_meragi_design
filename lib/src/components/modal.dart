@@ -10,6 +10,7 @@ class MDModal extends StatelessWidget {
   final bool showCloseButton;
   final CardDecoration? decoration;
   final EdgeInsets bodyPadding;
+  final bool scrollableBody;
 
   const MDModal._({
     Key? key,
@@ -20,6 +21,7 @@ class MDModal extends StatelessWidget {
     this.widthFactor = 0.5,
     this.decoration,
     this.bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
+    this.scrollableBody = true,
   }) : super(key: key);
 
   // Default constructor (medium size)
@@ -32,6 +34,7 @@ class MDModal extends StatelessWidget {
     double widthFactor = 0.5,
     CardDecoration? decoration,
     final EdgeInsets bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
+    final bool scrollableBody = true,
   }) {
     return MDModal._(
       key: key,
@@ -42,6 +45,7 @@ class MDModal extends StatelessWidget {
       widthFactor: widthFactor, // Default to medium size: 50% of screen width
       decoration: decoration,
       bodyPadding: bodyPadding,
+      scrollableBody: scrollableBody,
     );
   }
   //
@@ -105,7 +109,9 @@ class MDModal extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               header,
-              Flexible(child: Padding(padding: bodyPadding, child: SingleChildScrollView(child: body))),
+              Flexible(
+                  child:
+                      Padding(padding: bodyPadding, child: scrollableBody ? SingleChildScrollView(child: body) : body)),
               footer,
             ],
           ),
@@ -218,6 +224,7 @@ class ModalFooter extends StatelessWidget {
   final String? cancelButtonText;
   final bool? doneLoading;
   final bool? cancelLoading;
+  final bool isDoneDisabled;
 
   const ModalFooter({
     Key? key,
@@ -227,6 +234,7 @@ class ModalFooter extends StatelessWidget {
     this.cancelButtonText,
     this.doneLoading = false,
     this.cancelLoading = false,
+    this.isDoneDisabled = false,
   }) : super(key: key);
 
   @override
@@ -249,7 +257,11 @@ class ModalFooter extends StatelessWidget {
             ),
           const SizedBox(width: 8.0),
           MDButton(
-            onTap: doneLoading ?? false ? null : onDone,
+            onTap: doneLoading ?? false
+                ? null
+                : isDoneDisabled
+                    ? null
+                    : onDone,
             decoration: ButtonDecoration(
               context: context,
               variant: ButtonVariant.filled,
