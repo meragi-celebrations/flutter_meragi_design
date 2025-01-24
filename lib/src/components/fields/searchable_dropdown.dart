@@ -20,6 +20,7 @@ class SelectDropdown<T, U> extends StatefulWidget {
   final FocusNode? focusNode;
   final TextEditingController? controller;
   final bool canClear;
+  final Function(TextEditingController controller, U data)? onInitialData;
 
   const SelectDropdown({
     super.key,
@@ -38,13 +39,14 @@ class SelectDropdown<T, U> extends StatefulWidget {
     this.focusNode,
     this.controller,
     this.canClear = false,
+    this.onInitialData,
   }) : assert(!(initialValue != null && getOneBloc == null), "GetOneBloc cant be null if initialValue is not null");
 
   @override
-  State<SelectDropdown> createState() => _SelectDropdownState();
+  State<SelectDropdown<T, U>> createState() => _SelectDropdownState();
 }
 
-class _SelectDropdownState extends State<SelectDropdown> {
+class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
   late TextEditingController controller;
   final Debounce _debounce = Debounce(const Duration(milliseconds: 400));
   String prevText = "";
@@ -59,6 +61,7 @@ class _SelectDropdownState extends State<SelectDropdown> {
       widget.getOneBloc!.onSuccess = (data) {
         widget.getListBloc.list.value.add(data);
         widget.getListBloc.list.notifyListeners();
+        widget.onInitialData?.call(controller, data as U);
       };
       widget.getOneBloc!.id.value = widget.initialValue.toString();
       widget.getOneBloc!.get();
@@ -153,6 +156,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
   final bool shouldMakeInitialCall;
   final bool requestFocusOnTap;
   final bool canClear;
+  final Function(TextEditingController controller, U data)? onInitialData;
 
   MDSearchableDropdown({
     super.key,
@@ -175,6 +179,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
     this.shouldMakeInitialCall = false,
     this.requestFocusOnTap = true,
     this.canClear = false,
+    this.onInitialData,
   }) : super(
           builder: (FormFieldState<T?> field) {
             final state = field as _MDSearchableDropdownState;
@@ -200,6 +205,7 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
               shouldMakeInitialCall: shouldMakeInitialCall,
               requestFocusOnTap: requestFocusOnTap,
               canClear: canClear,
+              onInitialData: onInitialData,
             );
           },
         );
