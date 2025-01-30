@@ -147,6 +147,18 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   BorderRadius get navigationRailBorderRadius;
   Duration get navigationRailAnimationDuration;
   List<BoxShadow> get navigationRailBoxShadow;
+  bool get initiallyExpanded;
+  Color get expansionTileSplashColor;
+  Color get expansionTileHoverColor;
+  InteractiveInkFeatureFactory get expansionTileSplashFactory;
+  bool get shouldOnTileTapExpand;
+  Color get expansionTileBackgroundColor;
+  EdgeInsets get expansiontitlePadding;
+  bool get showExpandMoreIcon;
+  AnimationStyle get expansionAnimationStyle;
+  VisualDensity get visualDensity;
+  ShapeBorder get expansionTileCollapsedShape;
+  ShapeBorder get expansionTileExpandedShape;
   Color get primaryColor;
   Color get secondaryColor;
   Color get tertiaryColor;
@@ -298,6 +310,18 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     BorderRadius? navigationRailBorderRadius,
     Duration? navigationRailAnimationDuration,
     List<BoxShadow>? navigationRailBoxShadow,
+    bool? initiallyExpanded,
+    Color? expansionTileSplashColor,
+    Color? expansionTileHoverColor,
+    InteractiveInkFeatureFactory? expansionTileSplashFactory,
+    bool? shouldOnTileTapExpand,
+    Color? expansionTileBackgroundColor,
+    EdgeInsets? expansiontitlePadding,
+    bool? showExpandMoreIcon,
+    AnimationStyle? expansionAnimationStyle,
+    VisualDensity? visualDensity,
+    ShapeBorder? expansionTileCollapsedShape,
+    ShapeBorder? expansionTileExpandedShape,
     Color? primaryColor,
     Color? secondaryColor,
     Color? tertiaryColor,
@@ -504,6 +528,27 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           this.navigationRailAnimationDuration,
       navigationRailBoxShadow:
           navigationRailBoxShadow ?? this.navigationRailBoxShadow,
+      initiallyExpanded: initiallyExpanded ?? this.initiallyExpanded,
+      expansionTileSplashColor:
+          expansionTileSplashColor ?? this.expansionTileSplashColor,
+      expansionTileHoverColor:
+          expansionTileHoverColor ?? this.expansionTileHoverColor,
+      expansionTileSplashFactory:
+          expansionTileSplashFactory ?? this.expansionTileSplashFactory,
+      shouldOnTileTapExpand:
+          shouldOnTileTapExpand ?? this.shouldOnTileTapExpand,
+      expansionTileBackgroundColor:
+          expansionTileBackgroundColor ?? this.expansionTileBackgroundColor,
+      expansiontitlePadding:
+          expansiontitlePadding ?? this.expansiontitlePadding,
+      showExpandMoreIcon: showExpandMoreIcon ?? this.showExpandMoreIcon,
+      expansionAnimationStyle:
+          expansionAnimationStyle ?? this.expansionAnimationStyle,
+      visualDensity: visualDensity ?? this.visualDensity,
+      expansionTileCollapsedShape:
+          expansionTileCollapsedShape ?? this.expansionTileCollapsedShape,
+      expansionTileExpandedShape:
+          expansionTileExpandedShape ?? this.expansionTileExpandedShape,
       primaryColor: primaryColor ?? this.primaryColor,
       secondaryColor: secondaryColor ?? this.secondaryColor,
       tertiaryColor: tertiaryColor ?? this.tertiaryColor,
@@ -760,6 +805,31 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           : other.navigationRailAnimationDuration,
       navigationRailBoxShadow:
           t < 0.5 ? navigationRailBoxShadow : other.navigationRailBoxShadow,
+      initiallyExpanded: t < 0.5 ? initiallyExpanded : other.initiallyExpanded,
+      expansionTileSplashColor: Color.lerp(
+          expansionTileSplashColor, other.expansionTileSplashColor, t)!,
+      expansionTileHoverColor: Color.lerp(
+          expansionTileHoverColor, other.expansionTileHoverColor, t)!,
+      expansionTileSplashFactory: t < 0.5
+          ? expansionTileSplashFactory
+          : other.expansionTileSplashFactory,
+      shouldOnTileTapExpand:
+          t < 0.5 ? shouldOnTileTapExpand : other.shouldOnTileTapExpand,
+      expansionTileBackgroundColor: Color.lerp(
+          expansionTileBackgroundColor, other.expansionTileBackgroundColor, t)!,
+      expansiontitlePadding:
+          t < 0.5 ? expansiontitlePadding : other.expansiontitlePadding,
+      showExpandMoreIcon:
+          t < 0.5 ? showExpandMoreIcon : other.showExpandMoreIcon,
+      expansionAnimationStyle:
+          t < 0.5 ? expansionAnimationStyle : other.expansionAnimationStyle,
+      visualDensity: t < 0.5 ? visualDensity : other.visualDensity,
+      expansionTileCollapsedShape: t < 0.5
+          ? expansionTileCollapsedShape
+          : other.expansionTileCollapsedShape,
+      expansionTileExpandedShape: t < 0.5
+          ? expansionTileExpandedShape
+          : other.expansionTileExpandedShape,
       primaryColor: Color.lerp(primaryColor, other.primaryColor, t)!,
       secondaryColor: Color.lerp(secondaryColor, other.secondaryColor, t)!,
       tertiaryColor: Color.lerp(tertiaryColor, other.tertiaryColor, t)!,
@@ -955,6 +1025,18 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(navigationRailBorderRadius, other.navigationRailBorderRadius) &&
             const DeepCollectionEquality().equals(navigationRailAnimationDuration, other.navigationRailAnimationDuration) &&
             const DeepCollectionEquality().equals(navigationRailBoxShadow, other.navigationRailBoxShadow) &&
+            const DeepCollectionEquality().equals(initiallyExpanded, other.initiallyExpanded) &&
+            const DeepCollectionEquality().equals(expansionTileSplashColor, other.expansionTileSplashColor) &&
+            const DeepCollectionEquality().equals(expansionTileHoverColor, other.expansionTileHoverColor) &&
+            const DeepCollectionEquality().equals(expansionTileSplashFactory, other.expansionTileSplashFactory) &&
+            const DeepCollectionEquality().equals(shouldOnTileTapExpand, other.shouldOnTileTapExpand) &&
+            const DeepCollectionEquality().equals(expansionTileBackgroundColor, other.expansionTileBackgroundColor) &&
+            const DeepCollectionEquality().equals(expansiontitlePadding, other.expansiontitlePadding) &&
+            const DeepCollectionEquality().equals(showExpandMoreIcon, other.showExpandMoreIcon) &&
+            const DeepCollectionEquality().equals(expansionAnimationStyle, other.expansionAnimationStyle) &&
+            const DeepCollectionEquality().equals(visualDensity, other.visualDensity) &&
+            const DeepCollectionEquality().equals(expansionTileCollapsedShape, other.expansionTileCollapsedShape) &&
+            const DeepCollectionEquality().equals(expansionTileExpandedShape, other.expansionTileExpandedShape) &&
             const DeepCollectionEquality().equals(primaryColor, other.primaryColor) &&
             const DeepCollectionEquality().equals(secondaryColor, other.secondaryColor) &&
             const DeepCollectionEquality().equals(tertiaryColor, other.tertiaryColor) &&
@@ -1113,6 +1195,18 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(navigationRailBorderRadius),
       const DeepCollectionEquality().hash(navigationRailAnimationDuration),
       const DeepCollectionEquality().hash(navigationRailBoxShadow),
+      const DeepCollectionEquality().hash(initiallyExpanded),
+      const DeepCollectionEquality().hash(expansionTileSplashColor),
+      const DeepCollectionEquality().hash(expansionTileHoverColor),
+      const DeepCollectionEquality().hash(expansionTileSplashFactory),
+      const DeepCollectionEquality().hash(shouldOnTileTapExpand),
+      const DeepCollectionEquality().hash(expansionTileBackgroundColor),
+      const DeepCollectionEquality().hash(expansiontitlePadding),
+      const DeepCollectionEquality().hash(showExpandMoreIcon),
+      const DeepCollectionEquality().hash(expansionAnimationStyle),
+      const DeepCollectionEquality().hash(visualDensity),
+      const DeepCollectionEquality().hash(expansionTileCollapsedShape),
+      const DeepCollectionEquality().hash(expansionTileExpandedShape),
       const DeepCollectionEquality().hash(primaryColor),
       const DeepCollectionEquality().hash(secondaryColor),
       const DeepCollectionEquality().hash(tertiaryColor),
@@ -1285,6 +1379,23 @@ extension ThemeTokenBuildContextProps on BuildContext {
       themeToken.navigationRailAnimationDuration;
   List<BoxShadow> get navigationRailBoxShadow =>
       themeToken.navigationRailBoxShadow;
+  bool get initiallyExpanded => themeToken.initiallyExpanded;
+  Color get expansionTileSplashColor => themeToken.expansionTileSplashColor;
+  Color get expansionTileHoverColor => themeToken.expansionTileHoverColor;
+  InteractiveInkFeatureFactory get expansionTileSplashFactory =>
+      themeToken.expansionTileSplashFactory;
+  bool get shouldOnTileTapExpand => themeToken.shouldOnTileTapExpand;
+  Color get expansionTileBackgroundColor =>
+      themeToken.expansionTileBackgroundColor;
+  EdgeInsets get expansiontitlePadding => themeToken.expansiontitlePadding;
+  bool get showExpandMoreIcon => themeToken.showExpandMoreIcon;
+  AnimationStyle get expansionAnimationStyle =>
+      themeToken.expansionAnimationStyle;
+  VisualDensity get visualDensity => themeToken.visualDensity;
+  ShapeBorder get expansionTileCollapsedShape =>
+      themeToken.expansionTileCollapsedShape;
+  ShapeBorder get expansionTileExpandedShape =>
+      themeToken.expansionTileExpandedShape;
   Color get primaryColor => themeToken.primaryColor;
   Color get secondaryColor => themeToken.secondaryColor;
   Color get tertiaryColor => themeToken.tertiaryColor;

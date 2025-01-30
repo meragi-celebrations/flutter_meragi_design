@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
+import 'package:flutter_meragi_design/src/extensions/colors.dart';
 
 ThemeToken light = ThemeToken(
   // Standard Properties
@@ -46,8 +47,7 @@ ThemeToken light = ThemeToken(
   //Card
   defaultCardBackgroundColor: Colors.white,
   primaryCardBackgroundColor: Colors.deepPurple.shade100.withOpacity(.3),
-  secondaryCardBackgroundColor:
-      Colors.deepPurpleAccent.shade100.withOpacity(.3),
+  secondaryCardBackgroundColor: Colors.deepPurpleAccent.shade100.withOpacity(.3),
   dangerCardBackgroundColor: Colors.redAccent.shade100.withOpacity(.3),
   successCardBackgroundColor: Colors.green.shade100.withOpacity(.3),
   warningCardBackgroundColor: Colors.orange.shade100.withOpacity(.3),
@@ -119,11 +119,9 @@ ThemeToken light = ThemeToken(
   bodyTextStyle: const TextStyle(fontSize: 14),
   h6TextStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
   captionTextStyle: const TextStyle(fontSize: 10, color: Colors.grey),
-  codeTextStyle: const TextStyle(
-      fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
+  codeTextStyle: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
   quoteTextStyle: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-  linkTextStyle: const TextStyle(
-      fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
+  linkTextStyle: const TextStyle(fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
   standardHoverButtonColor: Colors.deepPurple[100]!.withOpacity(0.7),
   primaryHoverButtonColor: Colors.deepPurple.withOpacity(0.7),
   secondaryHoverButtonColor: Colors.deepPurpleAccent[100]!.withOpacity(0.7),
@@ -157,21 +155,29 @@ ThemeToken light = ThemeToken(
   navigationRailCollapsedWidth: 65,
   navigationRailExpandedWidth: 250,
   navigationRailcontentPadding: const EdgeInsets.all(15),
-  navigationRailDestinationSelectedColor:
-      Colors.deepPurpleAccent.shade100.withOpacity(.3),
-  navigationRailDestinationNonSelectedHoverColor:
-      Colors.deepPurple[100]!.withOpacity(0.7),
-  navigationRailDestinationNonSelectedColor:
-      Colors.deepPurple.shade100.withOpacity(0.2),
-  navigationRailDestinationSelectedHoverColor:
-      Colors.deepPurple[200]!.withOpacity(0.7),
+  navigationRailDestinationSelectedColor: Colors.deepPurpleAccent.shade100.withOpacity(.3),
+  navigationRailDestinationNonSelectedHoverColor: Colors.deepPurple[100]!.withOpacity(0.7),
+  navigationRailDestinationNonSelectedColor: Colors.deepPurple.shade100.withOpacity(0.2),
+  navigationRailDestinationSelectedHoverColor: Colors.deepPurple[200]!.withOpacity(0.7),
   navigationRailBorderRadius: const BorderRadius.all(Radius.circular(12)),
   navigationRailAnimationDuration: const Duration(milliseconds: 150),
   navigationRailBoxShadow: const [
-    BoxShadow(
-        blurRadius: 12,
-        spreadRadius: 3,
-        color: Color(0xFFCFCFD2),
-        blurStyle: BlurStyle.normal)
+    BoxShadow(blurRadius: 12, spreadRadius: 3, color: Color(0xFFCFCFD2), blurStyle: BlurStyle.normal)
   ],
+
+  //exapansionTile
+  initiallyExpanded: false,
+  expansionTileSplashColor: const Color(0xFFE9E9E9).lighten(70),
+  expansionTileHoverColor: const Color(0xFFE9E9E9).lighten(70),
+  expansionTileSplashFactory: InkRipple.splashFactory,
+  shouldOnTileTapExpand: true,
+  expansionTileBackgroundColor: Colors.white,
+  expansiontitlePadding: const EdgeInsets.symmetric(horizontal: 10),
+  showExpandMoreIcon: true,
+  expansionAnimationStyle: AnimationStyle(duration: const Duration(milliseconds: 200)),
+  visualDensity: VisualDensity.compact,
+  expansionTileCollapsedShape: const OutlineInputBorder(
+      borderSide: BorderSide(color: Color(0xFFE9E9E9)), borderRadius: BorderRadius.all(Radius.circular(12))),
+  expansionTileExpandedShape: const OutlineInputBorder(
+      borderSide: BorderSide(color: Color(0xFFE9E9E9)), borderRadius: BorderRadius.all(Radius.circular(12))),
 );
