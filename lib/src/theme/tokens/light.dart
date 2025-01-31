@@ -166,14 +166,11 @@ ThemeToken light = ThemeToken(
   ],
 
   //exapansionTile
-  initiallyExpanded: false,
   expansionTileSplashColor: const Color(0xFFE9E9E9).lighten(70),
   expansionTileHoverColor: const Color(0xFFE9E9E9).lighten(70),
   expansionTileSplashFactory: InkRipple.splashFactory,
-  shouldOnTileTapExpand: true,
   expansionTileBackgroundColor: Colors.transparent,
   expansiontitlePadding: const EdgeInsets.symmetric(horizontal: 10),
-  showExpandMoreIcon: true,
   expansionAnimationStyle: AnimationStyle(duration: const Duration(milliseconds: 200)),
   visualDensity: VisualDensity.compact,
   expansionTileCollapsedShape: const OutlineInputBorder(
