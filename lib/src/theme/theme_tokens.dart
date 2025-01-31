@@ -6,8 +6,7 @@ import '../extensions/colors.dart';
 part 'theme_tokens.tailor.dart';
 
 @TailorMixin()
-class ThemeToken extends ThemeExtension<ThemeToken>
-    with _$ThemeTokenTailorMixin {
+class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin {
   //Card
 
   // //Background Color
@@ -333,6 +332,26 @@ class ThemeToken extends ThemeExtension<ThemeToken>
   @override
   final List<BoxShadow> navigationRailBoxShadow;
 
+  // ExpansionTile
+  @override
+  final Color expansionTileSplashColor;
+  @override
+  final Color expansionTileHoverColor;
+  @override
+  final InteractiveInkFeatureFactory expansionTileSplashFactory;
+  @override
+  final Color expansionTileBackgroundColor;
+  @override
+  final EdgeInsets expansiontitlePadding;
+  @override
+  final AnimationStyle expansionAnimationStyle;
+  @override
+  final VisualDensity visualDensity;
+  @override
+  final ShapeBorder expansionTileCollapsedShape;
+  @override
+  final ShapeBorder expansionTileExpandedShape;
+
   // Standard properties
   @override
   final Color primaryColor;
@@ -501,6 +520,17 @@ class ThemeToken extends ThemeExtension<ThemeToken>
     required this.navigationRailBorderRadius,
     required this.navigationRailAnimationDuration,
     required this.navigationRailBoxShadow,
+
+    // ExpansionTile
+    required this.expansionTileSplashColor,
+    required this.expansionTileHoverColor,
+    required this.expansionTileSplashFactory,
+    required this.expansionTileBackgroundColor,
+    required this.expansiontitlePadding,
+    required this.expansionAnimationStyle,
+    required this.visualDensity,
+    required this.expansionTileCollapsedShape,
+    required this.expansionTileExpandedShape,
 
     // Standard Properties
     required this.primaryColor,
