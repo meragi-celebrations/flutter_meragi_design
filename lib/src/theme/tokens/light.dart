@@ -171,7 +171,7 @@ ThemeToken light = ThemeToken(
   expansionTileHoverColor: const Color(0xFFE9E9E9).lighten(70),
   expansionTileSplashFactory: InkRipple.splashFactory,
   shouldOnTileTapExpand: true,
-  expansionTileBackgroundColor: Colors.white,
+  expansionTileBackgroundColor: Colors.transparent,
   expansiontitlePadding: const EdgeInsets.symmetric(horizontal: 10),
   showExpandMoreIcon: true,
   expansionAnimationStyle: AnimationStyle(duration: const Duration(milliseconds: 200)),
