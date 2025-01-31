@@ -145,6 +145,121 @@ class _DescriptionDetailsState extends State<DescriptionDetails> {
                 spacingBetweenKeyAndValue: 5,
               ),
             ),
+            MDCard(
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.primary,
+              ),
+              header: const Text("MDSlider"),
+              body: const MDDescription(
+                data: [
+                  DescriptionItem(
+                    label: Text('Description'),
+                    value: Text('A slider component that supports both single and range selection modes. '
+                        'Can be used standalone or within forms. Provides visual feedback with value bubbles '
+                        'and supports min/max labels.'),
+                  ),
+                ],
+                minColumns: 1,
+                maxColumns: 1,
+              ),
+            ),
+            MDCard(
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.primary,
+              ),
+              header: const Text("Code Example"),
+              body: const MDDescription(
+                data: [
+                  DescriptionItem(
+                    label: Text('Code'),
+                    value: Text('''
+// Single value slider
+MDSlider(
+  label: "Select Value",
+  min: 0,
+  max: 100,
+  value: 50,
+  onChanged: (value) => print(value),
+),
+
+// Range slider
+MDSlider(
+  label: "Select Range",
+  min: 0,
+  max: 100,
+  isRange: true,
+  values: RangeValues(30, 70),
+  onRangeChanged: (values) => print(values),
+),
+
+// Form builder usage
+FormBuilderMDSlider(
+  name: 'slider',
+  min: 0,
+  max: 100,
+  decoration: InputDecoration(
+    labelText: 'Select Value',
+    helperText: 'Drag to select a value',
+  ),
+),
+'''),
+                  ),
+                ],
+                minColumns: 1,
+                maxColumns: 1,
+              ),
+            ),
+            MDCard(
+              decoration: CardDecoration(
+                context: context,
+                type: CardType.primary,
+              ),
+              header: const Text("Example"),
+              body: MDDescription(
+                data: [
+                  DescriptionItem(
+                    label: Text('Example'),
+                    value: Column(
+                      children: [
+                        MDSlider(
+                          label: "Single Value Slider",
+                          min: 0,
+                          max: 100,
+                          value: 50,
+                          onChanged: (value) => print("Value changed: $value"),
+                        ),
+                        const SizedBox(height: 32),
+                        MDRangeSliderFormBuilder(
+                          name: 'range_slider',
+                          min: 0,
+                          max: 100,
+                          initialValue: const RangeValues(30, 70),
+                          decoration: const InputDecoration(
+                            labelText: 'Range Slider',
+                          ),
+                          onChanged: (value) => print("Range changed: $value"),
+                        ),
+                        const SizedBox(height: 32),
+                        MDSingleSliderFormBuilder(
+                          name: 'slider_example',
+                          min: 0,
+                          max: 100,
+                          decoration: const InputDecoration(
+                            labelText: 'Form Slider',
+                            helperText: 'This slider is part of a form',
+                          ),
+                          onChanged: (value) => print("Form value changed: $value"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                minColumns: 1,
+                maxColumns: 1,
+              ),
+            ),
           ],
         ),
       ),

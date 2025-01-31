@@ -68,3 +68,4 @@ export 'src/utils/platform.dart';
 export 'src/utils/scroll_handler.dart';
 export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
+export 'src/components/fields/md_slider.dart';

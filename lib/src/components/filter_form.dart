@@ -76,6 +76,8 @@ class _MDFilterFormViewState extends State<MDFilterFormView> {
         valueSet = value;
       } else if (value is List) {
         valueSet = value.toSet();
+      } else if (value is RangeValues) {
+        valueSet = {value.start.toString(), value.end.toString()};
       } else {
         debugPrint('Unexpected value type: ${value.runtimeType} for key: $key');
         valueSet = {value};
