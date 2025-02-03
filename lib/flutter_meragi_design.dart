@@ -69,3 +69,4 @@ export 'src/utils/scroll_handler.dart';
 export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
 export 'src/components/fields/md_slider.dart';
+export 'src/components/expansion_tile/expansion_tile.dart';
