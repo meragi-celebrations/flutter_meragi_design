@@ -3,6 +3,7 @@ import 'package:example/cards.dart';
 import 'package:example/crud/repo.dart';
 import 'package:example/crud_main.dart';
 import 'package:example/descriptions.dart';
+import 'package:example/expansion_tile_story.dart';
 import 'package:example/fields.dart';
 import 'package:example/scaffold_detail.dart';
 import 'package:example/tags.dart';
@@ -371,6 +372,10 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context) {
             return const NavigationRailStory();
           },
+        ),
+        Story(
+          name: "Layout/Expansion Tile",
+          builder: (context) => const ExpansionTileStory(),
         ),
         Story(
           name: "Helper/Gesture Detector",
