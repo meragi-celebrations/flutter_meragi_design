@@ -1,37 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:flutter_meragi_design/src/theme/style.dart';
 
-class MDSliderDecoration {
-  final Color? bubbleColor;
-  final Color? bubbleTextColor;
-  final Color? labelTextColor;
-  final Color? helperTextColor;
-  final Color? activeTrackColor;
-  final Color? inactiveTrackColor;
-  final Color? thumbColor;
-  final Color? minMaxLabelsColor;
-  final BuildContext context;
+class MDSliderDecoration extends Style {
+  MDSliderDecoration({
+    required super.context,
+    Color? bubbleColorOverride,
+    Color? bubbleTextColorOverride,
+    Color? labelTextColorOverride,
+    Color? helperTextColorOverride,
+    Color? activeTrackColorOverride,
+    Color? inactiveTrackColorOverride,
+    Color? thumbColorOverride,
+    Color? minMaxLabelsColorOverride,
+  })  : _bubbleColorOverride = bubbleColorOverride,
+        _bubbleTextColorOverride = bubbleTextColorOverride,
+        _labelTextColorOverride = labelTextColorOverride,
+        _helperTextColorOverride = helperTextColorOverride,
+        _activeTrackColorOverride = activeTrackColorOverride,
+        _inactiveTrackColorOverride = inactiveTrackColorOverride,
+        _thumbColorOverride = thumbColorOverride,
+        _minMaxLabelsColorOverride = minMaxLabelsColorOverride;
 
-  const MDSliderDecoration({
-    required this.context,
-    this.bubbleColor,
-    this.bubbleTextColor,
-    this.labelTextColor,
-    this.helperTextColor,
-    this.activeTrackColor,
-    this.inactiveTrackColor,
-    this.thumbColor,
-    this.minMaxLabelsColor,
-  });
+  final Color? _bubbleColorOverride;
+  final Color? _bubbleTextColorOverride;
+  final Color? _labelTextColorOverride;
+  final Color? _helperTextColorOverride;
+  final Color? _activeTrackColorOverride;
+  final Color? _inactiveTrackColorOverride;
+  final Color? _thumbColorOverride;
+  final Color? _minMaxLabelsColorOverride;
 
-  Color get _bubbleColor => bubbleColor ?? Colors.white;
-  Color get _bubbleTextColor => bubbleTextColor ?? Theme.of(context).colorScheme.onPrimary;
-  Color get _labelTextColor => labelTextColor ?? Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
-  Color get _helperTextColor => helperTextColor ?? Theme.of(context).textTheme.bodySmall?.color ?? Colors.black54;
-  Color get _activeTrackColor => activeTrackColor ?? Theme.of(context).primaryColor;
-  Color get _inactiveTrackColor => inactiveTrackColor ?? Theme.of(context).primaryColor.withOpacity(0.2);
-  Color get _thumbColor => thumbColor ?? Theme.of(context).primaryColor;
-  Color get _minMaxLabelsColor => minMaxLabelsColor ?? Theme.of(context).textTheme.bodySmall?.color ?? Colors.black54;
+  @override
+  Map get styles => {};
+
+  Color get bubbleColor => _bubbleColorOverride ?? token.defaultCardBackgroundColor;
+  Color get bubbleTextColor => _bubbleTextColorOverride ?? token.primaryTextColor;
+  Color get labelTextColor => _labelTextColorOverride ?? token.primaryTextColor;
+  Color get helperTextColor => _helperTextColorOverride ?? token.secondaryTextColor;
+  Color get activeTrackColor => _activeTrackColorOverride ?? token.primaryColor;
+  Color get inactiveTrackColor => _inactiveTrackColorOverride ?? token.primaryColor.withOpacity(0.2);
+  Color get thumbColor => _thumbColorOverride ?? token.primaryColor;
+  Color get minMaxLabelsColor => _minMaxLabelsColorOverride ?? token.secondaryTextColor;
 }
 
 class MDSlider extends StatefulWidget {
@@ -111,8 +121,8 @@ class _MDSliderState extends State<MDSlider> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               widget.label!,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: widget.decoration?._labelTextColor,
+              style: widget.decoration?.token.bodyTextStyle.copyWith(
+                color: widget.decoration?.labelTextColor,
               ),
             ),
           ),
@@ -120,14 +130,14 @@ class _MDSliderState extends State<MDSlider> {
           height: 48,
           child: widget.isRange ? _buildRangeSlider(theme) : _buildSingleSlider(theme),
         ),
-        _buildMinMaxLabels(theme),
+        _buildMinMaxLabels(),
         if (widget.errorText != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               widget.errorText!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.error,
+              style: widget.decoration?.token.bodyTextStyle.copyWith(
+                color: widget.decoration?.token.errorColor,
               ),
             ),
           ),
@@ -136,7 +146,9 @@ class _MDSliderState extends State<MDSlider> {
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               widget.helperText!,
-              style: theme.textTheme.bodySmall,
+              style: widget.decoration?.token.bodyTextStyle.copyWith(
+                color: widget.decoration?.helperTextColor,
+              ),
             ),
           ),
       ],
@@ -145,26 +157,21 @@ class _MDSliderState extends State<MDSlider> {
 
   Widget _buildSingleSlider(ThemeData theme) {
     return LayoutBuilder(builder: (context, constraints) {
-      final sliderWidth = constraints.maxWidth - 32; // Account for slider padding
-      final bubbleWidth = 32.0; // Width of the bubble
+      final sliderWidth = constraints.maxWidth - 32;
+      final bubbleWidth = 32.0;
       final position = ((_currentValue - widget.min) / (widget.max - widget.min)) * sliderWidth;
-
-      // Clamp position to keep bubble visible
-      final clampedPosition = position.clamp(
-          bubbleWidth / 2, // Min position
-          sliderWidth - bubbleWidth / 2 // Max position
-          );
+      final clampedPosition = position.clamp(bubbleWidth / 2, sliderWidth - bubbleWidth / 2);
 
       return Stack(
         alignment: Alignment.center,
         children: [
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: widget.decoration?._activeTrackColor ?? theme.primaryColor,
-              inactiveTrackColor: widget.decoration?._inactiveTrackColor ?? theme.primaryColor.withOpacity(0.2),
-              thumbColor: widget.decoration?._thumbColor ?? theme.primaryColor,
-              overlayColor: widget.decoration?._thumbColor.withOpacity(0.1),
-              valueIndicatorColor: widget.decoration?._thumbColor,
+              activeTrackColor: widget.decoration?.activeTrackColor,
+              inactiveTrackColor: widget.decoration?.inactiveTrackColor,
+              thumbColor: widget.decoration?.thumbColor,
+              overlayColor: widget.decoration?.thumbColor.withOpacity(0.1),
+              valueIndicatorColor: widget.decoration?.thumbColor,
             ),
             child: Slider(
               value: _currentValue,
@@ -184,7 +191,7 @@ class _MDSliderState extends State<MDSlider> {
               left: clampedPosition - bubbleWidth / 2,
               top: 0,
               child: _buildValueBubble(
-                  widget.simplifyValues ? _currentValue.round().toString() : _currentValue.toStringAsFixed(1), theme),
+                  widget.simplifyValues ? _currentValue.round().toString() : _currentValue.toStringAsFixed(1)),
             ),
         ],
       );
@@ -213,10 +220,10 @@ class _MDSliderState extends State<MDSlider> {
         children: [
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: widget.decoration?._activeTrackColor ?? theme.primaryColor,
-              inactiveTrackColor: widget.decoration?._inactiveTrackColor ?? theme.primaryColor.withOpacity(0.2),
-              thumbColor: widget.decoration?._thumbColor ?? theme.primaryColor,
-              overlayColor: widget.decoration?._thumbColor.withOpacity(0.1),
+              activeTrackColor: widget.decoration?.activeTrackColor ?? theme.primaryColor,
+              inactiveTrackColor: widget.decoration?.inactiveTrackColor ?? theme.primaryColor.withOpacity(0.2),
+              thumbColor: widget.decoration?.thumbColor ?? theme.primaryColor,
+              overlayColor: widget.decoration?.thumbColor.withOpacity(0.1),
               rangeThumbShape: const RoundRangeSliderThumbShape(),
               rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
             ),
@@ -238,19 +245,19 @@ class _MDSliderState extends State<MDSlider> {
               left: clampedStartPosition - bubbleWidth / 2,
               top: 0,
               child: _buildValueBubble(
-                  widget.simplifyValues
-                      ? _currentRangeValues.start.round().toString()
-                      : _currentRangeValues.start.toStringAsFixed(1),
-                  theme),
+                widget.simplifyValues
+                    ? _currentRangeValues.start.round().toString()
+                    : _currentRangeValues.start.toStringAsFixed(1),
+              ),
             ),
             Positioned(
               left: clampedEndPosition - bubbleWidth / 2,
               top: 0,
               child: _buildValueBubble(
-                  widget.simplifyValues
-                      ? _currentRangeValues.end.round().toString()
-                      : _currentRangeValues.end.toStringAsFixed(1),
-                  theme),
+                widget.simplifyValues
+                    ? _currentRangeValues.end.round().toString()
+                    : _currentRangeValues.end.toStringAsFixed(1),
+              ),
             ),
           ],
         ],
@@ -258,24 +265,23 @@ class _MDSliderState extends State<MDSlider> {
     });
   }
 
-  Widget _buildValueBubble(String value, ThemeData theme) {
-    final decoration = widget.decoration;
+  Widget _buildValueBubble(String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: decoration?._bubbleColor ?? Colors.white,
-        borderRadius: BorderRadius.circular(4),
+        color: widget.decoration?.bubbleColor,
+        borderRadius: BorderRadius.circular(widget.decoration?.token.radius ?? 4),
       ),
       child: Text(
         value,
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: decoration?._bubbleTextColor ?? theme.colorScheme.onPrimary,
+        style: widget.decoration?.token.bodyTextStyle.copyWith(
+          color: widget.decoration?.bubbleTextColor,
         ),
       ),
     );
   }
 
-  Widget _buildMinMaxLabels(ThemeData theme) {
+  Widget _buildMinMaxLabels() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -283,11 +289,15 @@ class _MDSliderState extends State<MDSlider> {
         children: [
           Text(
             widget.min.round().toString(),
-            style: theme.textTheme.bodySmall,
+            style: widget.decoration?.token.bodyTextStyle.copyWith(
+              color: widget.decoration?.minMaxLabelsColor,
+            ),
           ),
           Text(
             widget.max.round().toString(),
-            style: theme.textTheme.bodySmall,
+            style: widget.decoration?.token.bodyTextStyle.copyWith(
+              color: widget.decoration?.minMaxLabelsColor,
+            ),
           ),
         ],
       ),
