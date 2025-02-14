@@ -101,9 +101,8 @@ class _MDMoodboardState extends State<MDMoodboard> {
       // Total available width.
       final double availableWidth = constraints.maxWidth;
 
-      final double cellWidth = (availableWidth -
-              (widget.crossAxisCount - 1) * widget.crossAxisSpacing) /
-          widget.crossAxisCount;
+      final double cellWidth =
+          (availableWidth - (widget.crossAxisCount - 1) * widget.crossAxisSpacing) / widget.crossAxisCount;
 
       // Build a list of tiles by calling the tile builder for each index.
       final List<MDMoodboardTile> tiles = List.generate(
@@ -120,8 +119,7 @@ class _MDMoodboardState extends State<MDMoodboard> {
       );
 
       // Build a list of [StaggeredTile] objects for the grid delegate.
-      final List<MDStaggeredTile> staggeredTiles =
-          List.generate(widget.tileCount, (index) {
+      final List<MDStaggeredTile> staggeredTiles = List.generate(widget.tileCount, (index) {
         return MDStaggeredTile(
           crossAxisCellCount: tiles[index].tileCrossAxisSpan,
           tileHeight: _tileHeights[index],
@@ -163,8 +161,7 @@ class MDStaggeredTile {
   });
 
   @override
-  String toString() =>
-      'StaggeredTile($crossAxisCellCount, height: $tileHeight)';
+  String toString() => 'StaggeredTile($crossAxisCellCount, height: $tileHeight)';
 }
 
 ///
@@ -219,8 +216,7 @@ class _MDStaggeredGridDelegate extends MultiChildLayoutDelegate {
       final double tileTop = minMaxHeight;
       final double tileLeft = chosenCol * (cellWidth + crossAxisSpacing);
       final double tileWidth = span * cellWidth + (span - 1) * crossAxisSpacing;
-      placements.add(_TilePlacement(
-          top: tileTop, left: tileLeft, width: tileWidth, height: tileHeight));
+      placements.add(_TilePlacement(top: tileTop, left: tileLeft, width: tileWidth, height: tileHeight));
 
       // Update the columns that this tile spans.
       final double newHeight = tileTop + tileHeight + mainAxisSpacing;
@@ -233,8 +229,7 @@ class _MDStaggeredGridDelegate extends MultiChildLayoutDelegate {
     for (int i = 0; i < placements.length; i++) {
       if (hasChild(i)) {
         final placement = placements[i];
-        layoutChild(
-            i, BoxConstraints.tight(Size(placement.width, placement.height)));
+        layoutChild(i, BoxConstraints.tight(Size(placement.width, placement.height)));
         positionChild(i, Offset(placement.left, placement.top));
       }
     }
@@ -311,6 +306,7 @@ class MDAsyncImageTile extends MDMoodboardTile {
 
   /// The width (in pixels) of one grid cell. (Computed by the parent.)
   final double cellWidth;
+  final double? imageWidth;
   final double crossAxisSpacing;
   final double mainAxisSpacing;
   final Widget Function(BuildContext context, String url) builder;
@@ -325,6 +321,7 @@ class MDAsyncImageTile extends MDMoodboardTile {
     required this.crossAxisSpacing,
     required this.mainAxisSpacing,
     required this.builder,
+    this.imageWidth,
   }) : super(
           key: key,
           tileCrossAxisSpan: tileCrossAxisSpan,
@@ -357,10 +354,12 @@ class MDAsyncImageTileState extends State<MDAsyncImageTile> {
 
   void _resolveImage() {
     String formatterUrl = "${widget.imageUrl}?format=webp";
+    if (widget.imageWidth != null) {
+      formatterUrl = "$formatterUrl&width=${widget.imageWidth}";
+    }
     final ImageProvider provider = NetworkImage(formatterUrl);
     _imageStream = provider.resolve(const ImageConfiguration());
-    _imageStreamListener =
-        ImageStreamListener((ImageInfo info, bool synchronousCall) {
+    _imageStreamListener = ImageStreamListener((ImageInfo info, bool synchronousCall) {
       if (!_didComputeHeight) {
         _didComputeHeight = true;
         final int naturalWidth = info.image.width;
