@@ -2,7 +2,6 @@ library flutter_meragi_design;
 
 export 'package:flutter_form_builder/flutter_form_builder.dart';
 export 'package:form_builder_validators/form_builder_validators.dart';
-
 export 'src/components/alert_dialog.dart';
 export 'src/components/button.dart';
 export 'src/components/card.dart';
@@ -68,4 +67,5 @@ export 'src/utils/platform.dart';
 export 'src/utils/scroll_handler.dart';
 export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
+export 'src/components/fields/md_slider.dart';
 export 'src/components/expansion_tile/expansion_tile.dart';
