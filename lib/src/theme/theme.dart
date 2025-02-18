@@ -3,10 +3,8 @@ import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
 import 'package:flutter_meragi_design/src/theme/tokens/light.dart';
 
 class MeragiTheme extends InheritedWidget {
-  late final ThemeToken token;
-  MeragiTheme({super.key, required super.child, ThemeToken? token,}) {
-    this.token = token ?? light;
-  }
+  final ThemeToken token;
+  MeragiTheme({super.key, required super.child, ThemeToken? token}) : token = token ?? light;
 
   @override
   bool updateShouldNotify(covariant MeragiTheme oldWidget) {
@@ -22,4 +20,8 @@ class MeragiTheme extends InheritedWidget {
   static MeragiTheme? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<MeragiTheme>();
   }
+}
+
+extension MeragiToken on BuildContext {
+  ThemeToken get token => MeragiTheme.of(this).token;
 }
