@@ -116,7 +116,7 @@ class MDNetworkImage extends StatelessWidget {
               isAntiAlias: isAntiAlias,
               loadingBuilder: loadingBuilder ??
                   (context, child, loadingProgress, isLoading) {
-                    return isLoading!
+                    return isLoading
                         ? ConstrainedBox(
                             constraints: const BoxConstraints(minHeight: 200, minWidth: 200),
                             child: Center(
@@ -226,7 +226,7 @@ class MDImage extends StatefulWidget {
   ///
   ///  ```loadingProgress``` will always be null for flutter web canvas.
   /// You can use the ```isLoading``` instead in flutter web
-  final Widget Function(BuildContext context, Widget child, ImageChunkEvent? loadingProgress, bool? isLoading)?
+  final Widget Function(BuildContext context, Widget child, ImageChunkEvent? loadingProgress, bool isLoading)?
       loadingBuilder;
   final ImageErrorWidgetBuilder? errorBuilder;
   final double? scale;
