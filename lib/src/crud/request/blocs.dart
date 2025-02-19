@@ -239,13 +239,13 @@ class GetOneBloc<T> extends BaseBloc<T> {
 
   ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
-  List<Map<String, String>> customFilters = [];
+  List<MDFilter> customFilters = [];
 
   ValueNotifier<String?> id = ValueNotifier(null);
 
   RequestCache cache = RequestCache();
 
-  addFilters(List<Map<String, String>> newFilters, {ListFilterAddType type = ListFilterAddType.append}) {
+  addFilters(List<MDFilter> newFilters, {ListFilterAddType type = ListFilterAddType.append}) {
     if (type == ListFilterAddType.reset) {
       customFilters = [];
     }
@@ -256,10 +256,16 @@ class GetOneBloc<T> extends BaseBloc<T> {
     customFilters.removeAt(index);
   }
 
-  String getKey(String url, List<Map<String, String>> filters) {
+  String getKey(String url, List<MDFilter> filters) {
     Map<String, String> data = {};
     if (filters.isNotEmpty) {
-      data.addAll(parseFilterListToMap(filters));
+      data.addAll(parseFilterListToMap(filters
+          .map((filter) => {
+                'field': filter.field,
+                'operator': filter.operator,
+                'value': filter.value,
+              })
+          .toList()));
     }
     return url + Uri(queryParameters: data).query;
   }
