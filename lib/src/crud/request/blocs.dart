@@ -291,6 +291,7 @@ class GetOneBloc<T> extends BaseBloc<T> {
       debugPrint("$e");
       debugPrintStack(stackTrace: s);
       onError?.call(e);
+      requestState.value = RequestState.error;
     } finally {
       onSettled?.call();
     }
