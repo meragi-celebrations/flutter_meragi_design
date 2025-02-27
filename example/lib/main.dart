@@ -28,25 +28,31 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Meragi Design',
-        theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // TRY THIS: Try running your application with "flutter run". You'll see
-          // the application has a blue toolbar. Then, without quitting the app,
-          // try changing the seedColor in the colorScheme below to Colors.green
-          // and then invoke "hot reload" (save your changes or press the "hot
-          // reload" button in a Flutter-supported IDE, or press "r" if you used
-          // the command line to start the app).
-          //
-          // Notice that the counter didn't reset back to zero; the application
-          // state is not lost during the reload. To reset the state, use hot
-          // restart instead.
-          //
-          // This works for code too, not just values: Most code changes can be
-          // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
+        themeMode: ThemeMode.light,
+        theme: MDTheme(appColor: CoralThemeColor(), typography: MDDefaultTypography()).themeData,
+        // ThemeData(
+        //   // This is the theme of your application.
+        //   //
+        //   // TRY THIS: Try running your application with "flutter run". You'll see
+        //   // the application has a blue toolbar. Then, without quitting the app,
+        //   // try changing the seedColor in the colorScheme below to Colors.green
+        //   // and then invoke "hot reload" (save your changes or press the "hot
+        //   // reload" button in a Flutter-supported IDE, or press "r" if you used
+        //   // the command line to start the app).
+        //   //
+        //   // Notice that the counter didn't reset back to zero; the application
+        //   // state is not lost during the reload. To reset the state, use hot
+        //   // restart instead.
+        //   //
+        //   // This works for code too, not just values: Most code changes can be
+        //   // tested with just a hot reload.
+        //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        //   useMaterial3: true,
+        //   extensions: [
+        //     AppColorExtension(colors: CoralThemeColor()),
+        //     MDInputThemeExtension(theme: MDInputTheme()),
+        //   ],
+        // ),
         home: const MyHomePage(title: 'Meragi Design'),
       ),
     );
@@ -978,7 +984,10 @@ class _MyHomePageState extends State<MyHomePage> {
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: MDEditor(
-                initialText: '''# This is markdown''',
+                editorState: EditorState(
+                  document: markdownToDocument('''# This is markdown'''),
+                ),
+                // initialText: '''# This is markdown''',
                 readOnly: context.knobs.boolean(
                   label: "Read Only",
                   initial: false,
@@ -996,7 +1005,8 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context) {
             return MoodboardStory();
           },
-        ),Story(
+        ),
+        Story(
           name: "Form/Fields/Slider",
           builder: (context) {
             return MDScaffold(
@@ -1084,113 +1094,91 @@ class MoodboardStory extends StatefulWidget {
 class _MoodboardStoryState extends State<MoodboardStory> {
   final List<Map<String, dynamic>> images = [
     {
-      'url':
-          'https://d1p55htxo8z8mf.cloudfront.net/product/11013/59a659a8-8f6a-457a-905f-c36316343a06.jpg',
+      'url': 'https://d1p55htxo8z8mf.cloudfront.net/product/11013/59a659a8-8f6a-457a-905f-c36316343a06.jpg',
       'priority': 3
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/10011/3618c085-ae85-4dea-8441-34ef1cb93c2d.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/10011/3618c085-ae85-4dea-8441-34ef1cb93c2d.jpg",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/10011/dbfff9ee-a114-47a3-b0dd-198b78bf9773.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/10011/dbfff9ee-a114-47a3-b0dd-198b78bf9773.jpg",
       'priority': 2
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/7936/41d87583-6182-4796-82dc-68a2a895e7a6.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/7936/41d87583-6182-4796-82dc-68a2a895e7a6.png",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/321/11962e0b-a039-4f64-b172-484be70f83ad.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/321/11962e0b-a039-4f64-b172-484be70f83ad.jpg",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/384/8b2a3c47-fdbb-413d-8e8f-1730e9c7c200.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/384/8b2a3c47-fdbb-413d-8e8f-1730e9c7c200.png",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/767/14a52fb7-90b1-48b5-9a25-34dc814d17ff.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/767/14a52fb7-90b1-48b5-9a25-34dc814d17ff.png",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/13591/dc40ebdf-f4e3-486d-85e3-5a8b0c4bc7c0.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/13591/dc40ebdf-f4e3-486d-85e3-5a8b0c4bc7c0.jpg",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/771/8c340059-6325-468b-9a0b-752fbed7dd3e.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/771/8c340059-6325-468b-9a0b-752fbed7dd3e.png",
       'priority': 3
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/771/f7d9304d-833c-4c68-9857-4fdc228ffb57.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/771/f7d9304d-833c-4c68-9857-4fdc228ffb57.png",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/29858/8ca21f98-c797-4f91-a987-e4f2c9906309.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/29858/8ca21f98-c797-4f91-a987-e4f2c9906309.jpg",
       'priority': 1
     },
     {
-      'url':
-          'https://d1p55htxo8z8mf.cloudfront.net/product/11013/59a659a8-8f6a-457a-905f-c36316343a06.jpg',
+      'url': 'https://d1p55htxo8z8mf.cloudfront.net/product/11013/59a659a8-8f6a-457a-905f-c36316343a06.jpg',
       'priority': 2
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/10011/3618c085-ae85-4dea-8441-34ef1cb93c2d.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/10011/3618c085-ae85-4dea-8441-34ef1cb93c2d.jpg",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/10011/dbfff9ee-a114-47a3-b0dd-198b78bf9773.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/10011/dbfff9ee-a114-47a3-b0dd-198b78bf9773.jpg",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/7936/41d87583-6182-4796-82dc-68a2a895e7a6.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/7936/41d87583-6182-4796-82dc-68a2a895e7a6.png",
       'priority': 2
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/321/11962e0b-a039-4f64-b172-484be70f83ad.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/321/11962e0b-a039-4f64-b172-484be70f83ad.jpg",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/384/8b2a3c47-fdbb-413d-8e8f-1730e9c7c200.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/384/8b2a3c47-fdbb-413d-8e8f-1730e9c7c200.png",
       'priority': 2
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/767/14a52fb7-90b1-48b5-9a25-34dc814d17ff.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/767/14a52fb7-90b1-48b5-9a25-34dc814d17ff.png",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/13591/dc40ebdf-f4e3-486d-85e3-5a8b0c4bc7c0.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/13591/dc40ebdf-f4e3-486d-85e3-5a8b0c4bc7c0.jpg",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/771/8c340059-6325-468b-9a0b-752fbed7dd3e.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/771/8c340059-6325-468b-9a0b-752fbed7dd3e.png",
       'priority': 2
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/771/f7d9304d-833c-4c68-9857-4fdc228ffb57.png",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/771/f7d9304d-833c-4c68-9857-4fdc228ffb57.png",
       'priority': 1
     },
     {
-      'url':
-          "https://d1p55htxo8z8mf.cloudfront.net/product/29858/8ca21f98-c797-4f91-a987-e4f2c9906309.jpg",
+      'url': "https://d1p55htxo8z8mf.cloudfront.net/product/29858/8ca21f98-c797-4f91-a987-e4f2c9906309.jpg",
       'priority': 1
     }
   ];
@@ -1208,8 +1196,8 @@ class _MoodboardStoryState extends State<MoodboardStory> {
         crossAxisCount: 8,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
-        tileBuilder: (context, index, crossAxisCount, crossAxisSpacing,
-            mainAxisSpacing, cellWidth, onTileHeightComputed) {
+        tileBuilder:
+            (context, index, crossAxisCount, crossAxisSpacing, mainAxisSpacing, cellWidth, onTileHeightComputed) {
           return MDAsyncImageTile(
             imageUrl: images[index]['url'],
             tileCrossAxisSpan: images[index]['priority'],
