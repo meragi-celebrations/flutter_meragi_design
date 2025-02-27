@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 @immutable
 class MDInputTheme {
-  final EdgeInsetsGeometry? padding;
+  final EdgeInsets? padding;
   final Color? selectionColor;
   final Color? cursorColor;
   final Color? borderColor;
@@ -23,7 +23,7 @@ class MDInputTheme {
   });
 
   MDInputTheme copyWith({
-    EdgeInsetsGeometry? padding,
+    EdgeInsets? padding,
     Color? selectionColor,
     Color? cursorColor,
     Color? borderColor,
@@ -47,7 +47,7 @@ class MDInputTheme {
       return this;
     }
     return MDInputTheme(
-      padding: EdgeInsetsGeometry.lerp(padding, other.padding, t),
+      padding: EdgeInsets.lerp(padding, other.padding, t),
       selectionColor: Color.lerp(selectionColor, other.selectionColor, t),
       cursorColor: Color.lerp(cursorColor, other.cursorColor, t),
       borderColor: Color.lerp(borderColor, other.borderColor, t),
@@ -71,13 +71,3 @@ class MDInputTheme {
     );
   }
 }
-
-// MDInputTheme standardInputTheme = MDInputTheme(
-//   height: ,
-//   borderRadius: ,
-//   padding: ,
-//   borderColor: ,
-//   cursorColor: ,
-//   selectionColor: ,
-//   textStyle: ,
-// );
