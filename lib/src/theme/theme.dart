@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/src/theme/components/typography.dart';
-import 'package:flutter_meragi_design/src/theme/extensions/typography.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
-import 'package:flutter_meragi_design/src/theme/tokens/light.dart';
-
-import 'components/app_colors.dart';
-import 'components/input_theme.dart';
-import 'extensions/colors.dart';
-import 'extensions/input_theme.dart';
 
 class MeragiTheme extends InheritedWidget {
   late final ThemeToken token;
 
-  MeragiTheme({super.key, required super.child, ThemeToken? token}) : token = token ?? light;
+  MeragiTheme({super.key, required super.child, ThemeToken? token})
+      : token = token ?? light;
 
   @override
   bool updateShouldNotify(covariant MeragiTheme oldWidget) {
@@ -31,33 +25,41 @@ class MeragiTheme extends InheritedWidget {
 }
 
 class MDTheme {
-  final AppColor appColor;
+  final AppColor colors;
   final AppTypography typography;
-  // final MDDimensions dimensions;
+  final AppDimension dimensions;
+
   final MDInputTheme? inputTheme;
 
   const MDTheme({
-    required this.appColor,
+    required this.colors,
     required this.typography,
-    // required this.dimensions,
+    required this.dimensions,
     this.inputTheme,
   });
 
   ThemeData get themeData => ThemeData(
-        primaryColor: appColor.primary,
-        secondaryHeaderColor: appColor.primaryB,
+        primaryColor: colors.primary,
+        secondaryHeaderColor: colors.primaryB,
         brightness: Brightness.light,
         fontFamily: typography.fontFamily,
         // backgroundColor: appColor.background.primary,
-        scaffoldBackgroundColor: appColor.background.primary,
+        scaffoldBackgroundColor: colors.background.primary,
         extensions: [
-          AppColorExtension(colors: appColor),
+          AppColorExtension(colors: colors),
           AppTypographyExtension(fonts: typography),
           MDInputThemeExtension(
             theme: MDInputTheme(
-              cursorColor: appColor.primary,
-              borderColor: appColor.border.opaque,
-              selectionColor: appColor.background.tertiary,
+              cursorColor: colors.primary,
+              borderColor: colors.border.opaque,
+              selectionColor: colors.background.tertiary,
+              borderRadius: dimensions.radius,
+              height: dimensions.inputHeight,
+              textStyle: typography.paragraph.medium,
+              padding: EdgeInsets.symmetric(
+                vertical: 0.0,
+                horizontal: dimensions.padding,
+              ),
             ).merge(inputTheme),
           ),
         ],

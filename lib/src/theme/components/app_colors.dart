@@ -5,186 +5,474 @@ abstract class AppColor {
     required this.background,
     required this.content,
     required this.border,
+    required this.primary,
+    required this.primaryB,
+    required this.accent,
+    required this.info,
+    required this.negative,
+    required this.warning,
+    required this.positive,
   });
+
   final MDBackgroundColor background;
   final MDContentColor content;
   final MDBorderColor border;
 
-  abstract final Color primary;
-  abstract final Color primaryB;
-  abstract final Color accent;
+  final Color primary;
+  final Color primaryB;
+  final Color accent;
 
-  abstract final Color info;
-  abstract final Color negative;
-  abstract final Color warning;
-  abstract final Color positive;
+  final Color info;
+  final Color negative;
+  final Color warning;
+  final Color positive;
 }
 
 abstract class MDBackgroundColor {
-  const MDBackgroundColor();
+  const MDBackgroundColor({
+    required this.primary,
+    required this.secondary,
+    required this.tertiary,
+    required this.stateDisabled,
+    required this.overlayDark,
+    required this.overlayLight,
+    required this.accent,
+    required this.negative,
+    required this.warning,
+    required this.positive,
+    required this.lightAccent,
+    required this.lightInfo,
+    required this.lightNegative,
+    required this.lightWarning,
+    required this.lightPositive,
+    required this.alwaysDark,
+    required this.alwaysLight,
+  });
 
-  abstract final Color primary;
-  abstract final Color secondary;
-  abstract final Color tertiary;
+  final Color primary;
+  final Color secondary;
+  final Color tertiary;
 
-  abstract final Color stateDisabled;
-  abstract final Color overlayDark;
-  abstract final Color overlayLight;
+  final Color stateDisabled;
+  final Color overlayDark;
+  final Color overlayLight;
 
-  abstract final Color accent;
-  abstract final Color negative;
-  abstract final Color warning;
-  abstract final Color positive;
+  final Color accent;
+  final Color negative;
+  final Color warning;
+  final Color positive;
 
-  abstract final Color lightAccent;
-  abstract final Color lightInfo;
-  abstract final Color lightNegative;
-  abstract final Color lightWarning;
-  abstract final Color lightPositive;
+  final Color lightAccent;
+  final Color lightInfo;
+  final Color lightNegative;
+  final Color lightWarning;
+  final Color lightPositive;
 
-  abstract final Color alwaysDark;
-  abstract final Color alwaysLight;
+  final Color alwaysDark;
+  final Color alwaysLight;
 }
 
 abstract class MDContentColor {
-  const MDContentColor();
+  const MDContentColor({
+    required this.primary,
+    required this.secondary,
+    required this.tertiary,
+    required this.stateDisabled,
+    required this.onColor,
+    required this.onColorInverse,
+    required this.accent,
+    required this.negative,
+    required this.warning,
+    required this.positive,
+  });
 
-  abstract final Color primary;
-  abstract final Color secondary;
-  abstract final Color tertiary;
+  final Color primary;
+  final Color secondary;
+  final Color tertiary;
 
-  abstract final Color stateDisabled;
-  abstract final Color onColor;
-  abstract final Color onColorInverse;
+  final Color stateDisabled;
+  final Color onColor;
+  final Color onColorInverse;
 
-  abstract final Color accent;
-  abstract final Color negative;
-  abstract final Color warning;
-  abstract final Color positive;
+  final Color accent;
+  final Color negative;
+  final Color warning;
+  final Color positive;
 }
 
 abstract class MDBorderColor {
-  const MDBorderColor();
+  const MDBorderColor({
+    required this.opaque,
+    required this.transparent,
+    required this.selected,
+    required this.stateDisabled,
+    required this.accent,
+    required this.negative,
+    required this.warning,
+    required this.positive,
+  });
 
-  abstract final Color opaque;
-  abstract final Color transparent;
-  abstract final Color selected;
+  final Color opaque;
+  final Color transparent;
+  final Color selected;
 
-  abstract final Color stateDisabled;
-  abstract final Color accent;
-  abstract final Color negative;
-  abstract final Color warning;
-  abstract final Color positive;
+  final Color stateDisabled;
+  final Color accent;
+  final Color negative;
+  final Color warning;
+  final Color positive;
 }
 
 // AppThemeColor Implementation
 class CoralThemeColor implements AppColor {
-  @override
-  final Color primary = Colors.black;
-  @override
-  final Color primaryB = Colors.white;
-  @override
-  final Color accent = Color(0xFFE63946);
+  CoralThemeColor({
+    this.primary = Colors.black,
+    this.primaryB = Colors.white,
+    this.accent = const Color(0xFFE63946),
+    this.info = const Color(0xFF457B9D),
+    this.negative = const Color(0xFFE63946),
+    this.warning = const Color(0xFFF4A261),
+    this.positive = const Color(0xFF2A9D8F),
+    MDBackgroundColor? background,
+    MDContentColor? content,
+    MDBorderColor? border,
+  })  : background = background ?? MDCoralBackgroundColor(),
+        content = content ?? MDCoralContentColor(),
+        border = border ?? MDCoralBorderColor();
 
   @override
-  final Color info = Color(0xFF457B9D);
+  final Color primary;
   @override
-  final Color negative = Color(0xFFE63946);
+  final Color primaryB;
   @override
-  final Color warning = Color(0xFFF4A261);
-  @override
-  final Color positive = Color(0xFF2A9D8F);
+  final Color accent;
 
   @override
-  final MDBackgroundColor background = _ThemeBackground();
+  final Color info;
   @override
-  final MDContentColor content = _ThemeContent();
+  final Color negative;
   @override
-  final MDBorderColor border = _ThemeBorder();
+  final Color warning;
+  @override
+  final Color positive;
+
+  @override
+  final MDBackgroundColor background;
+  @override
+  final MDContentColor content;
+  @override
+  final MDBorderColor border;
+
+  CoralThemeColor copyWith({
+    Color? primary,
+    Color? primaryB,
+    Color? accent,
+    Color? info,
+    Color? negative,
+    Color? warning,
+    Color? positive,
+    MDBackgroundColor? background,
+    MDContentColor? content,
+    MDBorderColor? border,
+  }) {
+    return CoralThemeColor(
+      primary: primary ?? this.primary,
+      primaryB: primaryB ?? this.primaryB,
+      accent: accent ?? this.accent,
+      info: info ?? this.info,
+      negative: negative ?? this.negative,
+      warning: warning ?? this.warning,
+      positive: positive ?? this.positive,
+      background: background ?? this.background,
+      content: content ?? this.content,
+      border: border ?? this.border,
+    );
+  }
+
+  CoralThemeColor merge(CoralThemeColor? other) {
+    if (other == null) return this;
+    return copyWith(
+      primary: other.primary,
+      primaryB: other.primaryB,
+      accent: other.accent,
+      info: other.info,
+      negative: other.negative,
+      warning: other.warning,
+      positive: other.positive,
+      background: other.background,
+      content: other.content,
+      border: other.border,
+    );
+  }
 }
 
-class _ThemeBackground implements MDBackgroundColor {
-  @override
-  final Color primary = Colors.white;
-  @override
-  final Color secondary = Color(0xFFE0E0E0);
-  @override
-  final Color tertiary = Color(0xFFBDBDBD);
+class MDCoralBackgroundColor implements MDBackgroundColor {
+  MDCoralBackgroundColor({
+    this.primary = Colors.white,
+    this.secondary = const Color(0xFFE0E0E0),
+    this.tertiary = const Color(0xFFBDBDBD),
+    this.stateDisabled = const Color(0xFFBDBDBD),
+    this.overlayDark = Colors.black,
+    this.overlayLight = Colors.white,
+    this.accent = const Color(0xFFE63946),
+    this.negative = const Color(0xFFE63946),
+    this.warning = const Color(0xFFF4A261),
+    this.positive = const Color(0xFF2A9D8F),
+    this.lightAccent = const Color(0xFFFFE5E5),
+    this.lightInfo = const Color(0xFFE0F2FE),
+    this.lightNegative = const Color(0xFFFFCDD2),
+    this.lightWarning = const Color(0xFFFFF3CD),
+    this.lightPositive = const Color(0xFFDCFCE7),
+    this.alwaysDark = Colors.black,
+    this.alwaysLight = Colors.white,
+  });
 
   @override
-  final Color stateDisabled = Color(0xFFBDBDBD);
+  final Color primary;
   @override
-  final Color overlayDark = Colors.black;
+  final Color secondary;
   @override
-  final Color overlayLight = Colors.white;
+  final Color tertiary;
 
   @override
-  final Color accent = Color(0xFFE63946);
+  final Color stateDisabled;
   @override
-  final Color negative = Color(0xFFE63946);
+  final Color overlayDark;
   @override
-  final Color warning = Color(0xFFF4A261);
-  @override
-  final Color positive = Color(0xFF2A9D8F);
+  final Color overlayLight;
 
   @override
-  final Color lightAccent = Color(0xFFFFE5E5);
+  final Color accent;
   @override
-  final Color lightInfo = Color(0xFFE0F2FE);
+  final Color negative;
   @override
-  final Color lightNegative = Color(0xFFFFCDD2);
+  final Color warning;
   @override
-  final Color lightWarning = Color(0xFFFFF3CD);
-  @override
-  final Color lightPositive = Color(0xFFDCFCE7);
+  final Color positive;
 
   @override
-  final Color alwaysDark = Colors.black;
+  final Color lightAccent;
   @override
-  final Color alwaysLight = Colors.white;
+  final Color lightInfo;
+  @override
+  final Color lightNegative;
+  @override
+  final Color lightWarning;
+  @override
+  final Color lightPositive;
+
+  @override
+  final Color alwaysDark;
+  @override
+  final Color alwaysLight;
+
+  MDCoralBackgroundColor copyWith({
+    Color? primary,
+    Color? secondary,
+    Color? tertiary,
+    Color? stateDisabled,
+    Color? overlayDark,
+    Color? overlayLight,
+    Color? accent,
+    Color? negative,
+    Color? warning,
+    Color? positive,
+    Color? lightAccent,
+    Color? lightInfo,
+    Color? lightNegative,
+    Color? lightWarning,
+    Color? lightPositive,
+    Color? alwaysDark,
+    Color? alwaysLight,
+  }) {
+    return MDCoralBackgroundColor(
+      primary: primary ?? this.primary,
+      secondary: secondary ?? this.secondary,
+      tertiary: tertiary ?? this.tertiary,
+      stateDisabled: stateDisabled ?? this.stateDisabled,
+      overlayDark: overlayDark ?? this.overlayDark,
+      overlayLight: overlayLight ?? this.overlayLight,
+      accent: accent ?? this.accent,
+      negative: negative ?? this.negative,
+      warning: warning ?? this.warning,
+      positive: positive ?? this.positive,
+      lightAccent: lightAccent ?? this.lightAccent,
+      lightInfo: lightInfo ?? this.lightInfo,
+      lightNegative: lightNegative ?? this.lightNegative,
+      lightWarning: lightWarning ?? this.lightWarning,
+      lightPositive: lightPositive ?? this.lightPositive,
+      alwaysDark: alwaysDark ?? this.alwaysDark,
+      alwaysLight: alwaysLight ?? this.alwaysLight,
+    );
+  }
+
+  MDCoralBackgroundColor merge(MDCoralBackgroundColor? other) {
+    if (other == null) return this;
+    return copyWith(
+      primary: other.primary,
+      secondary: other.secondary,
+      tertiary: other.tertiary,
+      stateDisabled: other.stateDisabled,
+      overlayDark: other.overlayDark,
+      overlayLight: other.overlayLight,
+      accent: other.accent,
+      negative: other.negative,
+      warning: other.warning,
+      positive: other.positive,
+      lightAccent: other.lightAccent,
+      lightInfo: other.lightInfo,
+      lightNegative: other.lightNegative,
+      lightWarning: other.lightWarning,
+      lightPositive: other.lightPositive,
+      alwaysDark: other.alwaysDark,
+      alwaysLight: other.alwaysLight,
+    );
+  }
 }
 
-class _ThemeContent implements MDContentColor {
-  @override
-  final Color primary = Colors.black;
-  @override
-  final Color secondary = Color(0xFF757575);
-  @override
-  final Color tertiary = Color(0xFF616161);
+class MDCoralContentColor implements MDContentColor {
+  MDCoralContentColor({
+    this.primary = Colors.black,
+    this.secondary = const Color(0xFF757575),
+    this.tertiary = const Color(0xFF616161),
+    this.stateDisabled = const Color(0xFFBDBDBD),
+    this.onColor = Colors.white,
+    this.onColorInverse = Colors.black,
+    this.accent = const Color(0xFF457B9D),
+    this.negative = const Color(0xFFE63946),
+    this.warning = const Color(0xFFF4A261),
+    this.positive = const Color(0xFF2A9D8F),
+  });
 
   @override
-  final Color stateDisabled = Color(0xFFBDBDBD);
+  final Color primary;
   @override
-  final Color onColor = Colors.white;
+  final Color secondary;
   @override
-  final Color onColorInverse = Colors.black;
+  final Color tertiary;
 
   @override
-  final Color accent = Color(0xFF457B9D);
+  final Color stateDisabled;
   @override
-  final Color negative = Color(0xFFE63946);
+  final Color onColor;
   @override
-  final Color warning = Color(0xFFF4A261);
+  final Color onColorInverse;
+
   @override
-  final Color positive = Color(0xFF2A9D8F);
+  final Color accent;
+  @override
+  final Color negative;
+  @override
+  final Color warning;
+  @override
+  final Color positive;
+
+  MDCoralContentColor copyWith({
+    Color? primary,
+    Color? secondary,
+    Color? tertiary,
+    Color? stateDisabled,
+    Color? onColor,
+    Color? onColorInverse,
+    Color? accent,
+    Color? negative,
+    Color? warning,
+    Color? positive,
+  }) {
+    return MDCoralContentColor(
+      primary: primary ?? this.primary,
+      secondary: secondary ?? this.secondary,
+      tertiary: tertiary ?? this.tertiary,
+      stateDisabled: stateDisabled ?? this.stateDisabled,
+      onColor: onColor ?? this.onColor,
+      onColorInverse: onColorInverse ?? this.onColorInverse,
+      accent: accent ?? this.accent,
+      negative: negative ?? this.negative,
+      warning: warning ?? this.warning,
+      positive: positive ?? this.positive,
+    );
+  }
+
+  MDCoralContentColor merge(MDCoralContentColor? other) {
+    if (other == null) return this;
+    return copyWith(
+      primary: other.primary,
+      secondary: other.secondary,
+      tertiary: other.tertiary,
+      stateDisabled: other.stateDisabled,
+      onColor: other.onColor,
+      onColorInverse: other.onColorInverse,
+      accent: other.accent,
+      negative: other.negative,
+      warning: other.warning,
+      positive: other.positive,
+    );
+  }
 }
 
-class _ThemeBorder implements MDBorderColor {
-  @override
-  final Color opaque = Color(0xFFBDBDBD);
-  @override
-  final Color transparent = Colors.transparent;
-  @override
-  final Color selected = Colors.black;
+class MDCoralBorderColor implements MDBorderColor {
+  MDCoralBorderColor({
+    this.opaque = const Color(0xFFBDBDBD),
+    this.transparent = Colors.transparent,
+    this.selected = Colors.black,
+    this.stateDisabled = const Color(0xFFBDBDBD),
+    this.accent = const Color(0xFFE63946),
+    this.negative = const Color(0xFFE63946),
+    this.warning = const Color(0xFFF4A261),
+    this.positive = const Color(0xFF2A9D8F),
+  });
 
   @override
-  final Color stateDisabled = Color(0xFFBDBDBD);
+  final Color opaque;
   @override
-  final Color accent = Color(0xFFE63946);
+  final Color transparent;
   @override
-  final Color negative = Color(0xFFE63946);
+  final Color selected;
+
   @override
-  final Color warning = Color(0xFFF4A261);
+  final Color stateDisabled;
   @override
-  final Color positive = Color(0xFF2A9D8F);
+  final Color accent;
+  @override
+  final Color negative;
+  @override
+  final Color warning;
+  @override
+  final Color positive;
+
+  MDCoralBorderColor copyWith({
+    Color? opaque,
+    Color? transparent,
+    Color? selected,
+    Color? stateDisabled,
+    Color? accent,
+    Color? negative,
+    Color? warning,
+    Color? positive,
+  }) {
+    return MDCoralBorderColor(
+      opaque: opaque ?? this.opaque,
+      transparent: transparent ?? this.transparent,
+      selected: selected ?? this.selected,
+      stateDisabled: stateDisabled ?? this.stateDisabled,
+      accent: accent ?? this.accent,
+      negative: negative ?? this.negative,
+      warning: warning ?? this.warning,
+      positive: positive ?? this.positive,
+    );
+  }
+
+  MDCoralBorderColor merge(MDCoralBorderColor? other) {
+    if (other == null) return this;
+    return copyWith(
+      opaque: other.opaque,
+      transparent: other.transparent,
+      selected: other.selected,
+      stateDisabled: other.stateDisabled,
+      accent: other.accent,
+      negative: other.negative,
+      warning: other.warning,
+      positive: other.positive,
+    );
+  }
 }
