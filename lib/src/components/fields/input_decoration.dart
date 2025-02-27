@@ -1,16 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/theme/style.dart';
 
-enum MDInputType {
-  primary,
-  secondary,
-  tertiary,
-  error,
-  success,
-  warning,
-  info,
-  disabled
-}
+enum MDInputType { primary, secondary, tertiary, error, success, warning, info, disabled }
 
 class MDInputDecoration extends Style {
   final MDInputType type;
@@ -38,12 +29,11 @@ class MDInputDecoration extends Style {
   @override
   Map get styles => {};
 
-  Color get selectionColor =>
-      _selectionColorOverride ?? token.secondaryColor.withOpacity(.3);
+  Color get selectionColor => _selectionColorOverride ?? token.secondaryColor.withOpacity(.3);
 
   Color get cursorColor => _cursorColorOverride ?? token.secondaryColor;
 
-  EdgeInsets get padding => _paddingOverride ?? EdgeInsets.all(token.padding);
+  EdgeInsets get padding => _paddingOverride ?? EdgeInsets.symmetric(horizontal: token.padding);
 
   Color get borderColor => _borderColorOverride ?? token.borderColor;
 
