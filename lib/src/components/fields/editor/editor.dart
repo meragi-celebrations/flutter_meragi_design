@@ -40,8 +40,6 @@ class _MDEditorState extends State<MDEditor> {
   void initState() {
     super.initState();
 
-    print("init editor");
-
     editorState = widget.editorState != null
         ? widget.editorState!
         : EditorState.blank(withInitialText: true);
@@ -55,7 +53,6 @@ class _MDEditorState extends State<MDEditor> {
       },
     );
 
-    print("init editor done");
     // editorStyle = _buildDesktopEditorStyle();
     // blockComponentBuilders = _buildBlockComponentBuilders();
     // commandShortcuts = _buildCommandShortcuts();

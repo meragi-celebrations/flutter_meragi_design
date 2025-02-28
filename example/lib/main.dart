@@ -1070,20 +1070,32 @@ class _MyHomePageState extends State<MyHomePage> {
         Story(
           name: 'Markdown Editor',
           builder: (context) {
+            EditorState _editorState = EditorState(
+              document: markdownToDocument(
+                '''# This is markdown''',
+              ),
+            );
             return MDScaffold(
-              body: MDEditor(
-                editorState: EditorState(
-                  document: markdownToDocument('''# This is markdown'''),
-                ),
-                // initialText: '''# This is markdown''',
-                readOnly: context.knobs.boolean(
-                  label: "Read Only",
-                  initial: false,
-                ),
-                isExpanded: context.knobs.boolean(
-                  label: "Is Expanded",
-                  initial: false,
-                ),
+              body: Column(
+                children: [
+                  MDEditor(
+                    editorState: _editorState,
+                    readOnly: context.knobs.boolean(
+                      label: "Read Only",
+                      initial: false,
+                    ),
+                    isExpanded: context.knobs.boolean(
+                      label: "Is Expanded",
+                      initial: false,
+                    ),
+                  ),
+                  MDButton(
+                    onTap: () {
+                      print(documentToMarkdown(_editorState.document));
+                    },
+                    child: const Text("Print markdown"),
+                  ),
+                ],
               ),
             );
           },
