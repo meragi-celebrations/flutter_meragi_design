@@ -1367,6 +1367,7 @@ class _RatingStoryState extends State<RatingStory> {
               .map((e) => Option(label: e.name, value: e))
               .toList(),
         ),
+        showLabels: context.knobs.boolean(label: "Show Labels", initial: true),
         starSize: context.knobs.slider(
           label: "Icon Size",
           initial: 20.0,
