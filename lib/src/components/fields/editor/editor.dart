@@ -3,7 +3,6 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/editor/handlers/user_mention.dart';
 import 'package:flutter_meragi_design/src/components/fields/editor/inline_actions_command.dart';
 import 'package:flutter_meragi_design/src/components/fields/editor/inline_actions_service.dart';
-import 'package:flutter_meragi_design/src/extensions/context.dart';
 
 class MDEditor extends StatefulWidget {
   final bool readOnly;
@@ -51,6 +50,7 @@ class _MDEditorState extends State<MDEditor> {
         widget.onTransactionChanged?.call(onData.$1, onData.$2);
       },
     );
+
     // editorStyle = _buildDesktopEditorStyle();
     // blockComponentBuilders = _buildBlockComponentBuilders();
     // commandShortcuts = _buildCommandShortcuts();
@@ -67,17 +67,17 @@ class _MDEditorState extends State<MDEditor> {
   @override
   Widget build(BuildContext context) {
     late final MDInputTheme decoration;
-    print("build editor ${context.theme.colors}");
     decoration = widget.decoration ?? context.theme.inputTheme;
     final editor = AppFlowyEditor(
       editorState: editorState,
       editable: !widget.readOnly,
-      editorScrollController: editorScrollController,
+      // editorScrollController: editorScrollController,
+      shrinkWrap: true,
       editorStyle: EditorStyle.desktop(
         cursorColor: widget.readOnly ? Colors.transparent : decoration.cursorColor,
         cursorWidth: widget.readOnly ? 0 : 2,
         selectionColor: decoration.selectionColor,
-        padding: EdgeInsets.zero, //decoration.padding,
+        padding: decoration.padding,
         textStyleConfiguration: TextStyleConfiguration(
           text: context.theme.fonts.paragraph.medium,
           lineHeight: context.theme.fonts.paragraph.medium.height ?? 1.2,
@@ -89,21 +89,28 @@ class _MDEditorState extends State<MDEditor> {
       ],
     );
 
-    final wrapper = DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: decoration.borderColor!),
-        borderRadius: BorderRadius.all(
-          Radius.circular(decoration.borderRadius ?? 5),
+    final wrapper = IntrinsicHeight(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: decoration.borderColor!),
+          borderRadius: BorderRadius.all(
+            Radius.circular(decoration.borderRadius ?? 5),
+          ),
         ),
+        constraints: widget.readOnly
+            ? null
+            : const BoxConstraints(
+                minHeight: 150,
+              ),
+        child: editor,
       ),
-      child: editor,
     );
 
     if (widget.isExpanded) {
       return Expanded(
         child: wrapper,
       );
-    }
+    } else {}
 
     return wrapper;
   }

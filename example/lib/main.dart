@@ -23,13 +23,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    CoralThemeColor colors = CoralThemeColor();
     return MeragiTheme(
       token: isPlatform([MeragiPlatform.android, MeragiPlatform.ios]) ? light : lightWide_v2,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Meragi Design',
         themeMode: ThemeMode.light,
-        theme: MDTheme(appColor: CoralThemeColor(), typography: MDDefaultTypography()).themeData,
+        theme: MDTheme(
+          colors: colors,
+          typography: MDDefaultTypography(color: colors.content.primary),
+          dimensions: const MDDefaultDimension(),
+        ).themeData,
         // ThemeData(
         //   // This is the theme of your application.
         //   //
@@ -92,6 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Storybook(
       initialStory: "Data/Typography",
+      wrapperBuilder: (context, child) {
+        return MaterialApp(
+          theme: context.theme,
+          home: child,
+        );
+      },
       stories: [
         Story(
           name: "Data/Typography",
@@ -937,6 +948,12 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
+          name: "Form/Fields/Rating",
+          builder: (context) {
+            return const RatingStory();
+          },
+        ),
+        Story(
           name: "Enhanced Widget",
           builder: (context) {
             WidgetStatesController _controller = WidgetStatesController();
@@ -979,23 +996,34 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         Story(
-          name: 'Calendar',
+          name: 'Markdown Editor',
           builder: (context) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: MDEditor(
-                editorState: EditorState(
-                  document: markdownToDocument('''# This is markdown'''),
-                ),
-                // initialText: '''# This is markdown''',
-                readOnly: context.knobs.boolean(
-                  label: "Read Only",
-                  initial: false,
-                ),
-                isExpanded: context.knobs.boolean(
-                  label: "Is Expanded",
-                  initial: false,
-                ),
+            EditorState _editorState = EditorState(
+              document: markdownToDocument(
+                '''# This is markdown''',
+              ),
+            );
+            return MDScaffold(
+              body: Column(
+                children: [
+                  MDEditor(
+                    editorState: _editorState,
+                    readOnly: context.knobs.boolean(
+                      label: "Read Only",
+                      initial: false,
+                    ),
+                    isExpanded: context.knobs.boolean(
+                      label: "Is Expanded",
+                      initial: false,
+                    ),
+                  ),
+                  MDButton(
+                    onTap: () {
+                      print(documentToMarkdown(_editorState.document));
+                    },
+                    child: const Text("Print markdown"),
+                  ),
+                ],
               ),
             );
           },
@@ -1218,6 +1246,43 @@ class _MoodboardStoryState extends State<MoodboardStory> {
               );
             },
           );
+        },
+      ),
+    );
+  }
+}
+
+class RatingStory extends StatefulWidget {
+  const RatingStory({super.key});
+
+  @override
+  State<RatingStory> createState() => _RatingStoryState();
+}
+
+class _RatingStoryState extends State<RatingStory> {
+  double rating = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      body: MDRating(
+        iconType: context.knobs.options(
+          label: "Icon Type",
+          initial: IconType.filled,
+          options: IconType.values.map((e) => Option(label: e.name, value: e)).toList(),
+        ),
+        showLabels: context.knobs.boolean(label: "Show Labels", initial: true),
+        starSize: context.knobs.slider(
+          label: "Icon Size",
+          initial: 20.0,
+          min: 12,
+          max: 48,
+        ),
+        value: rating,
+        onValueChanged: (value) {
+          setState(() {
+            rating = value;
+          });
         },
       ),
     );
