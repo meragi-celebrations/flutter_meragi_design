@@ -40,9 +40,7 @@ class _MDEditorState extends State<MDEditor> {
   void initState() {
     super.initState();
 
-    editorState = widget.editorState != null
-        ? widget.editorState!
-        : EditorState.blank(withInitialText: true);
+    editorState = widget.editorState != null ? widget.editorState! : EditorState.blank(withInitialText: true);
     editorScrollController = EditorScrollController(
       editorState: editorState,
       shrinkWrap: false,
@@ -73,10 +71,10 @@ class _MDEditorState extends State<MDEditor> {
     final editor = AppFlowyEditor(
       editorState: editorState,
       editable: !widget.readOnly,
-      editorScrollController: editorScrollController,
+      // editorScrollController: editorScrollController,
+      shrinkWrap: true,
       editorStyle: EditorStyle.desktop(
-        cursorColor:
-            widget.readOnly ? Colors.transparent : decoration.cursorColor,
+        cursorColor: widget.readOnly ? Colors.transparent : decoration.cursorColor,
         cursorWidth: widget.readOnly ? 0 : 2,
         selectionColor: decoration.selectionColor,
         padding: decoration.padding,
@@ -91,21 +89,28 @@ class _MDEditorState extends State<MDEditor> {
       ],
     );
 
-    final wrapper = DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: decoration.borderColor!),
-        borderRadius: BorderRadius.all(
-          Radius.circular(decoration.borderRadius ?? 5),
+    final wrapper = IntrinsicHeight(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: decoration.borderColor!),
+          borderRadius: BorderRadius.all(
+            Radius.circular(decoration.borderRadius ?? 5),
+          ),
         ),
+        constraints: widget.readOnly
+            ? null
+            : const BoxConstraints(
+                minHeight: 150,
+              ),
+        child: editor,
       ),
-      child: editor,
     );
 
     if (widget.isExpanded) {
       return Expanded(
         child: wrapper,
       );
-    }
+    } else {}
 
     return wrapper;
   }
