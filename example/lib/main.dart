@@ -44,6 +44,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.card_giftcard),
       label: 'Card',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.select_all),
+      label: 'Select',
+    ),
   ];
 
   @override
@@ -62,7 +66,11 @@ class _HomePageState extends State<HomePage> {
             destinations: _items,
           ),
           Expanded(
-            child: [const ButtonsStory(), const CardStory()][_selectedIndex],
+            child: [
+              const ButtonsStory(),
+              const CardStory(),
+              const SelectStory(),
+            ][_selectedIndex],
           ),
         ],
       ),
@@ -255,5 +263,76 @@ class ButtonsStory extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class SelectStory extends StatelessWidget {
+  const SelectStory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+        body: Column(
+      children: [
+        Row(
+          children: [
+            const Text('Single'),
+            MDSelect<String>(
+              options: const [
+                MDOption(value: 'Option 1', child: Text('Option 1')),
+                MDOption(value: 'Option 2', child: Text('Option 2')),
+              ],
+              placeholder: const Text('Select an option'),
+              selectedOptionBuilder: (context, value) => Text(value),
+              onChanged: (value) => print(value),
+            ),
+          ].withSpaceBetween(width: 10),
+        ),
+        Row(
+          children: [
+            const Text('Multiple'),
+            MDSelect<String>.multiple(
+              closeOnSelect: false,
+              options: const [
+                MDOption(value: 'Option 1', child: Text('Option 1')),
+                MDOption(value: 'Option 2', child: Text('Option 2')),
+              ],
+              placeholder: const Text('Select options'),
+              selectedOptionsBuilder: (context, values) => Text(values.join(', ')),
+              onChanged: (values) => print(values),
+            ),
+          ].withSpaceBetween(width: 10),
+        ),
+        Row(
+          children: [
+            const Text('Search'),
+            MDSelect<String>.withSearch(
+              options: const [
+                MDOption(value: 'Option 1', child: Text('Option 1')),
+                MDOption(value: 'Option 2', child: Text('Option 2')),
+              ],
+              placeholder: const Text('Select options'),
+              onChanged: (values) => print(values),
+              onSearchChanged: (value) => print(value),
+            ),
+          ].withSpaceBetween(width: 10),
+        ),
+        Row(
+          children: [
+            const Text('Multiple with Search'),
+            MDSelect<String>.multipleWithSearch(
+              options: const [
+                MDOption(value: 'Option 1', child: Text('Option 1')),
+                MDOption(value: 'Option 2', child: Text('Option 2')),
+              ],
+              placeholder: const Text('Select options'),
+              selectedOptionsBuilder: (context, values) => Text(values.join(', ')),
+              onChanged: (values) => print(values),
+              onSearchChanged: (value) => print(value),
+            ),
+          ].withSpaceBetween(width: 10),
+        ),
+      ],
+    ));
   }
 }

@@ -24,6 +24,7 @@ export 'src/components/fields/form_list_builder.dart';
 export 'src/components/fields/html_editor.dart';
 export 'src/components/fields/input_decoration.dart';
 export 'src/components/fields/list.dart';
+export 'src/components/fields/select.dart';
 export 'src/components/fields/md_slider.dart';
 export 'src/components/fields/ratings.dart';
 export 'src/components/fields/searchable_dropdown.dart';

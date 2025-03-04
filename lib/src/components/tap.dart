@@ -454,7 +454,10 @@ class _MDTapState extends State<MDTap> {
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
-    
+
+    final shadTheme = ShadTheme.of(context);
+
+    print(sizeTheme(shadTheme, widget.size ?? ShadButtonSize.regular));
 
     Widget loader = SizedBox.square(
       dimension: 12,
