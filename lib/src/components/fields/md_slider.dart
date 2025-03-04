@@ -94,18 +94,30 @@ class _MDSliderState extends State<MDSlider> {
   @override
   void initState() {
     super.initState();
-    _currentValue = widget.value ?? widget.min;
-    _currentRangeValues = widget.values ?? RangeValues(widget.min, widget.max);
+    // Round initial values if simplifyValues is true
+    if (widget.simplifyValues) {
+      _currentValue = (widget.value ?? widget.min).round().toDouble();
+      _currentRangeValues = widget.values ?? RangeValues(widget.min.round().toDouble(), widget.max.round().toDouble());
+    } else {
+      _currentValue = widget.value ?? widget.min;
+      _currentRangeValues = widget.values ?? RangeValues(widget.min, widget.max);
+    }
   }
 
   @override
   void didUpdateWidget(MDSlider oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != oldWidget.value) {
-      _currentValue = widget.value ?? widget.min;
+      _currentValue =
+          widget.simplifyValues ? (widget.value ?? widget.min).round().toDouble() : (widget.value ?? widget.min);
     }
     if (widget.values != oldWidget.values) {
-      _currentRangeValues = widget.values ?? RangeValues(widget.min, widget.max);
+      if (widget.simplifyValues) {
+        final values = widget.values ?? RangeValues(widget.min, widget.max);
+        _currentRangeValues = RangeValues(values.start.round().toDouble(), values.end.round().toDouble());
+      } else {
+        _currentRangeValues = widget.values ?? RangeValues(widget.min, widget.max);
+      }
     }
   }
 
@@ -127,10 +139,17 @@ class _MDSliderState extends State<MDSlider> {
             ),
           ),
         SizedBox(
-          height: 48,
-          child: widget.isRange ? _buildRangeSlider(theme) : _buildSingleSlider(theme),
+          height: 100,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: widget.isRange ? _buildRangeSlider(theme) : _buildSingleSlider(theme)),
+              _buildMinMaxLabels(),
+            ],
+          ),
         ),
-        _buildMinMaxLabels(),
         if (widget.errorText != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
@@ -172,6 +191,8 @@ class _MDSliderState extends State<MDSlider> {
               thumbColor: widget.decoration?.thumbColor,
               overlayColor: widget.decoration?.thumbColor.withOpacity(0.1),
               valueIndicatorColor: widget.decoration?.thumbColor,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
+              trackHeight: 4.0,
             ),
             child: Slider(
               value: _currentValue,
@@ -181,8 +202,9 @@ class _MDSliderState extends State<MDSlider> {
               onChanged: widget.disabled
                   ? null
                   : (value) {
-                      setState(() => _currentValue = value);
-                      widget.onChanged?.call(value);
+                      final updatedValue = widget.simplifyValues ? value.round().toDouble() : value;
+                      setState(() => _currentValue = updatedValue);
+                      widget.onChanged?.call(updatedValue);
                     },
             ),
           ),
@@ -200,20 +222,13 @@ class _MDSliderState extends State<MDSlider> {
 
   Widget _buildRangeSlider(ThemeData theme) {
     return LayoutBuilder(builder: (context, constraints) {
-      final sliderWidth = constraints.maxWidth - 32; // Account for slider padding
-      final bubbleWidth = 32.0; // Width of the bubble
+      final sliderWidth = constraints.maxWidth - 32;
+      const bubbleWidth = 32.0;
       final startPosition = ((_currentRangeValues.start - widget.min) / (widget.max - widget.min)) * sliderWidth;
       final endPosition = ((_currentRangeValues.end - widget.min) / (widget.max - widget.min)) * sliderWidth;
 
-      // Clamp positions to keep bubbles visible
-      final clampedStartPosition = startPosition.clamp(
-          bubbleWidth / 2, // Min position
-          sliderWidth - bubbleWidth / 2 // Max position
-          );
-      final clampedEndPosition = endPosition.clamp(
-          bubbleWidth / 2, // Min position
-          sliderWidth - bubbleWidth / 2 // Max position
-          );
+      final clampedStartPosition = startPosition.clamp(bubbleWidth / 2, sliderWidth - bubbleWidth / 2);
+      final clampedEndPosition = endPosition.clamp(bubbleWidth / 2, sliderWidth - bubbleWidth / 2);
 
       return Stack(
         alignment: Alignment.center,
@@ -224,8 +239,8 @@ class _MDSliderState extends State<MDSlider> {
               inactiveTrackColor: widget.decoration?.inactiveTrackColor ?? theme.primaryColor.withOpacity(0.2),
               thumbColor: widget.decoration?.thumbColor ?? theme.primaryColor,
               overlayColor: widget.decoration?.thumbColor.withOpacity(0.1),
-              rangeThumbShape: const RoundRangeSliderThumbShape(),
-              rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
+              rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 8.0),
+              trackHeight: 4.0,
             ),
             child: RangeSlider(
               values: _currentRangeValues,
@@ -235,15 +250,21 @@ class _MDSliderState extends State<MDSlider> {
               onChanged: widget.disabled
                   ? null
                   : (RangeValues values) {
-                      setState(() => _currentRangeValues = values);
-                      widget.onRangeChanged?.call(values);
+                      final updatedValues = widget.simplifyValues
+                          ? RangeValues(
+                              values.start.round().toDouble(),
+                              values.end.round().toDouble(),
+                            )
+                          : values;
+                      setState(() => _currentRangeValues = updatedValues);
+                      widget.onRangeChanged?.call(updatedValues);
                     },
             ),
           ),
           if (!widget.disabled) ...[
             Positioned(
               left: clampedStartPosition - bubbleWidth / 2,
-              top: 0,
+              top: -8,
               child: _buildValueBubble(
                 widget.simplifyValues
                     ? _currentRangeValues.start.round().toString()
@@ -252,7 +273,7 @@ class _MDSliderState extends State<MDSlider> {
             ),
             Positioned(
               left: clampedEndPosition - bubbleWidth / 2,
-              top: 0,
+              top: -8,
               child: _buildValueBubble(
                 widget.simplifyValues
                     ? _currentRangeValues.end.round().toString()
@@ -267,7 +288,7 @@ class _MDSliderState extends State<MDSlider> {
 
   Widget _buildValueBubble(String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
         color: widget.decoration?.bubbleColor,
         borderRadius: BorderRadius.circular(widget.decoration?.token.radius ?? 4),
@@ -283,7 +304,7 @@ class _MDSliderState extends State<MDSlider> {
 
   Widget _buildMinMaxLabels() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
