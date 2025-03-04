@@ -270,6 +270,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_animate:
+    dependency: transitive
+    description:
+      name: flutter_animate
+      sha256: "7befe2d3252728afb77aecaaea1dec88a89d35b9b1d2eea6d04479e8af9117b5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.5.2"
   flutter_colorpicker:
     dependency: transitive
     description:
@@ -345,7 +353,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "3.11.0"
+    version: "3.12.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -386,6 +394,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
+  flutter_shaders:
+    dependency: transitive
+    description:
+      name: flutter_shaders
+      sha256: "34794acadd8275d971e02df03afee3dee0f98dbfb8c4837082ad0034f612a3e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.3"
   flutter_svg:
     dependency: transitive
     description:
@@ -540,6 +556,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  lucide_icons_flutter:
+    dependency: transitive
+    description:
+      name: lucide_icons_flutter
+      sha256: "0556185ba61e3b844e1d930bc09fe562a2e5062babbff15f3ca3ca5221c765d4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.8"
   markdown:
     dependency: transitive
     description:
@@ -836,6 +860,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  shadcn_ui:
+    dependency: transitive
+    description:
+      name: shadcn_ui
+      sha256: "7cf9c07c8557069f85f8151fd7f3bcf22b5bf889360817e27c704159aff90a73"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.16.3"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -945,6 +977,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
+  two_dimensional_scrollables:
+    dependency: transitive
+    description:
+      name: two_dimensional_scrollables
+      sha256: b6028c80e782e58a5d18f9491737aae4f70d72dc08050ac92006905c7c0b5e21
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3"
   typed_data:
     dependency: transitive
     description:

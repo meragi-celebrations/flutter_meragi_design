@@ -81,3 +81,5 @@ export 'src/utils/platform.dart';
 export 'src/utils/scroll_handler.dart';
 export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
+export 'src/app.dart';
+export 'package:shadcn_ui/shadcn_ui.dart' hide ValueTransformer, TextDirection;
