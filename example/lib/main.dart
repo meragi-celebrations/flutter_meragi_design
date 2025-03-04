@@ -37,8 +37,12 @@ class _HomePageState extends State<HomePage> {
 
   final List<MDNavigationRailDestination> _items = [
     MDNavigationRailDestination(
-      icon: const Icon(Icons.home),
-      label: 'Home',
+      icon: const Icon(Icons.list),
+      label: 'Buttons',
+    ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.card_giftcard),
+      label: 'Card',
     ),
   ];
 
@@ -48,6 +52,7 @@ class _HomePageState extends State<HomePage> {
       body: Row(
         children: [
           MDNavigationRail(
+            controller: MDNavigationRailController(isExpanded: true),
             selectedIndex: _selectedIndex,
             onDestinationSelected: (index) {
               setState(() {
@@ -56,27 +61,198 @@ class _HomePageState extends State<HomePage> {
             },
             destinations: _items,
           ),
-          const Expanded(
-            child: Center(
-              child: Column(
-                children: [
-                  ShadButton(
-                    child: Text('Test string'),
-                  ),
-                  ShadButton.secondary(
-                    child: Text('Secondary button'),
-                  ),
-                  ShadButton.outline(
-                    child: Text('Outline button'),
-                  ),
-                  ShadButton.destructive(
-                    child: Text('Destructive button'),
-                  )
-                ],
-              ),
-            ),
+          Expanded(
+            child: [const ButtonsStory(), const CardStory()][_selectedIndex],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CardStory extends StatelessWidget {
+  const CardStory({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text('Card'),
+        asPageHeader: true,
+      ),
+      body: MDPanel(
+        width: 450,
+        title: const Text('Title'),
+        description: const Text('Description'),
+        footer: MDTap(
+          width: double.infinity,
+          icon: const Padding(
+            padding: EdgeInsets.only(right: 8),
+            child: Icon(PhosphorIconsRegular.check),
+          ),
+          onPressed: () {},
+          child: const Text('Mark all as read'),
+        ),
+        child: const Text('Footer'),
+      ),
+    );
+  }
+}
+
+class ButtonsStory extends StatelessWidget {
+  const ButtonsStory({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text('Buttons'),
+        asPageHeader: true,
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ...ShadButtonSize.values
+                    .map(
+                      (e) => MDTap(
+                        size: e,
+                        child: Text('Primary, ${e.name}'),
+                      ),
+                    )
+                    .toList(),
+                const MDTap(
+                  isLoading: true,
+                  child: Text('Primary'),
+                ),
+                const MDTap(
+                  enabled: false,
+                  child: Text('Disabled'),
+                ),
+                const MDTap(
+                  icon: Icon(PhosphorIconsRegular.check),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                ...ShadButtonSize.values
+                    .map(
+                      (e) => MDTap.secondary(
+                        size: e,
+                        child: Text('Secondary, ${e.name}'),
+                      ),
+                    )
+                    .toList(),
+                const MDTap.secondary(
+                  isLoading: true,
+                  child: Text('Secondary'),
+                ),
+                const MDTap.secondary(
+                  enabled: false,
+                  child: Text('Disabled'),
+                ),
+                const MDTap.secondary(
+                  icon: Icon(PhosphorIconsRegular.check),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                ...ShadButtonSize.values
+                    .map(
+                      (e) => MDTap.outline(
+                        size: e,
+                        child: Text('Outline, ${e.name}'),
+                      ),
+                    )
+                    .toList(),
+                const MDTap.outline(
+                  isLoading: true,
+                  child: Text('Outline'),
+                ),
+                const MDTap.outline(
+                  enabled: false,
+                  child: Text('Disabled'),
+                ),
+                const MDTap.outline(
+                  icon: Icon(PhosphorIconsRegular.check),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                ...ShadButtonSize.values
+                    .map(
+                      (e) => MDTap.ghost(
+                        size: e,
+                        child: Text('Ghost, ${e.name}'),
+                      ),
+                    )
+                    .toList(),
+                const MDTap.ghost(
+                  isLoading: true,
+                  child: Text('Ghost'),
+                ),
+                const MDTap.ghost(
+                  enabled: false,
+                  child: Text('Disabled'),
+                ),
+                const MDTap.ghost(
+                  icon: Icon(PhosphorIconsRegular.check),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                ...ShadButtonSize.values
+                    .map(
+                      (e) => MDTap.destructive(
+                        size: e,
+                        child: Text('Destructive, ${e.name}'),
+                      ),
+                    )
+                    .toList(),
+                const MDTap.destructive(
+                  isLoading: true,
+                  child: Text('Destructive'),
+                ),
+                const MDTap.destructive(
+                  enabled: false,
+                  child: Text('Disabled'),
+                ),
+                const MDTap.destructive(
+                  icon: Icon(PhosphorIconsRegular.check),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                ...ShadButtonSize.values
+                    .map(
+                      (e) => MDTap.link(
+                        size: e,
+                        child: Text('Link, ${e.name}'),
+                      ),
+                    )
+                    .toList(),
+                const MDTap.link(
+                  isLoading: true,
+                  child: Text('Link'),
+                ),
+                const MDTap.link(
+                  enabled: false,
+                  child: Text('Disabled'),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

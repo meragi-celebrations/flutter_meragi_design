@@ -20,6 +20,7 @@ enum CardSize { sm, rg, lg }
 /// The [decoration] property can be used to customize the appearance of the
 /// card. The [decoration] property can be used to specify the background color,
 /// border color, border width, and border radius of the card.
+@Deprecated('Use MDPanel instead')
 class MDCard extends StatelessWidget {
   /// The header of the card
   final Widget? header;

@@ -42,7 +42,7 @@ class MDTheme {
   ShadColorScheme get shadColorScheme => ShadColorScheme(
   background: colors.background.primary,
   foreground: colors.content.primary,
-  card: colors.background.secondary,
+  card: colors.background.primary,
   cardForeground: colors.content.primary,
   popover: colors.background.secondary,
   popoverForeground: colors.content.primary,
@@ -69,63 +69,38 @@ class MDTheme {
     size: ShadButtonSize.regular,
     backgroundColor: colors.primary,
     foregroundColor: colors.content.onColor,
-    hoverBackgroundColor: colors.primary.withOpacity(0.8),
-    decoration: ShadDecoration(
-      border: ShadBorder(
-        radius: BorderRadius.circular(10),
+    hoverBackgroundColor: colors.primary.lighten(20),
+    sizesTheme: ShadButtonSizesTheme(
+      // merge: true,
+      sm: ShadButtonSizeTheme(
+        padding: EdgeInsets.zero,
+        height: 2,
+        width: 2,
       ),
-    ),
-  ),
+  ),),
   secondaryButtonTheme: ShadButtonTheme(
     merge: true,
     backgroundColor: colors.background.tertiary,
     foregroundColor: colors.content.primary,
     hoverBackgroundColor: colors.background.tertiary.darken(),
-    decoration: ShadDecoration(
-      border: ShadBorder(
-        radius: BorderRadius.circular(10),
-      ),
-    ),
   ),
   outlineButtonTheme: ShadButtonTheme(
     merge: true,
     backgroundColor: colors.background.primary,
     foregroundColor: colors.content.primary,
     hoverBackgroundColor: colors.background.primary.darken(),
-    decoration: ShadDecoration(
-      border: ShadBorder(
-        merge: true,
-        top: BorderSide(
-          color: colors.border.opaque,
-          width: dimensions.stroke,
-        ),
-        bottom: BorderSide(
-          color: colors.border.opaque,
-          width: dimensions.stroke,
-        ),
-        left: BorderSide(
-          color: colors.border.opaque,
-          width: dimensions.stroke,
-        ),
-        right: BorderSide(
-          color: colors.border.opaque,
-          width: dimensions.stroke,
-        ),
-        radius: BorderRadius.circular(10),
-      ),
-    ),
+  ),
+  ghostButtonTheme: ShadButtonTheme(
+    merge: true,
+    backgroundColor: colors.background.primary,
+    foregroundColor: colors.content.primary,
+    hoverBackgroundColor: colors.background.primary.darken(),
   ),
   destructiveButtonTheme: ShadButtonTheme(
     merge: true,  
     backgroundColor: colors.negative,
     foregroundColor: colors.content.onColor,
     hoverBackgroundColor: colors.negative.darken(),
-    decoration: ShadDecoration(
-      border: ShadBorder(
-        merge: true,
-        radius: BorderRadius.circular(10),
-      ),
-    ),
   ),
   );
 
@@ -139,6 +114,7 @@ class MDTheme {
         extensions: [
           AppColorExtension(colors: colors),
           AppTypographyExtension(fonts: typography),
+          AppDimensionExtension(dimensions: dimensions),
           MDInputThemeExtension(
             theme: MDInputTheme(
               cursorColor: colors.primary,

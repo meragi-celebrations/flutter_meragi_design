@@ -6,8 +6,10 @@ export 'package:form_builder_validators/form_builder_validators.dart';
 
 export 'src/components/alert_dialog.dart';
 export 'src/components/button.dart';
-export 'src/components/card.dart';
 export 'src/components/carousel.dart';
+export 'src/components/card.dart';
+export 'src/components/panel.dart';
+export 'src/components/tap.dart';
 export 'src/components/description.dart';
 export 'src/components/divider.dart';
 export 'src/components/drawer.dart';
@@ -83,3 +85,4 @@ export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
 export 'src/app.dart';
 export 'package:shadcn_ui/shadcn_ui.dart' hide ValueTransformer, TextDirection;
+export 'package:phosphor_flutter/phosphor_flutter.dart';
