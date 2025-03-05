@@ -308,7 +308,8 @@ class SelectStory extends StatelessWidget {
                 MDOption(value: 'Option 2', child: Text('Option 2')),
               ],
               placeholder: const Text('Select options'),
-              selectedOptionsBuilder: (context, values) => Text(values.join(', ')),
+              selectedOptionsBuilder: (context, values) =>
+                  Text(values.join(', ')),
               onChanged: (values) => print(values),
             ),
           ].withSpaceBetween(width: 10),
@@ -336,7 +337,8 @@ class SelectStory extends StatelessWidget {
                 MDOption(value: 'Option 2', child: Text('Option 2')),
               ],
               placeholder: const Text('Select options'),
-              selectedOptionsBuilder: (context, values) => Text(values.join(', ')),
+              selectedOptionsBuilder: (context, values) =>
+                  Text(values.join(', ')),
               onChanged: (values) => print(values),
               onSearchChanged: (value) => print(value),
             ),
@@ -367,15 +369,16 @@ class _FormStoryState extends State<FormStory> {
       body: MDPanel(
         width: 450,
         title: const Text('Form'),
-        description: const Text('This is a simple form that prints the values of the form to the console when the submit button is pressed'),
-      footer: MDTap(
-        width: double.infinity,
-        onPressed: () {
-          formKey.currentState?.save();
-          print(formKey.currentState?.value);
-        },
-        child: const Text('Submit'),
-      ),
+        description: const Text(
+            'This is a simple form that prints the values of the form to the console when the submit button is pressed'),
+        footer: MDTap(
+          width: double.infinity,
+          onPressed: () {
+            formKey.currentState?.save();
+            print(formKey.currentState?.value);
+          },
+          child: const Text('Submit'),
+        ),
         child: Column(
           children: [
             const MDDivider(),
@@ -396,7 +399,6 @@ class _FormStoryState extends State<FormStory> {
                       name: 'select',
                       placeholder: const Text('Select an option'),
                       minWidth: double.infinity,
-                      
                       options: const [
                         MDOption(value: 'Option 1', child: Text('Option 1')),
                         MDOption(value: 'Option 2', child: Text('Option 2')),
@@ -426,12 +428,10 @@ class _FormStoryState extends State<FormStory> {
                   ),
                   MDFormItem(
                     label: const Text('Multiple Select'),
-                    error: const Text('Error'),
                     child: MDMultipleSelectFormField<String>(
                       name: 'multiple_select',
                       placeholder: const Text('Select an option'),
                       minWidth: double.infinity,
-                      closeOnSelect: false,
                       options: const [
                         MDOption(value: 'Option 1', child: Text('Option 1')),
                         MDOption(value: 'Option 2', child: Text('Option 2')),
@@ -439,22 +439,35 @@ class _FormStoryState extends State<FormStory> {
                         MDOption(value: 'Option 4', child: Text('Option 4')),
                         MDOption(value: 'Option 5', child: Text('Option 5')),
                       ],
-                      selectedOptionsBuilder: (context, values) => Text(values.join(', ')),
+                      selectedOptionsBuilder: (context, values) =>
+                          Text(values.join(', ')),
                     ),
+                  ),
+                  const MDDivider(),
+                  MDToggleFormField(
+                    name: 'toggle',
+                    label: const Text('I accept the terms and conditions'),
+                    sublabel: const Text('You must accept the terms and conditions to continue'),
                   )
                 ],
               ),
-                  ),
+            ),
           ],
         ),
-    ),
+      ),
     );
   }
 }
 
-class InputStory extends StatelessWidget {
+class InputStory extends StatefulWidget {
   const InputStory({super.key});
 
+  @override
+  State<InputStory> createState() => _InputStoryState();
+}
+
+class _InputStoryState extends State<InputStory> {
+  bool _toggleValue = false;
   @override
   Widget build(BuildContext context) {
     return MDScaffold(
@@ -466,7 +479,14 @@ class InputStory extends StatelessWidget {
         width: 450,
         child: Column(
           children: [
-            MDInput(placeholder: const Text('Input'), onChanged: (value) => print(value)),
+            MDInput(
+                placeholder: const Text('Input'),
+                onChanged: (value) => print(value)),
+            MDToggle(
+              value: _toggleValue,
+              onChanged: (value) => setState(() => _toggleValue = value),
+              label: const Text('Toggle'),
+            ),
           ],
         ),
       ),

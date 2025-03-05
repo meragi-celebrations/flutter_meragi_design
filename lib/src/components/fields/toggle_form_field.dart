@@ -1,48 +1,47 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
-/// On/Off Cupertino switch field
-@Deprecated('Use MDToggle/MDToggleFormField instead')
-class MDSwitch extends MDFormBuilderField<bool> {
-  /// The color to use when this switch is on.
-  ///
-  /// Defaults to [CupertinoColors.systemGreen] when null and ignores
-  /// the [CupertinoTheme] in accordance to native iOS behavior.
-  final Color? activeColor;
-
-  /// The color to use for the background when the switch is off.
-  ///
-  /// Defaults to [CupertinoColors.secondarySystemFill] when null.
-  final Color? trackColor;
-
-  /// The color to use for the thumb of the switch.
-  ///
-  /// Defaults to [CupertinoColors.white] when null.
+/// A form field that wraps the [MDToggle] widget.
+class MDToggleFormField extends MDFormBuilderField<bool> {
+  /// The color of the toggle thumb.
   final Color? thumbColor;
 
-  /// {@template flutter.cupertino.CupertinoSwitch.dragStartBehavior}
-  /// Determines the way that drag start behavior is handled.
-  ///
-  /// If set to [DragStartBehavior.start], the drag behavior used to move the
-  /// switch from on to off will begin at the position where the drag gesture won
-  /// the arena. If set to [DragStartBehavior.down] it will begin at the position
-  /// where a down event was first detected.
-  ///
-  /// In general, setting this to [DragStartBehavior.start] will make drag
-  /// animation smoother and setting it to [DragStartBehavior.down] will make
-  /// drag behavior feel slightly more reactive.
-  ///
-  /// By default, the drag start behavior is [DragStartBehavior.start].
-  ///
-  /// See also:
-  ///
-  ///  * [DragGestureRecognizer.dragStartBehavior], which gives an example for
-  ///    the different behaviors.
-  ///
-  /// {@endtemplate}
-  final DragStartBehavior dragStartBehavior;
+  /// The color of the unchecked track.
+  final Color? uncheckedTrackColor;
+
+  /// The color of the checked track.
+  final Color? checkedTrackColor;
+
+  /// The width of the toggle, defaults to 44.
+  final double? width;
+
+  /// The height of the toggle, defaults to 24.
+  final double? height;
+
+  /// The margin of the toggle, defaults to 2.
+  final double? margin;
+
+  /// The duration of the toggle animation, defaults to 100ms.
+  final Duration? duration;
+
+  /// The decoration of the toggle.
+  final ShadDecoration? decoration;
+
+  /// An optional label for the toggle, displayed on the right side if
+  /// the [direction] is `TextDirection.ltr`.
+  final Widget? label;
+
+  /// An optional sublabel for the toggle, displayed below the label.
+  final Widget? sublabel;
+
+  /// The padding between the toggle and the label, defaults to
+  /// `EdgeInsets.only(left: 8)`.
+  final EdgeInsets? padding;
+
+  /// The direction of the toggle.
+  final TextDirection? direction;
 
   /// Defines whether the field input expands to fill the entire width
   /// of the row field.
@@ -81,8 +80,8 @@ class MDSwitch extends MDFormBuilderField<bool> {
   /// [prefix] and [child]. If null, the row is shorter.
   final Widget? Function(String error)? errorBuilder;
 
-  /// Creates On/Off Cupertino switch field
-  MDSwitch({
+  /// Creates a form field that wraps the [MDToggle] widget.
+  MDToggleFormField({
     super.key,
     required super.name,
     super.validator,
@@ -93,12 +92,20 @@ class MDSwitch extends MDFormBuilderField<bool> {
     super.onSaved,
     super.autovalidateMode,
     super.onReset,
-    super.focusNode,
     super.restorationId,
-    this.activeColor,
-    this.dragStartBehavior = DragStartBehavior.start,
-    this.trackColor,
+    super.focusNode,
     this.thumbColor,
+    this.uncheckedTrackColor,
+    this.checkedTrackColor,
+    this.width,
+    this.height,
+    this.margin,
+    this.duration,
+    this.decoration,
+    this.direction,
+    this.label,
+    this.sublabel,
+    this.padding,
     this.shouldExpandedField = false,
     this.errorBuilder,
     this.helper,
@@ -106,28 +113,40 @@ class MDSwitch extends MDFormBuilderField<bool> {
     this.prefix,
   }) : super(
           builder: (FormFieldState<bool?> field) {
-            final state = field as _MDSwitchState;
+            final state = field as _MDToggleFormFieldState;
 
-            Color finalActiveColor = activeColor ?? Colors.deepPurple;
-
-            final fieldWidget = CupertinoSwitch(
+            final fieldWidget = MDToggle(
               value: state.value ?? false,
+              enabled: state.enabled,
               onChanged: state.enabled
                   ? (value) {
                       field.didChange(value);
                     }
                   : null,
-              activeColor: finalActiveColor,
-              dragStartBehavior: dragStartBehavior,
               thumbColor: thumbColor,
-              trackColor: trackColor,
+              uncheckedTrackColor: uncheckedTrackColor,
+              checkedTrackColor: checkedTrackColor,
+              width: width,
+              height: height,
+              margin: margin,
+              duration: duration,
+              decoration: decoration,
+              label: label,
+              sublabel: sublabel,
+              padding: padding,
             );
+
             return fieldWidget;
           },
         );
 
   @override
-  MDFormBuilderFieldState<MDSwitch, bool> createState() => _MDSwitchState();
+  MDFormBuilderFieldState<MDToggleFormField, bool> createState() => _MDToggleFormFieldState();
 }
 
-class _MDSwitchState extends MDFormBuilderFieldState<MDSwitch, bool> {}
+class _MDToggleFormFieldState extends MDFormBuilderFieldState<MDToggleFormField, bool> {
+  @override
+  Widget build(BuildContext context) {
+    return super.build(context);
+  }
+}
