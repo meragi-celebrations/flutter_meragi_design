@@ -48,6 +48,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.select_all),
       label: 'Select',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.format_align_center),
+      label: 'Form',
+    ),
   ];
 
   @override
@@ -70,6 +74,7 @@ class _HomePageState extends State<HomePage> {
               const ButtonsStory(),
               const CardStory(),
               const SelectStory(),
+              const FormStory(),
             ][_selectedIndex],
           ),
         ],
@@ -334,5 +339,67 @@ class SelectStory extends StatelessWidget {
         ),
       ],
     ));
+  }
+}
+
+class FormStory extends StatefulWidget {
+  const FormStory({super.key});
+
+  @override
+  State<FormStory> createState() => _FormStoryState();
+}
+
+class _FormStoryState extends State<FormStory> {
+  final formKey = GlobalKey<FormBuilderState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text('Form'),
+        asPageHeader: true,
+      ),
+      body: MDPanel(
+        width: 450,
+        title: const Text('Form'),
+        description: const Text('This is a simple form that prints the values of the form to the console when the submit button is pressed'),
+      footer: MDTap(
+        width: double.infinity,
+        onPressed: () {
+          formKey.currentState?.save();
+          print(formKey.currentState?.value);
+        },
+        child: const Text('Submit'),
+      ),
+        child: Column(
+          children: [
+            const MDDivider(),
+            FormBuilder(
+              key: formKey,
+              child: Column(
+                children: [
+                  MDFormItem(
+                    label: const Text('Select'),
+                    child: MDSelectFormField<String>(
+                      name: 'select',
+                      placeholder: const Text('Select an option'),
+                      minWidth: 250,
+                      options: const [
+                        MDOption(value: 'Option 1', child: Text('Option 1')),
+                        MDOption(value: 'Option 2', child: Text('Option 2')),
+                        MDOption(value: 'Option 3', child: Text('Option 3')),
+                        MDOption(value: 'Option 4', child: Text('Option 4')),
+                        MDOption(value: 'Option 5', child: Text('Option 5')),
+                      ],
+                      selectedOptionBuilder: (context, value) => Text(value),
+                    ),
+                  )
+                ],
+              ),
+                  ),
+          ],
+        ),
+    ),
+    );
   }
 }

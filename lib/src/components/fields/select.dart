@@ -553,11 +553,11 @@ class MDOption<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShadOption<T>(
       value: value,
-      child: child,
       hoveredBackgroundColor: hoveredBackgroundColor,
       padding: padding,
       selectedIcon: selectedIcon,
       radius: radius,
+      child: child,
     );
   }
 }

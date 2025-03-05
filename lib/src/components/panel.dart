@@ -54,7 +54,6 @@ class MDPanel extends StatelessWidget {
     return ShadCard(
       title: title,
       description: description,
-      child: child,
       footer: footer,
       padding: padding,
       backgroundColor: backgroundColor,
@@ -71,6 +70,7 @@ class MDPanel extends StatelessWidget {
       columnCrossAxisAlignment: columnCrossAxisAlignment,
       rowMainAxisSize: rowMainAxisSize,
       columnMainAxisSize: columnMainAxisSize,
+      child: child,
     );
   }
 }
