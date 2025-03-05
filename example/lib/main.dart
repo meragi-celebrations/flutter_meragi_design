@@ -49,6 +49,10 @@ class _HomePageState extends State<HomePage> {
       label: 'Select',
     ),
     MDNavigationRailDestination(
+      icon: const Icon(Icons.input),
+      label: 'Input',
+    ),
+    MDNavigationRailDestination(
       icon: const Icon(Icons.format_align_center),
       label: 'Form',
     ),
@@ -74,6 +78,7 @@ class _HomePageState extends State<HomePage> {
               const ButtonsStory(),
               const CardStory(),
               const SelectStory(),
+              const InputStory(),
               const FormStory(),
             ][_selectedIndex],
           ),
@@ -379,11 +384,19 @@ class _FormStoryState extends State<FormStory> {
               child: Column(
                 children: [
                   MDFormItem(
+                    label: const Text('Input'),
+                    child: MDInputFormField(
+                      name: 'input',
+                      placeholder: const Text('Input'),
+                    ),
+                  ),
+                  MDFormItem(
                     label: const Text('Select'),
                     child: MDSelectFormField<String>(
                       name: 'select',
                       placeholder: const Text('Select an option'),
-                      minWidth: 250,
+                      minWidth: double.infinity,
+                      
                       options: const [
                         MDOption(value: 'Option 1', child: Text('Option 1')),
                         MDOption(value: 'Option 2', child: Text('Option 2')),
@@ -393,6 +406,41 @@ class _FormStoryState extends State<FormStory> {
                       ],
                       selectedOptionBuilder: (context, value) => Text(value),
                     ),
+                  ),
+                  MDFormItem(
+                    label: const Text('Select with Search'),
+                    child: MDSelectFormField<String>.search(
+                      name: 'select_search',
+                      placeholder: const Text('Select an option'),
+                      minWidth: double.infinity,
+                      onSearchChanged: (value) => print(value),
+                      options: const [
+                        MDOption(value: 'Option 1', child: Text('Option 1')),
+                        MDOption(value: 'Option 2', child: Text('Option 2')),
+                        MDOption(value: 'Option 3', child: Text('Option 3')),
+                        MDOption(value: 'Option 4', child: Text('Option 4')),
+                        MDOption(value: 'Option 5', child: Text('Option 5')),
+                      ],
+                      selectedOptionBuilder: (context, value) => Text(value),
+                    ),
+                  ),
+                  MDFormItem(
+                    label: const Text('Multiple Select'),
+                    error: const Text('Error'),
+                    child: MDMultipleSelectFormField<String>(
+                      name: 'multiple_select',
+                      placeholder: const Text('Select an option'),
+                      minWidth: double.infinity,
+                      closeOnSelect: false,
+                      options: const [
+                        MDOption(value: 'Option 1', child: Text('Option 1')),
+                        MDOption(value: 'Option 2', child: Text('Option 2')),
+                        MDOption(value: 'Option 3', child: Text('Option 3')),
+                        MDOption(value: 'Option 4', child: Text('Option 4')),
+                        MDOption(value: 'Option 5', child: Text('Option 5')),
+                      ],
+                      selectedOptionsBuilder: (context, values) => Text(values.join(', ')),
+                    ),
                   )
                 ],
               ),
@@ -400,6 +448,28 @@ class _FormStoryState extends State<FormStory> {
           ],
         ),
     ),
+    );
+  }
+}
+
+class InputStory extends StatelessWidget {
+  const InputStory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text('Input'),
+        asPageHeader: true,
+      ),
+      body: MDPanel(
+        width: 450,
+        child: Column(
+          children: [
+            MDInput(placeholder: const Text('Input'), onChanged: (value) => print(value)),
+          ],
+        ),
+      ),
     );
   }
 }

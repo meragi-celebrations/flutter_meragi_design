@@ -31,6 +31,8 @@ export 'src/components/fields/searchable_dropdown.dart';
 export 'src/components/fields/switch.dart';
 export 'src/components/fields/text_field.dart';
 export 'src/components/fields/select_form_field.dart';
+export 'src/components/fields/input.dart';
+export 'src/components/fields/input_form_field.dart';
 export 'src/components/filter_form.dart';
 export 'src/components/gesture_detector.dart';
 export 'src/components/image.dart';

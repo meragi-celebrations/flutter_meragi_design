@@ -106,6 +106,17 @@ class MDTheme {
         optionTheme: ShadOptionTheme(
           hoveredBackgroundColor: colors.background.tertiary,
         ),
+        inputTheme: ShadInputTheme(
+          placeholderStyle: typography.paragraph.small.copyWith(color: colors.content.stateDisabled),
+          decoration: ShadDecoration(
+            border: ShadBorder(
+              top: BorderSide(color: colors.border.opaque),
+              bottom: BorderSide(color: colors.border.opaque),
+              left: BorderSide(color: colors.border.opaque),
+              right: BorderSide(color: colors.border.opaque),
+            ),
+          ),
+        ),
       );
 
   ThemeData get themeData => ThemeData(

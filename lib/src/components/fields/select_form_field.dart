@@ -159,15 +159,15 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.groupId,
     this.itemCount,
     this.shrinkWrap,
-    this.onSearchChanged,
-    this.searchDivider,
-    this.searchInputPrefix,
-    this.searchPlaceholder,
-    this.searchPadding,
-    this.search,
-    this.clearSearchOnClose,
   })  : variant = MDSelectVariant.primary,
         focusNode = focusNode,
+        onSearchChanged = null,
+        searchDivider = null,
+        searchInputPrefix = null,
+        searchPlaceholder = null,
+        searchPadding = null,
+        search = null,
+        clearSearchOnClose = false,
         super(
           builder: (FormFieldState<T?> field) {
             final state = field as _MDSelectFormFieldState<T>;
@@ -263,8 +263,8 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.itemCount,
     this.shrinkWrap,
   })  : variant = MDSelectVariant.search,
-        selectedOptionsBuilder = null,
         focusNode = focusNode,
+        selectedOptionsBuilder = null,
         super(
           builder: (FormFieldState<T?> field) {
             final state = field as _MDSelectFormFieldState<T>;
@@ -319,7 +319,133 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
           },
         );
 
-  MDSelectFormField.multiple({
+  @override
+  MDFormBuilderFieldState<MDSelectFormField<T>, T> createState() => _MDSelectFormFieldState<T>();
+}
+
+class _MDSelectFormFieldState<T> extends MDFormBuilderFieldState<MDSelectFormField<T>, T> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void reset() {
+    super.reset();
+  }
+}
+
+class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
+  /// The options of the [MDSelect].
+  final Iterable<Widget>? options;
+
+  /// The builder for the options of the [MDSelect].
+  final Widget? Function(BuildContext, int)? optionsBuilder;
+
+  /// The builder for the selected options of the [MDSelect].
+  final ShadSelectedOptionBuilder<List<T>>? selectedOptionsBuilder;
+
+  /// The placeholder of the [MDSelect], displayed when the value is null.
+  final Widget? placeholder;
+
+  /// The focus node of the [MDSelect].
+  final FocusNode? focusNode;
+
+  /// Whether to close the [MDSelect] when the user taps outside of it,
+  /// defaults to `true`.
+  final bool closeOnTapOutside;
+
+  /// The minimum width of the [MDSelect].
+  final double? minWidth;
+
+  /// The maximum width of the [MDSelect].
+  final double? maxWidth;
+
+  /// The maximum height of the [MDSelect].
+  final double? maxHeight;
+
+  /// The decoration of the [MDSelect].
+  final ShadDecoration? decoration;
+
+  /// The trailing widget of the [MDSelect].
+  final Widget? trailing;
+
+  /// The padding of the [MDSelect].
+  final EdgeInsets? padding;
+
+  /// The padding of the options of the [MDSelect].
+  final EdgeInsets? optionsPadding;
+
+  /// Whether to show the scroll-to-top chevron.
+  final bool? showScrollToTopChevron;
+
+  /// Whether to show the scroll-to-bottom chevron.
+  final bool? showScrollToBottomChevron;
+
+  /// The scroll controller of the [MDSelect].
+  final ScrollController? scrollController;
+
+  /// The anchor of the [MDSelect].
+  final ShadAnchorBase? anchor;
+
+  /// The effects of the [MDSelect].
+  final List<Effect>? effects;
+
+  /// The shadows of the [MDSelect].
+  final List<BoxShadow>? shadows;
+
+  /// The filter of the [MDSelect].
+  final ui.ImageFilter? filter;
+
+  /// The controller of the [MDSelect].
+  final ShadPopoverController? controller;
+
+  /// The header of the [MDSelect].
+  final Widget? header;
+
+  /// The footer of the [MDSelect].
+  final Widget? footer;
+
+  /// Whether to close the [MDSelect] when a value is selected.
+  final bool closeOnSelect;
+
+  /// Whether to allow deselection.
+  final bool allowDeselection;
+
+  /// The group ID of the [MDSelect].
+  final Object? groupId;
+
+  /// The number of items in the options.
+  final int? itemCount;
+
+  /// Whether the options should shrink wrap.
+  final bool? shrinkWrap;
+
+  /// The callback that is called when the search value changes.
+  final ValueChanged<String>? onSearchChanged;
+
+  /// The widget that is displayed between the search input and the options.
+  final Widget? searchDivider;
+
+  /// The prefix of the search input.
+  final Widget? searchInputPrefix;
+
+  /// The placeholder of the search input.
+  final Widget? searchPlaceholder;
+
+  /// The padding of the search input.
+  final EdgeInsets? searchPadding;
+
+  /// A complete customizable search input.
+  final Widget? search;
+
+  /// Whether to clear the search input when the popover is closed.
+  final bool? clearSearchOnClose;
+
+  /// The type of the [MDSelect].
+  final MDSelectVariant variant;
+
+  MDMultipleSelectFormField({
     super.key,
     required super.name,
     super.validator,
@@ -360,7 +486,6 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.itemCount,
     this.shrinkWrap,
   })  : variant = MDSelectVariant.multiple,
-        selectedOptionBuilder = null,
         onSearchChanged = null,
         searchDivider = null,
         searchInputPrefix = null,
@@ -370,8 +495,8 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
         clearSearchOnClose = false,
         focusNode = focusNode,
         super(
-          builder: (FormFieldState<T?> field) {
-            final state = field as _MDSelectFormFieldState<T>;
+          builder: (FormFieldState<List<T>?> field) {
+            final state = field as _MDMultipleSelectFormFieldState<T>;
 
             return MDSelect<T>.multiple(
               options: options,
@@ -380,13 +505,13 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
               controller: controller,
               enabled: state.enabled,
               placeholder: placeholder,
-              initialValues: state.value != null ? [state.value!] : [],
+              initialValues: state.value ?? [],
               onChanged: (values) {
                 if (state.enabled) {
-                  state.didChange(values.isNotEmpty ? values.first : null);
+                  state.didChange(values);
                 }
                 if (onChanged != null) {
-                  onChanged(values.isNotEmpty ? values.first : null);
+                  onChanged(values);
                 }
               },
               focusNode: state.effectiveFocusNode,
@@ -416,7 +541,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
           },
         );
 
-  MDSelectFormField.multipleWithSearch({
+  MDMultipleSelectFormField.withSearch({
     super.key,
     required super.name,
     super.validator,
@@ -464,23 +589,22 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.itemCount,
     this.shrinkWrap,
   })  : variant = MDSelectVariant.multipleWithSearch,
-        selectedOptionBuilder = null,
         focusNode = focusNode,
         super(
-          builder: (FormFieldState<T?> field) {
-            final state = field as _MDSelectFormFieldState<T>;
+          builder: (FormFieldState<List<T>?> field) {
+            final state = field as _MDMultipleSelectFormFieldState<T>;
 
             return MDSelect<T>.multipleWithSearch(
               options: options,
               optionsBuilder: optionsBuilder,
-              onSearchChanged: onSearchChanged!,
+              onSearchChanged: onSearchChanged,
               selectedOptionsBuilder: selectedOptionsBuilder!,
               onChanged: (values) {
                 if (state.enabled) {
-                  state.didChange(values.isNotEmpty ? values.first : null);
+                  state.didChange(values);
                 }
                 if (onChanged != null) {
-                  onChanged(values.isNotEmpty ? values.first : null);
+                  onChanged(values);
                 }
               },
               controller: controller,
@@ -492,7 +616,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
               clearSearchOnClose: clearSearchOnClose,
               enabled: state.enabled,
               placeholder: placeholder,
-              initialValues: state.value != null ? [state.value!] : [],
+              initialValues: state.value ?? [],
               focusNode: state.effectiveFocusNode,
               closeOnTapOutside: closeOnTapOutside,
               minWidth: minWidth,
@@ -521,10 +645,10 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
         );
 
   @override
-  MDFormBuilderFieldState<MDSelectFormField<T>, T> createState() => _MDSelectFormFieldState<T>();
+  MDFormBuilderFieldState<MDMultipleSelectFormField<T>, List<T>> createState() => _MDMultipleSelectFormFieldState<T>();
 }
 
-class _MDSelectFormFieldState<T> extends MDFormBuilderFieldState<MDSelectFormField<T>, T> {
+class _MDMultipleSelectFormFieldState<T> extends MDFormBuilderFieldState<MDMultipleSelectFormField<T>, List<T>> {
   @override
   void initState() {
     super.initState();
