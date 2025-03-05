@@ -35,6 +35,8 @@ export 'src/components/fields/select_form_field.dart';
 export 'src/components/fields/input.dart';
 export 'src/components/fields/toggle_form_field.dart';
 export 'src/components/fields/input_form_field.dart';
+export 'src/components/fields/tickbox.dart';
+export 'src/components/fields/tickbox_form_field.dart';
 export 'src/components/filter_form.dart';
 export 'src/components/gesture_detector.dart';
 export 'src/components/image.dart';

@@ -385,6 +385,7 @@ class _FormStoryState extends State<FormStory> {
             FormBuilder(
               key: formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   MDFormItem(
                     label: const Text('Input'),
@@ -443,12 +444,17 @@ class _FormStoryState extends State<FormStory> {
                           Text(values.join(', ')),
                     ),
                   ),
+                  
+                  MDTickboxFormField(
+                    name: 'tickbox',
+                    label: const Text('Send me a newsletter')
+                  ),
                   const MDDivider(),
                   MDToggleFormField(
                     name: 'toggle',
                     label: const Text('I accept the terms and conditions'),
                     sublabel: const Text('You must accept the terms and conditions to continue'),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -468,6 +474,7 @@ class InputStory extends StatefulWidget {
 
 class _InputStoryState extends State<InputStory> {
   bool _toggleValue = false;
+  bool _tickboxValue = false;
   @override
   Widget build(BuildContext context) {
     return MDScaffold(
@@ -486,6 +493,11 @@ class _InputStoryState extends State<InputStory> {
               value: _toggleValue,
               onChanged: (value) => setState(() => _toggleValue = value),
               label: const Text('Toggle'),
+            ),
+            MDTickbox(
+              value: _tickboxValue,
+              onChanged: (value) => setState(() => _tickboxValue = value),
+              label: const Text('Tickbox'),
             ),
           ],
         ),

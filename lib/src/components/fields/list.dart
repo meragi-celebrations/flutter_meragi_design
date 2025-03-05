@@ -196,6 +196,7 @@ class MDFormCheckbox extends MDFormBuilderField<bool> {
 
 class _MDFormCheckboxState extends MDFormBuilderFieldState<MDFormCheckbox, bool> {}
 
+@Deprecated('Use MDTickbox instead')
 class MDCheckbox extends StatelessWidget {
   final bool? value;
   final ValueChanged<bool?>? onChanged;
