@@ -21,6 +21,8 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
   /// The placeholder of the [MDSelect], displayed when the value is null.
   final Widget? placeholder;
 
+  final String? placeholderText;
+
   /// The focus node of the [MDSelect].
   final FocusNode? focusNode;
 
@@ -136,6 +138,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.selectedOptionBuilder,
     this.selectedOptionsBuilder,
     this.placeholder,
+    this.placeholderText,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -179,6 +182,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
               controller: controller,
               enabled: state.enabled,
               placeholder: placeholder,
+              placeholderText: placeholderText,
               initialValue: state.value,
               onChanged: (value) {
                 if (state.enabled) {
@@ -239,6 +243,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.search,
     this.clearSearchOnClose,
     this.placeholder,
+    this.placeholderText,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -273,7 +278,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
               options: options,
               optionsBuilder: optionsBuilder,
               selectedOptionBuilder: selectedOptionBuilder,
-              onSearchChanged: onSearchChanged!,
+              onSearchChanged: onSearchChanged,
               controller: controller,
               searchDivider: searchDivider,
               searchInputPrefix: searchInputPrefix,
@@ -283,6 +288,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
               clearSearchOnClose: clearSearchOnClose,
               enabled: state.enabled,
               placeholder: placeholder,
+              placeholderText: placeholderText,
               initialValue: state.value,
               onChanged: (value) {
                 if (state.enabled) {
@@ -347,6 +353,8 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
 
   /// The placeholder of the [MDSelect], displayed when the value is null.
   final Widget? placeholder;
+
+  final String? placeholderText;
 
   /// The focus node of the [MDSelect].
   final FocusNode? focusNode;
@@ -462,6 +470,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
     this.options,
     this.optionsBuilder,
     this.placeholder,
+    this.placeholderText,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -481,7 +490,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
     this.header,
     this.footer,
     this.allowDeselection = true,
-    this.closeOnSelect = true,
+    this.closeOnSelect = false,
     this.groupId,
     this.itemCount,
     this.shrinkWrap,
@@ -505,6 +514,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
               controller: controller,
               enabled: state.enabled,
               placeholder: placeholder,
+              placeholderText: placeholderText,
               initialValues: state.value ?? [],
               onChanged: (values) {
                 if (state.enabled) {
@@ -565,6 +575,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
     this.search,
     this.clearSearchOnClose,
     this.placeholder,
+    this.placeholderText,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -584,7 +595,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
     this.header,
     this.footer,
     this.allowDeselection = true,
-    this.closeOnSelect = true,
+    this.closeOnSelect = false,
     this.groupId,
     this.itemCount,
     this.shrinkWrap,
@@ -616,6 +627,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
               clearSearchOnClose: clearSearchOnClose,
               enabled: state.enabled,
               placeholder: placeholder,
+              placeholderText: placeholderText,
               initialValues: state.value ?? [],
               focusNode: state.effectiveFocusNode,
               closeOnTapOutside: closeOnTapOutside,

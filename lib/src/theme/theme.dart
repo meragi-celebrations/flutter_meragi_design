@@ -117,6 +117,15 @@ class MDTheme {
             ),
           ),
         ),
+        checkboxTheme: ShadCheckboxTheme(
+          decoration: ShadDecoration(
+            border: ShadBorder(
+              top: BorderSide(color: colors.border.opaque.darken(15)),
+              bottom: BorderSide(color: colors.border.opaque.darken(15)),
+              left: BorderSide(color: colors.border.opaque.darken(15)),
+              right: BorderSide(color: colors.border.opaque.darken(15)),
+            ),),
+        ),
       );
 
   ThemeData get themeData => ThemeData(

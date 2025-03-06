@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// A wrapper around ShadSelect that provides a more consistent API for Meragi Design
@@ -14,6 +15,7 @@ class MDSelect<T> extends StatefulWidget {
     this.controller,
     this.enabled = true,
     this.placeholder,
+    this.placeholderText,
     this.initialValue,
     this.initialValues = const [],
     this.onChanged,
@@ -74,6 +76,7 @@ class MDSelect<T> extends StatefulWidget {
     this.clearSearchOnClose,
     this.enabled = true,
     this.placeholder,
+    this.placeholderText,
     this.initialValue,
     this.initialValues = const [],
     this.focusNode,
@@ -115,6 +118,7 @@ class MDSelect<T> extends StatefulWidget {
     this.controller,
     this.enabled = true,
     this.placeholder,
+    this.placeholderText,
     this.initialValues = const [],
     ValueChanged<List<T>>? onChanged,
     this.focusNode,
@@ -173,6 +177,7 @@ class MDSelect<T> extends StatefulWidget {
     this.clearSearchOnClose,
     this.enabled = true,
     this.placeholder,
+    this.placeholderText,
     this.initialValues = const [],
     this.focusNode,
     this.closeOnTapOutside = true,
@@ -228,6 +233,8 @@ class MDSelect<T> extends StatefulWidget {
 
   /// The placeholder of the [MDSelect], displayed when the value is null.
   final Widget? placeholder;
+
+  final String? placeholderText;
 
   /// The builder for the selected option of the [MDSelect].
   final ShadSelectedOptionBuilder<T>? selectedOptionBuilder;
@@ -349,15 +356,41 @@ enum MDSelectVariant {
 class _MDSelectState<T> extends State<MDSelect<T>> {
   @override
   Widget build(BuildContext context) {
+    final shadTheme = ShadTheme.of(context);
+    final theme = context.theme;
+
+    final effectiveController = widget.controller ?? ShadPopoverController();
+
+    final effectivePlaceholder = widget.placeholder ??
+        Text(
+          widget.placeholderText ?? '',
+          style: theme.fonts.paragraph.small.copyWith(color: theme.colors.content.stateDisabled),
+        );
+
+    final effectiveTrailing = ListenableBuilder(
+      listenable: effectiveController,
+      builder: (context, _) {
+        return AnimatedRotation(
+          turns: effectiveController.isOpen ? -0.5 : 0,
+          duration: const Duration(milliseconds: 200),
+          child: ShadImage.square(
+              PhosphorIconsRegular.caretDown,
+              size: 16,
+              color: shadTheme.colorScheme.popoverForeground.withOpacity(.5),
+            ),
+        );
+      },
+    );
+
     switch (widget.variant) {
       case MDSelectVariant.primary:
         return ShadSelect<T>(
           options: widget.options,
           optionsBuilder: widget.optionsBuilder,
           selectedOptionBuilder: widget.selectedOptionBuilder,
-          controller: widget.controller,
+          controller: effectiveController,
           enabled: widget.enabled,
-          placeholder: widget.placeholder,
+          placeholder: effectivePlaceholder,
           initialValue: widget.initialValue,
           initialValues: widget.initialValues,
           onChanged: widget.onChanged,
@@ -367,7 +400,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           maxWidth: widget.maxWidth,
           maxHeight: widget.maxHeight,
           decoration: widget.decoration,
-          trailing: widget.trailing,
+          trailing: effectiveTrailing,
           padding: widget.padding,
           optionsPadding: widget.optionsPadding,
           showScrollToBottomChevron: widget.showScrollToBottomChevron,
@@ -391,7 +424,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           optionsBuilder: widget.optionsBuilder,
           selectedOptionBuilder: widget.selectedOptionBuilder,
           onSearchChanged: widget.onSearchChanged!,
-          controller: widget.controller,
+          controller: effectiveController,
           searchDivider: widget.searchDivider,
           searchInputPrefix: widget.searchInputPrefix,
           searchPlaceholder: widget.searchPlaceholder,
@@ -399,7 +432,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           search: widget.search,
           clearSearchOnClose: widget.clearSearchOnClose,
           enabled: widget.enabled,
-          placeholder: widget.placeholder,
+          placeholder: effectivePlaceholder,
           initialValue: widget.initialValue,
           initialValues: widget.initialValues,
           onChanged: widget.onChanged,
@@ -409,7 +442,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           maxWidth: widget.maxWidth,
           maxHeight: widget.maxHeight,
           decoration: widget.decoration,
-          trailing: widget.trailing,
+          trailing: effectiveTrailing,
           padding: widget.padding,
           optionsPadding: widget.optionsPadding,
           showScrollToBottomChevron: widget.showScrollToBottomChevron,
@@ -432,9 +465,9 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           options: widget.options,
           optionsBuilder: widget.optionsBuilder,
           selectedOptionsBuilder: widget.selectedOptionsBuilder!,
-          controller: widget.controller,
+          controller: effectiveController,
           enabled: widget.enabled,
-          placeholder: widget.placeholder,
+          placeholder: effectivePlaceholder,
           initialValues: widget.initialValues,
           onChanged: widget.onMultipleChanged,
           focusNode: widget.focusNode,
@@ -443,7 +476,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           maxWidth: widget.maxWidth,
           maxHeight: widget.maxHeight,
           decoration: widget.decoration,
-          trailing: widget.trailing,
+          trailing: effectiveTrailing,
           padding: widget.padding,
           optionsPadding: widget.optionsPadding,
           showScrollToBottomChevron: widget.showScrollToBottomChevron,
@@ -468,7 +501,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           onSearchChanged: widget.onSearchChanged!,
           selectedOptionsBuilder: widget.selectedOptionsBuilder!,
           onChanged: widget.onMultipleChanged,
-          controller: widget.controller,
+          controller: effectiveController,
           searchDivider: widget.searchDivider,
           searchInputPrefix: widget.searchInputPrefix,
           searchPlaceholder: widget.searchPlaceholder,
@@ -476,7 +509,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           search: widget.search,
           clearSearchOnClose: widget.clearSearchOnClose,
           enabled: widget.enabled,
-          placeholder: widget.placeholder,
+          placeholder: effectivePlaceholder,
           initialValues: widget.initialValues,
           focusNode: widget.focusNode,
           closeOnTapOutside: widget.closeOnTapOutside,
@@ -484,7 +517,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           maxWidth: widget.maxWidth,
           maxHeight: widget.maxHeight,
           decoration: widget.decoration,
-          trailing: widget.trailing,
+          trailing: effectiveTrailing,
           padding: widget.padding,
           optionsPadding: widget.optionsPadding,
           showScrollToBottomChevron: widget.showScrollToBottomChevron,

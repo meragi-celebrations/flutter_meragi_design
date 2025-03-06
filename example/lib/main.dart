@@ -398,7 +398,7 @@ class _FormStoryState extends State<FormStory> {
                     label: const Text('Select'),
                     child: MDSelectFormField<String>(
                       name: 'select',
-                      placeholder: const Text('Select an option'),
+                      placeholderText: 'Select option',
                       minWidth: double.infinity,
                       options: const [
                         MDOption(value: 'Option 1', child: Text('Option 1')),
@@ -414,7 +414,7 @@ class _FormStoryState extends State<FormStory> {
                     label: const Text('Select with Search'),
                     child: MDSelectFormField<String>.search(
                       name: 'select_search',
-                      placeholder: const Text('Select an option'),
+                      placeholderText: 'Select option with search',
                       minWidth: double.infinity,
                       onSearchChanged: (value) => print(value),
                       options: const [
@@ -431,7 +431,7 @@ class _FormStoryState extends State<FormStory> {
                     label: const Text('Multiple Select'),
                     child: MDMultipleSelectFormField<String>(
                       name: 'multiple_select',
-                      placeholder: const Text('Select an option'),
+                      placeholderText: 'Select options',
                       minWidth: double.infinity,
                       options: const [
                         MDOption(value: 'Option 1', child: Text('Option 1')),
