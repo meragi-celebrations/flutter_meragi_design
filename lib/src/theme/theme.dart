@@ -64,6 +64,17 @@ class MDTheme {
   ShadThemeData get shadTheme => ShadThemeData(
         colorScheme: shadColorScheme,
         brightness: Brightness.light,
+        textTheme: ShadTextTheme(
+          family: typography.fontFamily,
+          h1Large: typography.heading.xLarge,
+          h1: typography.heading.large,
+          h2: typography.heading.medium,
+          h3: typography.heading.small,
+          h4: typography.heading.xSmall,
+          p: typography.paragraph.medium,
+          small: typography.paragraph.small,
+          large: typography.paragraph.large,
+        ),
         primaryButtonTheme: ShadButtonTheme(
           backgroundColor: colors.primary,
           foregroundColor: colors.content.onColor,
@@ -95,12 +106,16 @@ class MDTheme {
         ),
         buttonSizesTheme: const ShadButtonSizesTheme(
           sm: ShadButtonSizeTheme(
-            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
             height: 34,
           ),
           regular: ShadButtonSizeTheme(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
             height: 38,
+          ),
+          icon: ShadButtonSizeTheme(
+            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            height: 28,
           ),
         ),
         optionTheme: ShadOptionTheme(

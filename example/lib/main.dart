@@ -163,7 +163,13 @@ class ButtonsStory extends StatelessWidget {
                   child: Text('Disabled'),
                 ),
                 const MDTap(
-                  icon: Icon(PhosphorIconsRegular.check),
+                  iconData: PhosphorIconsBold.check,
+                  size: ShadButtonSize.sm,
+                ),
+                 const MDTap(
+                  iconData: PhosphorIconsBold.check,
+                  child: Text('Check'),
+                  size: ShadButtonSize.sm,
                 ),
               ],
             ),
@@ -186,7 +192,12 @@ class ButtonsStory extends StatelessWidget {
                   child: Text('Disabled'),
                 ),
                 const MDTap.secondary(
-                  icon: Icon(PhosphorIconsRegular.check),
+                  iconData: PhosphorIconsRegular.check,
+                ),
+                const MDTap.secondary(
+                  iconData: PhosphorIconsRegular.check,
+                  size: ShadButtonSize.sm,
+                  child: Text('Check'),
                 ),
               ],
             ),
@@ -209,7 +220,12 @@ class ButtonsStory extends StatelessWidget {
                   child: Text('Disabled'),
                 ),
                 const MDTap.outline(
-                  icon: Icon(PhosphorIconsRegular.check),
+                  iconData: PhosphorIconsRegular.check,
+                ),
+                const MDTap.outline(
+                  iconData: PhosphorIconsRegular.check,
+                  size: ShadButtonSize.sm,
+                  child: Text('Check'),
                 ),
               ],
             ),
@@ -232,7 +248,12 @@ class ButtonsStory extends StatelessWidget {
                   child: Text('Disabled'),
                 ),
                 const MDTap.ghost(
-                  icon: Icon(PhosphorIconsRegular.check),
+                  iconData: PhosphorIconsRegular.check,
+                ),
+                const MDTap.ghost(
+                  iconData: PhosphorIconsRegular.check,
+                  size: ShadButtonSize.sm,
+                  child: Text('Check'),
                 ),
               ],
             ),
@@ -255,7 +276,12 @@ class ButtonsStory extends StatelessWidget {
                   child: Text('Disabled'),
                 ),
                 const MDTap.destructive(
-                  icon: Icon(PhosphorIconsRegular.check),
+                  iconData: PhosphorIconsRegular.check,
+                ),
+                const MDTap.destructive(
+                  iconData: PhosphorIconsRegular.check,
+                  size: ShadButtonSize.sm,
+                  child: Text('Check'),
                 ),
               ],
             ),

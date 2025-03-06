@@ -7,6 +7,7 @@ class MDTap extends StatefulWidget {
     super.key,
     this.child,
     this.icon,
+    this.iconData,
     this.onPressed,
     this.size,
     this.applyIconColorFilter,
@@ -61,6 +62,7 @@ class MDTap extends StatefulWidget {
     this.size,
     this.child,
     this.icon,
+    this.iconData,
     this.onPressed,
     this.applyIconColorFilter,
     this.cursor,
@@ -112,6 +114,7 @@ class MDTap extends StatefulWidget {
     super.key,
     this.child,
     this.icon,
+    this.iconData,
     this.onPressed,
     this.size,
     this.applyIconColorFilter,
@@ -164,6 +167,7 @@ class MDTap extends StatefulWidget {
     super.key,
     this.child,
     this.icon,
+    this.iconData,
     this.onPressed,
     this.size,
     this.applyIconColorFilter,
@@ -216,6 +220,7 @@ class MDTap extends StatefulWidget {
     super.key,
     this.child,
     this.icon,
+    this.iconData,
     this.onPressed,
     this.size,
     this.applyIconColorFilter,
@@ -268,6 +273,7 @@ class MDTap extends StatefulWidget {
     super.key,
     this.child,
     this.icon,
+    this.iconData,
     this.onPressed,
     this.size,
     this.applyIconColorFilter,
@@ -366,11 +372,13 @@ class MDTap extends StatefulWidget {
     this.onFocusChange,
     this.isLoading = false,
   })  : variant = ShadButtonVariant.link,
-        icon = null;
+        icon = null,
+        iconData = null;
 
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
   final Widget? icon;
+  final IconData? iconData;
   final Widget? child;
   final ShadButtonVariant variant;
   final ShadButtonSize? size;
@@ -457,10 +465,10 @@ class _MDTapState extends State<MDTap> {
 
     final shadTheme = ShadTheme.of(context);
 
-    print(sizeTheme(shadTheme, widget.size ?? ShadButtonSize.regular));
+    print("size: ${shadTheme.textTheme.small.fontSize}");
 
     Widget loader = SizedBox.square(
-      dimension: 12,
+      dimension: shadTheme.textTheme.small.fontSize,
       child: ColorFiltered(
         colorFilter: ColorFilter.mode(
           widget.pressedForegroundColor ??
@@ -475,10 +483,18 @@ class _MDTapState extends State<MDTap> {
       ),
     );
 
+    final effectiveIcon = widget.isLoading
+        ? loader
+        : widget.icon ?? (widget.iconData != null ?
+            Icon(
+              widget.iconData,
+              size: shadTheme.textTheme.small.fontSize,
+            ) : null);
+
     return ShadButton.raw(
       key: widget.key,
       variant: widget.variant,
-      icon: widget.isLoading ? loader : widget.icon,
+      icon: effectiveIcon,
       onPressed: widget.isLoading ? null : widget.onPressed,
       size: widget.size,
       applyIconColorFilter: widget.applyIconColorFilter,
