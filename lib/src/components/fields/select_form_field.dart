@@ -23,9 +23,6 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
 
   final String? placeholderText;
 
-  /// The focus node of the [MDSelect].
-  final FocusNode? focusNode;
-
   /// Whether to close the [MDSelect] when the user taps outside of it,
   /// defaults to `true`.
   final bool closeOnTapOutside;
@@ -163,7 +160,6 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.itemCount,
     this.shrinkWrap,
   })  : variant = MDSelectVariant.primary,
-        focusNode = focusNode,
         onSearchChanged = null,
         searchDivider = null,
         searchInputPrefix = null,
@@ -219,7 +215,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
           },
         );
 
-  MDSelectFormField.search({
+  MDSelectFormField.withSearch({
     super.key,
     required super.name,
     super.validator,
@@ -268,7 +264,6 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
     this.itemCount,
     this.shrinkWrap,
   })  : variant = MDSelectVariant.search,
-        focusNode = focusNode,
         selectedOptionsBuilder = null,
         super(
           builder: (FormFieldState<T?> field) {
@@ -280,6 +275,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
               selectedOptionBuilder: selectedOptionBuilder,
               onSearchChanged: onSearchChanged,
               controller: controller,
+              focusNode: state.effectiveFocusNode,
               searchDivider: searchDivider,
               searchInputPrefix: searchInputPrefix,
               searchPlaceholder: searchPlaceholder,
@@ -298,7 +294,6 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
                   onChanged(value);
                 }
               },
-              focusNode: state.effectiveFocusNode,
               closeOnTapOutside: closeOnTapOutside,
               minWidth: minWidth,
               maxWidth: maxWidth,
@@ -355,9 +350,6 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
   final Widget? placeholder;
 
   final String? placeholderText;
-
-  /// The focus node of the [MDSelect].
-  final FocusNode? focusNode;
 
   /// Whether to close the [MDSelect] when the user taps outside of it,
   /// defaults to `true`.
@@ -502,7 +494,6 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
         searchPadding = null,
         search = null,
         clearSearchOnClose = false,
-        focusNode = focusNode,
         super(
           builder: (FormFieldState<List<T>?> field) {
             final state = field as _MDMultipleSelectFormFieldState<T>;
@@ -600,7 +591,6 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
     this.itemCount,
     this.shrinkWrap,
   })  : variant = MDSelectVariant.multipleWithSearch,
-        focusNode = focusNode,
         super(
           builder: (FormFieldState<List<T>?> field) {
             final state = field as _MDMultipleSelectFormFieldState<T>;
@@ -660,10 +650,11 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
   MDFormBuilderFieldState<MDMultipleSelectFormField<T>, List<T>> createState() => _MDMultipleSelectFormFieldState<T>();
 }
 
-class _MDMultipleSelectFormFieldState<T> extends MDFormBuilderFieldState<MDMultipleSelectFormField<T>, List<T>> {
+class _MDMultipleSelectFormFieldState<T> extends MDFormBuilderFieldState<MDMultipleSelectFormField<T>, List<T>> {  
   @override
   void initState() {
     super.initState();
+    effectiveFocusNode = widget.focusNode ?? FocusNode(debugLabel: widget.name);
   }
 
   @override

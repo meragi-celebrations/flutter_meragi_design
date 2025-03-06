@@ -448,7 +448,7 @@ class _FormStoryState extends State<FormStory> {
                   ),
                   MDFormItem(
                     label: const Text('Select with Search'),
-                    child: MDSelectFormField<String>.search(
+                    child: MDSelectFormField<String>.withSearch(
                       name: 'select_search',
                       placeholderText: 'Select option with search',
                       minWidth: double.infinity,
