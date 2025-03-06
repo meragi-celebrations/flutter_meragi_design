@@ -38,11 +38,11 @@ class _HomePageState extends State<HomePage> {
   final List<MDNavigationRailDestination> _items = [
     MDNavigationRailDestination(
       icon: const Icon(Icons.list),
-      label: 'Buttons',
+      label: 'Taps',
     ),
     MDNavigationRailDestination(
       icon: const Icon(Icons.card_giftcard),
-      label: 'Card',
+      label: 'Panel',
     ),
     MDNavigationRailDestination(
       icon: const Icon(Icons.select_all),
@@ -100,20 +100,30 @@ class CardStory extends StatelessWidget {
         title: Text('Card'),
         asPageHeader: true,
       ),
-      body: MDPanel(
-        width: 450,
-        title: const Text('Title'),
-        description: const Text('Description'),
-        footer: MDTap(
-          width: double.infinity,
-          icon: const Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: Icon(PhosphorIconsRegular.check),
+      body: ShadContextMenuRegion(
+        items: [
+          ShadContextMenuItem(
+            child: const Text('Item 1'),
           ),
-          onPressed: () {},
-          child: const Text('Mark all as read'),
+          ShadContextMenuItem(
+            child: const Text('Item 2'),
+          ),
+        ],
+        child: MDPanel(
+          width: 450,
+          title: const Text('Title'),
+          description: const Text('Description'),
+          footer: MDTap(
+            width: double.infinity,
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(PhosphorIconsRegular.check),
+            ),
+            onPressed: () {},
+            child: const Text('Mark all as read'),
+          ),
+          child: const Text('Footer'),
         ),
-        child: const Text('Footer'),
       ),
     );
   }
@@ -444,16 +454,15 @@ class _FormStoryState extends State<FormStory> {
                           Text(values.join(', ')),
                     ),
                   ),
-                  
                   MDTickboxFormField(
-                    name: 'tickbox',
-                    label: const Text('Send me a newsletter')
-                  ),
+                      name: 'tickbox',
+                      label: const Text('Send me a newsletter')),
                   const MDDivider(),
                   MDToggleFormField(
                     name: 'toggle',
                     label: const Text('I accept the terms and conditions'),
-                    sublabel: const Text('You must accept the terms and conditions to continue'),
+                    sublabel: const Text(
+                        'You must accept the terms and conditions to continue'),
                   ),
                 ],
               ),

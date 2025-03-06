@@ -371,8 +371,8 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
       listenable: effectiveController,
       builder: (context, _) {
         return AnimatedRotation(
-          turns: effectiveController.isOpen ? -0.5 : 0,
-          duration: const Duration(milliseconds: 200),
+          turns: effectiveController.isOpen ? 0.5 : 0,
+          duration: const Duration(milliseconds: 100),
           child: ShadImage.square(
               PhosphorIconsRegular.caretDown,
               size: 16,

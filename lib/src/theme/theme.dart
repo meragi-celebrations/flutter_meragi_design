@@ -126,6 +126,12 @@ class MDTheme {
               right: BorderSide(color: colors.border.opaque.darken(15)),
             ),),
         ),
+        contextMenuTheme: ShadContextMenuTheme(
+          backgroundColor: colors.background.primary,
+          selectedBackgroundColor: colors.background.tertiary,
+          textStyle: typography.paragraph.small,
+          trailingTextStyle: typography.paragraph.small.copyWith(color: colors.content.stateDisabled),
+        ),
       );
 
   ThemeData get themeData => ThemeData(
