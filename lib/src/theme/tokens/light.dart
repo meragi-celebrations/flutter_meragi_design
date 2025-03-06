@@ -14,7 +14,6 @@ ThemeToken light = ThemeToken(
   padding: 15.0,
   radius: 6.0,
   borderColor: Colors.grey.shade200,
-
   standardButtonColor: Colors.deepPurple[100]!,
   primaryButtonColor: Colors.deepPurple,
   secondaryButtonColor: Colors.deepPurpleAccent[100]!,
@@ -27,7 +26,6 @@ ThemeToken light = ThemeToken(
   primaryFilledHoverButtonColor: Colors.blue[100]!,
   secondaryFilledHoverButtonColor: Colors.deepPurpleAccent[100]!,
   standardFilledHoverButtonColor: Colors.deepPurple[100]!,
-
   smButtonHeight: 34,
   smButtonPadding: const EdgeInsets.symmetric(horizontal: 12),
   rgButtonHeight: 42,
@@ -177,4 +175,5 @@ ThemeToken light = ThemeToken(
       borderSide: BorderSide(color: Color(0xFFE9E9E9)), borderRadius: BorderRadius.all(Radius.circular(12))),
   expansionTileExpandedShape: const OutlineInputBorder(
       borderSide: BorderSide(color: Color(0xFFE9E9E9)), borderRadius: BorderRadius.all(Radius.circular(12))),
+  childrenPadding: null,
 );

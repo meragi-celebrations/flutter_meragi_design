@@ -12,6 +12,7 @@ class MDExpansionTileDecoration extends Style {
     final VisualDensity? visualDensityOverride,
     final ShapeBorder? expansionTileCollapsedShapeOverride,
     final ShapeBorder? expansionTileExpandedShapeOverride,
+    final EdgeInsets? childrenPaddingOverride,
   })  : _expansionTileSplashColorOverride = expansionTileSplashColorOverride,
         _expansionTileHoverColorOverride = expansionTileHoverColorOverride,
         _expansionTileSplashFactoryOverride = expansionTileSplashFactoryOverride,
@@ -20,6 +21,7 @@ class MDExpansionTileDecoration extends Style {
         _expansionAnimationStyleOverride = expansionAnimationStyleOverride,
         _visualDensityOverride = visualDensityOverride,
         _expansionTileCollapsedShapeOverride = expansionTileCollapsedShapeOverride,
+        _childrenPaddingOverride = childrenPaddingOverride,
         _expansionTileExpandedShapeOverride = expansionTileExpandedShapeOverride;
 
   final Color? _expansionTileSplashColorOverride;
@@ -31,6 +33,7 @@ class MDExpansionTileDecoration extends Style {
   final VisualDensity? _visualDensityOverride;
   final ShapeBorder? _expansionTileCollapsedShapeOverride;
   final ShapeBorder? _expansionTileExpandedShapeOverride;
+  final EdgeInsets? _childrenPaddingOverride;
 
   Color get expansionTileSplashColor => _expansionTileSplashColorOverride ?? token.expansionTileSplashColor;
 
@@ -49,6 +52,8 @@ class MDExpansionTileDecoration extends Style {
 
   ShapeBorder get expansionTileExpandedShape => _expansionTileExpandedShapeOverride ?? token.expansionTileExpandedShape;
 
+  EdgeInsets? get childrenPadding => _childrenPaddingOverride ?? token.childrenPadding;
+
   ShapeBorder get expansionTileCollapsedShape =>
       _expansionTileCollapsedShapeOverride ?? token.expansionTileCollapsedShape;
 
@@ -65,6 +70,7 @@ class MDExpansionTileDecoration extends Style {
     final VisualDensity? visualDensityOverride,
     final ShapeBorder? expansionTileCollapsedShapeOverride,
     final ShapeBorder? expansionTileExpandedShapeOverride,
+    final EdgeInsets? childrenPaddingOverride,
   }) {
     return MDExpansionTileDecoration(
       context: context,
@@ -77,6 +83,7 @@ class MDExpansionTileDecoration extends Style {
       visualDensityOverride: visualDensityOverride ?? visualDensity,
       expansionTileCollapsedShapeOverride: expansionTileCollapsedShapeOverride ?? expansionTileCollapsedShape,
       expansionTileExpandedShapeOverride: expansionTileExpandedShapeOverride ?? expansionTileExpandedShape,
+      childrenPaddingOverride: childrenPaddingOverride ?? childrenPadding,
     );
   }
 
@@ -84,15 +91,15 @@ class MDExpansionTileDecoration extends Style {
     if (other == null) return this;
 
     return copyWith(
-      expansionTileSplashColorOverride: other.expansionTileSplashColor,
-      expansionTileHoverColorOverride: other.expansionTileHoverColor,
-      expansionTileSplashFactoryOverride: other.expansionTileSplashFactory,
-      expansionTileBackgroundColorOverride: other.expansionTileBackgroundColor,
-      expansiontitlePaddingOverride: other.expansiontitlePadding,
-      expansionAnimationStyleOverride: other.expansionAnimationStyle,
-      visualDensityOverride: other.visualDensity,
-      expansionTileCollapsedShapeOverride: other.expansionTileCollapsedShape,
-      expansionTileExpandedShapeOverride: other.expansionTileExpandedShape,
-    );
+        expansionTileSplashColorOverride: other.expansionTileSplashColor,
+        expansionTileHoverColorOverride: other.expansionTileHoverColor,
+        expansionTileSplashFactoryOverride: other.expansionTileSplashFactory,
+        expansionTileBackgroundColorOverride: other.expansionTileBackgroundColor,
+        expansiontitlePaddingOverride: other.expansiontitlePadding,
+        expansionAnimationStyleOverride: other.expansionAnimationStyle,
+        visualDensityOverride: other.visualDensity,
+        expansionTileCollapsedShapeOverride: other.expansionTileCollapsedShape,
+        expansionTileExpandedShapeOverride: other.expansionTileExpandedShape,
+        childrenPaddingOverride: other.childrenPadding);
   }
 }
