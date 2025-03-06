@@ -116,6 +116,7 @@ class MDTheme {
           icon: ShadButtonSizeTheme(
             padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
             height: 28,
+            width: 28
           ),
         ),
         optionTheme: ShadOptionTheme(

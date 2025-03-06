@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
 class MDTap extends StatefulWidget {
@@ -490,7 +491,9 @@ class _MDTapState extends State<MDTap> {
               widget.iconData,
               size: shadTheme.textTheme.small.fontSize,
             ) : null);
-
+    
+    final MouseCursor? effectiveCursor = widget.cursor ?? (widget.isLoading ? SystemMouseCursors.forbidden : null);
+ 
     return ShadButton.raw(
       key: widget.key,
       variant: widget.variant,
@@ -498,7 +501,7 @@ class _MDTapState extends State<MDTap> {
       onPressed: widget.isLoading ? null : widget.onPressed,
       size: widget.size,
       applyIconColorFilter: widget.applyIconColorFilter,
-      cursor: widget.cursor,
+      cursor: effectiveCursor,
       width: widget.width,
       height: widget.height,
       padding: widget.padding,
