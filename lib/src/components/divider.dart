@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
 enum DividerPosition { start, center, end }
 
@@ -56,6 +57,9 @@ class MDDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    Color effectiveColor = color ?? context.theme.colors.border.opaque;
+
     if (direction == Axis.horizontal) {
       return Row(
         children: [
@@ -67,7 +71,7 @@ class MDDivider extends StatelessWidget {
                 thickness: thickness,
                 indent: indent,
                 endIndent: endIndent,
-                color: color,
+                color: effectiveColor,
               ),
             ),
           // Child widget
@@ -84,7 +88,7 @@ class MDDivider extends StatelessWidget {
                 thickness: thickness,
                 indent: indent,
                 endIndent: endIndent,
-                color: color,
+                color: effectiveColor,
               ),
             ),
         ],

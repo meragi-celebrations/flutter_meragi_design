@@ -1,15 +1,15 @@
-import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
+import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
-@Deprecated('Use MDInputFormField instead')
-class MDTextField extends MDFormBuilderField<String> {
+
+class MDInputFormField extends MDFormBuilderField<String> {
   /// Controls the text being edited.
   ///
   /// If null, this widget will create its own [TextEditingController].
@@ -28,10 +28,6 @@ class MDTextField extends MDFormBuilderField<String> {
   final TextCapitalization textCapitalization;
 
   /// The style to use for the text being edited.
-  ///
-  /// Also serves as a base for the [placeholder] text's style.
-  ///
-  /// Defaults to the standard iOS font style from [CupertinoTheme] if null.
   final TextStyle? style;
 
   /// {@macro flutter.widgets.editableText.strutStyle}
@@ -39,9 +35,6 @@ class MDTextField extends MDFormBuilderField<String> {
 
   /// {@macro flutter.widgets.editableText.textAlign}
   final TextAlign textAlign;
-
-  /// {@macro flutter.widgets.inputDecorator.textAlignVertical}
-  final TextAlignVertical? textAlignVertical;
 
   /// {@macro flutter.widgets.editableText.textDirection}
   final TextDirection? textDirection;
@@ -69,22 +62,9 @@ class MDTextField extends MDFormBuilderField<String> {
 
   /// A lighter colored placeholder hint that appears on the first line of the
   /// text field when the text entry is empty.
-  ///
-  /// Defaults to having no placeholder text.
-  ///
-  /// The text style of the placeholder text matches that of the text field's
-  /// main text entry except a lighter font weight and a grey font color.
-  final String? placeholder;
+  final Widget? placeholder;
 
   /// The style to use for the placeholder text.
-  ///
-  /// The [placeholderStyle] is merged with the [style] [TextStyle] when applied
-  /// to the [placeholder] text. To avoid merging with [style], specify
-  /// [TextStyle.inherit] as false.
-  ///
-  /// Defaults to the [style] property with w300 font weight and grey color.
-  ///
-  /// If specifically set to null, placeholder's style will be the same as [style].
   final TextStyle? placeholderStyle;
 
   /// {@macro flutter.widgets.editableText.maxLines}
@@ -97,12 +77,6 @@ class MDTextField extends MDFormBuilderField<String> {
   final bool expands;
 
   /// {@macro flutter.widgets.EditableText.contextMenuBuilder}
-  ///
-  /// If not provided, will build a default menu based on the platform.
-  ///
-  /// See also:
-  ///
-  ///  * [CupertinoAdaptiveTextSelectionToolbar], which is built by default.
   final EditableTextContextMenuBuilder? contextMenuBuilder;
 
   /// {@macro flutter.widgets.editableText.showCursor}
@@ -110,44 +84,15 @@ class MDTextField extends MDFormBuilderField<String> {
 
   /// The maximum number of characters (Unicode grapheme clusters) to allow in
   /// the text field.
-  ///
-  /// After [maxLength] characters have been input, additional input
-  /// is ignored, unless [maxLengthEnforcement] is set to
-  /// [MaxLengthEnforcement.none].
-  ///
-  /// The TextField enforces the length with a
-  /// [LengthLimitingTextInputFormatter], which is evaluated after the supplied
-  /// [inputFormatters], if any.
-  ///
-  /// This value must be either null or greater than zero. If set to null
-  /// (the default), there is no limit to the number of characters allowed.
-  ///
-  /// Whitespace characters (e.g. newline, space, tab) are included in the
-  /// character count.
-  ///
-  /// {@macro flutter.services.lengthLimitingTextInputFormatter.maxLength}
   final int? maxLength;
 
   /// Determines how the [maxLength] limit should be enforced.
-  ///
-  /// If [MaxLengthEnforcement.none] is set, additional input beyond [maxLength]
-  /// will not be enforced by the limit.
-  ///
-  /// {@macro flutter.services.textFormatter.effectiveMaxLengthEnforcement}
-  ///
-  /// {@macro flutter.services.textFormatter.maxLengthEnforcement}
   final MaxLengthEnforcement? maxLengthEnforcement;
 
   /// {@macro flutter.widgets.editableText.onEditingComplete}
   final VoidCallback? onEditingComplete;
 
   /// {@macro flutter.widgets.editableText.onSubmitted}
-  ///
-  /// See also:
-  ///
-  ///  * [EditableText.onSubmitted] for an example of how to handle moving to
-  ///    the next/previous field when using [TextInputAction.next] and
-  ///    [TextInputAction.previous] for [textInputAction].
   final ValueChanged<String?>? onSubmitted;
 
   /// {@macro flutter.widgets.editableText.inputFormatters}
@@ -160,29 +105,18 @@ class MDTextField extends MDFormBuilderField<String> {
   final double? cursorHeight;
 
   /// {@macro flutter.widgets.editableText.cursorRadius}
-  final Radius cursorRadius;
+  final Radius? cursorRadius;
 
   /// The color to use when painting the cursor.
-  ///
-  /// Defaults to [TextSelectionThemeData.cursorColor] or [CupertinoTheme.primaryColor]
-  /// depending on [ThemeData.platform].
   final Color? cursorColor;
 
   /// Controls how tall the selection highlight boxes are computed to be.
-  ///
-  /// See [ui.BoxHeightStyle] for details on available styles.
   final ui.BoxHeightStyle selectionHeightStyle;
 
   /// Controls how wide the selection highlight boxes are computed to be.
-  ///
-  /// See [ui.BoxWidthStyle] for details on available styles.
   final ui.BoxWidthStyle selectionWidthStyle;
 
   /// The appearance of the keyboard.
-  ///
-  /// This setting is only honored on iOS devices.
-  ///
-  /// If unset, defaults to the theme brightness.
   final Brightness? keyboardAppearance;
 
   /// {@macro flutter.widgets.editableText.scrollPadding}
@@ -198,26 +132,7 @@ class MDTextField extends MDFormBuilderField<String> {
   bool get selectionEnabled => enableInteractiveSelection;
 
   /// {@template flutter.material.textfield.onTap}
-  /// Called for each distinct tap except for every second tap of a double tap.
-  ///
-  /// The text field builds a [GestureDetector] to handle input events like tap,
-  /// to trigger focus requests, to move the caret, adjust the selection, etc.
-  /// Handling some of those events by wrapping the text field with a competing
-  /// GestureDetector is problematic.
-  ///
-  /// To unconditionally handle taps, without interfering with the text field's
-  /// internal gesture detector, provide this callback.
-  ///
-  /// If the text field is created with [enabled] false, taps will not be
-  /// recognized.
-  ///
-  /// To be notified when the text field gains or loses the focus, provide a
-  /// [focusNode] and add a listener to that.
-  ///
-  /// To listen to arbitrary pointer events without competing with the
-  /// text field's internal gesture detector, use a [Listener].
-  /// {@endtemplate}
-  final GestureTapCallback? onTap;
+  final GestureTapCallback? onPressed;
 
   /// {@macro flutter.widgets.editableText.scrollPhysics}
   final ScrollPhysics? scrollPhysics;
@@ -226,32 +141,18 @@ class MDTextField extends MDFormBuilderField<String> {
   final ScrollController? scrollController;
 
   /// {@macro flutter.widgets.editableText.autofillHints}
-  /// {@macro flutter.services.autofill.autofillHints}
   final Iterable<String>? autofillHints;
 
   ///{@macro flutter.widgets.text_selection.TextMagnifierConfiguration.intro}
-  ///
-  ///{@macro flutter.widgets.magnifier.intro}
-  ///
-  ///{@macro flutter.widgets.text_selection.TextMagnifierConfiguration.details}
   final TextMagnifierConfiguration? magnifierConfiguration;
 
   /// By default `false`
   final bool readOnly;
 
-  /// Controls the [BoxDecoration] of the box behind the text input.
-  ///
-  /// Defaults to having a rounded rectangle grey border and can be null to have
-  /// no box decoration.
-  final BoxDecoration? decoration;
+  /// Controls the decoration of the input field
+  final ShadDecoration? decoration;
 
   /// A builder widget that is displayed underneath the [label] and [child] widgets.
-  ///
-  /// The [error] widget is primarily used to inform users of input errors. When
-  /// a [Text] is given to [error], it will be shown in
-  /// [CupertinoColors.destructiveRed] coloring and medium-weighted font. The
-  /// row becomes taller in order to display the [helper] widget underneath
-  /// [label] and [child]. If null, the row is shorter.
   final Widget? Function(String error)? errorBuilder;
 
   /// {@macro flutter.widgets.editableText.scribbleEnabled}
@@ -260,29 +161,34 @@ class MDTextField extends MDFormBuilderField<String> {
   /// {@macro flutter.services.TextInputConfiguration.enableIMEPersonalizedLearning}
   final bool enableIMEPersonalizedLearning;
 
-  /// Show an iOS-style clear button to clear the current text entry.
-  ///
-  /// Can be made to appear depending on various text states of the
-  /// [TextEditingController].
-  ///
-  /// Will only appear if no [suffix] widget is appearing.
-  ///
-  /// Defaults to never appearing and cannot be null.
-  final OverlayVisibilityMode clearButtonMode;
-
   /// {@macro flutter.widgets.editableText.contentInsertionConfiguration}
   final ContentInsertionConfiguration? contentInsertionConfiguration;
 
+  /// Widget to display before the text input
+  final Widget? prefix;
+
+  /// Widget to display after the text input
   final Widget? suffix;
 
-  /// Show an clear button to clear the current text entry.
-  ///
-  /// If `true`, a clear button will appear on the right side of the text field,
-  /// allowing users to clear the text entry.
-  /// By default, it is set to `false`.
-  final bool isClearable;
+  /// MainAxisAlignment for the input field
+  final MainAxisAlignment? mainAxisAlignment;
 
-  MDTextField({
+  /// CrossAxisAlignment for the input field
+  final CrossAxisAlignment? crossAxisAlignment;
+
+  /// Alignment for the placeholder
+  final Alignment? placeholderAlignment;
+
+  /// Padding for the input field
+  final EdgeInsets? inputPadding;
+
+  /// Gap between prefix/suffix and text
+  final double? gap;
+
+  /// Whether to always call onPressed
+  final bool onPressedAlwaysCalled;
+
+  MDInputFormField({
     super.key,
     required super.name,
     super.validator,
@@ -317,15 +223,14 @@ class MDTextField extends MDFormBuilderField<String> {
     this.onEditingComplete,
     this.onSubmitted,
     this.inputFormatters,
-    this.cursorRadius = const Radius.circular(2.0),
+    this.cursorRadius,
     this.cursorColor,
     this.keyboardAppearance,
     this.expands = false,
     this.minLines,
     this.showCursor,
-    this.onTap,
+    this.onPressed,
     this.enableSuggestions = false,
-    this.textAlignVertical,
     this.dragStartBehavior = DragStartBehavior.start,
     this.scrollController,
     this.scrollPhysics,
@@ -335,18 +240,23 @@ class MDTextField extends MDFormBuilderField<String> {
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.autofillHints,
     this.obscuringCharacter = '•',
-    this.contextMenuBuilder = _defaultContextMenuBuilder,
+    this.contextMenuBuilder,
     this.magnifierConfiguration,
     this.decoration,
     this.errorBuilder,
     this.enableIMEPersonalizedLearning = true,
     this.scribbleEnabled = true,
-    this.clearButtonMode = OverlayVisibilityMode.never,
     this.contentInsertionConfiguration,
     this.placeholder,
     this.placeholderStyle,
-    this.isClearable = false,
+    this.prefix,
     this.suffix,
+    this.mainAxisAlignment,
+    this.crossAxisAlignment,
+    this.placeholderAlignment,
+    this.inputPadding,
+    this.gap,
+    this.onPressedAlwaysCalled = false,
   })  : assert(maxLines == null || maxLines > 0),
         assert(minLines == null || minLines > 0),
         assert(
@@ -359,7 +269,6 @@ class MDTextField extends MDFormBuilderField<String> {
         ),
         assert(!obscureText || maxLines == 1, 'Obscured fields cannot be multiline.'),
         assert(maxLength == null || maxLength > 0),
-        // Assert the following instead of setting it directly to avoid surprising the user by silently changing the value they set.
         assert(
           !identical(textInputAction, TextInputAction.newline) ||
               maxLines == 1 ||
@@ -369,57 +278,20 @@ class MDTextField extends MDFormBuilderField<String> {
         super(
           initialValue: controller != null ? controller.text : initialValue,
           builder: (FormFieldState<String?> field) {
-            final state = field as _FormBuilderCupertinoTextFieldState;
+            final state = field as _FormBuilderMDInputFieldState;
 
-            BoxDecoration finalDecoration = decoration ??
-                BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10),
-                );
+            Widget? finalSuffix = suffix;
 
-            BoxDecoration errorDecoration = finalDecoration.copyWith(
-              border: Border.all(color: Colors.red),
-            );
-
-            BoxDecoration focusedDecoration = finalDecoration.copyWith(
-              border: Border.all(color: Colors.deepPurple),
-            );
-
-            Widget? finalSuffix = suffix ??
-                ((state.value != null && isClearable)
-                    ? MDButton(
-                        decoration: ButtonDecoration(
-                          context: state.context,
-                          variant: ButtonVariant.ghost,
-                          size: ButtonSize.sm,
-                        ),
-                        icon: PhosphorIconsRegular.x,
-                        onTap: () {
-                          state.didChange(null);
-                        },
-                      )
-                    : null);
-
-            TextStyle finalPlaceholderStyle = placeholderStyle ??
-                const TextStyle(
-                  color: Colors.grey,
-                );
-
-            final fieldWidget = CupertinoTextField(
+            final fieldWidget = MDInput(
               restorationId: restorationId,
               controller: state._effectiveController,
               focusNode: state.effectiveFocusNode,
-              decoration: state.isFocused
-                  ? focusedDecoration
-                  : state.hasError
-                      ? errorDecoration
-                      : finalDecoration,
+              decoration: decoration,
               keyboardType: keyboardType,
               textInputAction: textInputAction,
               style: style,
               strutStyle: strutStyle,
               textAlign: textAlign,
-              textAlignVertical: textAlignVertical,
               textDirection: textDirection,
               textCapitalization: textCapitalization,
               autofocus: autofocus,
@@ -429,13 +301,15 @@ class MDTextField extends MDFormBuilderField<String> {
               autocorrect: autocorrect,
               enableSuggestions: enableSuggestions,
               placeholder: placeholder,
-              placeholderStyle: finalPlaceholderStyle,
+              placeholderStyle: placeholderStyle,
+              placeholderAlignment: placeholderAlignment,
               maxLengthEnforcement: maxLengthEnforcement,
               maxLines: maxLines,
               minLines: minLines,
               expands: expands,
               maxLength: maxLength,
-              onTap: onTap,
+              onPressed: onPressed,
+              onPressedAlwaysCalled: onPressedAlwaysCalled,
               onEditingComplete: onEditingComplete,
               onSubmitted: onSubmitted,
               inputFormatters: inputFormatters,
@@ -457,68 +331,67 @@ class MDTextField extends MDFormBuilderField<String> {
               contextMenuBuilder: contextMenuBuilder,
               obscuringCharacter: obscuringCharacter,
               autofillHints: autofillHints,
-              magnifierConfiguration: magnifierConfiguration,
+              magnifierConfiguration: magnifierConfiguration ?? TextMagnifierConfiguration.disabled,
               enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
               scribbleEnabled: scribbleEnabled,
-              clearButtonMode: clearButtonMode,
               contentInsertionConfiguration: contentInsertionConfiguration,
+              prefix: prefix,
               suffix: finalSuffix,
+              mainAxisAlignment: mainAxisAlignment,
+              crossAxisAlignment: crossAxisAlignment,
+              inputPadding: inputPadding,
+              gap: gap,
             );
 
             return fieldWidget;
           },
         );
 
-  static Widget _defaultContextMenuBuilder(
-    BuildContext context,
-    EditableTextState editableTextState,
-  ) {
-    return CupertinoAdaptiveTextSelectionToolbar.editableText(
-      editableTextState: editableTextState,
-    );
-  }
-
   @override
-  MDFormBuilderFieldState<MDTextField, String> createState() => _FormBuilderCupertinoTextFieldState();
+  MDFormBuilderFieldState<MDInputFormField, String> createState() => _FormBuilderMDInputFieldState();
 }
 
-class _FormBuilderCupertinoTextFieldState extends MDFormBuilderFieldState<MDTextField, String> {
-  TextEditingController? get _effectiveController => widget.controller ?? _controller;
-
-  TextEditingController? _controller;
+class _FormBuilderMDInputFieldState extends MDFormBuilderFieldState<MDInputFormField, String> {
+  late TextEditingController _effectiveController;
 
   @override
   void initState() {
     super.initState();
-    //setting this to value instead of initialValue here is OK since we handle initial value in the parent class
-    _controller = widget.controller ?? TextEditingController(text: value);
-    _controller!.addListener(_handleControllerChanged);
+    _effectiveController = widget.controller ?? TextEditingController(text: value);
+    _effectiveController.addListener(_handleControllerChanged);
+  }
+
+    @override
+  void reset() {
+    super.reset();
+    setState(() {
+      _effectiveController.text = initialValue ?? '';
+    });
   }
 
   @override
   void dispose() {
-    // Dispose the _controller when initState created it
-    _controller!.removeListener(_handleControllerChanged);
-    if (null == widget.controller) {
-      _controller!.dispose();
+    _effectiveController.removeListener(_handleControllerChanged);
+    if (widget.controller == null) {
+      _effectiveController.dispose();
     }
     super.dispose();
   }
 
   @override
-  void reset() {
-    super.reset();
-    setState(() {
-      _effectiveController!.text = initialValue ?? '';
-    });
+  void didUpdateWidget(MDInputFormField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != null && widget.controller != oldWidget.controller) {
+      _effectiveController = widget.controller!;
+    }
   }
 
   @override
   void didChange(String? value) {
     super.didChange(value);
-
-    if (_effectiveController!.text != value) {
-      _effectiveController!.text = value ?? '';
+    print('didChange: $value');
+    if (value != _effectiveController.text) {
+      _effectiveController.text = value ?? '';
     }
   }
 
@@ -533,5 +406,71 @@ class _FormBuilderCupertinoTextFieldState extends MDFormBuilderFieldState<MDText
     if (_effectiveController!.text != (value ?? '')) {
       didChange(_effectiveController!.text);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fieldWidget = MDInput(
+      restorationId: widget.restorationId,
+      controller: _effectiveController,
+      focusNode: effectiveFocusNode,
+      decoration: widget.decoration,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      style: widget.style,
+      strutStyle: widget.strutStyle,
+      textAlign: widget.textAlign,
+      textDirection: widget.textDirection,
+      textCapitalization: widget.textCapitalization,
+      autofocus: widget.autofocus,
+      readOnly: widget.readOnly,
+      showCursor: widget.showCursor,
+      obscureText: widget.obscureText,
+      autocorrect: widget.autocorrect,
+      enableSuggestions: widget.enableSuggestions,
+      placeholder: widget.placeholder,
+      placeholderStyle: widget.placeholderStyle,
+      placeholderAlignment: widget.placeholderAlignment,
+      maxLengthEnforcement: widget.maxLengthEnforcement,
+      maxLines: widget.maxLines,
+      minLines: widget.minLines,
+      expands: widget.expands,
+      maxLength: widget.maxLength,
+      onPressed: widget.onPressed,
+      onPressedAlwaysCalled: widget.onPressedAlwaysCalled,
+      onEditingComplete: widget.onEditingComplete,
+      onSubmitted: widget.onSubmitted,
+      inputFormatters: widget.inputFormatters,
+      enabled: widget.enabled,
+      cursorWidth: widget.cursorWidth,
+      cursorHeight: widget.cursorHeight,
+      cursorRadius: widget.cursorRadius,
+      cursorColor: widget.cursorColor,
+      scrollPadding: widget.scrollPadding,
+      keyboardAppearance: widget.keyboardAppearance,
+      enableInteractiveSelection: widget.enableInteractiveSelection,
+      dragStartBehavior: widget.dragStartBehavior,
+      scrollController: widget.scrollController,
+      scrollPhysics: widget.scrollPhysics,
+      selectionHeightStyle: widget.selectionHeightStyle,
+      selectionWidthStyle: widget.selectionWidthStyle,
+      smartDashesType: widget.smartDashesType,
+      smartQuotesType: widget.smartQuotesType,
+      contextMenuBuilder: widget.contextMenuBuilder,
+      obscuringCharacter: widget.obscuringCharacter,
+      autofillHints: widget.autofillHints,
+      magnifierConfiguration: widget.magnifierConfiguration ?? TextMagnifierConfiguration.disabled,
+      enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
+      scribbleEnabled: widget.scribbleEnabled,
+      contentInsertionConfiguration: widget.contentInsertionConfiguration,
+      prefix: widget.prefix,
+      suffix: widget.suffix,
+      mainAxisAlignment: widget.mainAxisAlignment,
+      crossAxisAlignment: widget.crossAxisAlignment,
+      inputPadding: widget.inputPadding,
+      gap: widget.gap,
+    );
+
+    return fieldWidget;
   }
 }

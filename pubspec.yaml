@@ -32,6 +32,7 @@ dependencies:
   sliver_tools: ^0.2.12
   appflowy_editor: ^4.0.0
   flutter_rating_stars: ^1.1.0
+  shadcn_ui: ^0.16.3
 
 dev_dependencies:
   flutter_test:

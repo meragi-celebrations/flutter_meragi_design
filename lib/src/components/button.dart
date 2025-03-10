@@ -36,6 +36,7 @@ enum ButtonSize { sm, rg, lg }
 /// The [Button.dropdown] constructor also takes a list of [Widget]s as its
 /// menuChildren parameter. The [menuChildren] parameter is used to define the
 /// children of the dropdown menu.
+@Deprecated('Use MDTap instead')
 class MDButton extends StatefulWidget {
   /// The callback that is called when the button is tapped.
   final VoidCallback? onTap;
