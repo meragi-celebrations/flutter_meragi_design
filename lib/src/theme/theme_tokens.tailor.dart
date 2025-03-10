@@ -156,6 +156,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
   VisualDensity get visualDensity;
   ShapeBorder get expansionTileCollapsedShape;
   ShapeBorder get expansionTileExpandedShape;
+  EdgeInsets? get childrenPadding;
   Color get primaryColor;
   Color get secondaryColor;
   Color get tertiaryColor;
@@ -316,6 +317,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
     VisualDensity? visualDensity,
     ShapeBorder? expansionTileCollapsedShape,
     ShapeBorder? expansionTileExpandedShape,
+    EdgeInsets? childrenPadding,
     Color? primaryColor,
     Color? secondaryColor,
     Color? tertiaryColor,
@@ -539,6 +541,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
           expansionTileCollapsedShape ?? this.expansionTileCollapsedShape,
       expansionTileExpandedShape:
           expansionTileExpandedShape ?? this.expansionTileExpandedShape,
+      childrenPadding: childrenPadding ?? this.childrenPadding,
       primaryColor: primaryColor ?? this.primaryColor,
       secondaryColor: secondaryColor ?? this.secondaryColor,
       tertiaryColor: tertiaryColor ?? this.tertiaryColor,
@@ -815,6 +818,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       expansionTileExpandedShape: t < 0.5
           ? expansionTileExpandedShape
           : other.expansionTileExpandedShape,
+      childrenPadding: t < 0.5 ? childrenPadding : other.childrenPadding,
       primaryColor: Color.lerp(primaryColor, other.primaryColor, t)!,
       secondaryColor: Color.lerp(secondaryColor, other.secondaryColor, t)!,
       tertiaryColor: Color.lerp(tertiaryColor, other.tertiaryColor, t)!,
@@ -1019,6 +1023,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
             const DeepCollectionEquality().equals(visualDensity, other.visualDensity) &&
             const DeepCollectionEquality().equals(expansionTileCollapsedShape, other.expansionTileCollapsedShape) &&
             const DeepCollectionEquality().equals(expansionTileExpandedShape, other.expansionTileExpandedShape) &&
+            const DeepCollectionEquality().equals(childrenPadding, other.childrenPadding) &&
             const DeepCollectionEquality().equals(primaryColor, other.primaryColor) &&
             const DeepCollectionEquality().equals(secondaryColor, other.secondaryColor) &&
             const DeepCollectionEquality().equals(tertiaryColor, other.tertiaryColor) &&
@@ -1186,6 +1191,7 @@ mixin _$ThemeTokenTailorMixin on ThemeExtension<ThemeToken> {
       const DeepCollectionEquality().hash(visualDensity),
       const DeepCollectionEquality().hash(expansionTileCollapsedShape),
       const DeepCollectionEquality().hash(expansionTileExpandedShape),
+      const DeepCollectionEquality().hash(childrenPadding),
       const DeepCollectionEquality().hash(primaryColor),
       const DeepCollectionEquality().hash(secondaryColor),
       const DeepCollectionEquality().hash(tertiaryColor),
@@ -1372,6 +1378,7 @@ extension ThemeTokenBuildContextProps on BuildContext {
       themeToken.expansionTileCollapsedShape;
   ShapeBorder get expansionTileExpandedShape =>
       themeToken.expansionTileExpandedShape;
+  EdgeInsets? get childrenPadding => themeToken.childrenPadding;
   Color get primaryColor => themeToken.primaryColor;
   Color get secondaryColor => themeToken.secondaryColor;
   Color get tertiaryColor => themeToken.tertiaryColor;

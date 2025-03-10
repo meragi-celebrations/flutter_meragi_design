@@ -67,6 +67,7 @@ class MDExpansionTile extends StatelessWidget {
           shape: decoration.expansionTileExpandedShape,
           collapsedShape: decoration.expansionTileCollapsedShape,
           onExpansionChanged: onExpansionChanged,
+          childrenPadding: decoration.childrenPadding,
           title: MDGestureDetector(
               onTap: () {
                 if (shouldOnTileTapExpand) {

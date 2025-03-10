@@ -351,6 +351,8 @@ class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin
   final ShapeBorder expansionTileCollapsedShape;
   @override
   final ShapeBorder expansionTileExpandedShape;
+  @override
+  final EdgeInsets? childrenPadding;
 
   // Standard properties
   @override
@@ -531,6 +533,7 @@ class ThemeToken extends ThemeExtension<ThemeToken> with _$ThemeTokenTailorMixin
     required this.visualDensity,
     required this.expansionTileCollapsedShape,
     required this.expansionTileExpandedShape,
+    required this.childrenPadding,
 
     // Standard Properties
     required this.primaryColor,
