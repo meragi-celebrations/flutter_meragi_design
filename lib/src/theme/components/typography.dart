@@ -87,8 +87,8 @@ class _DefaultParagraphTypography implements MDParagraphTypography {
   @override
   TextStyle get xSmall => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 12,
-        height: 20 / 12,
+        fontSize: 10,
+        height: 1.2,
         fontWeight: FontWeight.normal,
         color: color,
       );
@@ -96,8 +96,8 @@ class _DefaultParagraphTypography implements MDParagraphTypography {
   @override
   TextStyle get small => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 14,
-        height: 20 / 14,
+        fontSize: 12,
+        height: 1.2,
         fontWeight: FontWeight.normal,
         color: color,
       );
@@ -105,8 +105,8 @@ class _DefaultParagraphTypography implements MDParagraphTypography {
   @override
   TextStyle get medium => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 16,
-        height: 24 / 16,
+        fontSize: 14,
+        height: 1.2,
         fontWeight: FontWeight.normal,
         color: color,
       );
@@ -114,8 +114,8 @@ class _DefaultParagraphTypography implements MDParagraphTypography {
   @override
   TextStyle get large => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 18,
-        height: 28 / 18,
+        fontSize: 16,
+        height: 1.2,
         fontWeight: FontWeight.normal,
         color: color,
       );
@@ -136,54 +136,54 @@ class _DefaultHeadingTypography implements MDHeadingTypography {
   @override
   TextStyle get xSmall => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 20,
-        height: 28 / 20,
-        fontWeight: FontWeight.bold,
+        fontSize: 12,
+        height: 1.2,
+        fontWeight: FontWeight.w500,
         color: color,
       );
 
   @override
   TextStyle get small => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 24,
-        height: 32 / 24,
-        fontWeight: FontWeight.bold,
+        fontSize: 14,
+        height: 1.2,
+        fontWeight: FontWeight.w500,
         color: color,
       );
 
   @override
   TextStyle get medium => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 28,
-        height: 36 / 28,
-        fontWeight: FontWeight.bold,
+        fontSize: 18,
+        height: 1.2,
+        fontWeight: FontWeight.w500,
         color: color,
       );
 
   @override
   TextStyle get large => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 32,
-        height: 40 / 32,
-        fontWeight: FontWeight.bold,
+        fontSize: 24,
+        height: 1.2,
+        fontWeight: FontWeight.w500,
         color: color,
       );
 
   @override
   TextStyle get xLarge => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 36,
-        height: 44 / 36,
-        fontWeight: FontWeight.bold,
+        fontSize: 26,
+        height: 1.2,
+        fontWeight: FontWeight.w500,
         color: color,
       );
 
   @override
   TextStyle get xxLarge => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 40,
-        height: 52 / 40,
-        fontWeight: FontWeight.bold,
+        fontSize: 28,
+        height: 1.2,
+        fontWeight: FontWeight.w500,
         color: color,
       );
 }

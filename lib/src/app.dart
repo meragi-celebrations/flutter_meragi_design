@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/theme/theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-
-
 
 class MDApp extends StatelessWidget {
   final String? title;
-  final Widget? home;
-  final Map<String, WidgetBuilder>? routes;
-  final String? initialRoute;
-  final RouteFactory? onGenerateRoute;
-  final RouteFactory? onUnknownRoute;
-  final List<NavigatorObserver>? navigatorObservers;
-  final GlobalKey<NavigatorState>? navigatorKey;
   final TransitionBuilder? builder;
   final ThemeMode? themeMode;
   final Locale? locale;
@@ -27,17 +18,11 @@ class MDApp extends StatelessWidget {
   final Map<Type, Action<Intent>>? actions;
   final String? restorationScopeId;
   final MDTheme theme;
+  final RouterConfig<Object> routerConfig;
 
   const MDApp({
     super.key,
     this.title,
-    this.home,
-    this.routes,
-    this.initialRoute,
-    this.onGenerateRoute,
-    this.onUnknownRoute,
-    this.navigatorObservers,
-    this.navigatorKey,
     this.builder,
     this.themeMode,
     this.locale,
@@ -52,19 +37,14 @@ class MDApp extends StatelessWidget {
     this.actions,
     this.restorationScopeId,
     required this.theme,
+    required this.routerConfig,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ShadApp.material(
+    return ShadApp.materialRouter(
       title: title ?? '',
-      home: home,
-      routes: routes ?? const {},
-      initialRoute: initialRoute,
-      onGenerateRoute: onGenerateRoute,
-      onUnknownRoute: onUnknownRoute,
-      navigatorObservers: navigatorObservers ?? const [],
-      navigatorKey: navigatorKey,
+      routerConfig: routerConfig,
       builder: builder,
       themeMode: themeMode ?? ThemeMode.light,
       locale: locale,
@@ -81,7 +61,7 @@ class MDApp extends StatelessWidget {
       theme: theme.shadTheme,
       materialThemeBuilder: (context, builtTheme) => theme.themeData.copyWith(
         colorScheme: builtTheme.colorScheme,
-        ),
+      ),
     );
   }
 }

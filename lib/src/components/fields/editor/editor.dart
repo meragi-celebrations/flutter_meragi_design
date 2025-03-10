@@ -4,6 +4,8 @@ import 'package:flutter_meragi_design/src/components/fields/editor/handlers/user
 import 'package:flutter_meragi_design/src/components/fields/editor/inline_actions_command.dart';
 import 'package:flutter_meragi_design/src/components/fields/editor/inline_actions_service.dart';
 
+typedef BlockIconBuilder = Widget Function(BuildContext context, Node node);
+
 class MDEditor extends StatefulWidget {
   final bool readOnly;
   final MDInputTheme? decoration;
@@ -50,10 +52,6 @@ class _MDEditorState extends State<MDEditor> {
         widget.onTransactionChanged?.call(onData.$1, onData.$2);
       },
     );
-
-    // editorStyle = _buildDesktopEditorStyle();
-    // blockComponentBuilders = _buildBlockComponentBuilders();
-    // commandShortcuts = _buildCommandShortcuts();
   }
 
   @override
@@ -66,11 +64,24 @@ class _MDEditorState extends State<MDEditor> {
 
   @override
   Widget build(BuildContext context) {
-    late final MDInputTheme decoration;
-    decoration = widget.decoration ?? context.theme.inputTheme;
+    Map<String, BlockComponentBuilder> customBlock = {
+      ...standardBlockComponentBuilderMap,
+      BulletedListBlockKeys.type: BulletedListBlockComponentBuilder(
+        iconBuilder: (context, node) => _BulletedListIcon(node: node, textStyle: context.theme.fonts.paragraph.small),
+        configuration: standardBlockComponentConfiguration.copyWith(
+          placeholderText: (_) => AppFlowyEditorL10n.current.listItemPlaceholder,
+          padding: (node) => const EdgeInsets.only(bottom: 2),
+          textStyle: (node) => context.theme.fonts.paragraph.small.copyWith(height: 1.2),
+        ),
+      ),
+    };
+
+    final MDInputTheme decoration =
+        widget.decoration != null ? context.theme.inputTheme.merge(widget.decoration) : context.theme.inputTheme;
     final editor = AppFlowyEditor(
       editorState: editorState,
       editable: !widget.readOnly,
+      blockComponentBuilders: customBlock,
       // editorScrollController: editorScrollController,
       shrinkWrap: true,
       editorStyle: EditorStyle.desktop(
@@ -79,8 +90,9 @@ class _MDEditorState extends State<MDEditor> {
         selectionColor: decoration.selectionColor,
         padding: decoration.padding,
         textStyleConfiguration: TextStyleConfiguration(
-          text: context.theme.fonts.paragraph.medium,
-          lineHeight: context.theme.fonts.paragraph.medium.height ?? 1.2,
+          bold: context.theme.fonts.paragraph.medium,
+          text: context.theme.fonts.paragraph.small,
+          lineHeight: 1.5,
         ),
       ),
       characterShortcutEvents: [
@@ -113,5 +125,49 @@ class _MDEditorState extends State<MDEditor> {
     } else {}
 
     return wrapper;
+  }
+}
+
+class _BulletedListIcon extends StatelessWidget {
+  const _BulletedListIcon({
+    required this.node,
+    required this.textStyle,
+  });
+
+  final Node node;
+  final TextStyle textStyle;
+
+  static final bulletedListIcons = [
+    '●',
+    '◯',
+    '□',
+  ];
+
+  int get level {
+    var level = 0;
+    var parent = node.parent;
+    while (parent != null) {
+      if (parent.type == 'bulleted_list') {
+        level++;
+      }
+      parent = parent.parent;
+    }
+    return level;
+  }
+
+  String get icon => bulletedListIcons[level % bulletedListIcons.length];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(minWidth: 10, minHeight: (textStyle.fontSize ?? 12) * (1.2)),
+      padding: const EdgeInsets.only(right: 4.0),
+      child: Center(
+        child: Text(
+          icon,
+          style: textStyle.copyWith(fontSize: 5),
+        ),
+      ),
+    );
   }
 }
