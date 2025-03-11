@@ -37,8 +37,7 @@ dependencies:
   flutter_meragi_design:
     path: ../
   dio: 5.4.2+1
-  storybook_flutter: ^0.14.1
-  go_router: ^14.2.0
+  storybook_flutter: ^0.14.1  
 dev_dependencies:
   flutter_test:
     sdk: flutter
