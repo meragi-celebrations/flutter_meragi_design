@@ -1,6 +1,6 @@
 name: flutter_meragi_design
 description: Meragi Design System For Flutter
-version: 3.12.1
+version: 3.13.1
 homepage: "meragi.com"
 
 environment:
@@ -33,6 +33,7 @@ dependencies:
   appflowy_editor: ^4.0.0
   flutter_rating_stars: ^1.1.0
   shadcn_ui: ^0.16.3
+  flutter_animate: ^4.5.2
 
 dev_dependencies:
   flutter_test:

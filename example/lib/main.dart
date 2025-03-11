@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,13 +19,7 @@ class MyApp extends StatelessWidget {
           typography: MDDefaultTypography(color: colors.content.primary),
           dimensions: const MDDefaultDimension(),
         ),
-        routerConfig: GoRouter(initialLocation: "/", routes: [
-          GoRoute(
-            path: "/",
-            builder: (context, state) => const HomePage(),
-          )
-        ]),
-        // home: const HomePage(),
+        home: const HomePage(),
       ),
     );
   }
