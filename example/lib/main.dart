@@ -63,6 +63,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.format_align_center),
       label: 'Form',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.ac_unit),
+      label: 'Context Menu',
+    ),
   ];
 
   @override
@@ -87,6 +91,7 @@ class _HomePageState extends State<HomePage> {
               const SelectStory(),
               const InputStory(),
               const FormStory(),
+              const ContextMenuStory(),
             ][_selectedIndex],
           ),
         ],
@@ -108,12 +113,12 @@ class CardStory extends StatelessWidget {
         asPageHeader: true,
       ),
       body: ShadContextMenuRegion(
-        items: [
+        items: const [
           ShadContextMenuItem(
-            child: const Text('Item 1'),
+            child: Text('Item 1'),
           ),
           ShadContextMenuItem(
-            child: const Text('Item 2'),
+            child: Text('Item 2'),
           ),
         ],
         child: MDPanel(
@@ -546,4 +551,34 @@ class _InputStoryState extends State<InputStory> {
       ),
     );
   }
+}
+
+class ContextMenuStory extends StatelessWidget {
+  const ContextMenuStory({super.key});
+
+  @override
+  Widget build(BuildContext context) => MDScaffold(
+        appBar: const MDAppBar(
+          title: Text('Context Menu'),
+          asPageHeader: true,
+        ),
+        body: MDContextMenuRegion(
+          items: const [
+            MDContextMenuItem.inset(
+              child: Text('Item 1'),
+            ),
+            MDContextMenuItem.inset(
+              child: Text('Item 2'),
+            ),
+          ],
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              border: Border.all(color: context.theme.colors.border.opaque),
+            ),
+            child: Center(child: const Text('Context Menu')),
+          ),
+        ),
+      );
 }

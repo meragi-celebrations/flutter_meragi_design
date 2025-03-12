@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart'
+    hide MDProviderReadExt;
 import 'package:provider/provider.dart';
 
 class MDNavigationRail extends StatefulWidget {
@@ -40,7 +40,9 @@ class MDNavigationRail extends StatefulWidget {
     this.trailingFirst = true,
   }) : assert(
             destinations == null && builder != null ||
-                destinations != null && builder == null && onDestinationSelected != null,
+                destinations != null &&
+                    builder == null &&
+                    onDestinationSelected != null,
             "Please ensure that you provider destinations or builder but not both. Make sure that both parameters are not null. Also if you are providing the destinations, please ensure that onDestinations is also present");
 
   @override
@@ -56,15 +58,16 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
     super.initState();
   }
 
-  List<Widget>? _build(MDNavigationRailController controller) => widget.trailing != null
-      ? controller.expandedButton
-          ? widget.trailingFirst
-              ? [widget.trailing!, expandedButton(controller)]
-              : [expandedButton(controller), widget.trailing!]
-          : [widget.trailing!]
-      : controller.expandedButton
-          ? [expandedButton(controller)]
-          : null;
+  List<Widget>? _build(MDNavigationRailController controller) =>
+      widget.trailing != null
+          ? controller.expandedButton
+              ? widget.trailingFirst
+                  ? [widget.trailing!, expandedButton(controller)]
+                  : [expandedButton(controller), widget.trailing!]
+              : [widget.trailing!]
+          : controller.expandedButton
+              ? [expandedButton(controller)]
+              : null;
 
   Widget expandedButton(MDNavigationRailController controller) {
     return MDButton(
@@ -82,7 +85,9 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
         }
         widget.onExpandTap?.call();
       },
-      icon: controller.isExpanded ? PhosphorIconsRegular.caretLeft : PhosphorIconsRegular.caretRight,
+      icon: controller.isExpanded
+          ? PhosphorIconsRegular.caretLeft
+          : PhosphorIconsRegular.caretRight,
     );
   }
 
@@ -99,7 +104,8 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
 
   @override
   Widget build(BuildContext context) {
-    MDNavigationRailDecoration finalDecoration = MDNavigationRailDecoration(context: context).merge(widget.decoration);
+    MDNavigationRailDecoration finalDecoration =
+        MDNavigationRailDecoration(context: context).merge(widget.decoration);
     return ChangeNotifierProvider<MDNavigationRailController>.value(
       value: controller,
       builder: (context, child) {
@@ -119,7 +125,9 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
             builder: (context, value, child) {
               return AnimatedContainer(
                 duration: finalDecoration.animationDuration,
-                width: value.isExpanded ? finalDecoration.expandedWidth : finalDecoration.collapsedWidth,
+                width: value.isExpanded
+                    ? finalDecoration.expandedWidth
+                    : finalDecoration.collapsedWidth,
                 decoration: BoxDecoration(
                     color: finalDecoration.backgroundColor,
                     borderRadius: finalDecoration.borderRadius,
@@ -130,7 +138,10 @@ class _MDNavigationRailState extends State<MDNavigationRail> {
                         ? Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _wrapAroundChild(widget.type, widget.builder!.call(context, value.isExpanded)),
+                              _wrapAroundChild(
+                                  widget.type,
+                                  widget.builder!
+                                      .call(context, value.isExpanded)),
                               ..._build(controller)!
                             ],
                           )
@@ -200,7 +211,9 @@ class _MDNavigationContent extends StatelessWidget {
                       Expanded(
                         child: AnimatedCrossFade(
                           duration: const Duration(milliseconds: 300),
-                          crossFadeState: value.isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                          crossFadeState: value.isExpanded
+                              ? CrossFadeState.showSecond
+                              : CrossFadeState.showFirst,
                           firstChild: logo!,
                           secondChild: expandedLogo!,
                         ),
@@ -244,7 +257,9 @@ class _MDNavigationContent extends StatelessWidget {
               }
               onExpandTap?.call();
             },
-            icon: value.isExpanded ? PhosphorIconsRegular.caretLeft : PhosphorIconsRegular.caretRight,
+            icon: value.isExpanded
+                ? PhosphorIconsRegular.caretLeft
+                : PhosphorIconsRegular.caretRight,
           )
       ],
     );
@@ -277,7 +292,8 @@ class _NavigationItemState extends State<_NavigationItem> {
   @override
   void initState() {
     super.initState();
-    decoration = MDNavigationRailDestinationDecoration(context: context).merge(widget.destination.decoration);
+    decoration = MDNavigationRailDestinationDecoration(context: context)
+        .merge(widget.destination.decoration);
   }
 
   @override
@@ -328,7 +344,9 @@ class _NavigationItemState extends State<_NavigationItem> {
                     child: Material(
                       color: Colors.transparent,
                       child: AnimatedCrossFade(
-                        crossFadeState: widget._isExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                        crossFadeState: widget._isExpanded
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
                         duration: const Duration(milliseconds: 300),
                         firstChild: Padding(
                           padding: const EdgeInsets.only(left: 8.0),
@@ -371,12 +389,15 @@ class MDNavigationRailEmpty extends StatelessWidget {
   final MDNavigationRailDecoration? decoration;
   @override
   Widget build(BuildContext context) {
-    final MDNavigationRailDecoration finalDecoration = MDNavigationRailDecoration(context: context).merge(decoration);
+    final MDNavigationRailDecoration finalDecoration =
+        MDNavigationRailDecoration(context: context).merge(decoration);
     return Container(
       height: double.infinity,
       width: finalDecoration.collapsedWidth - 8,
       margin: const EdgeInsets.only(top: 8, right: 8, bottom: 8),
-      decoration: BoxDecoration(color: finalDecoration.backgroundColor, borderRadius: finalDecoration.borderRadius),
+      decoration: BoxDecoration(
+          color: finalDecoration.backgroundColor,
+          borderRadius: finalDecoration.borderRadius),
     );
   }
 }

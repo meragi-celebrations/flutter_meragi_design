@@ -14,6 +14,12 @@ class MDGestureDetector extends GestureDetector {
   /// disabled cursor.
   final bool isDisabled;
 
+  /// If true, this widget will show a disabled cursor, even if [isDisabled] is false.
+  final bool showDisabledCursor;
+
+  /// The cursor to display when the mouse is over the widget.
+  final MouseCursor cursor;
+
   void Function(PointerEnterEvent)? onEnter;
   void Function(PointerExitEvent)? onExit;
   void Function(PointerHoverEvent)? onHover;
@@ -49,12 +55,17 @@ class MDGestureDetector extends GestureDetector {
     GestureDragUpdateCallback? onPanUpdate,
     GestureDragEndCallback? onPanEnd,
     GestureDragCancelCallback? onPanCancel,
+    GestureTapDownCallback? onSecondaryTapDown,
+    GestureTapUpCallback? onSecondaryTapUp,
+    GestureLongPressStartCallback? onLongPressStart,
     HitTestBehavior? behavior,
     bool excludeFromSemantics = false,
     this.onEnter,
     this.onExit,
     this.onHover,
     this.isDisabled = false,
+    this.showDisabledCursor = false,
+    this.cursor = SystemMouseCursors.click,
   }) : super(
           key: key,
           child: child,
@@ -85,6 +96,9 @@ class MDGestureDetector extends GestureDetector {
           onPanUpdate: onPanUpdate,
           onPanEnd: onPanEnd,
           onPanCancel: onPanCancel,
+          onSecondaryTapDown: onSecondaryTapDown,
+          onSecondaryTapUp: onSecondaryTapUp,
+          onLongPressStart: onLongPressStart,
           behavior: behavior,
           excludeFromSemantics: excludeFromSemantics,
         );
@@ -99,11 +113,14 @@ class MDGestureDetector extends GestureDetector {
     // If isDisabled is true, this widget will not respond to any gestures and
     // will show a disabled cursor.
     if (isDisabled) {
-      return absorbing;
+      return MouseRegion(
+        cursor: SystemMouseCursors.forbidden,
+        child: absorbing,
+      );
     }
 
     return MouseRegion(
-      cursor: SystemMouseCursors.click,
+      cursor: showDisabledCursor ? SystemMouseCursors.forbidden : cursor,
       onEnter: onEnter,
       onExit: onExit,
       onHover: onHover,
