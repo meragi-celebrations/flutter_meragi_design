@@ -81,21 +81,23 @@ class MDTheme {
       ),
       secondaryButtonTheme: ShadButtonTheme(
         merge: true,
-        backgroundColor: colors.background.tertiary,
+        backgroundColor: colors.background.secondary,
         foregroundColor: colors.content.primary,
         hoverBackgroundColor: colors.background.tertiary.darken(),
       ),
       outlineButtonTheme: ShadButtonTheme(
         merge: true,
-        backgroundColor: colors.background.primary,
-        foregroundColor: colors.content.primary,
-        hoverBackgroundColor: colors.background.primary.darken(),
+        backgroundColor: Colors.transparent,
+        foregroundColor: colors.primary,
+        hoverBackgroundColor: colors.background.tertiary,
+        hoverForegroundColor: colors.primary,
       ),
       ghostButtonTheme: ShadButtonTheme(
         merge: true,
-        backgroundColor: colors.background.primary,
-        foregroundColor: colors.content.primary,
-        hoverBackgroundColor: colors.background.primary.darken(),
+        backgroundColor: Colors.transparent,
+        foregroundColor: colors.primary,
+        hoverBackgroundColor: colors.background.tertiary,
+        hoverForegroundColor: colors.primary,
       ),
       destructiveButtonTheme: ShadButtonTheme(
         merge: true,
@@ -119,6 +121,7 @@ class MDTheme {
       ),
       inputTheme: ShadInputTheme(
         placeholderStyle: typography.paragraph.small.copyWith(color: colors.content.stateDisabled),
+
         decoration: ShadDecoration(
           border: ShadBorder(
             top: BorderSide(color: colors.border.opaque),
@@ -127,6 +130,7 @@ class MDTheme {
             right: BorderSide(color: colors.border.opaque),
           ),
         ),
+        // padding: EdgeInsets.symmetric(horizontal: dimensions.padding, vertical: dimensions.padding / 2),
       ),
       checkboxTheme: ShadCheckboxTheme(
         decoration: ShadDecoration(
@@ -137,6 +141,7 @@ class MDTheme {
             right: BorderSide(color: colors.border.opaque.darken(15)),
           ),
         ),
+
       ),
       contextMenuTheme: ShadContextMenuTheme(
         backgroundColor: colors.background.primary,
@@ -144,7 +149,14 @@ class MDTheme {
         textStyle: typography.paragraph.small,
         trailingTextStyle: typography.paragraph.small.copyWith(color: colors.content.stateDisabled),
       ),
-      cardTheme: ShadCardTheme(padding: EdgeInsets.all(dimensions.padding)));
+      cardTheme: ShadCardTheme(padding: EdgeInsets.all(dimensions.padding)),
+      popoverTheme: ShadPopoverTheme(
+        decoration: ShadDecoration(
+          color: colors.background.tertiary,
+          border: ShadBorder.all(color: colors.border.transparent),
+        ),
+        ),
+      );
 
   ThemeData get themeData => ThemeData(
         primaryColor: colors.primary,
@@ -152,7 +164,29 @@ class MDTheme {
         brightness: Brightness.light,
         fontFamily: typography.fontFamily,
         // backgroundColor: appColor.background.primary,
-        scaffoldBackgroundColor: colors.background.secondary,
+        scaffoldBackgroundColor: colors.background.tertiary,
+        iconTheme: IconThemeData(color: colors.primary),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: MDWidgetStateResolver<Color>({
+            WidgetState.selected: colors.primary,
+            WidgetState.hovered: colors.background.secondary
+                .darken(20),
+            "default":
+                colors.background.secondary,
+          }).resolveWith(),
+          side: BorderSide(
+            color: colors.background.secondary,
+            width: 1,
+          ),
+        ),
+        sliderTheme: SliderThemeData(
+          activeTrackColor: colors.primary,
+          inactiveTrackColor: colors.background.secondary,
+          thumbColor: colors.primary,
+          overlayColor: colors.primary.withOpacity(0.3),
+          rangeThumbShape: RoundRangeSliderThumbShape(enabledThumbRadius: dimensions.radius/2),
+          trackHeight: dimensions.stroke*2,
+        ),
         extensions: [
           AppColorExtension(colors: colors),
           AppTypographyExtension(fonts: typography),

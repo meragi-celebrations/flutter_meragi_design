@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:shadcn_ui/shadcn_ui.dart' hide TextDirection;
 
 class MDTickbox extends StatefulWidget {
@@ -78,7 +79,9 @@ class _MDTickboxState extends State<MDTickbox> {
       enabled: widget.enabled,
       onChanged: widget.onChanged,
       focusNode: widget.focusNode,
-      decoration: widget.decoration,
+      decoration: (widget.decoration ?? const ShadDecoration()).copyWith(
+        border: ShadBorder.all(color: widget.value ? context.theme.colors.primary : context.theme.colors.border.opaque),
+      ),
       size: widget.size,
       duration: widget.duration,
       icon: widget.icon,

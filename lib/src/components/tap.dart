@@ -466,8 +466,6 @@ class _MDTapState extends State<MDTap> {
 
     final shadTheme = ShadTheme.of(context);
 
-    print("size: ${shadTheme.textTheme.small.fontSize}");
-
     Widget loader = SizedBox.square(
       dimension: shadTheme.textTheme.small.fontSize,
       child: ColorFiltered(
