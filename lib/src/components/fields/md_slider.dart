@@ -184,29 +184,18 @@ class _MDSliderState extends State<MDSlider> {
       return Stack(
         alignment: Alignment.center,
         children: [
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: widget.decoration?.activeTrackColor,
-              inactiveTrackColor: widget.decoration?.inactiveTrackColor,
-              thumbColor: widget.decoration?.thumbColor,
-              overlayColor: widget.decoration?.thumbColor.withOpacity(0.1),
-              valueIndicatorColor: widget.decoration?.thumbColor,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
-              trackHeight: 4.0,
-            ),
-            child: Slider(
-              value: _currentValue,
-              min: widget.min,
-              max: widget.max,
-              divisions: widget.simplifyValues ? (widget.max - widget.min).round() : null,
-              onChanged: widget.disabled
-                  ? null
-                  : (value) {
-                      final updatedValue = widget.simplifyValues ? value.round().toDouble() : value;
-                      setState(() => _currentValue = updatedValue);
-                      widget.onChanged?.call(updatedValue);
-                    },
-            ),
+          Slider(
+            value: _currentValue,
+            min: widget.min,
+            max: widget.max,
+            divisions: widget.simplifyValues ? (widget.max - widget.min).round() : null,
+            onChanged: widget.disabled
+                ? null
+                : (value) {
+                    final updatedValue = widget.simplifyValues ? value.round().toDouble() : value;
+                    setState(() => _currentValue = updatedValue);
+                    widget.onChanged?.call(updatedValue);
+                  },
           ),
           if (!widget.disabled)
             Positioned(
@@ -233,33 +222,23 @@ class _MDSliderState extends State<MDSlider> {
       return Stack(
         alignment: Alignment.center,
         children: [
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: widget.decoration?.activeTrackColor ?? theme.primaryColor,
-              inactiveTrackColor: widget.decoration?.inactiveTrackColor ?? theme.primaryColor.withOpacity(0.2),
-              thumbColor: widget.decoration?.thumbColor ?? theme.primaryColor,
-              overlayColor: widget.decoration?.thumbColor.withOpacity(0.1),
-              rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 8.0),
-              trackHeight: 4.0,
-            ),
-            child: RangeSlider(
-              values: _currentRangeValues,
-              min: widget.min,
-              max: widget.max,
-              divisions: widget.simplifyValues ? (widget.max - widget.min).round() : null,
-              onChanged: widget.disabled
-                  ? null
-                  : (RangeValues values) {
-                      final updatedValues = widget.simplifyValues
-                          ? RangeValues(
-                              values.start.round().toDouble(),
-                              values.end.round().toDouble(),
-                            )
-                          : values;
-                      setState(() => _currentRangeValues = updatedValues);
-                      widget.onRangeChanged?.call(updatedValues);
-                    },
-            ),
+          RangeSlider(
+            values: _currentRangeValues,
+            min: widget.min,
+            max: widget.max,
+            divisions: widget.simplifyValues ? (widget.max - widget.min).round() : null,
+            onChanged: widget.disabled
+                ? null
+                : (RangeValues values) {
+                    final updatedValues = widget.simplifyValues
+                        ? RangeValues(
+                            values.start.round().toDouble(),
+                            values.end.round().toDouble(),
+                          )
+                        : values;
+                    setState(() => _currentRangeValues = updatedValues);
+                    widget.onRangeChanged?.call(updatedValues);
+                  },
           ),
           if (!widget.disabled) ...[
             Positioned(

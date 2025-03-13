@@ -14,10 +14,10 @@ abstract class AppDimension {
 
 class MDDefaultDimension implements AppDimension {
   const MDDefaultDimension({
-    this.radius = 15.0,
-    this.padding = 20.0,
+    this.radius = 10.0,
+    this.padding = 15.0,
     this.stroke = 1.0,
-    this.inputHeight = 48.0,
+    this.inputHeight = 42.0,
   });
 
   @override
