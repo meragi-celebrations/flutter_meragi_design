@@ -540,27 +540,29 @@ class _InputStoryState extends State<InputStory> {
                   label: const Text('Tickbox'),
                   tristate: true,
                 ),
-                ShadRadioGroup<String>(
-                  onChanged: (value) => {
-                    setState(
-                      () => _tickboxValue =
-                          value == 'mid' ? null : value == 'true',
-                    ),
-                  },
-                  items: const [
-                    ShadRadio(
-                      label: Text('Mid'),
-                      value: 'mid',
-                    ),
-                    ShadRadio(
-                      label: Text('False'),
-                      value: 'false',
-                    ),
-                    ShadRadio(
-                      label: Text('True'),
-                      value: 'true',
-                    ),
-                  ],
+                FocusTraversalGroup(
+                  child: MDRadioGroup<String>(
+                    onChanged: (value) => {
+                      setState(
+                        () => _tickboxValue =
+                            value == 'mid' ? null : value == 'true',
+                      ),
+                    },
+                    items: const [
+                      MDRadio(
+                        label: Text('Mid'),
+                        value: 'mid',
+                      ),
+                      MDRadio(
+                        label: Text('False'),
+                        value: 'false',
+                      ),
+                      MDRadio(
+                        label: Text('True'),
+                        value: 'true',
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

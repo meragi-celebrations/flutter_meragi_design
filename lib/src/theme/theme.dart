@@ -141,7 +141,14 @@ class MDTheme {
             right: BorderSide(color: colors.border.opaque.darken(15)),
           ),
         ),
-
+      ),
+      radioTheme: ShadRadioTheme(
+        circleSize: 14,
+        decoration: ShadDecoration(
+          border: ShadBorder.all(
+            color: colors.border.opaque,
+          )
+        )
       ),
       contextMenuTheme: ShadContextMenuTheme(
         backgroundColor: colors.background.primary,

@@ -30,6 +30,7 @@ export 'src/components/fields/md_slider.dart';
 export 'src/components/fields/ratings.dart';
 export 'src/components/fields/searchable_dropdown.dart';
 export 'src/components/fields/switch.dart';
+export 'src/components/fields/radio.dart';
 export 'src/components/fields/text_field.dart';
 export 'src/components/fields/select_form_field.dart';
 export 'src/components/fields/input.dart';
