@@ -56,6 +56,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.format_align_center),
       label: 'Form',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.radio_button_checked),
+      label: 'Popover',
+    ),
   ];
 
   @override
@@ -80,6 +84,7 @@ class _HomePageState extends State<HomePage> {
               const SelectStory(),
               const InputStory(),
               const FormStory(),
+              PopoverStory(),
             ][_selectedIndex],
           ),
         ],
@@ -568,6 +573,48 @@ class _InputStoryState extends State<InputStory> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class PopoverStory extends StatelessWidget {
+  PopoverStory({super.key});
+
+  final MDPopoverController _controller = MDPopoverController();
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text('Popover'),
+        asPageHeader: true,
+      ),
+      body: MDPanel(
+        width: 450,
+        child: MDPopover(
+            controller: _controller,
+            child: MDTap(
+              child: const Text('Open Popover'),
+              onPressed: () {
+                _controller.toggle();
+              },
+            ),
+            popover: (context) {
+              return MDPopoverMenu(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(
+                      6,
+                      (index) => MDPopoverItem(
+                        iconData: PhosphorIconsRegular.check,
+                        child: Text('Item $index'),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
       ),
     );
   }

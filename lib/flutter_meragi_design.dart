@@ -41,6 +41,7 @@ export 'src/components/fields/tickbox_form_field.dart';
 export 'src/components/filter_form.dart';
 export 'src/components/gesture_detector.dart';
 export 'src/components/image.dart';
+export 'src/components/popover.dart';
 export 'src/components/json/json_data_manager.dart';
 export 'src/components/json/json_interface.dart';
 export 'src/components/json/json_util.dart';
