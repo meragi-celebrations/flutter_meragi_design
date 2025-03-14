@@ -102,11 +102,11 @@ class CardStory extends StatelessWidget {
       ),
       body: ShadContextMenuRegion(
         items: [
-          ShadContextMenuItem(
-            child: const Text('Item 1'),
+          const ShadContextMenuItem(
+            child: Text('Item 1'),
           ),
-          ShadContextMenuItem(
-            child: const Text('Item 2'),
+          const ShadContextMenuItem(
+            child: Text('Item 2'),
           ),
         ],
         child: MDPanel(
@@ -509,7 +509,7 @@ class InputStory extends StatefulWidget {
 
 class _InputStoryState extends State<InputStory> {
   bool _toggleValue = false;
-  bool _tickboxValue = false;
+  bool? _tickboxValue = false;
   @override
   Widget build(BuildContext context) {
     return MDScaffold(
@@ -529,10 +529,40 @@ class _InputStoryState extends State<InputStory> {
               onChanged: (value) => setState(() => _toggleValue = value),
               label: const Text('Toggle'),
             ),
-            MDTickbox(
-              value: _tickboxValue,
-              onChanged: (value) => setState(() => _tickboxValue = value),
-              label: const Text('Tickbox'),
+            Row(
+              children: [
+                MDTickbox(
+                  value: _tickboxValue,
+                  onChanged: (value) {
+                    print("Tickbox value changed to: $value");
+                    setState(() => _tickboxValue = value);
+                  },
+                  label: const Text('Tickbox'),
+                  tristate: true,
+                ),
+                ShadRadioGroup<String>(
+                  onChanged: (value) => {
+                    setState(
+                      () => _tickboxValue =
+                          value == 'mid' ? null : value == 'true',
+                    ),
+                  },
+                  items: const [
+                    ShadRadio(
+                      label: Text('Mid'),
+                      value: 'mid',
+                    ),
+                    ShadRadio(
+                      label: Text('False'),
+                      value: 'false',
+                    ),
+                    ShadRadio(
+                      label: Text('True'),
+                      value: 'true',
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
