@@ -94,3 +94,4 @@ export 'src/utils/widget_state.dart';
 export 'src/app.dart';
 export 'package:shadcn_ui/shadcn_ui.dart' hide ValueTransformer, TextDirection;
 export 'package:phosphor_flutter/phosphor_flutter.dart';
+export 'src/crud/widgets/pagination_view.dart';
