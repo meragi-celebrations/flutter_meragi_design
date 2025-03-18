@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/editor/handlers/user_mention.dart';
@@ -28,26 +30,16 @@ class MDEditor extends StatefulWidget {
 }
 
 class _MDEditorState extends State<MDEditor> {
-  late final EditorScrollController editorScrollController;
+  StreamSubscription<(TransactionTime, Transaction)>? transactionStreamSubscription;
   late final EditorState editorState;
-
-  late final InlineActionsService inlineActionsService = InlineActionsService(
-    context: context,
-    handlers: [
-      InlineUserMentionService(),
-    ],
-  );
+  late final InlineActionsService inlineActionsService =
+      InlineActionsService(context: context, handlers: [InlineUserMentionService()]);
 
   @override
   void initState() {
     super.initState();
-
     editorState = widget.editorState != null ? widget.editorState! : EditorState.blank(withInitialText: true);
-    editorScrollController = EditorScrollController(
-      editorState: editorState,
-      shrinkWrap: false,
-    );
-    editorState.transactionStream.listen(
+    transactionStreamSubscription = editorState.transactionStream.listen(
       (onData) {
         widget.onTransactionChanged?.call(onData.$1, onData.$2);
       },
@@ -56,9 +48,9 @@ class _MDEditorState extends State<MDEditor> {
 
   @override
   void dispose() {
-    editorScrollController.dispose();
-    editorState.dispose();
-
+    if (widget.editorState == null) editorState.dispose();
+    transactionStreamSubscription?.cancel();
+    transactionStreamSubscription = null;
     super.dispose();
   }
 
@@ -82,7 +74,6 @@ class _MDEditorState extends State<MDEditor> {
       editorState: editorState,
       editable: !widget.readOnly,
       blockComponentBuilders: customBlock,
-      // editorScrollController: editorScrollController,
       shrinkWrap: true,
       editorStyle: EditorStyle.desktop(
         cursorColor: widget.readOnly ? Colors.transparent : decoration.cursorColor,
