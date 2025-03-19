@@ -14,7 +14,8 @@ class MDRating extends StatefulWidget {
     this.starBuilder,
     this.showLabels = false,
     this.labels,
-    this.labelBuilder, // Add this parameter
+    this.labelBuilder,
+    this.readOnly = false, // Add this parameter
   }) : super(key: key);
 
   final double value;
@@ -25,6 +26,7 @@ class MDRating extends StatefulWidget {
   final int starCount;
   final bool showLabels;
   final List<String>? labels;
+  final bool readOnly;
   final Widget Function(
     BuildContext context, {
     required bool isSelected,
@@ -116,6 +118,7 @@ class _MDRatingState extends State<MDRating> {
               },
               child: MDGestureDetector(
                 onTap: () {
+                  if (widget.readOnly) return; // Add this
                   _animateRating(index).then((_) {
                     setState(() {
                       _currentRating = index + 1;
@@ -124,7 +127,7 @@ class _MDRatingState extends State<MDRating> {
                   });
                 },
                 child: AnimatedScale(
-                  scale: (_animationIndex >= 0 && index <= _animationIndex) ||
+                  scale: widget.readOnly ? 1 : (_animationIndex >= 0 && index <= _animationIndex) ||
                           _hoverIndex == index
                       ? 1.2
                       : 1.0,
