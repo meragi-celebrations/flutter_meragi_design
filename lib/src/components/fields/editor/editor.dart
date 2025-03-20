@@ -42,7 +42,9 @@ class _MDEditorState extends State<MDEditor> {
   void initState() {
     super.initState();
 
-    editorState = widget.editorState != null ? widget.editorState! : EditorState.blank(withInitialText: true);
+    editorState = widget.editorState != null
+        ? widget.editorState!
+        : EditorState.blank(withInitialText: true);
     editorScrollController = EditorScrollController(
       editorState: editorState,
       shrinkWrap: false,
@@ -67,17 +69,21 @@ class _MDEditorState extends State<MDEditor> {
     Map<String, BlockComponentBuilder> customBlock = {
       ...standardBlockComponentBuilderMap,
       BulletedListBlockKeys.type: BulletedListBlockComponentBuilder(
-        iconBuilder: (context, node) => _BulletedListIcon(node: node, textStyle: context.theme.fonts.paragraph.small),
+        iconBuilder: (context, node) => _BulletedListIcon(
+            node: node, textStyle: context.theme.fonts.paragraph.small),
         configuration: standardBlockComponentConfiguration.copyWith(
-          placeholderText: (_) => AppFlowyEditorL10n.current.listItemPlaceholder,
+          placeholderText: (_) =>
+              AppFlowyEditorL10n.current.listItemPlaceholder,
           padding: (node) => const EdgeInsets.only(bottom: 2),
-          textStyle: (node) => context.theme.fonts.paragraph.small.copyWith(height: 1.2),
+          textStyle: (node) =>
+              context.theme.fonts.paragraph.small.copyWith(height: 1.2),
         ),
       ),
     };
 
-    final MDInputTheme decoration =
-        widget.decoration != null ? context.theme.inputTheme.merge(widget.decoration) : context.theme.inputTheme;
+    final MDInputTheme decoration = widget.decoration != null
+        ? context.theme.inputTheme.merge(widget.decoration)
+        : context.theme.inputTheme;
     final editor = AppFlowyEditor(
       editorState: editorState,
       editable: !widget.readOnly,
@@ -85,7 +91,8 @@ class _MDEditorState extends State<MDEditor> {
       // editorScrollController: editorScrollController,
       shrinkWrap: true,
       editorStyle: EditorStyle.desktop(
-        cursorColor: widget.readOnly ? Colors.transparent : decoration.cursorColor,
+        cursorColor:
+            widget.readOnly ? Colors.transparent : decoration.cursorColor,
         cursorWidth: widget.readOnly ? 0 : 2,
         selectionColor: decoration.selectionColor,
         padding: decoration.padding,
@@ -96,6 +103,21 @@ class _MDEditorState extends State<MDEditor> {
         ),
       ),
       characterShortcutEvents: [
+        customSlashCommand(
+          standardSelectionMenuItems,
+          style: SelectionMenuStyle(
+            selectionMenuBackgroundColor:
+                context.theme.colors.background.primary,
+            selectionMenuItemTextColor: context.theme.colors.content.primary,
+            selectionMenuItemIconColor: context.theme.colors.content.primary,
+            selectionMenuItemSelectedTextColor:
+                context.theme.colors.content.primary,
+            selectionMenuItemSelectedIconColor:
+                context.theme.colors.content.primary,
+            selectionMenuItemSelectedColor:
+                context.theme.colors.background.secondary,
+          ),
+        ),
         ...standardCharacterShortcutEvents,
         inlineActionsCommand(inlineActionsService),
       ],
@@ -160,7 +182,8 @@ class _BulletedListIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(minWidth: 10, minHeight: (textStyle.fontSize ?? 12) * (1.2)),
+      constraints: BoxConstraints(
+          minWidth: 10, minHeight: (textStyle.fontSize ?? 12) * (1.2)),
       padding: const EdgeInsets.only(right: 4.0),
       child: Center(
         child: Text(

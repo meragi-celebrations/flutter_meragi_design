@@ -587,6 +587,7 @@ class _InputStoryState extends State<InputStory> {
                 ),
               ],
             ),
+            MDEditor(),
           ],
         ),
       ),

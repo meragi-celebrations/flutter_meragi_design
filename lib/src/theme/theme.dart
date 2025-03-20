@@ -148,11 +148,13 @@ class MDTheme {
           ),
         ),
         radioTheme: ShadRadioTheme(
-            circleSize: 14,
-            decoration: ShadDecoration(
-                border: ShadBorder.all(
+          circleSize: 14,
+          decoration: ShadDecoration(
+            border: ShadBorder.all(
               color: colors.border.opaque,
-            ))),
+            ),
+          ),
+        ),
         contextMenuTheme: ShadContextMenuTheme(
           textStyle: typography.paragraph.small,
           trailingTextStyle: typography.paragraph.small
