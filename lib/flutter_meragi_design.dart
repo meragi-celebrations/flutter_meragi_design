@@ -12,6 +12,7 @@ export 'src/components/button.dart';
 export 'src/components/calendar.dart';
 export 'src/components/card.dart';
 export 'src/components/carousel.dart';
+export 'src/components/context_menu.dart';
 export 'src/components/description.dart';
 export 'src/components/divider.dart';
 export 'src/components/drawer.dart';

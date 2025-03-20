@@ -64,6 +64,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.calendar_today),
       label: 'Calendar',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.settings),
+      label: 'Context Menu',
+    ),
   ];
 
   @override
@@ -90,6 +94,7 @@ class _HomePageState extends State<HomePage> {
               const FormStory(),
               PopoverStory(),
               const CalendarStory(),
+              const ContextMenuStory(),
             ][_selectedIndex],
           ),
         ],
@@ -690,6 +695,36 @@ class CalendarStory extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ContextMenuStory extends StatelessWidget {
+  const ContextMenuStory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MDScaffold(
+      appBar: MDAppBar(
+        title: Text('Context Menu'),
+        asPageHeader: true,
+      ),
+      body: MDPanel(
+        width: 450,
+        child: MDContextMenuRegion(
+          items: [
+            MDContextMenuItem.inset(
+              child: Text('Item 1'),
+            ),
+            MDContextMenuItem.inset(
+              child: Text('Item 2'),
+            ),
+          ],
+          child: Center(
+            child: Text('Open Context Menu'),
+          ),
         ),
       ),
     );
