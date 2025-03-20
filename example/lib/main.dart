@@ -60,6 +60,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.radio_button_checked),
       label: 'Popover',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.calendar_today),
+      label: 'Calendar',
+    ),
   ];
 
   @override
@@ -85,6 +89,7 @@ class _HomePageState extends State<HomePage> {
               const InputStory(),
               const FormStory(),
               PopoverStory(),
+              const CalendarStory(),
             ][_selectedIndex],
           ),
         ],
@@ -485,9 +490,15 @@ class _FormStoryState extends State<FormStory> {
                           Text(values.join(', ')),
                     ),
                   ),
-                  MDTickboxFormField(
-                      name: 'tickbox',
-                      label: const Text('Send me a newsletter')),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      MDTickboxFormField(
+                        name: 'tickbox',
+                        label: const Text('Yes, Call me'),
+                      ),
+                    ],
+                  ),
                   const MDDivider(),
                   MDToggleFormField(
                     name: 'toggle',
@@ -615,6 +626,71 @@ class PopoverStory extends StatelessWidget {
                 ),
               );
             }),
+      ),
+    );
+  }
+}
+
+class CalendarStory extends StatelessWidget {
+  const CalendarStory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final today = DateTime.now();
+
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text('Calendar'),
+        asPageHeader: true,
+      ),
+      body: SingleChildScrollView(
+        child: Wrap(
+          children: [
+            MDPanel(
+              title: Text(
+                'Single',
+                style: context.theme.fonts.heading.medium,
+              ),
+              width: 450,
+              child: Center(
+                child: MDCalendar(
+                  selected: today,
+                  fromMonth: DateTime(today.year - 1),
+                  toMonth: DateTime(today.year, 12),
+                ),
+              ),
+            ),
+            MDPanel(
+              title: Text(
+                'Multiple',
+                style: context.theme.fonts.heading.medium,
+              ),
+              width: 450,
+              child: Center(
+                child: MDCalendar.multiple(
+                  numberOfMonths: 2,
+                  fromMonth: DateTime(today.year),
+                  toMonth: DateTime(today.year + 1, 12),
+                  min: 5,
+                  max: 10,
+                ),
+              ),
+            ),
+            MDPanel(
+              title: Text(
+                'Range',
+                style: context.theme.fonts.heading.medium,
+              ),
+              width: 450,
+              child: const Center(
+                child: MDCalendar.range(
+                  min: 2,
+                  max: 5,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
