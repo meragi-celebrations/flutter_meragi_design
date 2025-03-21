@@ -1,3 +1,4 @@
+import 'package:example/editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
@@ -56,6 +57,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.format_align_center),
       label: 'Form',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.edit),
+      label: 'Editor',
+    ),
   ];
 
   @override
@@ -80,6 +85,7 @@ class _HomePageState extends State<HomePage> {
               const SelectStory(),
               const InputStory(),
               const FormStory(),
+              const EditorStory(), // Added EditorStory here
             ][_selectedIndex],
           ),
         ],
@@ -102,11 +108,11 @@ class CardStory extends StatelessWidget {
       ),
       body: ShadContextMenuRegion(
         items: [
-          ShadContextMenuItem(
-            child: const Text('Item 1'),
+          const ShadContextMenuItem(
+            child: Text('Item 1'),
           ),
-          ShadContextMenuItem(
-            child: const Text('Item 2'),
+          const ShadContextMenuItem(
+            child: Text('Item 2'),
           ),
         ],
         child: MDPanel(
@@ -537,6 +543,19 @@ class _InputStoryState extends State<InputStory> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class EditorStory extends StatelessWidget {
+  const EditorStory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Ensure valid initial state
+
+    return const MDScaffold(
+      body: EditorExampleScreen(),
     );
   }
 }

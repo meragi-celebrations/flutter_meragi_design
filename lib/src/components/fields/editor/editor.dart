@@ -10,7 +10,9 @@ typedef BlockIconBuilder = Widget Function(BuildContext context, Node node);
 
 class MDEditor extends StatefulWidget {
   final bool readOnly;
+  @Deprecated('Use theme from context.theme.editorTheme')
   final MDInputTheme? decoration;
+  final MDEditorTheme? theme;
   final bool isExpanded;
 
   final EditorState? editorState;
@@ -20,6 +22,7 @@ class MDEditor extends StatefulWidget {
     super.key,
     this.readOnly = false,
     this.decoration,
+    this.theme,
     this.isExpanded = false,
     this.editorState,
     this.onTransactionChanged,
@@ -30,15 +33,24 @@ class MDEditor extends StatefulWidget {
 }
 
 class _MDEditorState extends State<MDEditor> {
-  StreamSubscription<(TransactionTime, Transaction)>? transactionStreamSubscription;
+  late final EditorScrollController editorScrollController;
+  StreamSubscription<(TransactionTime, Transaction)>?
+      transactionStreamSubscription;
   late final EditorState editorState;
-  late final InlineActionsService inlineActionsService =
-      InlineActionsService(context: context, handlers: [InlineUserMentionService()]);
+  late final InlineActionsService inlineActionsService = InlineActionsService(
+      context: context, handlers: [InlineUserMentionService()]);
 
   @override
   void initState() {
     super.initState();
-    editorState = widget.editorState != null ? widget.editorState! : EditorState.blank(withInitialText: true);
+    editorState = widget.editorState ??
+        EditorState.blank(
+          withInitialText: true,
+        ); // Ensure editorState is not null
+    editorScrollController = EditorScrollController(
+      editorState: editorState,
+      shrinkWrap: true,
+    );
     transactionStreamSubscription = editorState.transactionStream.listen(
       (onData) {
         widget.onTransactionChanged?.call(onData.$1, onData.$2);
@@ -56,49 +68,55 @@ class _MDEditorState extends State<MDEditor> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, BlockComponentBuilder> customBlock = {
-      ...standardBlockComponentBuilderMap,
-      BulletedListBlockKeys.type: BulletedListBlockComponentBuilder(
-        iconBuilder: (context, node) => _BulletedListIcon(node: node, textStyle: context.theme.fonts.paragraph.small),
-        configuration: standardBlockComponentConfiguration.copyWith(
-          placeholderText: (_) => AppFlowyEditorL10n.current.listItemPlaceholder,
-          padding: (node) => const EdgeInsets.only(bottom: 2),
-          textStyle: (node) => context.theme.fonts.paragraph.small.copyWith(height: 1.2),
-        ),
-      ),
-    };
+    final theme = widget.theme ??
+        context.theme
+            .editorTheme; // Ensure theme is not null // Use centralized customBlock
 
-    final MDInputTheme decoration =
-        widget.decoration != null ? context.theme.inputTheme.merge(widget.decoration) : context.theme.inputTheme;
-    final editor = AppFlowyEditor(
+    final editor = FloatingToolbar(
+      items: [
+        paragraphItem,
+        ...headingItems,
+        ...markdownFormatItems.sublist(
+          0,
+          markdownFormatItems.length - 1,
+        ), // This is to remove "code block" format
+        quoteItem,
+        bulletedListItem,
+        numberedListItem,
+        linkItem,
+      ],
+      tooltipBuilder: (context, _, message, child) {
+        return Tooltip(
+          message: message,
+          preferBelow: false,
+          child: child,
+        );
+      },
+      style: theme.floatingToolbarStyle ?? const FloatingToolbarStyle(),
       editorState: editorState,
-      editable: !widget.readOnly,
-      blockComponentBuilders: customBlock,
-      shrinkWrap: true,
-      editorStyle: EditorStyle.desktop(
-        cursorColor: widget.readOnly ? Colors.transparent : decoration.cursorColor,
-        cursorWidth: widget.readOnly ? 0 : 2,
-        selectionColor: decoration.selectionColor,
-        padding: decoration.padding,
-        textStyleConfiguration: TextStyleConfiguration(
-          bold: context.theme.fonts.paragraph.medium,
-          text: context.theme.fonts.paragraph.small,
-          lineHeight: 1.5,
+      editorScrollController: editorScrollController,
+      textDirection: TextDirection.ltr,
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppFlowyEditor(
+          editorState: editorState,
+          editable: !widget.readOnly,
+          blockComponentBuilders: theme.editorBlockComponents,
+          shrinkWrap: true,
+          editorStyle: theme.editorStyle,
+          characterShortcutEvents: [
+            ...standardCharacterShortcutEvents,
+            inlineActionsCommand(inlineActionsService),
+          ],
         ),
       ),
-      characterShortcutEvents: [
-        ...standardCharacterShortcutEvents,
-        inlineActionsCommand(inlineActionsService),
-      ],
     );
 
     final wrapper = IntrinsicHeight(
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: decoration.borderColor!),
-          borderRadius: BorderRadius.all(
-            Radius.circular(decoration.borderRadius ?? 5),
-          ),
+          border: Border.all(color: theme.p?.color ?? Colors.grey),
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
         ),
         constraints: widget.readOnly
             ? null
@@ -113,52 +131,8 @@ class _MDEditorState extends State<MDEditor> {
       return Expanded(
         child: wrapper,
       );
-    } else {}
+    }
 
     return wrapper;
-  }
-}
-
-class _BulletedListIcon extends StatelessWidget {
-  const _BulletedListIcon({
-    required this.node,
-    required this.textStyle,
-  });
-
-  final Node node;
-  final TextStyle textStyle;
-
-  static final bulletedListIcons = [
-    '●',
-    '◯',
-    '□',
-  ];
-
-  int get level {
-    var level = 0;
-    var parent = node.parent;
-    while (parent != null) {
-      if (parent.type == 'bulleted_list') {
-        level++;
-      }
-      parent = parent.parent;
-    }
-    return level;
-  }
-
-  String get icon => bulletedListIcons[level % bulletedListIcons.length];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(minWidth: 10, minHeight: (textStyle.fontSize ?? 12) * (1.2)),
-      padding: const EdgeInsets.only(right: 4.0),
-      child: Center(
-        child: Text(
-          icon,
-          style: textStyle.copyWith(fontSize: 5),
-        ),
-      ),
-    );
   }
 }
