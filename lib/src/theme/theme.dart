@@ -5,7 +5,8 @@ import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
 class MeragiTheme extends InheritedWidget {
   late final ThemeToken token;
 
-  MeragiTheme({super.key, required super.child, ThemeToken? token}) : token = token ?? light;
+  MeragiTheme({super.key, required super.child, ThemeToken? token})
+      : token = token ?? light;
 
   @override
   bool updateShouldNotify(covariant MeragiTheme oldWidget) {
@@ -61,100 +62,104 @@ class MDTheme {
       );
 
   ShadThemeData get shadTheme => ShadThemeData(
-      colorScheme: shadColorScheme,
-      brightness: Brightness.light,
-      textTheme: ShadTextTheme(
-        family: typography.fontFamily,
-        h1Large: typography.heading.xLarge,
-        h1: typography.heading.large,
-        h2: typography.heading.medium,
-        h3: typography.heading.small,
-        h4: typography.heading.xSmall,
-        p: typography.paragraph.medium,
-        small: typography.paragraph.small,
-        large: typography.paragraph.large,
-      ),
-      primaryButtonTheme: ShadButtonTheme(
-        backgroundColor: colors.primary,
-        foregroundColor: colors.content.onColor,
-        hoverBackgroundColor: colors.primary.lighten(20),
-      ),
-      secondaryButtonTheme: ShadButtonTheme(
-        merge: true,
-        backgroundColor: colors.background.secondary,
-        foregroundColor: colors.content.primary,
-        hoverBackgroundColor: colors.background.tertiary.darken(),
-      ),
-      outlineButtonTheme: ShadButtonTheme(
-        merge: true,
-        backgroundColor: Colors.transparent,
-        foregroundColor: colors.primary,
-        hoverBackgroundColor: colors.background.tertiary,
-        hoverForegroundColor: colors.primary,
-      ),
-      ghostButtonTheme: ShadButtonTheme(
-        merge: true,
-        backgroundColor: Colors.transparent,
-        foregroundColor: colors.primary,
-        hoverBackgroundColor: colors.background.tertiary,
-        hoverForegroundColor: colors.primary,
-      ),
-      destructiveButtonTheme: ShadButtonTheme(
-        merge: true,
-        backgroundColor: colors.negative,
-        foregroundColor: colors.content.onColor,
-        hoverBackgroundColor: colors.negative.darken(),
-      ),
-      buttonSizesTheme: const ShadButtonSizesTheme(
-        sm: ShadButtonSizeTheme(
-          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-          height: 26,
+        colorScheme: shadColorScheme,
+        brightness: Brightness.light,
+        textTheme: ShadTextTheme(
+          family: typography.fontFamily,
+          h1Large: typography.heading.xLarge,
+          h1: typography.heading.large,
+          h2: typography.heading.medium,
+          h3: typography.heading.small,
+          h4: typography.heading.xSmall,
+          p: typography.paragraph.medium,
+          small: typography.paragraph.small,
+          large: typography.paragraph.large,
         ),
-        regular: ShadButtonSizeTheme(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-          height: 34,
+        primaryButtonTheme: ShadButtonTheme(
+          backgroundColor: colors.primary,
+          foregroundColor: colors.content.onColor,
+          hoverBackgroundColor: colors.primary.lighten(20),
         ),
-        icon: ShadButtonSizeTheme(padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2), height: 28, width: 28),
-      ),
-      optionTheme: ShadOptionTheme(
-        hoveredBackgroundColor: colors.background.tertiary,
-      ),
-      inputTheme: ShadInputTheme(
-        placeholderStyle: typography.paragraph.small.copyWith(color: colors.content.stateDisabled),
+        secondaryButtonTheme: ShadButtonTheme(
+          merge: true,
+          backgroundColor: colors.background.secondary,
+          foregroundColor: colors.content.primary,
+          hoverBackgroundColor: colors.background.tertiary.darken(),
+        ),
+        outlineButtonTheme: ShadButtonTheme(
+          merge: true,
+          backgroundColor: Colors.transparent,
+          foregroundColor: colors.primary,
+          hoverBackgroundColor: colors.background.tertiary,
+          hoverForegroundColor: colors.primary,
+        ),
+        ghostButtonTheme: ShadButtonTheme(
+          merge: true,
+          backgroundColor: Colors.transparent,
+          foregroundColor: colors.primary,
+          hoverBackgroundColor: colors.background.tertiary,
+          hoverForegroundColor: colors.primary,
+        ),
+        destructiveButtonTheme: ShadButtonTheme(
+          merge: true,
+          backgroundColor: colors.negative,
+          foregroundColor: colors.content.onColor,
+          hoverBackgroundColor: colors.negative.darken(),
+        ),
+        buttonSizesTheme: const ShadButtonSizesTheme(
+          sm: ShadButtonSizeTheme(
+            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+            height: 26,
+          ),
+          regular: ShadButtonSizeTheme(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            height: 34,
+          ),
+          icon: ShadButtonSizeTheme(
+              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              height: 28,
+              width: 28),
+        ),
+        optionTheme: ShadOptionTheme(
+          hoveredBackgroundColor: colors.background.tertiary,
+        ),
+        inputTheme: ShadInputTheme(
+          placeholderStyle: typography.paragraph.small
+              .copyWith(color: colors.content.stateDisabled),
 
-        decoration: ShadDecoration(
-          border: ShadBorder(
-            top: BorderSide(color: colors.border.opaque),
-            bottom: BorderSide(color: colors.border.opaque),
-            left: BorderSide(color: colors.border.opaque),
-            right: BorderSide(color: colors.border.opaque),
+          decoration: ShadDecoration(
+            border: ShadBorder(
+              top: BorderSide(color: colors.border.opaque),
+              bottom: BorderSide(color: colors.border.opaque),
+              left: BorderSide(color: colors.border.opaque),
+              right: BorderSide(color: colors.border.opaque),
+            ),
+          ),
+          // padding: EdgeInsets.symmetric(horizontal: dimensions.padding, vertical: dimensions.padding / 2),
+        ),
+        checkboxTheme: ShadCheckboxTheme(
+          decoration: ShadDecoration(
+            border: ShadBorder(
+              top: BorderSide(color: colors.border.opaque.darken(15)),
+              bottom: BorderSide(color: colors.border.opaque.darken(15)),
+              left: BorderSide(color: colors.border.opaque.darken(15)),
+              right: BorderSide(color: colors.border.opaque.darken(15)),
+            ),
           ),
         ),
-        // padding: EdgeInsets.symmetric(horizontal: dimensions.padding, vertical: dimensions.padding / 2),
-      ),
-      checkboxTheme: ShadCheckboxTheme(
-        decoration: ShadDecoration(
-          border: ShadBorder(
-            top: BorderSide(color: colors.border.opaque.darken(15)),
-            bottom: BorderSide(color: colors.border.opaque.darken(15)),
-            left: BorderSide(color: colors.border.opaque.darken(15)),
-            right: BorderSide(color: colors.border.opaque.darken(15)),
+        contextMenuTheme: ShadContextMenuTheme(
+          backgroundColor: colors.background.primary,
+          selectedBackgroundColor: colors.background.tertiary,
+          textStyle: typography.paragraph.small,
+          trailingTextStyle: typography.paragraph.small
+              .copyWith(color: colors.content.stateDisabled),
+        ),
+        cardTheme: ShadCardTheme(padding: EdgeInsets.all(dimensions.padding)),
+        popoverTheme: ShadPopoverTheme(
+          decoration: ShadDecoration(
+            color: colors.background.tertiary,
+            border: ShadBorder.all(color: colors.border.transparent),
           ),
-        ),
-
-      ),
-      contextMenuTheme: ShadContextMenuTheme(
-        backgroundColor: colors.background.primary,
-        selectedBackgroundColor: colors.background.tertiary,
-        textStyle: typography.paragraph.small,
-        trailingTextStyle: typography.paragraph.small.copyWith(color: colors.content.stateDisabled),
-      ),
-      cardTheme: ShadCardTheme(padding: EdgeInsets.all(dimensions.padding)),
-      popoverTheme: ShadPopoverTheme(
-        decoration: ShadDecoration(
-          color: colors.background.tertiary,
-          border: ShadBorder.all(color: colors.border.transparent),
-        ),
         ),
       );
 
@@ -169,10 +174,8 @@ class MDTheme {
         checkboxTheme: CheckboxThemeData(
           fillColor: MDWidgetStateResolver<Color>({
             WidgetState.selected: colors.primary,
-            WidgetState.hovered: colors.background.secondary
-                .darken(20),
-            "default":
-                colors.background.secondary,
+            WidgetState.hovered: colors.background.secondary.darken(20),
+            "default": colors.background.secondary,
           }).resolveWith(),
           side: BorderSide(
             color: colors.background.secondary,
@@ -184,13 +187,32 @@ class MDTheme {
           inactiveTrackColor: colors.background.secondary,
           thumbColor: colors.primary,
           overlayColor: colors.primary.withOpacity(0.3),
-          rangeThumbShape: RoundRangeSliderThumbShape(enabledThumbRadius: dimensions.radius/2),
-          trackHeight: dimensions.stroke*2,
+          rangeThumbShape: RoundRangeSliderThumbShape(
+              enabledThumbRadius: dimensions.radius / 2),
+          trackHeight: dimensions.stroke * 2,
         ),
         extensions: [
           AppColorExtension(colors: colors),
           AppTypographyExtension(fonts: typography),
           AppDimensionExtension(dimensions: dimensions),
+          MDEditorThemeExtension(
+            theme: MDEditorTheme(
+              baseFontSize: typography.paragraph.medium.fontSize!,
+              floatingToolbarStyle: FloatingToolbarStyle(
+                backgroundColor: colors.background.primary,
+                toolbarActiveColor: colors.primary,
+                toolbarIconColor: colors.content.primary,
+                toolbarShadowColor: colors.border.opaque,
+                toolbarElevation: 2.0,
+              ),
+              editorStyle: EditorStyle.desktop(
+                cursorColor: colors.primary,
+                cursorWidth: 2,
+                selectionColor: colors.primaryB.withOpacity(0.5),
+                padding: EdgeInsets.all(dimensions.padding),
+              ),
+            ),
+          ),
           MDInputThemeExtension(
             theme: MDInputTheme(
               cursorColor: colors.primary,

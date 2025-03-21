@@ -28,7 +28,7 @@ class _ButtonsDetailsState extends State<ButtonsDetails> {
               Row(
                 children: [
                   Text(
-                    "${variant.name}",
+                    variant.name,
                     style: const TextStyle(fontSize: 20),
                   ),
                 ],
