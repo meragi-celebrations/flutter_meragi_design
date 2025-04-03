@@ -126,8 +126,8 @@ abstract class MDBorderColor {
 // AppThemeColor Implementation
 class CoralThemeColor implements AppColor {
   CoralThemeColor({
-    this.primary = const Color(0xFFFF4500),
-    this.primaryB =  const Color(0xFFFF5F68),
+    this.primary = const Color(0xFFef6a6a),
+    this.primaryB = const Color(0xFFFF5F68),
     this.accent = const Color(0xfff68e23),
     this.info = const Color(0xFF457B9D),
     this.negative = const Color(0xFFE63946),
@@ -209,8 +209,8 @@ class CoralThemeColor implements AppColor {
 class MDCoralBackgroundColor implements MDBackgroundColor {
   MDCoralBackgroundColor({
     this.primary = Colors.white,
-    this.secondary =const Color(0xFFfdf3e8),
-    this.tertiary = const Color(0xfffef8f2),
+    this.secondary = const Color(0xFFfdf3e8),
+    this.tertiary = const Color(0xfff3f5f6),
     this.stateDisabled = const Color(0xFFBDBDBD),
     this.overlayDark = Colors.black,
     this.overlayLight = Colors.white,
@@ -332,7 +332,7 @@ class MDCoralBackgroundColor implements MDBackgroundColor {
 
 class MDCoralContentColor implements MDContentColor {
   MDCoralContentColor({
-    this.primary = Colors.black,
+    this.primary = const Color(0xFF303030), //const Color(0xFF212121),
     this.secondary = const Color(0xFF757575),
     this.tertiary = const Color(0xFF616161),
     this.stateDisabled = const Color(0xFFBDBDBD),

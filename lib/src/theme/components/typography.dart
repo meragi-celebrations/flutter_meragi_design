@@ -50,7 +50,7 @@ abstract class MDHeadingTypography {
 class MDDefaultTypography implements AppTypography {
   MDDefaultTypography({
     this.fontFamily = 'Poppins',
-    this.color = Colors.black,
+    this.color = const Color(0xFF212121),
   });
 
   @override
