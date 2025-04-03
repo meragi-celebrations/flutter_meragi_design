@@ -56,9 +56,13 @@ class MDAlertDialog extends StatelessWidget {
     required this.content,
     this.onOk,
     this.title,
+    this.titleWidget,
+    this.description,
+    this.footer,
     this.okText,
     this.cancelText,
     this.onCancel,
+    this.hideCancel = false,
     this.backText,
     this.onBack,
     this.isDestructive = false,
@@ -69,24 +73,23 @@ class MDAlertDialog extends StatelessWidget {
 
   final String? title;
   final Widget content;
+  final Widget? titleWidget;
+  final Widget? description;
   final String? okText;
   final VoidCallback? onOk;
   final String? cancelText;
   final VoidCallback? onCancel;
+  final bool hideCancel;
   final String? backText;
   final VoidCallback? onBack;
   final bool isDestructive;
   final double width;
   final double? height;
   final CardType? type;
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
-    final cardDecoration = CardDecoration(
-      context: context,
-      type: type ?? CardType.defaultType,
-    );
-
     return Shortcuts(
       shortcuts: {
         const SingleActivator(LogicalKeyboardKey.escape): VoidCallbackIntent(
@@ -104,56 +107,52 @@ class MDAlertDialog extends StatelessWidget {
           child: SizedBox(
             width: width,
             height: height,
-            child: MDCard(
-              alignment: CrossAxisAlignment.start,
-              decoration: cardDecoration,
-              header: Row(
-                children: [H4(text: title ?? "Alert")],
-              ),
-              body: content,
-              footer: Row(
-                mainAxisAlignment: (onBack == null) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
-                children: [
-                  MDButton(
-                    decoration: ButtonDecoration(
-                      context: context,
-                      type: ButtonType.standard,
-                    ),
-                    onTap: () => handleOnCancel(context),
-                    child: Text(cancelText ?? "Cancel"),
+            child: MDPanel(
+              title: titleWidget ??
+                  Text(
+                    title ?? "Alert",
+                    style: context.theme.fonts.heading.medium,
                   ),
-                  const SizedBox(
-                    width: 5,
-                  ),
+              description: description,
+              footer: footer ??
                   Row(
+                    mainAxisAlignment: (onBack == null)
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.spaceBetween,
                     children: [
-                      (onBack != null)
-                          ? Row(
-                              children: [
-                                MDButton(
-                                  decoration: ButtonDecoration(
-                                    context: context,
-                                    type: ButtonType.standard,
-                                  ),
-                                  onTap: onBack ?? () {},
-                                  child: Text(backText ?? "Back"),
-                                ),
-                                const SizedBox(width: 5),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                      MDButton(
-                        decoration: ButtonDecoration(
-                          context: context,
-                          type: isDestructive ? ButtonType.danger : ButtonType.primary,
+                      if (!hideCancel) ...[
+                        MDTap.secondary(
+                          onPressed: () => handleOnCancel(context),
+                          child: Text(cancelText ?? "Cancel"),
                         ),
-                        onTap: handleOnOk,
-                        child: Text(okText ?? (onBack != null ? "Next" : "OK")),
-                      ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                      ],
+                      Row(
+                        children: [
+                          (onBack != null)
+                              ? Row(
+                                  children: [
+                                    MDTap(
+                                      onPressed: onBack ?? () {},
+                                      child: Text(backText ?? "Back"),
+                                    ),
+                                    const SizedBox(width: 5),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
+                          MDTap(
+                            onPressed: handleOnOk,
+                            child: Text(
+                              okText ?? (onBack != null ? "Next" : "OK"),
+                            ),
+                          ),
+                        ],
+                      )
                     ],
-                  )
-                ],
-              ),
+                  ),
+              child: content,
             ),
           ),
         ),

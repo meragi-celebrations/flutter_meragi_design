@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+@Deprecated('Use MDDialog instead')
 class MDModal extends StatelessWidget {
   final ModalHeader header;
   final Widget body;
@@ -20,7 +20,8 @@ class MDModal extends StatelessWidget {
     this.showCloseButton = true,
     this.widthFactor = 0.5,
     this.decoration,
-    this.bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
+    this.bodyPadding =
+        const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
     this.scrollableBody = true,
   }) : super(key: key);
 
@@ -33,7 +34,8 @@ class MDModal extends StatelessWidget {
     bool showCloseButton = true,
     double widthFactor = 0.5,
     CardDecoration? decoration,
-    final EdgeInsets bodyPadding = const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
+    final EdgeInsets bodyPadding =
+        const EdgeInsets.symmetric(vertical: 38.0, horizontal: 16.0),
     final bool scrollableBody = true,
   }) {
     return MDModal._(
@@ -91,7 +93,8 @@ class MDModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double modalWidth = screenWidth * widthFactor;
-    CardDecoration decoration = CardDecoration(context: context).merge(this.decoration);
+    CardDecoration decoration =
+        CardDecoration(context: context).merge(this.decoration);
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -99,7 +102,8 @@ class MDModal extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0), // Added outer padding for better spacing
+        padding: const EdgeInsets.only(
+            bottom: 16.0), // Added outer padding for better spacing
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: modalWidth, // Limit the width based on widthFactor
@@ -110,8 +114,11 @@ class MDModal extends StatelessWidget {
             children: [
               header,
               Flexible(
-                  child:
-                      Padding(padding: bodyPadding, child: scrollableBody ? SingleChildScrollView(child: body) : body)),
+                  child: Padding(
+                      padding: bodyPadding,
+                      child: scrollableBody
+                          ? SingleChildScrollView(child: body)
+                          : body)),
               footer,
             ],
           ),
@@ -121,6 +128,7 @@ class MDModal extends StatelessWidget {
   }
 }
 
+@Deprecated('Use MDDialog instead')
 class ModalHeader extends StatelessWidget {
   final String title;
   final String? description;
@@ -149,9 +157,11 @@ class ModalHeader extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 50,
-              padding: const EdgeInsets.all(8.0).copyWith(left: 100.0, top: 14.0),
+              padding:
+                  const EdgeInsets.all(8.0).copyWith(left: 100.0, top: 14.0),
               decoration: BoxDecoration(
-                  color: decoration?.backgroundColor ?? MeragiTheme.of(context).token.primaryCardBackgroundColor,
+                  color: decoration?.backgroundColor ??
+                      MeragiTheme.of(context).token.primaryCardBackgroundColor,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(12.0),
                     topRight: Radius.circular(12.0),
@@ -159,20 +169,23 @@ class ModalHeader extends StatelessWidget {
               child: Text(
                 title,
                 style: MeragiTheme.of(context).token.h3TextStyle.copyWith(
-                      color: decoration?.backgroundColor.darken(80) ?? MeragiTheme.of(context).token.primaryTextColor,
+                      color: decoration?.backgroundColor.darken(80) ??
+                          MeragiTheme.of(context).token.primaryTextColor,
                     ),
               ),
             ),
-            if (description != null && description!.isNotEmpty) // Validate description
+            if (description != null &&
+                description!.isNotEmpty) // Validate description
               SizedBox(
                 width: double.infinity,
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0).copyWith(left: 100.0, top: 16.0),
+                  padding: const EdgeInsets.all(8.0)
+                      .copyWith(left: 100.0, top: 16.0),
                   child: Text(
                     description!,
                     style: MeragiTheme.of(context).token.h5TextStyle.copyWith(
-                          color:
-                              decoration?.backgroundColor.darken(50) ?? MeragiTheme.of(context).token.defaultTextColor,
+                          color: decoration?.backgroundColor.darken(50) ??
+                              MeragiTheme.of(context).token.defaultTextColor,
                         ),
                   ),
                 ),
@@ -193,12 +206,16 @@ class ModalHeader extends StatelessWidget {
                 width: 3.0,
               ),
               color: decoration?.backgroundColor ??
-                  MeragiTheme.of(context).token.primaryCardBackgroundColor.withOpacity(0.6),
+                  MeragiTheme.of(context)
+                      .token
+                      .primaryCardBackgroundColor
+                      .withOpacity(0.6),
             ),
             child: Icon(
               icon ?? PhosphorIconsRegular.info, // Default icon
               size: 28,
-              color: decoration?.backgroundColor.darken(50) ?? MeragiTheme.of(context).token.primaryButtonColor,
+              color: decoration?.backgroundColor.darken(50) ??
+                  MeragiTheme.of(context).token.primaryButtonColor,
             ),
           ),
         ),
@@ -217,6 +234,7 @@ class ModalHeader extends StatelessWidget {
   }
 }
 
+@Deprecated('Use MDDialog instead')
 class ModalFooter extends StatelessWidget {
   final VoidCallback onDone;
   final VoidCallback? onCancel;
@@ -246,7 +264,9 @@ class ModalFooter extends StatelessWidget {
         children: [
           if (cancelButtonText != null)
             MDButton(
-              onTap: cancelLoading ?? false ? null : onCancel ?? () => Navigator.of(context).pop(),
+              onTap: cancelLoading ?? false
+                  ? null
+                  : onCancel ?? () => Navigator.of(context).pop(),
               isLoading: cancelLoading ?? false,
               decoration: ButtonDecoration(
                 context: context,

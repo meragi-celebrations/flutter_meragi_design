@@ -14,6 +14,7 @@ export 'src/components/card.dart';
 export 'src/components/carousel.dart';
 export 'src/components/context_menu.dart';
 export 'src/components/description.dart';
+export 'src/components/dialog.dart';
 export 'src/components/divider.dart';
 export 'src/components/drawer.dart';
 export 'src/components/expansion_tile/expansion_tile.dart';

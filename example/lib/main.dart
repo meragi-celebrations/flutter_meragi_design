@@ -68,6 +68,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.settings),
       label: 'Context Menu',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.slideshow),
+      label: 'Dialogs/Sliders',
+    ),
   ];
 
   @override
@@ -95,6 +99,7 @@ class _HomePageState extends State<HomePage> {
               PopoverStory(),
               const CalendarStory(),
               const ContextMenuStory(),
+              const MDAlertDialogStory(),
             ][_selectedIndex],
           ),
         ],
@@ -587,7 +592,7 @@ class _InputStoryState extends State<InputStory> {
                 ),
               ],
             ),
-            MDEditor(),
+            const MDEditor(),
           ],
         ),
       ),
@@ -727,6 +732,96 @@ class ContextMenuStory extends StatelessWidget {
             child: Text('Open Context Menu'),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class MDAlertDialogStory extends StatelessWidget {
+  const MDAlertDialogStory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      appBar: const MDAppBar(
+        title: Text('Alert Dialog'),
+        asPageHeader: true,
+      ),
+      body: Column(
+        children: [
+          MDTap(
+            onPressed: () {
+              showMDAlertDialog(
+                context: context,
+                builder: (context) {
+                  return const MDAlertDialog(
+                    title: 'Alert Dialog',
+                    content: Text('This is an alert dialog'),
+                    okText: 'OK',
+                    cancelText: 'Cancel',
+                  );
+                },
+              );
+            },
+            child: const Text('Show Alert'),
+          ),
+          MDTap(
+            onPressed: () {
+              showMDAlertDialog(
+                context: context,
+                builder: (context) {
+                  return MDAlertDialog(
+                    title: 'Alert Dialog',
+                    description:
+                        const Text("You can add a description if you want to"),
+                    content: const Text(
+                        'This is an alert dialog, with a long text that should be wrapped correctly and not overflow the screen. This is an alert dialog, with a long text that should be wrapped correctly and not overflow the screen. This is an alert dialog, with a long text that should be wrapped correctly and not overflow the screen.'),
+                    okText: 'OK',
+                    onOk: () {
+                      Navigator.pop(context);
+                    },
+                    cancelText: 'Cancel',
+                    hideCancel: true,
+                  );
+                },
+              );
+            },
+            child: const Text('Alert without cancel'),
+          ),
+          MDTap(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return const MDDialog(
+                    title: Text("This is title"),
+                    description: Text("This is Description"),
+                    child: Text("This is child"),
+                  );
+                },
+              );
+            },
+            child: const Text('Dialog'),
+          ),
+          MDTap(
+            onPressed: () {
+              showMDDrawer(
+                context: context,
+                builder: (context) {
+                  return const MDSlidingDrawer(
+                    child: MDPanel(
+                      title: Text("This is child"),
+                      description: Text("This is description"),
+                      footer: Text("This is footer"),
+                      child: Text("This is child"),
+                    ),
+                  );
+                },
+              );
+            },
+            child: const Text('Drawer'),
+          ),
+        ],
       ),
     );
   }
