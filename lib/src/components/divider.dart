@@ -7,7 +7,7 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 enum DividerPosition { start, center, end }
 
 /// Enum to define the style of the divider.
-enum MDDividerStyle { solid, swiggly }
+enum MDDividerStyle { solid, swiggly, handDrawn } // Add handDrawn style
 
 /// A divider widget that can be used to separate content.
 ///
@@ -81,19 +81,13 @@ class MDDivider extends StatelessWidget {
 
     Widget _buildDivider() {
       if (style == MDDividerStyle.swiggly) {
-        return direction == Axis.horizontal
-            ? CustomPaint(
-                size: Size(double.infinity, thickness ?? 1.0),
-                painter: _SwigglyDividerPainter(
-                  color: effectiveColor,
-                  thickness: thickness ?? 1.0,
-                  amplitude: amplitude,
-                  frequency: frequency,
-                ),
-              )
-            : RotatedBox(
-                quarterTurns: 1,
-                child: CustomPaint(
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: direction == Axis.horizontal ? indent ?? 0.0 : 0.0,
+            vertical: direction == Axis.vertical ? indent ?? 0.0 : 0.0,
+          ),
+          child: direction == Axis.horizontal
+              ? CustomPaint(
                   size: Size(double.infinity, thickness ?? 1.0),
                   painter: _SwigglyDividerPainter(
                     color: effectiveColor,
@@ -101,22 +95,67 @@ class MDDivider extends StatelessWidget {
                     amplitude: amplitude,
                     frequency: frequency,
                   ),
+                )
+              : RotatedBox(
+                  quarterTurns: 1,
+                  child: CustomPaint(
+                    size: Size(double.infinity, thickness ?? 1.0),
+                    painter: _SwigglyDividerPainter(
+                      color: effectiveColor,
+                      thickness: thickness ?? 1.0,
+                      amplitude: amplitude,
+                      frequency: frequency,
+                    ),
+                  ),
                 ),
-              );
+        );
+      } else if (style == MDDividerStyle.handDrawn) {
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: direction == Axis.horizontal ? indent ?? 0.0 : 0.0,
+            vertical: direction == Axis.vertical ? indent ?? 0.0 : 0.0,
+          ),
+          child: direction == Axis.horizontal
+              ? CustomPaint(
+                  size: Size(double.infinity, thickness ?? 1.0),
+                  painter: _HandDrawnDividerPainter(
+                    color: effectiveColor,
+                    thickness: thickness ?? 1.0,
+                    amplitude: amplitude,
+                  ),
+                )
+              : RotatedBox(
+                  quarterTurns: 1,
+                  child: CustomPaint(
+                    size: Size(double.infinity, thickness ?? 1.0),
+                    painter: _HandDrawnDividerPainter(
+                      color: effectiveColor,
+                      thickness: thickness ?? 1.0,
+                      amplitude: amplitude,
+                    ),
+                  ),
+                ),
+        );
       } else {
-        return direction == Axis.horizontal
-            ? Divider(
-                thickness: thickness,
-                indent: indent,
-                endIndent: endIndent,
-                color: effectiveColor,
-              )
-            : VerticalDivider(
-                thickness: thickness,
-                indent: indent,
-                endIndent: endIndent,
-                color: effectiveColor,
-              );
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: indent ?? 0.0,
+            vertical: endIndent ?? 0.0,
+          ),
+          child: direction == Axis.horizontal
+              ? Divider(
+                  thickness: thickness,
+                  indent: indent,
+                  endIndent: endIndent,
+                  color: effectiveColor,
+                )
+              : VerticalDivider(
+                  thickness: thickness,
+                  indent: indent,
+                  endIndent: endIndent,
+                  color: effectiveColor,
+                ),
+        );
       }
     }
 
@@ -179,6 +218,49 @@ class _SwigglyDividerPainter extends CustomPainter {
         path.moveTo(x, y);
       } else {
         path.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _HandDrawnDividerPainter extends CustomPainter {
+  final Color color;
+  final double thickness;
+  final double amplitude; // Add amplitude as a parameter
+
+  _HandDrawnDividerPainter({
+    required this.color,
+    required this.thickness,
+    required this.amplitude, // Initialize amplitude
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = thickness
+      ..style = PaintingStyle.stroke;
+
+    final path = ui.Path();
+
+    double y = size.height / 2;
+    for (double x = 0; x < size.width; x += 1) {
+      // Gradually reduce the amplitude as x increases
+      final taperFactor = 1 - (x / size.width).clamp(0, 1);
+      final adjustedAmplitude =
+          amplitude * taperFactor; // Use the passed amplitude
+      final yOffset =
+          adjustedAmplitude * sin(2 * pi * x / 50); // Smooth sine wave
+
+      if (x == 0) {
+        path.moveTo(x, y + yOffset);
+      } else {
+        path.lineTo(x, y + yOffset);
       }
     }
 

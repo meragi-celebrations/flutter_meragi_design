@@ -512,7 +512,11 @@ class _FormStoryState extends State<FormStory> {
                       ),
                     ],
                   ),
-                  const MDDivider(),
+                  const MDDivider(
+                    style: MDDividerStyle.handDrawn,
+                    thickness: 2,
+                    amplitude: 7,
+                  ),
                   MDToggleFormField(
                     name: 'toggle',
                     label: const Text('I accept the terms and conditions'),
