@@ -231,12 +231,12 @@ class _SwigglyDividerPainter extends CustomPainter {
 class _HandDrawnDividerPainter extends CustomPainter {
   final Color color;
   final double thickness;
-  final double amplitude; // Add amplitude as a parameter
+  final double amplitude;
 
   _HandDrawnDividerPainter({
     required this.color,
     required this.thickness,
-    required this.amplitude, // Initialize amplitude
+    required this.amplitude,
   });
 
   @override
@@ -247,13 +247,17 @@ class _HandDrawnDividerPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = ui.Path();
+    final random = Random();
 
     double y = size.height / 2;
     for (double x = 0; x < size.width; x += 1) {
-      // Gradually reduce the amplitude as x increases
-      final taperFactor = 1 - (x / size.width).clamp(0, 1);
-      final adjustedAmplitude =
-          amplitude * taperFactor; // Use the passed amplitude
+      // Gradually reduce the amplitude as x increases with randomness
+      final baseTaperFactor = 1 - (x / size.width).clamp(0, 1);
+      final randomFactor =
+          1 + (random.nextDouble() - 0.5) * 0.1; // Add slight randomness
+      final taperFactor =
+          baseTaperFactor * randomFactor; // Adjust taperFactor with randomness
+      final adjustedAmplitude = amplitude * taperFactor;
       final yOffset =
           adjustedAmplitude * sin(2 * pi * x / 50); // Smooth sine wave
 
