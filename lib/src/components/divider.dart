@@ -1,7 +1,13 @@
+import 'dart:math';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
 enum DividerPosition { start, center, end }
+
+/// Enum to define the style of the divider.
+enum MDDividerStyle { solid, swiggly }
 
 /// A divider widget that can be used to separate content.
 ///
@@ -18,6 +24,8 @@ enum DividerPosition { start, center, end }
 ///
 /// The [rotateChild] property is used to rotate the child widget for
 /// vertical dividers.
+///
+/// The [style] property is used to define the style of the divider.
 class MDDivider extends StatelessWidget {
   /// The direction of the divider.
   final Axis direction;
@@ -43,6 +51,15 @@ class MDDivider extends StatelessWidget {
   /// Whether to rotate the child widget for vertical dividers.
   final bool rotateChild;
 
+  /// The style of the divider.
+  final MDDividerStyle style;
+
+  /// The amplitude of the swiggly divider.
+  final double amplitude;
+
+  /// The frequency of the swiggly divider.
+  final double frequency;
+
   const MDDivider({
     super.key,
     this.direction = Axis.horizontal,
@@ -53,83 +70,121 @@ class MDDivider extends StatelessWidget {
     this.endIndent = 0.0,
     this.color,
     this.rotateChild = false,
+    this.style = MDDividerStyle.solid,
+    this.amplitude = 2.0,
+    this.frequency = 30.0,
   });
 
   @override
   Widget build(BuildContext context) {
-
     Color effectiveColor = color ?? context.theme.colors.border.opaque;
 
-    if (direction == Axis.horizontal) {
-      return Row(
-        children: [
-          // Start divider
-          if (position == DividerPosition.end ||
-              position == DividerPosition.center)
-            Expanded(
-              child: Divider(
+    Widget _buildDivider() {
+      if (style == MDDividerStyle.swiggly) {
+        return direction == Axis.horizontal
+            ? CustomPaint(
+                size: Size(double.infinity, thickness ?? 1.0),
+                painter: _SwigglyDividerPainter(
+                  color: effectiveColor,
+                  thickness: thickness ?? 1.0,
+                  amplitude: amplitude,
+                  frequency: frequency,
+                ),
+              )
+            : RotatedBox(
+                quarterTurns: 1,
+                child: CustomPaint(
+                  size: Size(double.infinity, thickness ?? 1.0),
+                  painter: _SwigglyDividerPainter(
+                    color: effectiveColor,
+                    thickness: thickness ?? 1.0,
+                    amplitude: amplitude,
+                    frequency: frequency,
+                  ),
+                ),
+              );
+      } else {
+        return direction == Axis.horizontal
+            ? Divider(
                 thickness: thickness,
                 indent: indent,
                 endIndent: endIndent,
                 color: effectiveColor,
-              ),
-            ),
-          // Child widget
-          if (child != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: child,
-            ),
-          // End divider
-          if (position == DividerPosition.start ||
-              position == DividerPosition.center)
-            Expanded(
-              child: Divider(
+              )
+            : VerticalDivider(
                 thickness: thickness,
                 indent: indent,
                 endIndent: endIndent,
                 color: effectiveColor,
-              ),
-            ),
-        ],
+              );
+      }
+    }
+
+    Widget _buildChild() {
+      if (child == null) return SizedBox.shrink();
+      return Padding(
+        padding: direction == Axis.horizontal
+            ? const EdgeInsets.symmetric(horizontal: 8.0)
+            : const EdgeInsets.symmetric(vertical: 8.0),
+        child: direction == Axis.vertical && rotateChild
+            ? RotatedBox(quarterTurns: 1, child: child)
+            : child,
       );
-    } else {
-      return Column(
+    }
+
+    Widget _buildWithChild() {
+      return Flex(
+        direction: direction,
         children: [
-          // Start divider
           if (position == DividerPosition.end ||
               position == DividerPosition.center)
-            Expanded(
-              child: VerticalDivider(
-                thickness: thickness,
-                indent: indent,
-                endIndent: endIndent,
-                color: color,
-              ),
-            ),
-          // Child widget
-          if (child != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: RotatedBox(
-                quarterTurns:
-                    rotateChild ? 1 : 0, // Rotate child for vertical divider
-                child: child,
-              ),
-            ),
-          // End divider
+            Expanded(child: _buildDivider()),
+          _buildChild(),
           if (position == DividerPosition.start ||
               position == DividerPosition.center)
-            Expanded(
-              child: VerticalDivider(
-                thickness: thickness,
-                indent: indent,
-                endIndent: endIndent,
-                color: color,
-              ),
-            ),
+            Expanded(child: _buildDivider()),
         ],
       );
     }
+
+    return child != null ? _buildWithChild() : _buildDivider();
   }
+}
+
+class _SwigglyDividerPainter extends CustomPainter {
+  final Color color;
+  final double thickness;
+  final double amplitude;
+  final double frequency;
+
+  _SwigglyDividerPainter({
+    required this.color,
+    required this.thickness,
+    required this.amplitude,
+    required this.frequency,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = thickness
+      ..style = PaintingStyle.stroke;
+
+    final path = ui.Path();
+
+    for (double x = 0; x < size.width; x++) {
+      final y = amplitude * sin(2 * pi * x / frequency) + size.height / 2;
+      if (x == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

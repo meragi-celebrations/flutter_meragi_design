@@ -437,7 +437,10 @@ class _FormStoryState extends State<FormStory> {
         ),
         child: Column(
           children: [
-            const MDDivider(),
+            const MDDivider(
+              style: MDDividerStyle.swiggly,
+              child: Text("Squiggly Divider"),
+            ),
             FormBuilder(
               key: formKey,
               child: Column(
