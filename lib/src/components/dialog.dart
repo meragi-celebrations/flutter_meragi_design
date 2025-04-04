@@ -11,6 +11,8 @@ class MDDialog extends StatelessWidget {
     this.footer,
     this.height,
     this.width,
+    this.showCloseButton = true,
+    this.closeButton,
   });
 
   final Widget? title;
@@ -19,6 +21,8 @@ class MDDialog extends StatelessWidget {
   final Widget? footer;
   final double? height;
   final double? width;
+  final bool showCloseButton;
+  final Widget? closeButton;
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +35,30 @@ class MDDialog extends StatelessWidget {
       child: Focus(
         autofocus: true,
         child: Center(
-          child: SizedBox(
-            width: width ?? 350,
-            height: height,
-            child: MDPanel(
-              title: title,
-              description: description,
-              footer: footer,
-              child: child,
-            ),
+          child: Stack(
+            children: [
+              SizedBox(
+                width: width ?? 350,
+                height: height,
+                child: MDPanel(
+                  title: title,
+                  description: description,
+                  footer: footer,
+                  child: child,
+                ),
+              ),
+              if (showCloseButton)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: closeButton ??
+                      MDTap.ghost(
+                        onPressed: () => Navigator.of(context).pop(),
+                        iconData: PhosphorIconsRegular.x,
+                        foregroundColor: context.theme.colors.primaryB,
+                      ),
+                )
+            ],
           ),
         ),
       ),
