@@ -336,6 +336,11 @@ class _ButtonsStoryState extends State<ButtonsStory> {
               )
             ],
           ),
+          const MDDivider(
+            style: MDDividerStyle.swiggly,
+            thickness: 2,
+            child: Text("Swipe Buttons"),
+          ),
           MDSwipeButton(
             label: 'Swipe to delete',
             isLoading: _isSwipeLoading,
@@ -346,7 +351,7 @@ class _ButtonsStoryState extends State<ButtonsStory> {
               });
             },
           ),
-          MDDivider(),
+          const MDDivider(),
           MDSwipeButton(
             label: 'Swipe to delete (disabled)',
             isDisabled: true,

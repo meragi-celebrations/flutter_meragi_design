@@ -1,9 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
+/// A customizable swipe button widget that allows users to perform an action
+/// by swiping a button horizontally. The button can be styled and configured
+/// with various properties.
+///
+/// The [MDSwipeButton] widget provides a draggable button that triggers the
+/// [onSwipe] callback when swiped to the end of the track. If the swipe fails
+/// (i.e., the button is not dragged to the end), the [onFailedSwipe] callback
+/// is triggered (if provided).
+///
+/// ### Features:
+/// - Customizable colors for the track, background, and button.
+/// - Adjustable dimensions such as height, button width, and corner radius.
+/// - Optional icon and label for the button.
+/// - Disabled and loading states.
+///
+/// ### Example Usage:
+/// ```dart
+/// MDSwipeButton(
+///   label: 'Swipe to Confirm',
+///   onSwipe: () {
+///     print('Swiped successfully!');
+///   },
+///   onFailedSwipe: () {
+///     print('Swipe failed.');
+///   },
+///   trackColor: Colors.green,
+///   backgroundColor: Colors.grey[200],
+///   buttonColor: Colors.blue,
+///   height: 50.0,
+///   buttonWidth: 60.0,
+///   radius: 12.0,
+///   isDisabled: false,
+///   isLoading: false,
+///   icon: Icons.arrow_forward,
+/// )
+/// ```
+///
+/// ### Parameters:
+/// - [label]: The text displayed in the center of the swipe button.
+/// - [onSwipe]: The callback triggered when the button is successfully swiped
+///   to the end of the track.
+/// - [onFailedSwipe]: An optional callback triggered when the swipe fails.
+/// - [trackColor]: The color of the track that appears as the button is swiped.
+/// - [backgroundColor]: The background color of the swipe button.
+/// - [buttonColor]: The color of the draggable button.
+/// - [height]: The height of the swipe button. Defaults to the theme's input height.
+/// - [buttonWidth]: The width of the draggable button. Defaults to the theme's input height.
+/// - [radius]: The corner radius of the button and track. Defaults to the theme's radius.
+/// - [isDisabled]: Whether the swipe button is disabled. Defaults to `false`.
+/// - [isLoading]: Whether the swipe button is in a loading state. Defaults to `false`.
+/// - [icon]: An optional icon displayed inside the draggable button.
+///
+/// ### Notes:
+/// - The widget uses an animation to reset the button position if the swipe fails.
+/// - The [isDisabled] and [isLoading] states prevent user interaction with the button.
 class MDSwipeButton extends StatefulWidget {
   final String label;
   final VoidCallback onSwipe;
+  final VoidCallback? onFailedSwipe;
   final Color? trackColor;
   final Color? backgroundColor;
   final Color? buttonColor;
@@ -18,6 +74,7 @@ class MDSwipeButton extends StatefulWidget {
     Key? key,
     required this.label,
     required this.onSwipe,
+    this.onFailedSwipe,
     this.trackColor,
     this.backgroundColor,
     this.buttonColor,
@@ -136,6 +193,7 @@ class _MDSwipeButtonState extends State<MDSwipeButton>
                               if (_dragPosition >= maxDrag) {
                                 widget.onSwipe();
                               } else {
+                                widget.onFailedSwipe?.call();
                                 _animation = Tween<double>(
                                   begin: currentPosition,
                                   end: 0.0,
