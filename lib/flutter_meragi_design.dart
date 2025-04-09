@@ -67,6 +67,7 @@ export 'src/components/panel.dart';
 export 'src/components/popover.dart';
 export 'src/components/sections.dart';
 export 'src/components/segmented_button.dart';
+export 'src/components/swipe_button.dart';
 export 'src/components/tag.dart';
 export 'src/components/tap.dart';
 export 'src/components/typography.dart';

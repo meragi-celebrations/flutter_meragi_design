@@ -72,6 +72,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.slideshow),
       label: 'Dialogs/Sliders',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.menu),
+      label: 'Moodboard',
+    ),
   ];
 
   @override
@@ -100,6 +104,7 @@ class _HomePageState extends State<HomePage> {
               const CalendarStory(),
               const ContextMenuStory(),
               const MDAlertDialogStory(),
+              MoodboardStory(),
             ][_selectedIndex],
           ),
         ],
@@ -149,10 +154,17 @@ class CardStory extends StatelessWidget {
   }
 }
 
-class ButtonsStory extends StatelessWidget {
+class ButtonsStory extends StatefulWidget {
   const ButtonsStory({
     super.key,
   });
+
+  @override
+  State<ButtonsStory> createState() => _ButtonsStoryState();
+}
+
+class _ButtonsStoryState extends State<ButtonsStory> {
+  bool _isSwipeLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -161,172 +173,188 @@ class ButtonsStory extends StatelessWidget {
         title: Text('Buttons'),
         asPageHeader: true,
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Row(
-              children: [
-                ...ShadButtonSize.values
-                    .map(
-                      (e) => MDTap(
-                        size: e,
-                        child: Text('Primary, ${e.name}'),
-                      ),
-                    )
-                    .toList(),
-                const MDTap(
-                  isLoading: true,
-                  child: Text('Primary'),
-                ),
-                const MDTap(
-                  enabled: false,
-                  child: Text('Disabled'),
-                ),
-                const MDTap(
-                  iconData: PhosphorIconsBold.check,
-                  size: ShadButtonSize.sm,
-                ),
-                const MDTap(
-                  iconData: PhosphorIconsBold.check,
-                  child: Text('Check'),
-                  size: ShadButtonSize.sm,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                ...ShadButtonSize.values
-                    .map(
-                      (e) => MDTap.secondary(
-                        size: e,
-                        child: Text('Secondary, ${e.name}'),
-                      ),
-                    )
-                    .toList(),
-                const MDTap.secondary(
-                  isLoading: true,
-                  child: Text('Secondary'),
-                ),
-                const MDTap.secondary(
-                  enabled: false,
-                  child: Text('Disabled'),
-                ),
-                const MDTap.secondary(
-                  iconData: PhosphorIconsRegular.check,
-                ),
-                const MDTap.secondary(
-                  iconData: PhosphorIconsRegular.check,
-                  size: ShadButtonSize.sm,
-                  child: Text('Check'),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                ...ShadButtonSize.values
-                    .map(
-                      (e) => MDTap.outline(
-                        size: e,
-                        child: Text('Outline, ${e.name}'),
-                      ),
-                    )
-                    .toList(),
-                const MDTap.outline(
-                  isLoading: true,
-                  child: Text('Outline'),
-                ),
-                const MDTap.outline(
-                  enabled: false,
-                  child: Text('Disabled'),
-                ),
-                const MDTap.outline(
-                  iconData: PhosphorIconsRegular.check,
-                ),
-                const MDTap.outline(
-                  iconData: PhosphorIconsRegular.check,
-                  size: ShadButtonSize.sm,
-                  child: Text('Check'),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                ...ShadButtonSize.values
-                    .map(
-                      (e) => MDTap.ghost(
-                        size: e,
-                        child: Text('Ghost, ${e.name}'),
-                      ),
-                    )
-                    .toList(),
-                const MDTap.ghost(
-                  isLoading: true,
-                  child: Text('Ghost'),
-                ),
-                const MDTap.ghost(
-                  enabled: false,
-                  child: Text('Disabled'),
-                ),
-                const MDTap.ghost(
-                  iconData: PhosphorIconsRegular.check,
-                ),
-                const MDTap.ghost(
-                  iconData: PhosphorIconsRegular.check,
-                  size: ShadButtonSize.sm,
-                  child: Text('Check'),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                ...ShadButtonSize.values
-                    .map(
-                      (e) => MDTap.destructive(
-                        size: e,
-                        child: Text('Destructive, ${e.name}'),
-                      ),
-                    )
-                    .toList(),
-                const MDTap.destructive(
-                  isLoading: true,
-                  child: Text('Destructive'),
-                ),
-                const MDTap.destructive(
-                  enabled: false,
-                  child: Text('Disabled'),
-                ),
-                const MDTap.destructive(
-                  iconData: PhosphorIconsRegular.check,
-                ),
-                const MDTap.destructive(
-                  iconData: PhosphorIconsRegular.check,
-                  size: ShadButtonSize.sm,
-                  child: Text('Check'),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                ...ShadButtonSize.values
-                    .map(
-                      (e) => MDTap.link(
-                        size: e,
-                        child: Text('Link, ${e.name}'),
-                      ),
-                    )
-                    .toList(),
-                const MDTap.link(
-                  isLoading: true,
-                  child: Text('Link'),
-                ),
-                const MDTap.link(
-                  enabled: false,
-                  child: Text('Disabled'),
-                )
-              ],
-            )
-          ],
-        ),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              ...ShadButtonSize.values
+                  .map(
+                    (e) => MDTap(
+                      size: e,
+                      child: Text('Primary, ${e.name}'),
+                    ),
+                  )
+                  .toList(),
+              const MDTap(
+                isLoading: true,
+                child: Text('Primary'),
+              ),
+              const MDTap(
+                enabled: false,
+                child: Text('Disabled'),
+              ),
+              const MDTap(
+                iconData: PhosphorIconsBold.check,
+                size: ShadButtonSize.sm,
+              ),
+              const MDTap(
+                iconData: PhosphorIconsBold.check,
+                child: Text('Check'),
+                size: ShadButtonSize.sm,
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              ...ShadButtonSize.values
+                  .map(
+                    (e) => MDTap.secondary(
+                      size: e,
+                      child: Text('Secondary, ${e.name}'),
+                    ),
+                  )
+                  .toList(),
+              const MDTap.secondary(
+                isLoading: true,
+                child: Text('Secondary'),
+              ),
+              const MDTap.secondary(
+                enabled: false,
+                child: Text('Disabled'),
+              ),
+              const MDTap.secondary(
+                iconData: PhosphorIconsRegular.check,
+              ),
+              const MDTap.secondary(
+                iconData: PhosphorIconsRegular.check,
+                size: ShadButtonSize.sm,
+                child: Text('Check'),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              ...ShadButtonSize.values
+                  .map(
+                    (e) => MDTap.outline(
+                      size: e,
+                      child: Text('Outline, ${e.name}'),
+                    ),
+                  )
+                  .toList(),
+              const MDTap.outline(
+                isLoading: true,
+                child: Text('Outline'),
+              ),
+              const MDTap.outline(
+                enabled: false,
+                child: Text('Disabled'),
+              ),
+              const MDTap.outline(
+                iconData: PhosphorIconsRegular.check,
+              ),
+              const MDTap.outline(
+                iconData: PhosphorIconsRegular.check,
+                size: ShadButtonSize.sm,
+                child: Text('Check'),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              ...ShadButtonSize.values
+                  .map(
+                    (e) => MDTap.ghost(
+                      size: e,
+                      child: Text('Ghost, ${e.name}'),
+                    ),
+                  )
+                  .toList(),
+              const MDTap.ghost(
+                isLoading: true,
+                child: Text('Ghost'),
+              ),
+              const MDTap.ghost(
+                enabled: false,
+                child: Text('Disabled'),
+              ),
+              const MDTap.ghost(
+                iconData: PhosphorIconsRegular.check,
+              ),
+              const MDTap.ghost(
+                iconData: PhosphorIconsRegular.check,
+                size: ShadButtonSize.sm,
+                child: Text('Check'),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              ...ShadButtonSize.values
+                  .map(
+                    (e) => MDTap.destructive(
+                      size: e,
+                      child: Text('Destructive, ${e.name}'),
+                    ),
+                  )
+                  .toList(),
+              const MDTap.destructive(
+                isLoading: true,
+                child: Text('Destructive'),
+              ),
+              const MDTap.destructive(
+                enabled: false,
+                child: Text('Disabled'),
+              ),
+              const MDTap.destructive(
+                iconData: PhosphorIconsRegular.check,
+              ),
+              const MDTap.destructive(
+                iconData: PhosphorIconsRegular.check,
+                size: ShadButtonSize.sm,
+                child: Text('Check'),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              ...ShadButtonSize.values
+                  .map(
+                    (e) => MDTap.link(
+                      size: e,
+                      child: Text('Link, ${e.name}'),
+                    ),
+                  )
+                  .toList(),
+              const MDTap.link(
+                isLoading: true,
+                child: Text('Link'),
+              ),
+              const MDTap.link(
+                enabled: false,
+                child: Text('Disabled'),
+              )
+            ],
+          ),
+          MDSwipeButton(
+            label: 'Swipe to delete',
+            isLoading: _isSwipeLoading,
+            onSwipe: () {
+              print("Drag successful");
+              setState(() {
+                _isSwipeLoading = !_isSwipeLoading;
+              });
+            },
+          ),
+          MDDivider(),
+          MDSwipeButton(
+            label: 'Swipe to delete (disabled)',
+            isDisabled: true,
+            onSwipe: () {
+              print("Drag successful");
+            },
+          )
+        ],
       ),
     );
   }
@@ -829,6 +857,51 @@ class MDAlertDialogStory extends StatelessWidget {
             child: const Text('Drawer'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class MoodboardStory extends StatelessWidget {
+  MoodboardStory({super.key});
+
+  final List<Map<String, Object>> tiles = [
+    {'url': 'https://picsum.photos/id/1/200/300', 'span': 3},
+    {'url': 'https://picsum.photos/id/2/200/300', 'span': 2},
+    {'url': 'https://picsum.photos/id/3/200/300', 'span': 1},
+    {'url': 'https://picsum.photos/id/4/200/300', 'span': 4},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return MDScaffold(
+      appBar: MDAppBar(
+        title: const Text('Moodboard'),
+        asPageHeader: true,
+      ),
+      body: Center(
+        child: MDPanel(
+          width: 450,
+          child: MDMoodboard(
+            crossAxisCount: 8,
+            tileCount: tiles.length,
+            tileBuilder: (context, index, crossAxisCount, crossAxisSpacing,
+                mainAxisSpacing, cellWidth, onTileHeightComputed) {
+              return MDAsyncImageTile(
+                  imageUrl: tiles[index]['url'] as String,
+                  tileCrossAxisSpan: tiles[index]['span'] as int,
+                  onTileHeightComputed: onTileHeightComputed,
+                  cellWidth: cellWidth,
+                  crossAxisSpacing: crossAxisSpacing,
+                  mainAxisSpacing: mainAxisSpacing,
+                  builder: (context, url) {
+                    return MDNetworkImage(
+                      src: url,
+                    );
+                  });
+            },
+          ),
+        ),
       ),
     );
   }
