@@ -58,9 +58,7 @@ class MDList<T> extends StatelessWidget {
 
         if (state == RequestState.loading) {
           Widget loadingIndicator = const Center(
-            child: MDLoadingIndicator(
-              color: Colors.deepPurple,
-            ),
+            child: MDLoadingIndicator(),
           );
           if (isSliver) {
             return SliverFillRemaining(
