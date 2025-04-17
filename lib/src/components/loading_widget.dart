@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/src/extensions/context.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/colors.dart';
 
 /// A widget that displays a loading indicator.
 ///
@@ -20,7 +22,7 @@ class MDLoadingIndicator extends StatelessWidget {
   final double strokeWidth;
 
   /// The color of the loading indicator
-  final Color color;
+  final Color? color;
 
   /// The child widget that is displayed behind the loading indicator
   final Widget? child;
@@ -42,7 +44,7 @@ class MDLoadingIndicator extends StatelessWidget {
   const MDLoadingIndicator({
     Key? key,
     this.radius = 20,
-    this.color = Colors.white,
+    this.color,
     this.strokeWidth = 2,
     this.child,
     this.isLoading = true,
@@ -51,6 +53,8 @@ class MDLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color color = this.color ?? context.theme.colors.primary;
+
     /// The loading indicator widget
     Widget loader = SizedBox(
       height: radius,

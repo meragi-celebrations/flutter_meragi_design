@@ -127,8 +127,7 @@ class MDNetworkImage extends StatelessWidget {
                     return isLoading
                         ? ConstrainedBox(
                             constraints: const BoxConstraints(minHeight: 200, minWidth: 200),
-                            child: Center(
-                                child: MDLoadingIndicator(color: MeragiTheme.of(context).token.primaryButtonColor)),
+                            child: const Center(child: MDLoadingIndicator()),
                           )
                         : child;
                   },
@@ -165,7 +164,6 @@ class MDNetworkImage extends StatelessWidget {
                   constraints: const BoxConstraints(minHeight: 200, minWidth: 200),
                   child: Center(
                       child: MDLoadingIndicator(
-                          color: MeragiTheme.of(context).token.primaryButtonColor,
                           value: loadingProgress.expectedTotalBytes != null
                               ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                               : null)),

@@ -105,7 +105,7 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
               requestFocusOnTap: widget.requestFocusOnTap,
               focusNode: widget.focusNode,
               trailingIcon: loadingList
-                  ? const MDLoadingIndicator(color: Colors.deepPurple)
+                  ? const MDLoadingIndicator()
                   : (widget.canClear && controller.text.isNotEmpty)
                       ? MDButton(
                           icon: PhosphorIconsBold.x,
@@ -121,7 +121,7 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
                           },
                         )
                       : null,
-              selectedTrailingIcon: loadingList ? const MDLoadingIndicator(color: Colors.deepPurple) : null,
+              selectedTrailingIcon: loadingList ? const MDLoadingIndicator() : null,
               inputDecorationTheme: widget.decoration,
               errorText: widget.errorText,
               helperText: widget.helperText,
