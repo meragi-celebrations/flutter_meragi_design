@@ -644,6 +644,8 @@ class PopoverStory extends StatelessWidget {
   PopoverStory({super.key});
 
   final MDPopoverController _controller = MDPopoverController();
+  final MDAnchorSliderController _anchorSliderController =
+      MDAnchorSliderController();
 
   @override
   Widget build(BuildContext context) {
@@ -652,31 +654,73 @@ class PopoverStory extends StatelessWidget {
         title: Text('Popover'),
         asPageHeader: true,
       ),
-      body: MDPanel(
-        width: 450,
-        child: MDPopover(
-            controller: _controller,
-            child: MDTap(
-              child: const Text('Open Popover'),
-              onPressed: () {
-                _controller.toggle();
-              },
-            ),
-            popover: (context) {
-              return MDPopoverMenu(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(
-                      6,
-                      (index) => MDPopoverItem(
-                        iconData: PhosphorIconsRegular.check,
-                        child: Text('Item $index'),
+      body: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Flexible(
+            flex: 7,
+            child: MDPanel(
+              width: double.infinity,
+              height: double.infinity,
+              child: MDPopover(
+                  controller: _controller,
+                  child: MDTap(
+                    child: const Text('Open Popover'),
+                    onPressed: () {
+                      _controller.toggle();
+                    },
+                  ),
+                  popover: (context) {
+                    return MDPopoverMenu(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: List.generate(
+                            6,
+                            (index) => MDPopoverItem(
+                              iconData: PhosphorIconsRegular.check,
+                              child: Text('Item $index'),
+                            ),
+                          ),
+                        ),
                       ),
+                    );
+                  }),
+            ),
+          ),
+          Flexible(
+            flex: 3,
+            child: MDAnchorSlider(
+              controller: _anchorSliderController,
+              overlayWidth: 800,
+              verticalOffset: 35,
+              anchor: MDPanel(
+                width: double.infinity,
+                height: double.infinity,
+                child: MDTap(
+                  child: const Text('Open Anchor Slider'),
+                  onPressed: () {
+                    _anchorSliderController.showOverlay();
+                  },
+                ),
+              ),
+              builder: (context, width) {
+                return Container(
+                  width: width > 0 ? width : 0.1,
+                  height: 500,
+                  color: Colors.green,
+                  child: Center(
+                    child: MDTap(
+                      child: Text('Hide overlay'),
+                      onPressed: () {
+                        _anchorSliderController.hideOverlay();
+                      },
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

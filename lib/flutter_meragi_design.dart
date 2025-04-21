@@ -8,6 +8,7 @@ export 'package:shadcn_ui/shadcn_ui.dart' hide ValueTransformer, TextDirection;
 
 export 'src/app.dart';
 export 'src/components/alert_dialog.dart';
+export 'src/components/anchor_slider.dart';
 export 'src/components/button.dart';
 export 'src/components/calendar.dart';
 export 'src/components/card.dart';
