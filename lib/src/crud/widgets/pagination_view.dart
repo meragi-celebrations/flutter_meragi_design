@@ -26,8 +26,7 @@ class _MDPaginationViewState extends State<MDPaginationView> {
       return;
     }
     const double itemWidth = 40;
-    final double offset =
-        (selectedIndex * itemWidth) - (maxWidth / 2) + (itemWidth / 2);
+    final double offset = (selectedIndex * itemWidth) - (maxWidth / 2) + (itemWidth / 2);
 
     // Scroll to the selected item
     _scrollController.animateTo(
@@ -69,14 +68,16 @@ class _MDPaginationViewState extends State<MDPaginationView> {
                           : () {
                               widget.bloc.previousPage();
                             },
-                      child: const Icon(PhosphorIconsRegular.caretDoubleLeft),
+                      child: Icon(
+                        PhosphorIconsRegular.caretLeft,
+                        size: context.theme.fonts.paragraph.medium.fontSize,
+                      ),
                     ),
                     Expanded(
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           if (current != 0) {
-                            _scrollToSelectedItem(
-                                current, constraints.maxWidth);
+                            _scrollToSelectedItem(current, constraints.maxWidth);
                           }
                           return SizedBox(
                             height: 30,
@@ -85,6 +86,7 @@ class _MDPaginationViewState extends State<MDPaginationView> {
                                 controller: _scrollController,
                                 itemCount: totalPages,
                                 scrollDirection: Axis.horizontal,
+                                physics: const ClampingScrollPhysics(),
                                 itemBuilder: (context, i) {
                                   return InkWell(
                                     onTap: () {
@@ -94,23 +96,15 @@ class _MDPaginationViewState extends State<MDPaginationView> {
                                     },
                                     child: CircleAvatar(
                                       radius: 20,
-                                      backgroundColor: i + 1 == current
-                                          ? null
-                                          : Colors.transparent,
+                                      backgroundColor: i + 1 == current ? null : Colors.transparent,
                                       child: Text(
                                         '${i + 1}',
                                         style: i + 1 == current
-                                            ? context
-                                                .theme.fonts.paragraph.medium
-                                                .copyWith(
-                                                color: context.theme.colors
-                                                    .content.onColor,
+                                            ? context.theme.fonts.paragraph.medium.copyWith(
+                                                color: context.theme.colors.content.onColor,
                                               )
-                                            : context
-                                                .theme.fonts.paragraph.medium
-                                                .copyWith(
-                                                color: context.theme.colors
-                                                    .content.primary,
+                                            : context.theme.fonts.paragraph.medium.copyWith(
+                                                color: context.theme.colors.content.primary,
                                               ),
                                       ),
                                     ),
@@ -128,7 +122,10 @@ class _MDPaginationViewState extends State<MDPaginationView> {
                           : () {
                               widget.bloc.nextPage();
                             },
-                      child: const Icon(PhosphorIconsRegular.caretDoubleRight),
+                      child: Icon(
+                        PhosphorIconsRegular.caretRight,
+                        size: context.theme.fonts.paragraph.medium.fontSize,
+                      ),
                     ),
                   ],
                 ),
@@ -141,15 +138,13 @@ class _MDPaginationViewState extends State<MDPaginationView> {
                       width: 80,
                       child: MenuAnchor(
                         style: MenuStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                              Theme.of(context).scaffoldBackgroundColor),
+                          backgroundColor: WidgetStatePropertyAll(Theme.of(context).scaffoldBackgroundColor),
                         ),
                         menuChildren: [20, 50, 100]
                             .map(
                               (e) => MenuItemButton(
                                 style: const ButtonStyle(
-                                  minimumSize:
-                                      WidgetStatePropertyAll(Size(80, 40)),
+                                  minimumSize: WidgetStatePropertyAll(Size(80, 40)),
                                 ),
                                 onPressed: () {
                                   widget.bloc.onPageSizeChanged(e);
@@ -168,12 +163,10 @@ class _MDPaginationViewState extends State<MDPaginationView> {
                               isDense: true,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color: Colors.white.withOpacity(0.3)),
+                                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                               ),
                               filled: true,
-                              fillColor:
-                                  context.theme.colors.background.primary,
+                              fillColor: context.theme.colors.background.primary,
                             ),
                             child: GestureDetector(
                               onTap: () {
@@ -184,8 +177,7 @@ class _MDPaginationViewState extends State<MDPaginationView> {
                                 }
                               },
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("$pageSize"),
                                   const Icon(Icons.arrow_drop_down, size: 20),

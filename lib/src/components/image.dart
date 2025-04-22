@@ -11,6 +11,8 @@ class MDNetworkImage extends StatelessWidget {
     this.format = "webp",
     this.width,
     this.height,
+    this.sourceWidth,
+    this.sourceHeight,
     this.color,
     this.opacity,
     this.colorBlendMode,
@@ -38,6 +40,8 @@ class MDNetworkImage extends StatelessWidget {
   final double scale;
   final double? width;
   final double? height;
+  final double? sourceWidth;
+  final double? sourceHeight;
   final Color? color;
   final Animation<double>? opacity;
   final BlendMode? colorBlendMode;
@@ -81,10 +85,14 @@ class MDNetworkImage extends StatelessWidget {
   Widget build(BuildContext context) {
     String formatterUrl = "$src?format=$format";
     String urlForPreview = formatterUrl;
-    if (width != null) {
+    if (sourceWidth != null) {
+      formatterUrl = "$formatterUrl&width=$sourceWidth";
+    } else if (width != null) {
       formatterUrl = "$formatterUrl&width=$width";
     }
-    if (height != null) {
+    if (sourceHeight != null) {
+      formatterUrl = "$formatterUrl&height=$sourceHeight";
+    } else if (height != null) {
       formatterUrl = "$formatterUrl&height=$height";
     }
     return MDGestureDetector(
@@ -119,8 +127,7 @@ class MDNetworkImage extends StatelessWidget {
                     return isLoading
                         ? ConstrainedBox(
                             constraints: const BoxConstraints(minHeight: 200, minWidth: 200),
-                            child: Center(
-                                child: MDLoadingIndicator(color: MeragiTheme.of(context).token.primaryButtonColor)),
+                            child: const Center(child: MDLoadingIndicator()),
                           )
                         : child;
                   },
@@ -157,7 +164,6 @@ class MDNetworkImage extends StatelessWidget {
                   constraints: const BoxConstraints(minHeight: 200, minWidth: 200),
                   child: Center(
                       child: MDLoadingIndicator(
-                          color: MeragiTheme.of(context).token.primaryButtonColor,
                           value: loadingProgress.expectedTotalBytes != null
                               ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                               : null)),

@@ -36,8 +36,7 @@ class _TypographyDetailsState extends State<TypographyDetails> {
             QuoteText(text: "Quote"),
             H2(
               text: "H2 with custom style",
-              style:
-                  TextStyle(color: Colors.pink, backgroundColor: Colors.amber),
+              style: TextStyle(color: Colors.pink, backgroundColor: Colors.amber),
             ),
             MDLoadingIndicator(
               isLoading: true,
@@ -48,7 +47,7 @@ class _TypographyDetailsState extends State<TypographyDetails> {
                 preview: false,
               ),
             ),
-            MDLoadingIndicator(color: Colors.black)
+            MDLoadingIndicator()
           ],
         ),
       ),
