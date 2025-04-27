@@ -70,6 +70,8 @@ class MDAlertDialog extends StatelessWidget {
     this.insetPadding,
     this.showTitle = true,
     this.showButtons = true,
+    this.header,
+    this.borderRadius,
   });
 
   final String? title;
@@ -89,13 +91,19 @@ class MDAlertDialog extends StatelessWidget {
   final EdgeInsets? insetPadding;
   final bool showTitle;
   final bool showButtons;
+  final Widget? header;
+  final double? borderRadius;
 
   @override
   Widget build(BuildContext context) {
     final cardDecoration = CardDecoration(
       context: context,
       type: type ?? CardType.defaultType,
+      borderRadiusOverride: borderRadius,
     );
+
+    // Calculate max height based on screen size
+    final double maxDialogHeight = MediaQuery.of(context).size.height * 0.95;
 
     return Shortcuts(
       shortcuts: {
@@ -114,63 +122,86 @@ class MDAlertDialog extends StatelessWidget {
           backgroundColor: backgroundColor,
           surfaceTintColor: surfaceTintColor,
           insetPadding: insetPadding,
-          child: SizedBox(
-            width: width,
-            height: height,
-            child: MDCard(
-              alignment: CrossAxisAlignment.start,
-              decoration: cardDecoration,
-              header: showTitle
-                  ? Row(
-                      children: [H4(text: title ?? "Alert")],
-                    )
-                  : null,
-              body: content,
-              footer: showButtons
-                  ? Row(
-                      mainAxisAlignment: (onBack == null) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
-                      children: [
-                        MDButton(
-                          decoration: ButtonDecoration(
-                            context: context,
-                            type: ButtonType.standard,
-                          ),
-                          onTap: () => handleOnCancel(context),
-                          child: Text(cancelText ?? "Cancel"),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Row(
-                          children: [
-                            (onBack != null)
-                                ? Row(
-                                    children: [
-                                      MDButton(
-                                        decoration: ButtonDecoration(
-                                          context: context,
-                                          type: ButtonType.standard,
-                                        ),
-                                        onTap: onBack ?? () {},
-                                        child: Text(backText ?? "Back"),
-                                      ),
-                                      const SizedBox(width: 5),
-                                    ],
-                                  )
-                                : const SizedBox.shrink(),
-                            MDButton(
-                              decoration: ButtonDecoration(
-                                context: context,
-                                type: isDestructive ? ButtonType.danger : ButtonType.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius ?? 10),
+          ),
+          // Use IntrinsicHeight to adapt to content size up to constraints
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: width,
+              maxHeight: maxDialogHeight,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (header != null) header!,
+                  MDCard(
+                    alignment: CrossAxisAlignment.start,
+                    decoration: cardDecoration,
+                    header: showTitle
+                        ? Row(
+                            children: [H4(text: title ?? "Alert")],
+                          )
+                        : null,
+                    body: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: maxDialogHeight, // 60% of max dialog height for content
+                      ),
+                      child: SingleChildScrollView(
+                        child: content,
+                      ),
+                    ),
+                    footer: showButtons
+                        ? Row(
+                            mainAxisAlignment:
+                                (onBack == null) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+                            children: [
+                              MDButton(
+                                decoration: ButtonDecoration(
+                                  context: context,
+                                  type: ButtonType.standard,
+                                ),
+                                onTap: () => handleOnCancel(context),
+                                child: Text(cancelText ?? "Cancel"),
                               ),
-                              onTap: handleOnOk,
-                              child: Text(okText ?? (onBack != null ? "Next" : "OK")),
-                            ),
-                          ],
-                        )
-                      ],
-                    )
-                  : null,
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Row(
+                                children: [
+                                  (onBack != null)
+                                      ? Row(
+                                          children: [
+                                            MDButton(
+                                              decoration: ButtonDecoration(
+                                                context: context,
+                                                type: ButtonType.standard,
+                                              ),
+                                              onTap: onBack ?? () {},
+                                              child: Text(backText ?? "Back"),
+                                            ),
+                                            const SizedBox(width: 5),
+                                          ],
+                                        )
+                                      : const SizedBox.shrink(),
+                                  MDButton(
+                                    decoration: ButtonDecoration(
+                                      context: context,
+                                      type: isDestructive ? ButtonType.danger : ButtonType.primary,
+                                    ),
+                                    onTap: handleOnOk,
+                                    child: Text(okText ?? (onBack != null ? "Next" : "OK")),
+                                  ),
+                                ],
+                              )
+                            ],
+                          )
+                        : null,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
