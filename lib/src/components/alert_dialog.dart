@@ -65,6 +65,11 @@ class MDAlertDialog extends StatelessWidget {
     this.width = 350,
     this.height,
     this.type,
+    this.backgroundColor,
+    this.surfaceTintColor,
+    this.insetPadding,
+    this.showTitle = true,
+    this.showButtons = true,
   });
 
   final String? title;
@@ -79,6 +84,11 @@ class MDAlertDialog extends StatelessWidget {
   final double width;
   final double? height;
   final CardType? type;
+  final Color? backgroundColor;
+  final Color? surfaceTintColor;
+  final EdgeInsets? insetPadding;
+  final bool showTitle;
+  final bool showButtons;
 
   @override
   Widget build(BuildContext context) {
@@ -100,60 +110,67 @@ class MDAlertDialog extends StatelessWidget {
       },
       child: Focus(
         autofocus: true,
-        child: Center(
+        child: Dialog(
+          backgroundColor: backgroundColor,
+          surfaceTintColor: surfaceTintColor,
+          insetPadding: insetPadding,
           child: SizedBox(
             width: width,
             height: height,
             child: MDCard(
               alignment: CrossAxisAlignment.start,
               decoration: cardDecoration,
-              header: Row(
-                children: [H4(text: title ?? "Alert")],
-              ),
+              header: showTitle
+                  ? Row(
+                      children: [H4(text: title ?? "Alert")],
+                    )
+                  : null,
               body: content,
-              footer: Row(
-                mainAxisAlignment: (onBack == null) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
-                children: [
-                  MDButton(
-                    decoration: ButtonDecoration(
-                      context: context,
-                      type: ButtonType.standard,
-                    ),
-                    onTap: () => handleOnCancel(context),
-                    child: Text(cancelText ?? "Cancel"),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Row(
-                    children: [
-                      (onBack != null)
-                          ? Row(
-                              children: [
-                                MDButton(
-                                  decoration: ButtonDecoration(
-                                    context: context,
-                                    type: ButtonType.standard,
-                                  ),
-                                  onTap: onBack ?? () {},
-                                  child: Text(backText ?? "Back"),
-                                ),
-                                const SizedBox(width: 5),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                      MDButton(
-                        decoration: ButtonDecoration(
-                          context: context,
-                          type: isDestructive ? ButtonType.danger : ButtonType.primary,
+              footer: showButtons
+                  ? Row(
+                      mainAxisAlignment: (onBack == null) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+                      children: [
+                        MDButton(
+                          decoration: ButtonDecoration(
+                            context: context,
+                            type: ButtonType.standard,
+                          ),
+                          onTap: () => handleOnCancel(context),
+                          child: Text(cancelText ?? "Cancel"),
                         ),
-                        onTap: handleOnOk,
-                        child: Text(okText ?? (onBack != null ? "Next" : "OK")),
-                      ),
-                    ],
-                  )
-                ],
-              ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Row(
+                          children: [
+                            (onBack != null)
+                                ? Row(
+                                    children: [
+                                      MDButton(
+                                        decoration: ButtonDecoration(
+                                          context: context,
+                                          type: ButtonType.standard,
+                                        ),
+                                        onTap: onBack ?? () {},
+                                        child: Text(backText ?? "Back"),
+                                      ),
+                                      const SizedBox(width: 5),
+                                    ],
+                                  )
+                                : const SizedBox.shrink(),
+                            MDButton(
+                              decoration: ButtonDecoration(
+                                context: context,
+                                type: isDestructive ? ButtonType.danger : ButtonType.primary,
+                              ),
+                              onTap: handleOnOk,
+                              child: Text(okText ?? (onBack != null ? "Next" : "OK")),
+                            ),
+                          ],
+                        )
+                      ],
+                    )
+                  : null,
             ),
           ),
         ),
