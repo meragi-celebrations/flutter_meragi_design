@@ -41,8 +41,7 @@ class MDFormListField extends MDFormBuilderField<List> {
   ///
   /// [index] - The index of the form that changed.
   /// [newValue] - The new value of the form, which can be null.
-  final Function(int index, Map<String, dynamic>? newValue)?
-      onIndividualFormChange;
+  final Function(int index, Map<String, dynamic>? newValue)? onIndividualFormChange;
 
   /// A callback function that is triggered when a form is added.
   final Function(int index)? onAdded;
@@ -73,20 +72,18 @@ class MDFormListField extends MDFormBuilderField<List> {
   }) : super(
           name: name,
           builder: (field) {
-            final state = field as _MDFormListFieldState;
-            return wrapperBuilder(state.forms.values.toList(), state.add);
+            final state = field as MDFormListFieldState;
+            return wrapperBuilder(state.forms.toList(), state.add);
           },
         );
 
   @override
-  MDFormBuilderFieldState<MDFormListField, List> createState() =>
-      _MDFormListFieldState();
+  MDFormBuilderFieldState<MDFormListField, List> createState() => MDFormListFieldState();
 }
 
-class _MDFormListFieldState
-    extends MDFormBuilderFieldState<MDFormListField, List> {
-  final Map<int, Widget> forms = {};
-  int counter = 0;
+class MDFormListFieldState extends MDFormBuilderFieldState<MDFormListField, List> {
+  final List<Widget> forms = [];
+  // int counter = 0;
 
   @override
 
@@ -105,12 +102,11 @@ class _MDFormListFieldState
     var tempValue = [];
 
     for (int i = 0; i < length; i++) {
-      counter++;
+      // counter++;
 
-      Map<String, dynamic> formInitialValue =
-          i < (initialValue?.length ?? 0) ? (initialValue?[i] ?? {}) : {};
+      Map<String, dynamic> formInitialValue = i < (initialValue?.length ?? 0) ? (initialValue?[i] ?? {}) : {};
 
-      forms[i] = _createFormBuilder(i, formInitialValue);
+      forms.add(_createFormBuilder(i, formInitialValue));
 
       tempValue.add(formInitialValue);
     }
@@ -123,16 +119,24 @@ class _MDFormListFieldState
   /// The new form will be added with a key that is one greater than the previous
   /// highest key.
   void add() {
-    int length = counter++;
+    int index = forms.length;
 
-    forms[length] = _createFormBuilder(length, {});
+    // Add a new form to the list
+    forms.add(_createFormBuilder(index, <String, dynamic>{}));
 
-    setState(() {});
+    // Update the current value by appending an empty map for the new form
+    List<Map<String, dynamic>> currentValue = List<Map<String, dynamic>>.from(value ?? <Map<String, dynamic>>[]);
+    currentValue.add(<String, dynamic>{});
 
-    didChangeFor(length);
+    // Notify listeners of the change
+    didChange(currentValue);
 
+    // Rebuild the widget
+    // setState(() {});
+
+    // Trigger the onAdded callback if provided
     if (widget.onAdded != null) {
-      widget.onAdded!(length);
+      widget.onAdded!(index);
     }
   }
 
@@ -144,15 +148,19 @@ class _MDFormListFieldState
   /// Also removes the form from the `forms` map corresponding to the index.
   ///
   void remove(int index) {
-    List currentValue = List.from(value ?? <dynamic>[]);
+    // Update the current value by removing the element at the given index
+    List<Map<String, dynamic>> currentValue = List<Map<String, dynamic>>.from(value ?? <Map<String, dynamic>>[]);
     currentValue.removeAt(index);
 
+    // Rebuild the forms list to match the updated currentValue
+    forms.removeAt(index);
+    // Notify listeners of the change
     didChange(currentValue);
 
-    forms.remove(index);
+    // Rebuild the widget
+    // setState(() {});
 
-    setState(() {});
-
+    // Trigger the onRemoved callback if provided
     if (widget.onRemoved != null) {
       widget.onRemoved!(index);
     }
@@ -161,7 +169,7 @@ class _MDFormListFieldState
   @override
   void save() {
     super.save();
-    for (Widget form in forms.values) {
+    for (Widget form in forms) {
       GlobalKey<FormBuilderState> key = form.key as GlobalKey<FormBuilderState>;
       key.currentState?.save();
     }
@@ -170,7 +178,7 @@ class _MDFormListFieldState
   @override
   void reset() {
     super.reset();
-    for (Widget form in forms.values) {
+    for (Widget form in forms) {
       GlobalKey<FormBuilderState> key = form.key as GlobalKey<FormBuilderState>;
       key.currentState?.reset();
     }
@@ -178,7 +186,7 @@ class _MDFormListFieldState
 
   @override
   void dispose() {
-    for (Widget form in forms.values) {
+    for (Widget form in forms) {
       GlobalKey<FormBuilderState> key = form.key as GlobalKey<FormBuilderState>;
       key.currentState?.dispose();
     }
@@ -198,11 +206,10 @@ class _MDFormListFieldState
   ///   index (int): The index of the form to update.
   void didChangeFor(int index) {
     List currentValue = List.from(value ?? <dynamic>[]);
+    print("didChangeFor:index $index");
+    print("didChangeFor:currentValue $currentValue");
 
-    Map<String, dynamic>? formValue =
-        (forms[index]?.key as GlobalKey<FormBuilderState>)
-            .currentState
-            ?.instantValue;
+    Map<String, dynamic>? formValue = (forms[index].key as GlobalKey<FormBuilderState>).currentState?.instantValue;
 
     if (currentValue.length <= index) {
       currentValue.add(formValue);
@@ -227,8 +234,7 @@ class _MDFormListFieldState
   /// Returns:
   /// - `Widget`: A widget representing the form builder for the specified index
   ///   and initial value.
-  Widget _createFormBuilder(int index, Map<String, dynamic> initialValue,
-      {GlobalKey<FormBuilderState>? key}) {
+  Widget _createFormBuilder(int index, Map<String, dynamic> initialValue, {GlobalKey<FormBuilderState>? key}) {
     var globalKey = key ?? GlobalKey<FormBuilderState>();
 
     return FormBuilder(
@@ -237,11 +243,47 @@ class _MDFormListFieldState
       child: widget.formBuilder(index, remove),
       onChanged: () {
         if (widget.onIndividualFormChange != null) {
-          widget.onIndividualFormChange!(
-              index, globalKey.currentState?.instantValue);
+          widget.onIndividualFormChange!(index, globalKey.currentState?.instantValue);
         }
         didChangeFor(index);
       },
     );
+  }
+
+  @override
+  bool validate({
+    bool clearCustomError = true,
+    bool focusOnInvalid = true,
+    bool autoScrollWhenFocusOnInvalid = false,
+  }) {
+    super.validate();
+    bool isValid = true;
+
+    for (Widget form in forms) {
+      GlobalKey<FormBuilderState> key = form.key as GlobalKey<FormBuilderState>;
+      if (!(key.currentState?.validate() ?? true)) {
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  }
+
+  void patchValue(int index, Map<String, dynamic> newValue) {
+    // Update the value in the currentValue list
+    List<Map<String, dynamic>> currentValue = List<Map<String, dynamic>>.from(value ?? <Map<String, dynamic>>[]);
+    if (currentValue.length > index) {
+      currentValue[index] = newValue;
+    } else {
+      currentValue.add(newValue);
+    }
+
+    // Notify listeners of the change
+    didChange(currentValue);
+
+    // Rebuild the specific form
+    setState(() {
+      forms[index] = _createFormBuilder(index, newValue);
+    });
   }
 }
