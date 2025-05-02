@@ -51,29 +51,24 @@ class AlertHeader extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(16.0).copyWith(left: icon != null ? 80.0 : 16.0),
               decoration: BoxDecoration(
-                color: MeragiTheme.of(context).token.primaryCardBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12.0),
-                  topRight: Radius.circular(12.0),
+                color: context.theme.colors.background.secondary,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(context.theme.dimensions.radius),
+                  topRight: Radius.circular(context.theme.dimensions.radius),
                 ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: MeragiTheme.of(context).token.h3TextStyle.copyWith(
-                          color: MeragiTheme.of(context).token.primaryTextColor,
-                        ),
-                  ),
+                  Text(title, style: context.theme.fonts.heading.medium),
                   if (description != null && description!.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
                         description!,
-                        style: MeragiTheme.of(context).token.h5TextStyle.copyWith(
-                              color: MeragiTheme.of(context).token.defaultTextColor,
-                            ),
+                        style: context.theme.fonts.paragraph.medium.copyWith(
+                          color: context.theme.colors.content.primary,
+                        ),
                       ),
                     ),
                 ],
@@ -94,12 +89,12 @@ class AlertHeader extends StatelessWidget {
                   color: Colors.white,
                   width: 2.0,
                 ),
-                color: MeragiTheme.of(context).token.primaryCardBackgroundColor.withOpacity(0.6),
+                color: context.theme.colors.background.primary.withOpacity(0.6),
               ),
               child: Icon(
                 icon,
                 size: 24,
-                color: MeragiTheme.of(context).token.primaryButtonColor,
+                color: context.theme.colors.primary,
               ),
             ),
           ),
@@ -137,7 +132,7 @@ class MDAlertDialog extends StatelessWidget {
     this.scrollableContent = true,
   });
 
-  final AlertHeader? header;
+  final Widget? header;
   final Widget content;
 
   // Button callbacks - if provided, corresponding button will be shown
