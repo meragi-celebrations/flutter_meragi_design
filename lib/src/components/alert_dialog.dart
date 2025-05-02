@@ -41,6 +41,8 @@ class AlertHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dims = context.theme.dimensions;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -49,12 +51,12 @@ class AlertHeader extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16.0).copyWith(left: icon != null ? 80.0 : 16.0),
+              padding: EdgeInsets.all(dims.padding).copyWith(left: icon != null ? 80.0 : dims.padding),
               decoration: BoxDecoration(
                 color: context.theme.colors.background.secondary,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(context.theme.dimensions.radius),
-                  topRight: Radius.circular(context.theme.dimensions.radius),
+                  topLeft: Radius.circular(dims.radius),
+                  topRight: Radius.circular(dims.radius),
                 ),
               ),
               child: Column(
@@ -63,7 +65,7 @@ class AlertHeader extends StatelessWidget {
                   Text(title, style: context.theme.fonts.heading.medium),
                   if (description != null && description!.isNotEmpty)
                     Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
+                      padding: EdgeInsets.only(top: dims.padding / 4),
                       child: Text(
                         description!,
                         style: context.theme.fonts.paragraph.medium.copyWith(
@@ -78,8 +80,8 @@ class AlertHeader extends StatelessWidget {
         ),
         if (icon != null)
           Positioned(
-            left: 16,
-            top: 16,
+            left: dims.padding,
+            top: dims.padding,
             child: Container(
               width: 48,
               height: 48,
@@ -159,10 +161,13 @@ class MDAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dims = context.theme.dimensions;
+    final effectiveBorderRadius = borderRadius ?? dims.radius;
+
     final cardDecoration = CardDecoration(
       context: context,
       type: CardType.defaultType,
-      borderRadiusOverride: borderRadius,
+      borderRadiusOverride: effectiveBorderRadius,
     ).merge(decoration);
 
     // Calculate max height based on screen size
@@ -186,7 +191,7 @@ class MDAlertDialog extends StatelessWidget {
           surfaceTintColor: surfaceTintColor,
           insetPadding: insetPadding,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius ?? 12.0),
+            borderRadius: BorderRadius.circular(effectiveBorderRadius),
           ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
@@ -200,7 +205,7 @@ class MDAlertDialog extends StatelessWidget {
                 if (header != null) header!,
                 Flexible(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(dims.padding),
                     child: scrollableContent ? SingleChildScrollView(child: content) : content,
                   ),
                 ),
@@ -214,8 +219,10 @@ class MDAlertDialog extends StatelessWidget {
   }
 
   Widget _buildFooter(BuildContext context) {
+    final dims = context.theme.dimensions;
+
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(dims.padding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -228,7 +235,7 @@ class MDAlertDialog extends StatelessWidget {
               onTap: onBack,
               child: Text(backText ?? "Back"),
             ),
-          if (onBack != null) const SizedBox(width: 8),
+          if (onBack != null) SizedBox(width: dims.padding / 2),
           if (onCancel != null)
             MDButton(
               decoration: ButtonDecoration(
@@ -238,7 +245,7 @@ class MDAlertDialog extends StatelessWidget {
               onTap: onCancel ?? () => Navigator.pop(context),
               child: Text(cancelText ?? "Cancel"),
             ),
-          if (onCancel != null) const SizedBox(width: 8),
+          if (onCancel != null) SizedBox(width: dims.padding / 2),
           if (onOk != null)
             MDButton(
               decoration: ButtonDecoration(
