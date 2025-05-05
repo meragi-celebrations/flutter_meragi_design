@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 /// Displays an alert dialog with a custom content.
 ///
@@ -25,67 +26,152 @@ Future<T?> showMDAlertDialog<T>({
   );
 }
 
-/// A basic alert dialog with a title, content, and one or two buttons.
-///
-/// The title is an optional parameter, and the content is a required parameter.
-///
-/// The buttons are created using the [MDButton] widget and the [ButtonDecoration]
-/// class. The first button is the cancel button and is created using the
-/// [ButtonType.standard] type. The second button is the OK button and is created
-/// using the [ButtonType.primary] type. If the [isDestructive] parameter is true,
-/// the OK button is created using the [ButtonType.danger] type.
-///
-/// The [onOk] and [onCancel] parameters are callbacks that are called when the
-/// respective button is tapped. If the [onCancel] parameter is null, the
-/// [Navigator.pop] function is called instead.
-///
-/// If the [onBack] parameter is not null, a third button is created with the
-/// [ButtonType.standard] type and the [backText] parameter as its text. When this
-/// button is tapped, the [onBack] callback is called.
-///
-/// The [width] parameter is the width of the dialog, and the [height] parameter
-/// is the height of the dialog. If the [height] parameter is null, the dialog's
-/// height is automatically set to fit its content.
-///
-/// The [type] parameter is the type of the card used to display the content of
-/// the dialog. If the [type] parameter is null, the [CardType.defaultType] type
-/// is used.
-class MDAlertDialog extends StatelessWidget {
-  const MDAlertDialog({
+/// A header widget for the alert dialog that displays a title, optional icon, and description.
+class AlertHeader extends StatelessWidget {
+  const AlertHeader({
     super.key,
-    required this.content,
-    this.onOk,
-    this.title,
-    this.okText,
-    this.cancelText,
-    this.onCancel,
-    this.backText,
-    this.onBack,
-    this.isDestructive = false,
-    this.width = 350,
-    this.height,
-    this.type,
+    required this.title,
+    this.description,
+    this.icon,
   });
 
-  final String? title;
-  final Widget content;
-  final String? okText;
-  final VoidCallback? onOk;
-  final String? cancelText;
-  final VoidCallback? onCancel;
-  final String? backText;
-  final VoidCallback? onBack;
-  final bool isDestructive;
-  final double width;
-  final double? height;
-  final CardType? type;
+  final String title;
+  final String? description;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
+    final dims = context.theme.dimensions;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(dims.padding).copyWith(left: icon != null ? 80.0 : dims.padding),
+              decoration: BoxDecoration(
+                color: context.theme.colors.background.secondary,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(dims.radius),
+                  topRight: Radius.circular(dims.radius),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: context.theme.fonts.heading.medium),
+                  if (description != null && description!.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: dims.padding / 4),
+                      child: Text(
+                        description!,
+                        style: context.theme.fonts.paragraph.medium.copyWith(
+                          color: context.theme.colors.content.primary,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (icon != null)
+          Positioned(
+            left: dims.padding,
+            top: dims.padding,
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2.0,
+                ),
+                color: context.theme.colors.background.primary.withOpacity(0.6),
+              ),
+              child: Icon(
+                icon,
+                size: 24,
+                color: context.theme.colors.primary,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// A basic alert dialog with a header, content, and automatically configured buttons.
+///
+/// The dialog will automatically show buttons based on the provided callbacks:
+/// - If [onOk] is provided, an OK button will be shown
+/// - If [onCancel] is provided, a Cancel button will be shown
+/// - If [onBack] is provided, a Back button will be shown
+///
+/// The buttons will use default text unless overridden by [okText], [cancelText], or [backText].
+class MDAlertDialog extends StatelessWidget {
+  const MDAlertDialog({
+    super.key,
+    this.header,
+    required this.content,
+    this.onOk,
+    this.onCancel,
+    this.onBack,
+    this.okText,
+    this.cancelText,
+    this.backText,
+    this.okButtonType = ButtonType.primary,
+    this.width = 350,
+    this.decoration,
+    this.backgroundColor,
+    this.surfaceTintColor,
+    this.insetPadding,
+    this.borderRadius,
+    this.scrollableContent = true,
+  });
+
+  final Widget? header;
+  final Widget content;
+
+  // Button callbacks - if provided, corresponding button will be shown
+  final VoidCallback? onOk;
+  final VoidCallback? onCancel;
+  final VoidCallback? onBack;
+
+  // Optional button text overrides
+  final String? okText;
+  final String? cancelText;
+  final String? backText;
+
+  // Button styling
+  final ButtonType okButtonType;
+
+  // Layout and styling
+  final double width;
+  final CardDecoration? decoration;
+  final Color? backgroundColor;
+  final Color? surfaceTintColor;
+  final EdgeInsets? insetPadding;
+  final double? borderRadius;
+  final bool scrollableContent;
+
+  @override
+  Widget build(BuildContext context) {
+    final dims = context.theme.dimensions;
+    final effectiveBorderRadius = borderRadius ?? dims.radius;
+
     final cardDecoration = CardDecoration(
       context: context,
-      type: type ?? CardType.defaultType,
-    );
+      type: CardType.defaultType,
+      borderRadiusOverride: effectiveBorderRadius,
+    ).merge(decoration);
+
+    // Calculate max height based on screen size
+    final double maxDialogHeight = MediaQuery.of(context).size.height * 0.95;
 
     return Shortcuts(
       shortcuts: {
@@ -100,63 +186,76 @@ class MDAlertDialog extends StatelessWidget {
       },
       child: Focus(
         autofocus: true,
-        child: Center(
-          child: SizedBox(
-            width: width,
-            height: height,
-            child: MDCard(
-              alignment: CrossAxisAlignment.start,
-              decoration: cardDecoration,
-              header: Row(
-                children: [H4(text: title ?? "Alert")],
-              ),
-              body: content,
-              footer: Row(
-                mainAxisAlignment: (onBack == null) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
-                children: [
-                  MDButton(
-                    decoration: ButtonDecoration(
-                      context: context,
-                      type: ButtonType.standard,
-                    ),
-                    onTap: () => handleOnCancel(context),
-                    child: Text(cancelText ?? "Cancel"),
+        child: Dialog(
+          backgroundColor: backgroundColor,
+          surfaceTintColor: surfaceTintColor,
+          insetPadding: insetPadding,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(effectiveBorderRadius),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: width,
+              maxHeight: maxDialogHeight,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (header != null) header!,
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.all(dims.padding),
+                    child: scrollableContent ? SingleChildScrollView(child: content) : content,
                   ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Row(
-                    children: [
-                      (onBack != null)
-                          ? Row(
-                              children: [
-                                MDButton(
-                                  decoration: ButtonDecoration(
-                                    context: context,
-                                    type: ButtonType.standard,
-                                  ),
-                                  onTap: onBack ?? () {},
-                                  child: Text(backText ?? "Back"),
-                                ),
-                                const SizedBox(width: 5),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                      MDButton(
-                        decoration: ButtonDecoration(
-                          context: context,
-                          type: isDestructive ? ButtonType.danger : ButtonType.primary,
-                        ),
-                        onTap: handleOnOk,
-                        child: Text(okText ?? (onBack != null ? "Next" : "OK")),
-                      ),
-                    ],
-                  )
-                ],
-              ),
+                ),
+                if (onOk != null || onCancel != null || onBack != null) _buildFooter(context),
+              ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    final dims = context.theme.dimensions;
+
+    return Padding(
+      padding: EdgeInsets.all(dims.padding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (onBack != null)
+            MDButton(
+              decoration: ButtonDecoration(
+                context: context,
+                type: ButtonType.standard,
+              ),
+              onTap: onBack,
+              child: Text(backText ?? "Back"),
+            ),
+          if (onBack != null) SizedBox(width: dims.padding / 2),
+          if (onCancel != null)
+            MDButton(
+              decoration: ButtonDecoration(
+                context: context,
+                type: ButtonType.standard,
+              ),
+              onTap: onCancel ?? () => Navigator.pop(context),
+              child: Text(cancelText ?? "Cancel"),
+            ),
+          if (onCancel != null) SizedBox(width: dims.padding / 2),
+          if (onOk != null)
+            MDButton(
+              decoration: ButtonDecoration(
+                context: context,
+                type: okButtonType,
+              ),
+              onTap: handleOnOk,
+              child: Text(okText ?? "OK"),
+            ),
+        ],
       ),
     );
   }
