@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/raw_carousel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -140,12 +141,35 @@ class _MDCarouselPreviewState extends State<MDCarouselPreview> {
     super.initState();
     _currentIndex = widget.initialIndex;
 
+    final isWebMobile =
+        kIsWeb && (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android);
+
     thumbnailController = MDCarouselController(
       initialIndex: widget.initialIndex,
-      itemExtent: 100,
+      itemExtent: isWebMobile ? 70 : 100,
     );
 
-    ServicesBinding.instance.keyboard.addHandler(_handleKeyboardEvent);
+    if (!isWebMobile) {
+      ServicesBinding.instance.keyboard.addHandler(_handleKeyboardEvent);
+    } else {
+      PaintingBinding.instance.imageCache.maximumSize = 50;
+    }
+  }
+
+  @override
+  void dispose() {
+    ServicesBinding.instance.keyboard.removeHandler(_handleKeyboardEvent);
+
+    thumbnailController.dispose();
+
+    final isWebMobile =
+        kIsWeb && (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android);
+    if (isWebMobile) {
+      PaintingBinding.instance.imageCache.clear();
+      PaintingBinding.instance.imageCache.clearLiveImages();
+    }
+
+    super.dispose();
   }
 
   bool _handleKeyboardEvent(KeyEvent event) {
@@ -287,6 +311,11 @@ class MDCarouselController {
     });
 
     currentIndex.addListener(() {});
+  }
+
+  void dispose() {
+    internalController.dispose();
+    currentIndex.dispose();
   }
 
   goTo(double index) {
