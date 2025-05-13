@@ -1,5 +1,7 @@
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:provider/provider.dart';
 
 class WebVideoControl extends StatelessWidget {
   const WebVideoControl({
@@ -24,6 +26,7 @@ class WebVideoControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.theme.colors;
     return FlickShowControlsActionWeb(
       child: Stack(
         children: <Widget>[
@@ -74,7 +77,7 @@ class WebVideoControl extends StatelessWidget {
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black54,
+                      Color.fromRGBO(0, 0, 0, 0.541),
                       Colors.transparent,
                     ],
                     begin: Alignment.bottomCenter,
@@ -123,6 +126,30 @@ class WebVideoControl extends StatelessWidget {
                           Expanded(
                             child: Container(),
                           ),
+                          MDMultiListenableBuilder(
+                            listenables: [speedLevel],
+                            builder: (context, child) {
+                              FlickControlManager controlManager = Provider.of<FlickControlManager>(context);
+                              return Material(
+                                color: Colors.transparent,
+                                child: MDTap.ghost(
+                                  onPressed: () {
+                                    double speed = speedLevel.value == 1
+                                        ? 1.5
+                                        : speedLevel.value == 1.5
+                                            ? 2
+                                            : 1;
+                                    controlManager.setPlaybackSpeed(speed);
+                                    speedLevel.value = speed;
+                                  },
+                                  child: Text(
+                                    '${speedLevel.value}x',
+                                    style: TextStyle(color: colors.content.onColor, fontSize: fontSize),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                           FlickFullScreenToggle(
                             size: iconSize,
                           ),
@@ -139,3 +166,5 @@ class WebVideoControl extends StatelessWidget {
     );
   }
 }
+
+ValueNotifier<double> speedLevel = ValueNotifier(1);
