@@ -37,7 +37,7 @@ class GetListBloc<T> extends BaseBloc<T> {
   //#region -List
   PropertyNotifier<ListResponse<List<T>>?> pageResponse = PropertyNotifier(null);
   PropertyNotifier<List<T>> list = PropertyNotifier([]);
-  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = ValueNotifier(RequestState.done);
   ValueNotifier<int> currentPage = ValueNotifier(1);
   ValueNotifier<int> totalPages = ValueNotifier(1);
   ValueNotifier<int> totalCount = ValueNotifier(0);
@@ -237,7 +237,7 @@ class GetOneBloc<T> extends BaseBloc<T> {
     }
   }
 
-  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = ValueNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
   List<Map<String, String>> customFilters = [];
 
@@ -312,7 +312,7 @@ class CreateBloc<T> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = ValueNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
   Future<void> mutate(Map<String, dynamic> data, {Map<String, dynamic> dataFiles = const {}, String? url}) async {
@@ -345,7 +345,7 @@ class UpdateBloc<T> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = ValueNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
   RequestCache cache = RequestCache();
@@ -384,7 +384,7 @@ class DeleteBloc<T> extends BaseBloc<T> {
     super.onSettled,
   });
 
-  ValueNotifier<RequestState> requestState = PropertyNotifier(RequestState.done);
+  ValueNotifier<RequestState> requestState = ValueNotifier(RequestState.done);
   ValueNotifier<T?> response = ValueNotifier(null);
 
   RequestCache cache = RequestCache();
