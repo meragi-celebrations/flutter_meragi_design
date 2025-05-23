@@ -158,7 +158,8 @@ class GetListBloc<T> extends BaseBloc<T> {
         } else {
           Map<String, int>? urlQueueData = urlCallQueue[response.url];
           if (urlQueueData != null) {
-            list.value.removeRange(urlQueueData['startIndex']!, urlQueueData['endIndex']!);
+            list.value.removeRange(urlQueueData['startIndex']!,
+                list.value.length < urlQueueData['endIndex']! ? list.value.length : urlQueueData['endIndex']!);
             list.value.addAll(listData);
             urlCallQueue.remove(response.url);
           } else {
