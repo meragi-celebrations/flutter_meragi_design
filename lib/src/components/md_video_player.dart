@@ -1,63 +1,61 @@
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/src/components/web_video_control.dart';
+import 'package:flutter_meragi_design/src/components/loading_widget.dart';
+import 'package:flutter_meragi_design/src/extensions/context.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/colors.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flick_video_player/flick_video_player.dart';
 
 class MDVideoPlayer extends StatefulWidget {
-  final String url;
+  const MDVideoPlayer({super.key, required this.url});
 
-  const MDVideoPlayer({
-    super.key,
-    required this.url,
-  });
+  final String url;
 
   @override
   State<MDVideoPlayer> createState() => _MDVideoPlayerState();
 }
 
 class _MDVideoPlayerState extends State<MDVideoPlayer> {
-  late FlickManager flickManager;
+  late final VideoPlayerController controller;
 
   @override
   void initState() {
     super.initState();
-    flickManager = FlickManager(
-      videoPlayerController: VideoPlayerController.networkUrl(
-        Uri.parse(widget.url),
-        videoPlayerOptions: VideoPlayerOptions(
-          allowBackgroundPlayback: false,
-        ),
-      ),
-      autoInitialize: true,
-      autoPlay: false,
-    );
+    controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
   }
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 16 / 9,
-      child: FlickVideoPlayer(
-        flickManager: flickManager,
-        flickVideoWithControls: FlickVideoWithControls(
-          aspectRatioWhenLoading: 1,
-          controls: WebVideoControl(
-            iconSize: 15,
-            fontSize: 12,
-            progressBarSettings: FlickProgressBarSettings(
-              height: 5,
-              handleRadius: 5.5,
-            ),
-          ),
-          videoFit: BoxFit.contain,
-        ),
-      ),
+      child: FutureBuilder(
+          future: controller.initialize(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const MDLoadingIndicator();
+            }
+            return ChangeNotifierProvider(create: (context) {
+              return ChewieController(
+                videoPlayerController: controller,
+                aspectRatio: 16 / 9,
+                errorBuilder: (context, errorMessage) {
+                  return ColoredBox(
+                    color: context.theme.colors.background.overlayDark,
+                    child:
+                        Center(child: Icon(Icons.error, color: context.theme.colors.background.overlayLight, size: 16)),
+                  );
+                },
+              );
+            }, builder: (context, child) {
+              return Chewie(controller: context.read<ChewieController>());
+            });
+          }),
     );
   }
 
   @override
   void dispose() {
-    flickManager.dispose();
+    controller.dispose();
     super.dispose();
   }
 }
