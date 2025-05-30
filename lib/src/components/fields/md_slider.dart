@@ -4,6 +4,7 @@ import 'package:flutter_meragi_design/src/components/fields/form_builder_field.d
 import 'package:flutter_meragi_design/src/components/fields/input.dart';
 import 'package:flutter_meragi_design/src/extensions/context.dart';
 import 'package:flutter_meragi_design/src/theme/extensions/dimensions.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/typography.dart';
 import 'package:flutter_meragi_design/src/theme/style.dart';
 
 class MDSliderDecoration extends Style {
@@ -202,6 +203,7 @@ class _MDSliderState extends State<MDSlider> {
               Flexible(
                 child: MDInput(
                   controller: minController,
+                  style: context.theme.fonts.paragraph.small,
                   placeholder: const Text("Min"),
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   onChanged: (value) {
@@ -214,8 +216,11 @@ class _MDSliderState extends State<MDSlider> {
                     if (numericValue <= widget.max && numericValue >= widget.min) {
                       if (currentMaxValue != null && numericValue <= currentMaxValue) {
                         setState(() {
-                          _currentRangeValues = RangeValues(numericValue, currentMaxValue);
+                          _currentRangeValues = widget.simplifyValues
+                              ? RangeValues(numericValue.round().toDouble(), currentMaxValue.round().toDouble())
+                              : RangeValues(numericValue, currentMaxValue);
                         });
+                        widget.onRangeChanged?.call(_currentRangeValues);
                       }
                     } else {
                       minController.text = widget.min.toString();
@@ -230,6 +235,7 @@ class _MDSliderState extends State<MDSlider> {
               Flexible(
                 child: MDInput(
                   controller: maxController,
+                  style: context.theme.fonts.paragraph.small,
                   placeholder: const Text("Max"),
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   onChanged: (value) {
@@ -242,8 +248,11 @@ class _MDSliderState extends State<MDSlider> {
                     if (numericValue <= widget.max && numericValue >= widget.min) {
                       if (currentMinValue != null && numericValue >= currentMinValue) {
                         setState(() {
-                          _currentRangeValues = RangeValues(currentMinValue, numericValue);
+                          _currentRangeValues = widget.simplifyValues
+                              ? RangeValues(currentMinValue.round().toDouble(), numericValue.round().toDouble())
+                              : RangeValues(currentMinValue, numericValue);
                         });
+                        widget.onRangeChanged?.call(_currentRangeValues);
                       }
                     } else {
                       if (numericValue > widget.max) {
@@ -257,21 +266,17 @@ class _MDSliderState extends State<MDSlider> {
               ),
             ],
           )
-        : TextField(
+        : MDInput(
             controller: singleController,
+            style: context.theme.fonts.paragraph.small,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              hintText: "Value",
-              labelText: "Value",
-              contentPadding: EdgeInsets.all(10),
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(6))),
-            ),
             onChanged: (value) {
               double? numericValue = double.tryParse(value);
               if (numericValue != null && numericValue >= widget.min && numericValue <= widget.max) {
                 setState(() {
-                  _currentValue = numericValue;
+                  _currentValue = widget.simplifyValues ? numericValue.round().toDouble() : numericValue;
                 });
+                widget.onChanged?.call(_currentValue);
               } else {
                 minController.text = _currentValue.toString();
               }
@@ -282,7 +287,7 @@ class _MDSliderState extends State<MDSlider> {
   Widget _buildSingleSlider(ThemeData theme) {
     return LayoutBuilder(builder: (context, constraints) {
       final sliderWidth = constraints.maxWidth - 32;
-      final bubbleWidth = 32.0;
+      const bubbleWidth = 32.0;
       final position = ((_currentValue - widget.min) / (widget.max - widget.min)) * sliderWidth;
       final clampedPosition = position.clamp(bubbleWidth / 2, sliderWidth - bubbleWidth / 2);
 
@@ -300,6 +305,11 @@ class _MDSliderState extends State<MDSlider> {
                     final updatedValue = widget.simplifyValues ? value.round().toDouble() : value;
                     setState(() => _currentValue = updatedValue);
                     singleController.text = updatedValue.toString();
+                  },
+            onChangeEnd: widget.disabled
+                ? null
+                : (value) {
+                    final updatedValue = widget.simplifyValues ? value.round().toDouble() : value;
                     widget.onChanged?.call(updatedValue);
                   },
           ),
@@ -345,6 +355,16 @@ class _MDSliderState extends State<MDSlider> {
                     setState(() => _currentRangeValues = updatedValues);
                     minController.text = updatedValues.start.toString();
                     maxController.text = updatedValues.end.toString();
+                  },
+            onChangeEnd: widget.disabled
+                ? null
+                : (values) {
+                    final updatedValues = widget.simplifyValues
+                        ? RangeValues(
+                            values.start.round().toDouble(),
+                            values.end.round().toDouble(),
+                          )
+                        : values;
                     widget.onRangeChanged?.call(updatedValues);
                   },
           ),
@@ -433,6 +453,10 @@ class MDSingleSliderFormBuilder extends MDFormBuilderField<double> {
     required this.max,
     this.disabled = false,
     this.decoration,
+    final bool? showMinMaxTextValues,
+    final EdgeInsets? sliderMargin,
+    final bool? showValues,
+    final bool = false,
     super.onChanged,
     super.valueTransformer,
     super.enabled = true,
@@ -457,6 +481,9 @@ class MDSingleSliderFormBuilder extends MDFormBuilderField<double> {
               helperText: decoration?.helperText,
               simplifyValues: simplifyValues,
               decoration: sliderDecoration,
+              showMinMaxTextValues: showMinMaxTextValues,
+              sliderMargin: sliderMargin,
+              showValues: showValues,
               onChanged: (value) {
                 field.didChange(value);
               },
@@ -500,6 +527,7 @@ class MDRangeSliderFormBuilder extends MDFormBuilderField<RangeValues> {
     final bool? showMinMaxTextValues,
     final EdgeInsets? sliderMargin,
     final bool? showValues,
+    final bool = false,
     super.onChanged,
     super.valueTransformer,
     super.enabled = true,
