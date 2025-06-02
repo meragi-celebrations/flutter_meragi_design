@@ -3,51 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
 import 'package:flutter_meragi_design/src/components/fields/input.dart';
 import 'package:flutter_meragi_design/src/extensions/context.dart';
+import 'package:flutter_meragi_design/src/theme/components/slider_theme.dart';
 import 'package:flutter_meragi_design/src/theme/extensions/dimensions.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/md_slider_theme_extension.dart';
 import 'package:flutter_meragi_design/src/theme/extensions/typography.dart';
-import 'package:flutter_meragi_design/src/theme/style.dart';
-
-class MDSliderDecoration extends Style {
-  MDSliderDecoration({
-    required super.context,
-    Color? bubbleColorOverride,
-    Color? bubbleTextColorOverride,
-    Color? labelTextColorOverride,
-    Color? helperTextColorOverride,
-    Color? activeTrackColorOverride,
-    Color? inactiveTrackColorOverride,
-    Color? thumbColorOverride,
-    Color? minMaxLabelsColorOverride,
-  })  : _bubbleColorOverride = bubbleColorOverride,
-        _bubbleTextColorOverride = bubbleTextColorOverride,
-        _labelTextColorOverride = labelTextColorOverride,
-        _helperTextColorOverride = helperTextColorOverride,
-        _activeTrackColorOverride = activeTrackColorOverride,
-        _inactiveTrackColorOverride = inactiveTrackColorOverride,
-        _thumbColorOverride = thumbColorOverride,
-        _minMaxLabelsColorOverride = minMaxLabelsColorOverride;
-
-  final Color? _bubbleColorOverride;
-  final Color? _bubbleTextColorOverride;
-  final Color? _labelTextColorOverride;
-  final Color? _helperTextColorOverride;
-  final Color? _activeTrackColorOverride;
-  final Color? _inactiveTrackColorOverride;
-  final Color? _thumbColorOverride;
-  final Color? _minMaxLabelsColorOverride;
-
-  @override
-  Map get styles => {};
-
-  Color get bubbleColor => _bubbleColorOverride ?? token.defaultCardBackgroundColor;
-  Color get bubbleTextColor => _bubbleTextColorOverride ?? token.primaryTextColor;
-  Color get labelTextColor => _labelTextColorOverride ?? token.primaryTextColor;
-  Color get helperTextColor => _helperTextColorOverride ?? token.secondaryTextColor;
-  Color get activeTrackColor => _activeTrackColorOverride ?? token.primaryColor;
-  Color get inactiveTrackColor => _inactiveTrackColorOverride ?? token.primaryColor.withOpacity(0.2);
-  Color get thumbColor => _thumbColorOverride ?? token.primaryColor;
-  Color get minMaxLabelsColor => _minMaxLabelsColorOverride ?? token.secondaryTextColor;
-}
 
 class MDSlider extends StatefulWidget {
   final String? label;
@@ -66,7 +25,7 @@ class MDSlider extends StatefulWidget {
   final bool simplifyValues;
   final bool showMinMaxTextValues;
   final bool showValues;
-  final MDSliderDecoration? decoration;
+  final MDSliderTheme? decoration;
   final EdgeInsets sliderMargin;
 
   const MDSlider({
@@ -107,6 +66,7 @@ class _MDSliderState extends State<MDSlider> {
   final TextEditingController minController = TextEditingController();
   final TextEditingController maxController = TextEditingController();
   final TextEditingController singleController = TextEditingController();
+  MDSliderTheme get decoration => context.theme.mdSliderTheme.merge(other: widget.decoration);
 
   @override
   void initState() {
@@ -159,12 +119,7 @@ class _MDSliderState extends State<MDSlider> {
         if (widget.label != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              widget.label!,
-              style: widget.decoration?.token.bodyTextStyle.copyWith(
-                color: widget.decoration?.labelTextColor,
-              ),
-            ),
+            child: Text(widget.label!, style: decoration.labelTextStyle),
           ),
         Padding(
           padding: widget.sliderMargin,
@@ -174,22 +129,12 @@ class _MDSliderState extends State<MDSlider> {
         if (widget.errorText != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              widget.errorText!,
-              style: widget.decoration?.token.bodyTextStyle.copyWith(
-                color: widget.decoration?.token.errorColor,
-              ),
-            ),
+            child: Text(widget.errorText!, style: decoration.errorTextStyle),
           ),
         if (widget.helperText != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              widget.helperText!,
-              style: widget.decoration?.token.bodyTextStyle.copyWith(
-                color: widget.decoration?.helperTextColor,
-              ),
-            ),
+            child: Text(widget.helperText!, style: decoration.helperTextStyle),
           ),
       ],
     );
@@ -298,6 +243,10 @@ class _MDSliderState extends State<MDSlider> {
             value: _currentValue,
             min: widget.min,
             max: widget.max,
+            activeColor: decoration.activeTrackColor,
+            inactiveColor: decoration.inactiveTrackColor,
+            secondaryActiveColor: decoration.secondaryActiveColor,
+            thumbColor: decoration.thumbColor,
             divisions: widget.simplifyValues ? (widget.max - widget.min).round() : null,
             onChanged: widget.disabled
                 ? null
@@ -396,16 +345,8 @@ class _MDSliderState extends State<MDSlider> {
   Widget _buildValueBubble(String value) {
     return Container(
       padding: const EdgeInsets.only(top: 8),
-      decoration: BoxDecoration(
-        color: widget.decoration?.bubbleColor,
-        borderRadius: BorderRadius.circular(widget.decoration?.token.radius ?? 4),
-      ),
-      child: Text(
-        value,
-        style: widget.decoration?.token.bodyTextStyle.copyWith(
-          color: widget.decoration?.bubbleTextColor,
-        ),
-      ),
+      decoration: BoxDecoration(color: decoration.bubbleColor, borderRadius: decoration.bubbleRadius),
+      child: Text(value, style: decoration.bubbleTextStyle),
     );
   }
 
@@ -415,18 +356,8 @@ class _MDSliderState extends State<MDSlider> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            widget.min.round().toString(),
-            style: widget.decoration?.token.bodyTextStyle.copyWith(
-              color: widget.decoration?.minMaxLabelsColor,
-            ),
-          ),
-          Text(
-            widget.max.round().toString(),
-            style: widget.decoration?.token.bodyTextStyle.copyWith(
-              color: widget.decoration?.minMaxLabelsColor,
-            ),
-          ),
+          Text(widget.min.round().toString(), style: decoration.minMaxLabelTextStyle),
+          Text(widget.max.round().toString(), style: decoration.minMaxLabelTextStyle),
         ],
       ),
     );
@@ -438,10 +369,9 @@ class MDSingleSliderFormBuilder extends MDFormBuilderField<double> {
   final double max;
   final String? hint;
   final bool disabled;
-  final InputDecoration? decoration;
-  final Function(bool, String?)? onError;
+
   final bool simplifyValues;
-  final MDSliderDecoration? sliderDecoration;
+  final MDSliderTheme? sliderDecoration;
 
   MDSingleSliderFormBuilder({
     super.key,
@@ -452,17 +382,17 @@ class MDSingleSliderFormBuilder extends MDFormBuilderField<double> {
     required this.min,
     required this.max,
     this.disabled = false,
-    this.decoration,
     final bool? showMinMaxTextValues,
     final EdgeInsets? sliderMargin,
     final bool? showValues,
-    final bool = false,
+    final String? labelText,
+    final String? helperText,
     super.onChanged,
     super.valueTransformer,
     super.enabled = true,
     super.onReset,
     super.focusNode,
-    this.onError,
+    super.onError,
     this.simplifyValues = false,
     this.sliderDecoration,
   }) : super(
@@ -475,10 +405,10 @@ class MDSingleSliderFormBuilder extends MDFormBuilderField<double> {
               min: min,
               max: max,
               disabled: disabled,
-              label: decoration?.labelText,
+              label: labelText,
               hint: hint,
               errorText: field.errorText,
-              helperText: decoration?.helperText,
+              helperText: helperText,
               simplifyValues: simplifyValues,
               decoration: sliderDecoration,
               showMinMaxTextValues: showMinMaxTextValues,
@@ -508,11 +438,10 @@ class MDRangeSliderFormBuilder extends MDFormBuilderField<RangeValues> {
   final double max;
   final String? hint;
   final bool disabled;
-  final InputDecoration? decoration;
-  final Function(bool, String?)? onError;
+
   final bool simplifyValues;
 
-  final MDSliderDecoration? sliderDecoration;
+  final MDSliderTheme? sliderDecoration;
 
   MDRangeSliderFormBuilder({
     super.key,
@@ -523,17 +452,17 @@ class MDRangeSliderFormBuilder extends MDFormBuilderField<RangeValues> {
     required this.min,
     required this.max,
     this.disabled = false,
-    this.decoration,
     final bool? showMinMaxTextValues,
     final EdgeInsets? sliderMargin,
     final bool? showValues,
-    final bool = false,
+    final String? labelText,
+    final String? helperText,
     super.onChanged,
     super.valueTransformer,
     super.enabled = true,
     super.onReset,
     super.focusNode,
-    this.onError,
+    super.onError,
     this.simplifyValues = false,
     this.sliderDecoration,
   }) : super(
@@ -547,10 +476,10 @@ class MDRangeSliderFormBuilder extends MDFormBuilderField<RangeValues> {
               max: max,
               isRange: true,
               disabled: disabled,
-              label: decoration?.labelText,
+              label: labelText,
               hint: hint,
               errorText: field.errorText,
-              helperText: decoration?.helperText,
+              helperText: helperText,
               simplifyValues: simplifyValues,
               decoration: sliderDecoration,
               showMinMaxTextValues: showMinMaxTextValues,

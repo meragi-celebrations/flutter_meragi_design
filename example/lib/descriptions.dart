@@ -236,9 +236,7 @@ FormBuilderMDSlider(
                           min: 0,
                           max: 100,
                           initialValue: const RangeValues(30, 70),
-                          decoration: const InputDecoration(
-                            labelText: 'Range Slider',
-                          ),
+                          labelText: "Range Slider",
                           onChanged: (value) => print("Range changed: $value"),
                         ),
                         const SizedBox(height: 32),
@@ -246,10 +244,8 @@ FormBuilderMDSlider(
                           name: 'slider_example',
                           min: 0,
                           max: 100,
-                          decoration: const InputDecoration(
-                            labelText: 'Form Slider',
-                            helperText: 'This slider is part of a form',
-                          ),
+                          helperText: 'This slider is part of a form',
+                          labelText: 'Form Slider',
                           onChanged: (value) => print("Form value changed: $value"),
                         ),
                       ],
