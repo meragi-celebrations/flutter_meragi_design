@@ -39,6 +39,7 @@ class MDFormItem extends StatefulWidget {
   final GridLayoutValues? gridValues;
   final double? contentSpace;
   final FormItemStyle? style;
+  final Widget? Function(String)? onErrorBuilder;
 
   const MDFormItem({
     Key? key,
@@ -50,6 +51,7 @@ class MDFormItem extends StatefulWidget {
     this.gridValues,
     this.contentSpace,
     this.style,
+    this.onErrorBuilder,
   }) : super(key: key);
 
   @override
@@ -74,7 +76,10 @@ class _MDFormItemState extends State<MDFormItem> {
         });
       } else {
         setState(() {
-          workingError = BodyText(text: error ?? "", type: TextType.error);
+          workingError = widget.onErrorBuilder != null
+              ? widget.onErrorBuilder!.call(error ?? "")
+              : Text(error ?? "",
+                  style: context.theme.fonts.paragraph.xSmall.copyWith(color: context.theme.colors.negative));
         });
       }
     };
