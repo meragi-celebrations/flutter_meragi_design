@@ -237,22 +237,14 @@ class MDAlertDialog extends StatelessWidget {
             ),
           if (onBack != null) SizedBox(width: dims.padding / 2),
           if (onCancel != null)
-            MDButton(
-              decoration: ButtonDecoration(
-                context: context,
-                type: ButtonType.standard,
-              ),
-              onTap: onCancel ?? () => Navigator.pop(context),
+            MDTap.destructive(
+              onPressed: onCancel ?? () => Navigator.pop(context),
               child: Text(cancelText ?? "Cancel"),
             ),
           if (onCancel != null) SizedBox(width: dims.padding / 2),
           if (onOk != null)
-            MDButton(
-              decoration: ButtonDecoration(
-                context: context,
-                type: okButtonType,
-              ),
-              onTap: handleOnOk,
+            MDTap(
+              onPressed: handleOnOk,
               child: Text(okText ?? "OK"),
             ),
         ],
