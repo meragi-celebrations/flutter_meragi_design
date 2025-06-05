@@ -79,6 +79,7 @@ export 'src/theme/components/dimensions.dart';
 export 'src/theme/components/input_theme.dart';
 export 'src/theme/components/typography.dart';
 export 'src/theme/extensions/colors.dart';
+export 'src/theme/extensions/md_slider_theme_extension.dart';
 export 'src/theme/extensions/dimensions.dart';
 export 'src/theme/extensions/input_theme.dart';
 export 'src/theme/extensions/typography.dart';

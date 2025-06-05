@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/theme/components/slider_theme.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/md_slider_theme_extension.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
 
 class MeragiTheme extends InheritedWidget {
@@ -193,6 +195,7 @@ class MDTheme {
           AppColorExtension(colors: colors),
           AppTypographyExtension(fonts: typography),
           AppDimensionExtension(dimensions: dimensions),
+          SliderThemeExtension(theme: mdSliderTheme),
           MDInputThemeExtension(
             theme: MDInputTheme(
               cursorColor: colors.primary,
@@ -208,6 +211,20 @@ class MDTheme {
             ).merge(inputTheme),
           ),
         ],
+      );
+
+  MDSliderTheme get mdSliderTheme => MDSliderTheme(
+        secondaryActiveColor: colors.content.secondary,
+        errorTextStyle: typography.paragraph.small.copyWith(color: colors.content.negative),
+        labelTextStyle: typography.heading.xSmall,
+        helperTextStyle: typography.paragraph.small,
+        bubbleTextStyle: typography.paragraph.small,
+        bubbleRadius: BorderRadius.all(Radius.circular(dimensions.radius)),
+        bubbleColor: colors.primary,
+        activeTrackColor: colors.content.primary,
+        inactiveTrackColor: colors.border.stateDisabled,
+        thumbColor: colors.content.primary,
+        minMaxLabelTextStyle: typography.paragraph.small,
       );
 }
 
