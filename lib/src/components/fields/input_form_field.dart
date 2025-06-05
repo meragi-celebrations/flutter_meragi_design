@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 
 class MDInputFormField extends MDFormBuilderField<String> {
@@ -382,14 +381,16 @@ class _FormBuilderMDInputFieldState extends MDFormBuilderFieldState<MDInputFormF
   void didUpdateWidget(MDInputFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != null && widget.controller != oldWidget.controller) {
+      oldWidget.controller?.removeListener(_handleControllerChanged);
       _effectiveController = widget.controller!;
+      _effectiveController.addListener(_handleControllerChanged);
     }
   }
 
   @override
   void didChange(String? value) {
     super.didChange(value);
-    print('didChange: $value');
+    debugPrint('didChange: $value');
     if (value != _effectiveController.text) {
       _effectiveController.text = value ?? '';
     }
@@ -403,74 +404,10 @@ class _FormBuilderMDInputFieldState extends MDFormBuilderFieldState<MDInputFormF
     // notifications for changes originating from within this class -- for
     // example, the reset() method. In such cases, the FormField value will
     // already have been set.
-    if (_effectiveController!.text != (value ?? '')) {
-      didChange(_effectiveController!.text);
+    if (_effectiveController.text != (value ?? '')) {
+      didChange(_effectiveController.text);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final fieldWidget = MDInput(
-      restorationId: widget.restorationId,
-      controller: _effectiveController,
-      focusNode: effectiveFocusNode,
-      decoration: widget.decoration,
-      keyboardType: widget.keyboardType,
-      textInputAction: widget.textInputAction,
-      style: widget.style,
-      strutStyle: widget.strutStyle,
-      textAlign: widget.textAlign,
-      textDirection: widget.textDirection,
-      textCapitalization: widget.textCapitalization,
-      autofocus: widget.autofocus,
-      readOnly: widget.readOnly,
-      showCursor: widget.showCursor,
-      obscureText: widget.obscureText,
-      autocorrect: widget.autocorrect,
-      enableSuggestions: widget.enableSuggestions,
-      placeholder: widget.placeholder,
-      placeholderStyle: widget.placeholderStyle,
-      placeholderAlignment: widget.placeholderAlignment,
-      maxLengthEnforcement: widget.maxLengthEnforcement,
-      maxLines: widget.maxLines,
-      minLines: widget.minLines,
-      expands: widget.expands,
-      maxLength: widget.maxLength,
-      onPressed: widget.onPressed,
-      onPressedAlwaysCalled: widget.onPressedAlwaysCalled,
-      onEditingComplete: widget.onEditingComplete,
-      onSubmitted: widget.onSubmitted,
-      inputFormatters: widget.inputFormatters,
-      enabled: widget.enabled,
-      cursorWidth: widget.cursorWidth,
-      cursorHeight: widget.cursorHeight,
-      cursorRadius: widget.cursorRadius,
-      cursorColor: widget.cursorColor,
-      scrollPadding: widget.scrollPadding,
-      keyboardAppearance: widget.keyboardAppearance,
-      enableInteractiveSelection: widget.enableInteractiveSelection,
-      dragStartBehavior: widget.dragStartBehavior,
-      scrollController: widget.scrollController,
-      scrollPhysics: widget.scrollPhysics,
-      selectionHeightStyle: widget.selectionHeightStyle,
-      selectionWidthStyle: widget.selectionWidthStyle,
-      smartDashesType: widget.smartDashesType,
-      smartQuotesType: widget.smartQuotesType,
-      contextMenuBuilder: widget.contextMenuBuilder,
-      obscuringCharacter: widget.obscuringCharacter,
-      autofillHints: widget.autofillHints,
-      magnifierConfiguration: widget.magnifierConfiguration ?? TextMagnifierConfiguration.disabled,
-      enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
-      scribbleEnabled: widget.scribbleEnabled,
-      contentInsertionConfiguration: widget.contentInsertionConfiguration,
-      prefix: widget.prefix,
-      suffix: widget.suffix,
-      mainAxisAlignment: widget.mainAxisAlignment,
-      crossAxisAlignment: widget.crossAxisAlignment,
-      inputPadding: widget.inputPadding,
-      gap: widget.gap,
-    );
-
-    return fieldWidget;
-  }
+  
 }
