@@ -271,11 +271,13 @@ class GetOneBloc<T> extends BaseBloc<T> {
 
       var cachedResponse = cache.get(key);
 
-      if (cachedResponse == null) {
+      if (response.value == null) {
         requestState.value = RequestState.loading;
       } else {
+        if (cachedResponse != null) {
+          handleResponse(cachedResponse);
+        }
         requestState.value = RequestState.fetching;
-        handleResponse(cachedResponse);
       }
       dynamic res;
       if (customUrl != null) {
