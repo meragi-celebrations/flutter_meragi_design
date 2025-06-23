@@ -113,9 +113,8 @@ class _MDEditorState extends State<MDEditor> {
       return Expanded(
         child: wrapper,
       );
-    } else {}
-
-    return wrapper;
+    }
+    return Focus(onKeyEvent: (node, event) => KeyEventResult.skipRemainingHandlers, child: wrapper);
   }
 }
 
