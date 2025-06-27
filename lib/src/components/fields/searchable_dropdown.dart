@@ -1,7 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/components/button.dart';
+import 'package:flutter_meragi_design/src/components/fields/dropdown_menu.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:flutter_meragi_design/src/components/filter_form.dart';
+import 'package:flutter_meragi_design/src/components/loading_widget.dart';
+import 'package:flutter_meragi_design/src/crud/request/blocs.dart';
+import 'package:flutter_meragi_design/src/crud/request/enums.dart';
+import 'package:flutter_meragi_design/src/utils/debouncer.dart';
+import 'package:flutter_meragi_design/src/utils/multi_value_listenable_builder.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class SelectDropdown<T, U> extends StatefulWidget {
@@ -21,6 +28,8 @@ class SelectDropdown<T, U> extends StatefulWidget {
   final TextEditingController? controller;
   final bool canClear;
   final Function(TextEditingController controller, U data)? onInitialData;
+  final List<MDFilter> filters;
+  final Map<String, String> sorters;
 
   const SelectDropdown({
     super.key,
@@ -40,6 +49,8 @@ class SelectDropdown<T, U> extends StatefulWidget {
     this.controller,
     this.canClear = false,
     this.onInitialData,
+    this.filters = const <MDFilter>[],
+    this.sorters = const <String, String>{},
   }) : assert(!(initialValue != null && getOneBloc == null), "GetOneBloc cant be null if initialValue is not null");
 
   @override
@@ -53,6 +64,12 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
   @override
   void initState() {
     super.initState();
+    if (widget.sorters.isNotEmpty) {
+      widget.getListBloc.addSorter(widget.sorters);
+    }
+    if (widget.filters.isNotEmpty) {
+      widget.getListBloc.addFilters(widget.filters);
+    }
     if (widget.shouldMakeInitialCall) {
       widget.getListBloc.reset();
     }
@@ -67,16 +84,17 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
       widget.getOneBloc!.get();
     }
     controller = widget.controller ?? TextEditingController();
-    controller.addListener(() {
-      _debounce(() {
-        if (controller.text.isNotEmpty && prevText != controller.text) {
-          widget.getListBloc.addFilters([MDFilter(field: "search", operator: "eq", value: controller.text)]);
-          widget.getListBloc.reset();
-        }
-        prevText = controller.text;
-      });
+    controller.addListener(listener);
+  }
+
+  void listener() {
+    _debounce(() {
+      if (controller.text.isNotEmpty && prevText != controller.text) {
+        widget.getListBloc.addFilters([MDFilter(field: "search", operator: "eq", value: controller.text)]);
+        widget.getListBloc.reset();
+      }
+      prevText = controller.text;
     });
-    controller = widget.controller ?? TextEditingController();
   }
 
   @override
@@ -135,7 +153,7 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
 
   @override
   void dispose() {
-    controller.removeListener(() {});
+    controller.removeListener(listener);
     super.dispose();
   }
 }
@@ -156,6 +174,8 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
   final bool shouldMakeInitialCall;
   final bool requestFocusOnTap;
   final bool canClear;
+  final List<MDFilter> filters;
+  final Map<String, String> sorters;
   final Function(TextEditingController controller, U data)? onInitialData;
 
   MDSearchableDropdown({
@@ -180,6 +200,8 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
     this.requestFocusOnTap = true,
     this.canClear = false,
     this.onInitialData,
+    this.filters = const <MDFilter>[],
+    this.sorters = const <String, String>{},
   }) : super(
           builder: (FormFieldState<T?> field) {
             final state = field as _MDSearchableDropdownState;
@@ -206,6 +228,8 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
               requestFocusOnTap: requestFocusOnTap,
               canClear: canClear,
               onInitialData: onInitialData,
+              filters: filters,
+              sorters: sorters,
             );
           },
         );
