@@ -230,6 +230,8 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
   /// Defaults to `false`.
   final bool isClearable;
 
+  final Offset offset;
+
   /// Creates field for Dropdown button
   MDDropdown({
     super.key,
@@ -266,6 +268,7 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
     this.alignment = AlignmentDirectional.centerStart,
     this.decoration,
     this.isClearable = false,
+    this.offset = Offset.zero,
   }) : super(
           builder: (FormFieldState<T?> field) {
             final state = field as _MDDropdownState<T, U>;
@@ -276,12 +279,10 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
               child: DropdownButton2(
                 items: items,
                 value: hasValue ? field.value : null,
-                onChanged:
-                    state.enabled ? (T? value) => state.didChange(value) : null,
+                onChanged: state.enabled ? (T? value) => state.didChange(value) : null,
                 buttonStyleData: ButtonStyleData(
                   height: 38,
-                  overlayColor: WidgetStatePropertyAll(
-                      Colors.deepPurple.withOpacity(0.1)),
+                  overlayColor: WidgetStatePropertyAll(Colors.deepPurple.withOpacity(0.1)),
                   decoration: BoxDecoration(
                     border: state.isFocused
                         ? Border.all(color: Colors.deepPurple)
@@ -294,6 +295,8 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
                   ),
                 ),
                 dropdownStyleData: DropdownStyleData(
+                  maxHeight: menuMaxHeight,
+                  offset: offset,
                   elevation: 1,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -305,17 +308,13 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
                   ),
                 ),
                 menuItemStyleData: MenuItemStyleData(
-                  overlayColor: WidgetStatePropertyAll(
-                      Colors.deepPurple.withOpacity(0.1)),
+                  overlayColor: WidgetStatePropertyAll(Colors.deepPurple.withOpacity(0.1)),
                 ),
                 isExpanded: isExpanded,
                 style: style,
                 isDense: isDense,
                 disabledHint: hasValue
-                    ? items
-                        .firstWhere(
-                            (dropDownItem) => dropDownItem.value == field.value)
-                        .child
+                    ? items.firstWhere((dropDownItem) => dropDownItem.value == field.value).child
                     : disabledHint,
                 focusNode: state.effectiveFocusNode,
                 autofocus: autofocus,
@@ -347,8 +346,7 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
                     ),
                     PhosphorIcon(
                       PhosphorIconsRegular.caretDown,
-                      size:
-                          MeragiTheme.of(state.context).token.smButtonIconSize,
+                      size: MeragiTheme.of(state.context).token.smButtonIconSize,
                     ),
                     const SizedBox(
                       width: 8,
@@ -361,12 +359,10 @@ class MDDropdown<T, U> extends MDFormBuilderField<T> {
         );
 
   @override
-  MDFormBuilderFieldState<MDDropdown<T, U>, T> createState() =>
-      _MDDropdownState<T, U>();
+  MDFormBuilderFieldState<MDDropdown<T, U>, T> createState() => _MDDropdownState<T, U>();
 }
 
-class _MDDropdownState<T, U>
-    extends MDFormBuilderFieldState<MDDropdown<T, U>, T> {
+class _MDDropdownState<T, U> extends MDFormBuilderFieldState<MDDropdown<T, U>, T> {
   @override
   void didUpdateWidget(covariant MDDropdown<T, U> oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -374,11 +370,9 @@ class _MDDropdownState<T, U>
     final oldValues = oldWidget.items.map((e) => e.value).toList();
     final currentlyValues = widget.items.map((e) => e.value).toList();
     final oldChilds = oldWidget.items.map((e) => e.child.toString()).toList();
-    final currentlyChilds =
-        widget.items.map((e) => e.child.toString()).toList();
+    final currentlyChilds = widget.items.map((e) => e.child.toString()).toList();
 
-    if (!currentlyValues.contains(initialValue) &&
-        !initialValue.emptyValidator()) {
+    if (!currentlyValues.contains(initialValue) && !initialValue.emptyValidator()) {
       assert(
         currentlyValues.contains(initialValue) && initialValue.emptyValidator(),
         'The initialValue [$initialValue] is not in the list of items or is not null or empty. '
@@ -388,10 +382,8 @@ class _MDDropdownState<T, U>
       setValue(null);
     }
 
-    if ((!listEquals(oldChilds, currentlyChilds) ||
-            !listEquals(oldValues, currentlyValues)) &&
-        (currentlyValues.contains(initialValue) ||
-            initialValue.emptyValidator())) {
+    if ((!listEquals(oldChilds, currentlyChilds) || !listEquals(oldValues, currentlyValues)) &&
+        (currentlyValues.contains(initialValue) || initialValue.emptyValidator())) {
       setValue(initialValue);
     }
   }
