@@ -2,10 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class SelectDropdown<T, U> extends StatefulWidget {
-  final num? initialValue;
+  final T? initialValue;
   final ValueChanged? onSelected;
   final String? label;
   final String? errorText;
@@ -40,7 +39,7 @@ class SelectDropdown<T, U> extends StatefulWidget {
     this.controller,
     this.canClear = false,
     this.onInitialData,
-  }) : assert(!(initialValue != null && getOneBloc == null), "GetOneBloc cant be null if initialValue is not null");
+  });
 
   @override
   State<SelectDropdown<T, U>> createState() => _SelectDropdownState();
@@ -58,13 +57,13 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
     }
 
     if (widget.initialValue != null) {
-      widget.getOneBloc!.onSuccess = (data) {
+      widget.getOneBloc?.onSuccess = (data) {
         widget.getListBloc.list.value.add(data);
         widget.getListBloc.list.notifyListeners();
         widget.onInitialData?.call(controller, data as U);
       };
-      widget.getOneBloc!.id.value = widget.initialValue.toString();
-      widget.getOneBloc!.get();
+      widget.getOneBloc?.id.value = widget.initialValue.toString();
+      widget.getOneBloc?.get();
     }
     controller = widget.controller ?? TextEditingController();
     controller.addListener(() {
