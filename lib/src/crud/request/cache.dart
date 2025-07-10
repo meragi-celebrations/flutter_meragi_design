@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 class RequestCache {
   Box box = Hive.box('meragi_crud_requests');
@@ -14,12 +14,8 @@ class RequestCache {
     return null;
   }
 
-  void put(String key, dynamic value,
-      {Duration duration = const Duration(minutes: 5)}) {
-    Map<String, dynamic> map = {
-      "expiry": _createMillisecondsFromDurationAndNow(duration),
-      "value": value
-    };
+  void put(String key, dynamic value, {Duration duration = const Duration(minutes: 5)}) {
+    Map<String, dynamic> map = {"expiry": _createMillisecondsFromDurationAndNow(duration), "value": value};
 
     box.put(key, map);
   }

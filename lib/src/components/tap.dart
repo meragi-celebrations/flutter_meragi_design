@@ -1,7 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/extensions/context.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/colors.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/dimensions.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MDTap extends StatefulWidget {
   const MDTap({
@@ -11,7 +13,6 @@ class MDTap extends StatefulWidget {
     this.iconData,
     this.onPressed,
     this.size,
-    this.applyIconColorFilter,
     this.cursor,
     this.width,
     this.height,
@@ -65,7 +66,6 @@ class MDTap extends StatefulWidget {
     this.icon,
     this.iconData,
     this.onPressed,
-    this.applyIconColorFilter,
     this.cursor,
     this.width,
     this.height,
@@ -118,7 +118,6 @@ class MDTap extends StatefulWidget {
     this.iconData,
     this.onPressed,
     this.size,
-    this.applyIconColorFilter,
     this.cursor,
     this.width,
     this.height,
@@ -171,7 +170,6 @@ class MDTap extends StatefulWidget {
     this.iconData,
     this.onPressed,
     this.size,
-    this.applyIconColorFilter,
     this.cursor,
     this.width,
     this.height,
@@ -224,7 +222,6 @@ class MDTap extends StatefulWidget {
     this.iconData,
     this.onPressed,
     this.size,
-    this.applyIconColorFilter,
     this.cursor,
     this.width,
     this.height,
@@ -277,7 +274,6 @@ class MDTap extends StatefulWidget {
     this.iconData,
     this.onPressed,
     this.size,
-    this.applyIconColorFilter,
     this.cursor,
     this.width,
     this.height,
@@ -328,7 +324,6 @@ class MDTap extends StatefulWidget {
     required this.child,
     this.onPressed,
     this.size,
-    this.applyIconColorFilter,
     this.cursor,
     this.width,
     this.height,
@@ -383,7 +378,6 @@ class MDTap extends StatefulWidget {
   final Widget? child;
   final ShadButtonVariant variant;
   final ShadButtonSize? size;
-  final bool? applyIconColorFilter;
   final MouseCursor? cursor;
   final double? width;
   final double? height;
@@ -443,11 +437,9 @@ class _MDTapState extends State<MDTap> {
     };
   }
 
-  ShadButtonSizeTheme sizeTheme(ShadThemeData theme, ShadButtonSize size,
-      {bool icon = false}) {
+  ShadButtonSizeTheme sizeTheme(ShadThemeData theme, ShadButtonSize size, {bool icon = false}) {
     if (icon) {
-      return buttonTheme(theme).sizesTheme?.icon ??
-          theme.buttonSizesTheme.icon!;
+      return buttonTheme(theme).sizesTheme?.icon ?? theme.buttonSizesTheme.icon!;
     }
     switch (size) {
       case ShadButtonSize.sm:
@@ -455,8 +447,7 @@ class _MDTapState extends State<MDTap> {
       case ShadButtonSize.lg:
         return buttonTheme(theme).sizesTheme?.lg ?? theme.buttonSizesTheme.lg!;
       case ShadButtonSize.regular:
-        return buttonTheme(theme).sizesTheme?.regular ??
-            theme.buttonSizesTheme.regular!;
+        return buttonTheme(theme).sizesTheme?.regular ?? theme.buttonSizesTheme.regular!;
     }
   }
 
@@ -484,21 +475,22 @@ class _MDTapState extends State<MDTap> {
 
     final effectiveIcon = widget.isLoading
         ? loader
-        : widget.icon ?? (widget.iconData != null ?
-            Icon(
-              widget.iconData,
-              size: shadTheme.textTheme.small.fontSize,
-            ) : null);
-    
+        : widget.icon ??
+            (widget.iconData != null
+                ? Icon(
+                    widget.iconData,
+                    size: shadTheme.textTheme.small.fontSize,
+                  )
+                : null);
+
     final MouseCursor? effectiveCursor = widget.cursor ?? (widget.isLoading ? SystemMouseCursors.forbidden : null);
- 
+
     return ShadButton.raw(
       key: widget.key,
       variant: widget.variant,
-      icon: effectiveIcon,
+      leading: effectiveIcon,
       onPressed: widget.isLoading ? null : widget.onPressed,
       size: widget.size,
-      applyIconColorFilter: widget.applyIconColorFilter,
       cursor: effectiveCursor,
       width: widget.width,
       height: widget.height,

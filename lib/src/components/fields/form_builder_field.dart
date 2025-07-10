@@ -29,6 +29,7 @@ class MDFormBuilderField<T> extends FormBuilderField<T> {
     super.onChanged,
     super.onReset,
     super.focusNode,
+    super.errorBuilder,
     this.onError,
   });
 

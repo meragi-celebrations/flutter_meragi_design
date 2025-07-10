@@ -1,7 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/extensions/context.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/colors.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/typography.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart' show PhosphorIconsRegular;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// A wrapper around ShadSelect that provides a more consistent API for Meragi Design
@@ -17,7 +20,6 @@ class MDSelect<T> extends StatefulWidget {
     this.placeholder,
     this.placeholderText,
     this.initialValue,
-    this.initialValues = const [],
     this.onChanged,
     this.focusNode,
     this.closeOnTapOutside = true,
@@ -46,11 +48,12 @@ class MDSelect<T> extends StatefulWidget {
         onSearchChanged = null,
         searchDivider = null,
         searchPlaceholder = null,
-        searchInputPrefix = null,
+        searchInputLeading = null,
         onMultipleChanged = null,
         searchPadding = null,
         search = null,
         clearSearchOnClose = false,
+        initialValues = const {},
         assert(
           options != null || optionsBuilder != null,
           'Either options or optionsBuilder must be provided',
@@ -69,7 +72,7 @@ class MDSelect<T> extends StatefulWidget {
     this.onChanged,
     this.controller,
     this.searchDivider,
-    this.searchInputPrefix,
+    this.searchInputLeading,
     this.searchPlaceholder,
     this.searchPadding,
     this.search,
@@ -78,7 +81,6 @@ class MDSelect<T> extends StatefulWidget {
     this.placeholder,
     this.placeholderText,
     this.initialValue,
-    this.initialValues = const [],
     this.focusNode,
     this.closeOnTapOutside = true,
     this.minWidth,
@@ -105,6 +107,7 @@ class MDSelect<T> extends StatefulWidget {
   })  : variant = MDSelectVariant.search,
         selectedOptionsBuilder = null,
         onMultipleChanged = null,
+        initialValues = const {},
         assert(
           options != null || optionsBuilder != null,
           'Either options or optionsBuilder must be provided',
@@ -119,8 +122,8 @@ class MDSelect<T> extends StatefulWidget {
     this.enabled = true,
     this.placeholder,
     this.placeholderText,
-    this.initialValues = const [],
-    ValueChanged<List<T>>? onChanged,
+    this.initialValues = const {},
+    ValueChanged<Set<T>>? onChanged,
     this.focusNode,
     this.closeOnTapOutside = true,
     this.minWidth,
@@ -150,7 +153,7 @@ class MDSelect<T> extends StatefulWidget {
         selectedOptionBuilder = null,
         searchDivider = null,
         searchPlaceholder = null,
-        searchInputPrefix = null,
+        searchInputLeading = null,
         searchPadding = null,
         search = null,
         clearSearchOnClose = false,
@@ -167,10 +170,10 @@ class MDSelect<T> extends StatefulWidget {
     this.optionsBuilder,
     required ValueChanged<String> this.onSearchChanged,
     required this.selectedOptionsBuilder,
-    ValueChanged<List<T>>? onChanged,
+    ValueChanged<Set<T>>? onChanged,
     this.controller,
     this.searchDivider,
-    this.searchInputPrefix,
+    this.searchInputLeading,
     this.searchPlaceholder,
     this.searchPadding,
     this.search,
@@ -178,7 +181,7 @@ class MDSelect<T> extends StatefulWidget {
     this.enabled = true,
     this.placeholder,
     this.placeholderText,
-    this.initialValues = const [],
+    this.initialValues = const {},
     this.focusNode,
     this.closeOnTapOutside = true,
     this.minWidth,
@@ -217,7 +220,7 @@ class MDSelect<T> extends StatefulWidget {
 
   /// The callback that is called when the values of the [MDSelect] changes.
   /// Called only when the variant is [MDSelect.multiple].
-  final ValueChanged<List<T>>? onMultipleChanged;
+  final ValueChanged<Set<T>>? onMultipleChanged;
 
   /// Whether the [MDSelect] allows deselection, defaults to `false`.
   final bool allowDeselection;
@@ -229,7 +232,7 @@ class MDSelect<T> extends StatefulWidget {
   final T? initialValue;
 
   /// The initial values of the [MDSelect], defaults to `[]`.
-  final List<T> initialValues;
+  final Set<T> initialValues;
 
   /// The placeholder of the [MDSelect], displayed when the value is null.
   final Widget? placeholder;
@@ -298,7 +301,7 @@ class MDSelect<T> extends StatefulWidget {
   final Widget? searchDivider;
 
   /// The prefix of the search input.
-  final Widget? searchInputPrefix;
+  final Widget? searchInputLeading;
 
   /// The placeholder of the search input.
   final Widget? searchPlaceholder;
@@ -373,10 +376,10 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
         return AnimatedRotation(
           turns: effectiveController.isOpen ? 0.5 : 0,
           duration: const Duration(milliseconds: 100),
-          child: ShadImage.square(
+          child: Icon(
             PhosphorIconsRegular.caretDown,
             size: 16,
-            color: shadTheme.colorScheme.popoverForeground.withOpacity(.5),
+            color: shadTheme.colorScheme.popoverForeground.withAlpha((255.0 * 0.5).round()),
           ),
         );
       },
@@ -388,11 +391,10 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           options: widget.options,
           optionsBuilder: widget.optionsBuilder,
           selectedOptionBuilder: widget.selectedOptionBuilder,
-          controller: effectiveController,
+          popoverController: effectiveController,
           enabled: widget.enabled,
           placeholder: effectivePlaceholder,
           initialValue: widget.initialValue,
-          initialValues: widget.initialValues,
           onChanged: widget.onChanged,
           focusNode: widget.focusNode,
           closeOnTapOutside: widget.closeOnTapOutside,
@@ -424,9 +426,9 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           optionsBuilder: widget.optionsBuilder,
           selectedOptionBuilder: widget.selectedOptionBuilder,
           onSearchChanged: widget.onSearchChanged!,
-          controller: effectiveController,
+          popoverController: effectiveController,
           searchDivider: widget.searchDivider,
-          searchInputPrefix: widget.searchInputPrefix,
+          searchInputLeading: widget.searchInputLeading,
           searchPlaceholder: widget.searchPlaceholder,
           searchPadding: widget.searchPadding,
           search: widget.search,
@@ -434,7 +436,6 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           enabled: widget.enabled,
           placeholder: effectivePlaceholder,
           initialValue: widget.initialValue,
-          initialValues: widget.initialValues,
           onChanged: widget.onChanged,
           focusNode: widget.focusNode,
           closeOnTapOutside: widget.closeOnTapOutside,
@@ -465,7 +466,7 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           options: widget.options,
           optionsBuilder: widget.optionsBuilder,
           selectedOptionsBuilder: widget.selectedOptionsBuilder!,
-          controller: effectiveController,
+          popoverController: effectiveController,
           enabled: widget.enabled,
           placeholder: effectivePlaceholder,
           initialValues: widget.initialValues,
@@ -501,9 +502,9 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           onSearchChanged: widget.onSearchChanged!,
           selectedOptionsBuilder: widget.selectedOptionsBuilder!,
           onChanged: widget.onMultipleChanged,
-          controller: effectiveController,
+          popoverController: effectiveController,
           searchDivider: widget.searchDivider,
-          searchInputPrefix: widget.searchInputPrefix,
+          searchInputLeading: widget.searchInputLeading,
           searchPlaceholder: widget.searchPlaceholder,
           searchPadding: widget.searchPadding,
           search: widget.search,
@@ -535,19 +536,6 @@ class _MDSelectState<T> extends State<MDSelect<T>> {
           itemCount: widget.itemCount,
           shrinkWrap: widget.shrinkWrap,
         );
-    }
-  }
-
-  ShadSelectVariant _convertVariant(MDSelectVariant variant) {
-    switch (variant) {
-      case MDSelectVariant.primary:
-        return ShadSelectVariant.primary;
-      case MDSelectVariant.search:
-        return ShadSelectVariant.search;
-      case MDSelectVariant.multiple:
-        return ShadSelectVariant.multiple;
-      case MDSelectVariant.multipleWithSearch:
-        return ShadSelectVariant.multipleWithSearch;
     }
   }
 }

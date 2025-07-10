@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/theme/theme.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MDApp extends StatelessWidget {
@@ -28,7 +29,7 @@ class MDApp extends StatelessWidget {
   final RouterConfig<Object>? routerConfig;
   final bool _isRouter;
 
-  const MDApp({
+  MDApp({
     super.key,
     this.title,
     this.home,
@@ -44,7 +45,7 @@ class MDApp extends StatelessWidget {
     this.supportedLocales,
     this.localeListResolutionCallback,
     this.localeResolutionCallback,
-    this.localizationsDelegates,
+    final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates,
     this.showPerformanceOverlay = false,
     this.showSemanticsDebugger = false,
     this.debugShowCheckedModeBanner = true,
@@ -53,9 +54,10 @@ class MDApp extends StatelessWidget {
     this.restorationScopeId,
     required this.theme,
   })  : _isRouter = false,
-        routerConfig = null;
+        routerConfig = null,
+        localizationsDelegates = (localizationsDelegates ?? []).toList()..add(FlutterQuillLocalizations.delegate);
 
-  const MDApp.router({
+  MDApp.router({
     super.key,
     this.title,
     this.builder,
@@ -64,7 +66,7 @@ class MDApp extends StatelessWidget {
     this.supportedLocales,
     this.localeListResolutionCallback,
     this.localeResolutionCallback,
-    this.localizationsDelegates,
+    final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates,
     this.showPerformanceOverlay = false,
     this.showSemanticsDebugger = false,
     this.debugShowCheckedModeBanner = true,
@@ -80,12 +82,13 @@ class MDApp extends StatelessWidget {
         onGenerateRoute = null,
         onUnknownRoute = null,
         navigatorObservers = null,
+        localizationsDelegates = (localizationsDelegates ?? []).toList()..add(FlutterQuillLocalizations.delegate),
         navigatorKey = null;
 
   @override
   Widget build(BuildContext context) {
     return _isRouter
-        ? ShadApp.materialRouter(
+        ? ShadApp.router(
             title: title ?? '',
             routerConfig: routerConfig,
             builder: builder,
@@ -105,7 +108,7 @@ class MDApp extends StatelessWidget {
             materialThemeBuilder: (context, builtTheme) =>
                 theme.themeData.copyWith(colorScheme: builtTheme.colorScheme),
           )
-        : ShadApp.material(
+        : ShadApp(
             title: title ?? '',
             home: home,
             routes: routes ?? const {},
@@ -128,8 +131,7 @@ class MDApp extends StatelessWidget {
             actions: actions,
             restorationScopeId: restorationScopeId,
             theme: theme.shadTheme,
-            materialThemeBuilder: (context, builtTheme) =>
-                theme.themeData.copyWith(
+            materialThemeBuilder: (context, builtTheme) => theme.themeData.copyWith(
               colorScheme: builtTheme.colorScheme,
             ),
           );

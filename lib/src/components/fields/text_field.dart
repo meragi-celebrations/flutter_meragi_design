@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/components/button.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -245,15 +245,6 @@ class MDTextField extends MDFormBuilderField<String> {
   /// no box decoration.
   final BoxDecoration? decoration;
 
-  /// A builder widget that is displayed underneath the [label] and [child] widgets.
-  ///
-  /// The [error] widget is primarily used to inform users of input errors. When
-  /// a [Text] is given to [error], it will be shown in
-  /// [CupertinoColors.destructiveRed] coloring and medium-weighted font. The
-  /// row becomes taller in order to display the [helper] widget underneath
-  /// [label] and [child]. If null, the row is shorter.
-  final Widget? Function(String error)? errorBuilder;
-
   /// {@macro flutter.widgets.editableText.scribbleEnabled}
   final bool scribbleEnabled;
 
@@ -295,6 +286,7 @@ class MDTextField extends MDFormBuilderField<String> {
     super.onReset,
     super.focusNode,
     super.restorationId,
+    super.errorBuilder,
     this.readOnly = false,
     this.maxLines = 1,
     this.obscureText = false,
@@ -338,7 +330,6 @@ class MDTextField extends MDFormBuilderField<String> {
     this.contextMenuBuilder = _defaultContextMenuBuilder,
     this.magnifierConfiguration,
     this.decoration,
-    this.errorBuilder,
     this.enableIMEPersonalizedLearning = true,
     this.scribbleEnabled = true,
     this.clearButtonMode = OverlayVisibilityMode.never,

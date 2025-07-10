@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
-import 'package:shadcn_ui/shadcn_ui.dart' hide TextDirection;
+import 'package:flutter_meragi_design/src/components/fields/tickbox.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// A form field that wraps the [MDTickbox] widget.
 class MDTickboxFormField extends MDFormBuilderField<bool> {
-  /// Whether the checkbox is enabled, defaults to true.
-  final bool enabled;
-
   /// The decoration of the checkbox.
   final ShadDecoration? decoration;
 
@@ -55,11 +52,6 @@ class MDTickboxFormField extends MDFormBuilderField<bool> {
   /// A widget that is displayed underneath the [prefix] and [child] widgets.
   final Widget? helper;
 
-  /// A builder widget that is displayed underneath the [prefix] and [child] widgets.
-  final Widget? Function(String error)? errorBuilder;
-
-  final FocusNode? focusNode;
-
   /// Creates a form field that wraps the [MDTickbox] widget.
   MDTickboxFormField({
     super.key,
@@ -72,8 +64,9 @@ class MDTickboxFormField extends MDFormBuilderField<bool> {
     super.autovalidateMode,
     super.onReset,
     super.restorationId,
-    this.focusNode,
-    this.enabled = true,
+    super.errorBuilder,
+    super.enabled,
+    super.focusNode,
     this.decoration,
     this.size,
     this.duration,
@@ -85,12 +78,10 @@ class MDTickboxFormField extends MDFormBuilderField<bool> {
     this.padding,
     this.crossAxisAlignment,
     this.shouldExpandedField = false,
-    this.errorBuilder,
     this.helper,
     this.contentPadding,
     this.prefix,
   }) : super(
-          enabled: enabled,
           builder: (FormFieldState<bool?> field) {
             final state = field as _MDTickboxFormFieldState;
 
@@ -120,12 +111,10 @@ class MDTickboxFormField extends MDFormBuilderField<bool> {
         );
 
   @override
-  MDFormBuilderFieldState<MDTickboxFormField, bool> createState() =>
-      _MDTickboxFormFieldState();
+  MDFormBuilderFieldState<MDTickboxFormField, bool> createState() => _MDTickboxFormFieldState();
 }
 
-class _MDTickboxFormFieldState
-    extends MDFormBuilderFieldState<MDTickboxFormField, bool> {
+class _MDTickboxFormFieldState extends MDFormBuilderFieldState<MDTickboxFormField, bool> {
   late final FocusNode focusNode;
 
   @override
