@@ -30,7 +30,7 @@ class MDEditor extends StatefulWidget {
 }
 
 class _MDEditorState extends State<MDEditor> {
-  StreamSubscription<(TransactionTime, Transaction)>? transactionStreamSubscription;
+  StreamSubscription<EditorTransactionValue>? transactionStreamSubscription;
   late final EditorState editorState;
   late final InlineActionsService inlineActionsService =
       InlineActionsService(context: context, handlers: [InlineUserMentionService()]);
@@ -63,7 +63,7 @@ class _MDEditorState extends State<MDEditor> {
         configuration: standardBlockComponentConfiguration.copyWith(
           placeholderText: (_) => AppFlowyEditorL10n.current.listItemPlaceholder,
           padding: (node) => const EdgeInsets.only(bottom: 2),
-          textStyle: (node) => context.theme.fonts.paragraph.small.copyWith(height: 1.2),
+          textStyle: (node, {textSpan}) => context.theme.fonts.paragraph.small.copyWith(height: 1.2),
         ),
       ),
     };

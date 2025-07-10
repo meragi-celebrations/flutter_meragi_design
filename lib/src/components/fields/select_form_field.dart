@@ -1,8 +1,9 @@
 import 'dart:ui' as ui show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:flutter_meragi_design/src/components/fields/select.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MDSelectFormField<T> extends MDFormBuilderField<T> {
@@ -277,7 +278,7 @@ class MDSelectFormField<T> extends MDFormBuilderField<T> {
               controller: controller,
               focusNode: state.effectiveFocusNode,
               searchDivider: searchDivider,
-              searchInputPrefix: searchInputPrefix,
+              searchInputLeading: searchInputPrefix,
               searchPlaceholder: searchPlaceholder,
               searchPadding: searchPadding,
               search: search,
@@ -336,7 +337,7 @@ class _MDSelectFormFieldState<T> extends MDFormBuilderFieldState<MDSelectFormFie
   }
 }
 
-class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
+class MDMultipleSelectFormField<T> extends MDFormBuilderField<Set<T>> {
   /// The options of the [MDSelect].
   final Iterable<Widget>? options;
 
@@ -495,7 +496,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
         search = null,
         clearSearchOnClose = false,
         super(
-          builder: (FormFieldState<List<T>?> field) {
+          builder: (FormFieldState<Set<T>?> field) {
             final state = field as _MDMultipleSelectFormFieldState<T>;
 
             return MDSelect<T>.multiple(
@@ -506,7 +507,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
               enabled: state.enabled,
               placeholder: placeholder,
               placeholderText: placeholderText,
-              initialValues: state.value ?? [],
+              initialValues: state.value ?? {},
               onChanged: (values) {
                 if (state.enabled) {
                   state.didChange(values);
@@ -592,7 +593,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
     this.shrinkWrap,
   })  : variant = MDSelectVariant.multipleWithSearch,
         super(
-          builder: (FormFieldState<List<T>?> field) {
+          builder: (FormFieldState<Set<T>?> field) {
             final state = field as _MDMultipleSelectFormFieldState<T>;
 
             return MDSelect<T>.multipleWithSearch(
@@ -610,7 +611,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
               },
               controller: controller,
               searchDivider: searchDivider,
-              searchInputPrefix: searchInputPrefix,
+              searchInputLeading: searchInputPrefix,
               searchPlaceholder: searchPlaceholder,
               searchPadding: searchPadding,
               search: search,
@@ -618,7 +619,7 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
               enabled: state.enabled,
               placeholder: placeholder,
               placeholderText: placeholderText,
-              initialValues: state.value ?? [],
+              initialValues: state.value ?? {},
               focusNode: state.effectiveFocusNode,
               closeOnTapOutside: closeOnTapOutside,
               minWidth: minWidth,
@@ -647,18 +648,13 @@ class MDMultipleSelectFormField<T> extends MDFormBuilderField<List<T>> {
         );
 
   @override
-  MDFormBuilderFieldState<MDMultipleSelectFormField<T>, List<T>> createState() => _MDMultipleSelectFormFieldState<T>();
+  MDFormBuilderFieldState<MDMultipleSelectFormField<T>, Set<T>> createState() => _MDMultipleSelectFormFieldState<T>();
 }
 
-class _MDMultipleSelectFormFieldState<T> extends MDFormBuilderFieldState<MDMultipleSelectFormField<T>, List<T>> {  
+class _MDMultipleSelectFormFieldState<T> extends MDFormBuilderFieldState<MDMultipleSelectFormField<T>, Set<T>> {
   @override
   void initState() {
     super.initState();
     effectiveFocusNode = widget.focusNode ?? FocusNode(debugLabel: widget.name);
-  }
-
-  @override
-  void reset() {
-    super.reset();
   }
 }

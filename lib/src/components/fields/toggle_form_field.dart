@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:flutter_meragi_design/src/components/fields/toggle.dart';
+import 'package:shadcn_ui/shadcn_ui.dart' show ShadDecoration;
 
 /// A form field that wraps the [MDToggle] widget.
 class MDToggleFormField extends MDFormBuilderField<bool> {
@@ -71,15 +71,6 @@ class MDToggleFormField extends MDFormBuilderField<bool> {
   /// null, the row is shorter.
   final Widget? helper;
 
-  /// A builder widget that is displayed underneath the [prefix] and [child] widgets.
-  ///
-  /// The [error] widget is primarily used to inform users of input errors. When
-  /// a [Text] is given to [error], it will be shown in
-  /// [CupertinoColors.destructiveRed] coloring and medium-weighted font. The
-  /// row becomes taller in order to display the [helper] widget underneath
-  /// [prefix] and [child]. If null, the row is shorter.
-  final Widget? Function(String error)? errorBuilder;
-
   /// Creates a form field that wraps the [MDToggle] widget.
   MDToggleFormField({
     super.key,
@@ -94,6 +85,8 @@ class MDToggleFormField extends MDFormBuilderField<bool> {
     super.onReset,
     super.restorationId,
     super.focusNode,
+    super.errorBuilder,
+    super.onError,
     this.thumbColor,
     this.uncheckedTrackColor,
     this.checkedTrackColor,
@@ -107,7 +100,6 @@ class MDToggleFormField extends MDFormBuilderField<bool> {
     this.sublabel,
     this.padding,
     this.shouldExpandedField = false,
-    this.errorBuilder,
     this.helper,
     this.contentPadding,
     this.prefix,

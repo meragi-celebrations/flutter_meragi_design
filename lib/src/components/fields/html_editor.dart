@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill_delta_from_html/parser/html_to_delta.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class MDHtmlEditor extends MDFormBuilderField<String> {
@@ -42,7 +43,7 @@ class MDHtmlEditor extends MDFormBuilderField<String> {
                   children: [
                     QuillSimpleToolbar(
                       controller: state.controller,
-                      configurations: const QuillSimpleToolbarConfigurations(
+                      config: QuillSimpleToolbarConfig(
                         toolbarIconAlignment: WrapAlignment.start,
                         toolbarIconCrossAlignment: WrapCrossAlignment.start,
                         showBoldButton: true,
@@ -87,7 +88,7 @@ class MDHtmlEditor extends MDFormBuilderField<String> {
                       child: QuillEditor.basic(
                         focusNode: state.focusNode,
                         controller: state.controller,
-                        configurations: QuillEditorConfigurations(
+                        config: QuillEditorConfig(
                           showCursor: true,
                           minHeight: height,
                         ),
@@ -113,7 +114,7 @@ class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
     super.initState();
     controller = widget.controller ?? QuillController.basic();
     if (value != null) {
-      controller.document = Document.fromHtml(value!);
+      controller.document = Document.fromDelta(HtmlToDelta().convert(value!));
     }
     // controller.changes.listen((event) {
     //   print("controller.changes $event");
@@ -126,11 +127,10 @@ class _MDHtmlEditor extends MDFormBuilderFieldState<MDHtmlEditor, String> {
   @override
   void didChange(String? value) {
     print("HERE $value");
-    super.didChange(value);
-
-    if (controller.document != Document.fromHtml(value!)) {
-      controller.setContents(Document.fromHtml(value).toDelta());
+    if (value != null) {
+      controller.document = Document.fromDelta(HtmlToDelta().convert(value));
     }
+    super.didChange(value);
   }
 
   @override

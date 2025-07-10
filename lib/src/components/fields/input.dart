@@ -2,8 +2,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:shadcn_ui/shadcn_ui.dart' hide TextDirection;
+import 'package:flutter_meragi_design/flutter_meragi_design.dart' show ShadInput;
+import 'package:shadcn_ui/shadcn_ui.dart' show ShadDecoration;
 
 class MDInput extends StatefulWidget {
   const MDInput({
@@ -78,14 +78,10 @@ class MDInput extends StatefulWidget {
     this.placeholderAlignment,
     this.inputPadding,
     this.gap,
-  })  : smartDashesType = smartDashesType ??
-            (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
-        smartQuotesType = smartQuotesType ??
-            (obscureText ? SmartQuotesType.disabled : SmartQuotesType.enabled),
-        keyboardType = keyboardType ??
-            (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
-        enableInteractiveSelection =
-            enableInteractiveSelection ?? (!readOnly || !obscureText),
+  })  : smartDashesType = smartDashesType ?? (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
+        smartQuotesType = smartQuotesType ?? (obscureText ? SmartQuotesType.disabled : SmartQuotesType.enabled),
+        keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
+        enableInteractiveSelection = enableInteractiveSelection ?? (!readOnly || !obscureText),
         assert(
           initialValue == null || controller == null,
           'Either initialValue or controller must be specified',
@@ -235,8 +231,8 @@ class _MDInputState extends State<MDInput> {
       magnifierConfiguration: widget.magnifierConfiguration,
       selectionColor: widget.selectionColor,
       padding: widget.padding,
-      prefix: widget.prefix,
-      suffix: widget.suffix,
+      leading: widget.prefix,
+      trailing: widget.suffix,
       mainAxisAlignment: widget.mainAxisAlignment,
       crossAxisAlignment: widget.crossAxisAlignment,
       placeholderStyle: widget.placeholderStyle,

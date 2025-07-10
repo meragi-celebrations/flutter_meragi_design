@@ -126,10 +126,10 @@ class MDTheme {
 
           decoration: ShadDecoration(
             border: ShadBorder(
-              top: BorderSide(color: colors.border.opaque),
-              bottom: BorderSide(color: colors.border.opaque),
-              left: BorderSide(color: colors.border.opaque),
-              right: BorderSide(color: colors.border.opaque),
+              top: ShadBorderSide(color: colors.border.opaque),
+              bottom: ShadBorderSide(color: colors.border.opaque),
+              left: ShadBorderSide(color: colors.border.opaque),
+              right: ShadBorderSide(color: colors.border.opaque),
             ),
           ),
           // padding: EdgeInsets.symmetric(horizontal: dimensions.padding, vertical: dimensions.padding / 2),
@@ -137,10 +137,10 @@ class MDTheme {
         checkboxTheme: ShadCheckboxTheme(
           decoration: ShadDecoration(
             border: ShadBorder(
-              top: BorderSide(color: colors.border.opaque.darken(15)),
-              bottom: BorderSide(color: colors.border.opaque.darken(15)),
-              left: BorderSide(color: colors.border.opaque.darken(15)),
-              right: BorderSide(color: colors.border.opaque.darken(15)),
+              top: ShadBorderSide(color: colors.border.opaque.darken(15)),
+              bottom: ShadBorderSide(color: colors.border.opaque.darken(15)),
+              left: ShadBorderSide(color: colors.border.opaque.darken(15)),
+              right: ShadBorderSide(color: colors.border.opaque.darken(15)),
             ),
           ),
         ),

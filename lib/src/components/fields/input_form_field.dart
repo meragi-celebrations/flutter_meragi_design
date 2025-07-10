@@ -4,8 +4,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart' show ShadDecoration;
 import 'package:flutter_meragi_design/src/components/fields/form_builder_field.dart';
+import 'package:flutter_meragi_design/src/components/fields/input.dart' show MDInput;
 
 
 class MDInputFormField extends MDFormBuilderField<String> {
@@ -151,9 +152,6 @@ class MDInputFormField extends MDFormBuilderField<String> {
   /// Controls the decoration of the input field
   final ShadDecoration? decoration;
 
-  /// A builder widget that is displayed underneath the [label] and [child] widgets.
-  final Widget? Function(String error)? errorBuilder;
-
   /// {@macro flutter.widgets.editableText.scribbleEnabled}
   final bool scribbleEnabled;
 
@@ -200,6 +198,7 @@ class MDInputFormField extends MDFormBuilderField<String> {
     super.onReset,
     super.focusNode,
     super.restorationId,
+    super.errorBuilder,    
     this.readOnly = false,
     this.maxLines = 1,
     this.obscureText = false,
@@ -242,7 +241,6 @@ class MDInputFormField extends MDFormBuilderField<String> {
     this.contextMenuBuilder,
     this.magnifierConfiguration,
     this.decoration,
-    this.errorBuilder,
     this.enableIMEPersonalizedLearning = true,
     this.scribbleEnabled = true,
     this.contentInsertionConfiguration,
