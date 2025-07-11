@@ -1,4 +1,4 @@
-library flutter_meragi_design;
+library;
 
 export 'package:appflowy_editor/appflowy_editor.dart' hide Debounce;
 export 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -93,7 +93,8 @@ export 'src/utils/scroll_handler.dart';
 export 'src/utils/shortcut_activators.dart';
 export 'src/utils/widget_state.dart';
 export 'src/app.dart';
-export 'package:shadcn_ui/shadcn_ui.dart' hide ValueTransformer, TextDirection;
+export 'package:shadcn_ui/shadcn_ui.dart' hide ValueTransformer;
 export 'package:phosphor_flutter/phosphor_flutter.dart';
 export 'src/crud/widgets/pagination_view.dart';
 export 'src/components/md_youtube/md_youtube_widget.dart';
+export 'src/theme/extensions/utils.dart';
