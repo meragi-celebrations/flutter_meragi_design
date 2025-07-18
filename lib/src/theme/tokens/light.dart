@@ -109,9 +109,9 @@ ThemeToken light = ThemeToken(
 
   // Text
   displayTextStyle: const TextStyle(fontSize: 24),
-  h1TextStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.w400),
-  h2TextStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
-  h3TextStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+  h1TextStyle: const TextStyle(fontSize: 48, fontWeight: FontWeight.w600),
+  h2TextStyle: const TextStyle(fontSize: 36, fontWeight: FontWeight.w500),
+  h3TextStyle: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
   h4TextStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
   h5TextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
   bodyTextStyle: const TextStyle(fontSize: 14),

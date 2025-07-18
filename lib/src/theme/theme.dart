@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/theme/components/slider_theme.dart';
+import 'package:flutter_meragi_design/src/theme/components/markdown_editor_theme.dart';
 import 'package:flutter_meragi_design/src/theme/extensions/md_slider_theme_extension.dart';
+import 'package:flutter_meragi_design/src/theme/extensions/markdown_editor_theme_extension.dart';
 import 'package:flutter_meragi_design/src/theme/theme_tokens.dart';
 
 class MeragiTheme extends InheritedWidget {
@@ -31,12 +33,14 @@ class MDTheme {
   final AppDimension dimensions;
 
   final MDInputTheme? inputTheme;
+  final MDMarkdownEditorTheme? markdownEditorTheme;
 
   const MDTheme({
     required this.colors,
     required this.typography,
     required this.dimensions,
     this.inputTheme,
+    this.markdownEditorTheme,
   });
 
   ShadColorScheme get shadColorScheme => ShadColorScheme(
@@ -209,6 +213,17 @@ class MDTheme {
                 horizontal: dimensions.padding,
               ),
             ).merge(inputTheme),
+          ),
+          MDMarkdownEditorThemeExtension(
+            theme: MDMarkdownEditorTheme(
+              backgroundColor: colors.background.primary,
+              borderColor: colors.border.opaque,
+              borderRadius: dimensions.radius,
+              padding: EdgeInsets.all(dimensions.padding),
+              textStyle: typography.paragraph.medium,
+              selectionColor: colors.background.tertiary,
+              cursorColor: colors.primary,
+            ).merge(markdownEditorTheme),
           ),
         ],
       );

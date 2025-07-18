@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'markdown_editor_story.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +19,17 @@ class MyApp extends StatelessWidget {
           colors: colors,
           typography: MDDefaultTypography(color: colors.content.primary),
           dimensions: const MDDefaultDimension(),
+          markdownEditorTheme: MDMarkdownEditorTheme(
+            backgroundColor: Colors.white,
+            borderColor: Colors.grey.shade300,
+            textStyle: TextStyle(
+              fontSize: 14,
+              color: colors.content.primary,
+            ),
+            cursorColor: colors.content.primary,
+            selectionColor: colors.primary.withOpacity(0.2),
+            hoverBackgroundColor: const Color(0xFFF3E8FF),
+          ),
         ),
         home: const HomePage(),
       ),
@@ -56,6 +68,10 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.format_align_center),
       label: 'Form',
     ),
+    MDNavigationRailDestination(
+      icon: const Icon(Icons.edit_note),
+      label: 'Markdown Editor',
+    ),
   ];
 
   @override
@@ -80,6 +96,7 @@ class _HomePageState extends State<HomePage> {
               const SelectStory(),
               const InputStory(),
               const FormStory(),
+              const MarkdownEditorStory(),
             ][_selectedIndex],
           ),
         ],
