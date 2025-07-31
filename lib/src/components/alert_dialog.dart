@@ -22,7 +22,7 @@ Future<T?> showMDAlertDialog<T>({
   return showDialog<T>(
     context: context,
     builder: builder,
-    barrierDismissible: false,
+    barrierDismissible: true,
   );
 }
 

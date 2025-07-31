@@ -86,7 +86,7 @@ class GetListBloc<T> extends BaseBloc<T> {
               })
           .toList()));
     }
-    return url! + Uri(queryParameters: data).query;
+    return "${url!}::${(Uri(queryParameters: data).query).hashCode}";
   }
 
   Future<void> get() async {
@@ -262,7 +262,7 @@ class GetOneBloc<T> extends BaseBloc<T> {
     if (filters.isNotEmpty) {
       data.addAll(parseFilterListToMap(filters));
     }
-    return url + Uri(queryParameters: data).query;
+    return "$url::${(Uri(queryParameters: data).query).hashCode}";
   }
 
   Future<void> get({String? customUrl}) async {

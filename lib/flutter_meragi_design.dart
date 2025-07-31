@@ -98,3 +98,4 @@ export 'package:phosphor_flutter/phosphor_flutter.dart';
 export 'src/crud/widgets/pagination_view.dart';
 export 'src/components/md_youtube/md_youtube_widget.dart';
 export 'src/theme/extensions/utils.dart';
+export 'src/utils/property_notifier.dart';
