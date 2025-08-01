@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PropertyNotifier<T> extends ValueNotifier<T> {
-  PropertyNotifier(T value) : super(value);
+  PropertyNotifier(super.value);
 
   bool _disposed = false;
 
