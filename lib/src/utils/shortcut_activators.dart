@@ -5,7 +5,12 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 class AnyKeyActivator implements ShortcutActivator {
   @override
   bool accepts(KeyEvent event, HardwareKeyboard state) {
-    if (state.isShiftPressed || state.isAltPressed || state.isControlPressed || state.isMetaPressed) {
+    if (state.isShiftPressed ||
+        state.isAltPressed ||
+        state.isControlPressed ||
+        state.isMetaPressed ||
+        state.isLogicalKeyPressed(LogicalKeyboardKey.tab) ||
+        state.isPhysicalKeyPressed(PhysicalKeyboardKey.tab)) {
       return false;
     }
     return true;
@@ -17,7 +22,6 @@ class AnyKeyActivator implements ShortcutActivator {
   }
 
   @override
-  // TODO: implement triggers
   Iterable<LogicalKeyboardKey>? get triggers => null;
 }
 
