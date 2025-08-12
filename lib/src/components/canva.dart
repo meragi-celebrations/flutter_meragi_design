@@ -140,59 +140,6 @@ class CanvasItem {
   }
 }
 
-// ——— Intents for Shortcuts ———
-class DeleteIntent extends Intent {
-  const DeleteIntent();
-}
-
-class DuplicateIntent extends Intent {
-  const DuplicateIntent();
-}
-
-class SelectAllIntent extends Intent {
-  const SelectAllIntent();
-}
-
-class NudgeLeftIntent extends Intent {
-  const NudgeLeftIntent();
-}
-
-class NudgeRightIntent extends Intent {
-  const NudgeRightIntent();
-}
-
-class NudgeUpIntent extends Intent {
-  const NudgeUpIntent();
-}
-
-class NudgeDownIntent extends Intent {
-  const NudgeDownIntent();
-}
-
-class NudgeLeftBigIntent extends Intent {
-  const NudgeLeftBigIntent();
-}
-
-class NudgeRightBigIntent extends Intent {
-  const NudgeRightBigIntent();
-}
-
-class NudgeUpBigIntent extends Intent {
-  const NudgeUpBigIntent();
-}
-
-class NudgeDownBigIntent extends Intent {
-  const NudgeDownBigIntent();
-}
-
-class UndoIntent extends Intent {
-  const UndoIntent();
-}
-
-class RedoIntent extends Intent {
-  const RedoIntent();
-}
-
 // ——— IMPLEMENTATION ———
 class _SimpleCanvaState extends State<SimpleCanva> {
   final GlobalKey _repaintKey = GlobalKey(); // wraps only the canvas
@@ -637,35 +584,6 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
   @override
   Widget build(BuildContext context) {
-    // Keyboard shortcuts using KeyEvent system
-    final shortcuts = <ShortcutActivator, Intent>{
-      const SingleActivator(LogicalKeyboardKey.delete): const DeleteIntent(),
-      const SingleActivator(LogicalKeyboardKey.backspace): const DeleteIntent(),
-      const SingleActivator(LogicalKeyboardKey.keyD, control: true):
-          const DuplicateIntent(),
-      const SingleActivator(LogicalKeyboardKey.keyD, meta: true):
-          const DuplicateIntent(),
-      const SingleActivator(LogicalKeyboardKey.keyA, control: true):
-          const SelectAllIntent(),
-      const SingleActivator(LogicalKeyboardKey.keyA, meta: true):
-          const SelectAllIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowLeft):
-          const NudgeLeftIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowRight):
-          const NudgeRightIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowUp): const NudgeUpIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowDown):
-          const NudgeDownIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true):
-          const NudgeLeftBigIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowRight, shift: true):
-          const NudgeRightBigIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true):
-          const NudgeUpBigIntent(),
-      const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true):
-          const NudgeDownBigIntent(),
-    };
-
     return Row(children: [
       // Sidebar
       SizedBox(
@@ -685,221 +603,145 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
       // Workspace and centered canvas
       Expanded(
-        child: Focus(
-          autofocus: true,
-          child: Shortcuts(
-            shortcuts: shortcuts,
-            child: Actions(
-              actions: <Type, Action<Intent>>{
-                DeleteIntent: CallbackAction<DeleteIntent>(onInvoke: (_) {
-                  _deleteSelected();
-                  return null;
-                }),
-                DuplicateIntent: CallbackAction<DuplicateIntent>(onInvoke: (_) {
-                  _duplicateSelected();
-                  return null;
-                }),
-                SelectAllIntent: CallbackAction<SelectAllIntent>(onInvoke: (_) {
-                  setState(() => _selected
-                    ..clear()
-                    ..addAll(_items.map((e) => e.id)));
-                  _notify();
-                  return null;
-                }),
-                NudgeLeftIntent: CallbackAction<NudgeLeftIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(-1, 0));
-                  return null;
-                }),
-                NudgeRightIntent:
-                    CallbackAction<NudgeRightIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(1, 0));
-                  return null;
-                }),
-                NudgeUpIntent: CallbackAction<NudgeUpIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(0, -1));
-                  return null;
-                }),
-                NudgeDownIntent: CallbackAction<NudgeDownIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(0, 1));
-                  return null;
-                }),
-                NudgeLeftBigIntent:
-                    CallbackAction<NudgeLeftBigIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(-10, 0));
-                  return null;
-                }),
-                NudgeRightBigIntent:
-                    CallbackAction<NudgeRightBigIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(10, 0));
-                  return null;
-                }),
-                NudgeUpBigIntent:
-                    CallbackAction<NudgeUpBigIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(0, -10));
-                  return null;
-                }),
-                NudgeDownBigIntent:
-                    CallbackAction<NudgeDownBigIntent>(onInvoke: (_) {
-                  _panSelected(const Offset(0, 10));
-                  return null;
-                }),
-              },
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Container(
-                      color: widget.workspaceColor,
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              // Fit a 16:9 canvas inside available constraints with padding
-                              final maxW = constraints.maxWidth;
-                              final maxH = constraints.maxHeight;
-                              final targetAspect = 16 / 9;
-                              double w = maxW;
-                              double h = w / targetAspect;
-                              if (h > maxH) {
-                                h = maxH;
-                                w = h * targetAspect;
-                              }
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Container(
+                color: widget.workspaceColor,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Fit a 16:9 canvas inside available constraints with padding
+                        final maxW = constraints.maxWidth;
+                        final maxH = constraints.maxHeight;
+                        final targetAspect = 16 / 9;
+                        double w = maxW;
+                        double h = w / targetAspect;
+                        if (h > maxH) {
+                          h = maxH;
+                          w = h * targetAspect;
+                        }
 
-                              return SizedBox(
-                                width: w,
-                                height: h,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                          blurRadius: 18,
-                                          color: Color(0x33000000))
-                                    ],
-                                  ),
-                                  child: Stack(children: [
-                                    // Workspace action bar at top center
-
-                                    // Canvas surface
-                                    Positioned.fill(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.deferToChild,
-                                        onTapDown: _handleTapDownOnCanvas,
-                                        child: RepaintBoundary(
-                                          key: _repaintKey,
-                                          child: Container(
-                                            key: _canvasBoxKey,
-                                            decoration: BoxDecoration(
-                                              color: _canvasColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                  color: Colors.black12),
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              child: DragTarget<
-                                                  CanvasPaletteImage>(
-                                                onWillAccept: (_) => true,
-                                                onAcceptWithDetails: (details) {
-                                                  final local =
-                                                      _toLocal(details.offset);
-                                                  final pal = details.data;
-                                                  final size =
-                                                      pal.preferredSize ??
-                                                          const Size(160, 160);
-                                                  _addItem(CanvasItem(
-                                                    id: _id(),
-                                                    imageId: pal.id,
-                                                    provider: pal.provider,
-                                                    position: local -
-                                                        Offset(size.width / 2,
-                                                            size.height / 2),
-                                                    size: size,
-                                                  ));
-                                                },
-                                                builder: (context, _, __) {
-                                                  final canvasSize = Size(w, h);
-                                                  return Stack(children: [
-                                                    for (final item in _items)
-                                                      _CanvasItemWidget(
-                                                        key: ValueKey(item.id),
-                                                        item: item,
-                                                        canvasSize: canvasSize,
-                                                        isSelected: _isSelected(
-                                                            item.id),
-                                                        onPanStart:
-                                                            _gestureBegin,
-                                                        onPanMove: _panSelected,
-                                                        onPanEnd: _gestureEnd,
-                                                        onResizeStart:
-                                                            _gestureBegin,
-                                                        onResizeCommit:
-                                                            (updated) {
-                                                          setState(() {
-                                                            final idx = _items
-                                                                .indexWhere(
-                                                                    (e) =>
-                                                                        e.id ==
-                                                                        item.id);
-                                                            if (idx != -1)
-                                                              _items[idx] =
-                                                                  updated;
-                                                          });
-                                                          _notify();
-                                                        },
-                                                        onResizeEnd:
-                                                            _gestureEnd,
-                                                      ),
-                                                  ]);
-                                                },
-                                              ),
-                                            ),
-                                          ),
+                        return SizedBox(
+                          width: w,
+                          height: h,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: const [
+                                BoxShadow(
+                                    blurRadius: 18, color: Color(0x33000000))
+                              ],
+                            ),
+                            child: Stack(children: [
+                              // Canvas surface
+                              Positioned.fill(
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.deferToChild,
+                                  onTapDown: _handleTapDownOnCanvas,
+                                  child: RepaintBoundary(
+                                    key: _repaintKey,
+                                    child: Container(
+                                      key: _canvasBoxKey,
+                                      decoration: BoxDecoration(
+                                        color: _canvasColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border:
+                                            Border.all(color: Colors.black12),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: DragTarget<CanvasPaletteImage>(
+                                          onWillAccept: (_) => true,
+                                          onAcceptWithDetails: (details) {
+                                            final local =
+                                                _toLocal(details.offset);
+                                            final pal = details.data;
+                                            final size = pal.preferredSize ??
+                                                const Size(160, 160);
+                                            _addItem(CanvasItem(
+                                              id: _id(),
+                                              imageId: pal.id,
+                                              provider: pal.provider,
+                                              position: local -
+                                                  Offset(size.width / 2,
+                                                      size.height / 2),
+                                              size: size,
+                                            ));
+                                          },
+                                          builder: (context, _, __) {
+                                            final canvasSize = Size(w, h);
+                                            return Stack(children: [
+                                              for (final item in _items)
+                                                _CanvasItemWidget(
+                                                  key: ValueKey(item.id),
+                                                  item: item,
+                                                  canvasSize: canvasSize,
+                                                  isSelected:
+                                                      _isSelected(item.id),
+                                                  onPanStart: _gestureBegin,
+                                                  onPanMove: _panSelected,
+                                                  onPanEnd: _gestureEnd,
+                                                  onResizeStart: _gestureBegin,
+                                                  onResizeCommit: (updated) {
+                                                    setState(() {
+                                                      final idx = _items
+                                                          .indexWhere((e) =>
+                                                              e.id == item.id);
+                                                      if (idx != -1)
+                                                        _items[idx] = updated;
+                                                    });
+                                                    _notify();
+                                                  },
+                                                  onResizeEnd: _gestureEnd,
+                                                ),
+                                            ]);
+                                          },
                                         ),
                                       ),
                                     ),
-                                  ]),
+                                  ),
                                 ),
-                              );
-                            },
+                              ),
+                            ]),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
-                  Positioned(
-                    top: 50,
-                    left: 0,
-                    right: 0,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: _WorkspaceActionBar(
-                        selectedCount: _selected.length,
-                        canvasColor: _canvasColor,
-                        onUndo: _undoAction,
-                        onRedo: _redoAction,
-                        onColorPick: (c) => _setCanvasColor(c),
-                        onDelete: _deleteSelected,
-                        onDuplicate: _duplicateSelected,
-                        onFront: _bringToFront,
-                        onBack: _sendToBack,
-                        onAlignLeft: _alignLeft,
-                        onAlignHCenter: _alignHCenter,
-                        onAlignRight: _alignRight,
-                        onAlignTop: _alignTop,
-                        onAlignVCenter: _alignVCenter,
-                        onAlignBottom: _alignBottom,
-                        onLockToggle: _toggleLockSelected,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+            Positioned(
+              top: 50,
+              left: 0,
+              right: 0,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: _WorkspaceActionBar(
+                  selectedCount: _selected.length,
+                  canvasColor: _canvasColor,
+                  onUndo: _undoAction,
+                  onRedo: _redoAction,
+                  onColorPick: (c) => _setCanvasColor(c),
+                  onDelete: _deleteSelected,
+                  onDuplicate: _duplicateSelected,
+                  onFront: _bringToFront,
+                  onBack: _sendToBack,
+                  onAlignLeft: _alignLeft,
+                  onAlignHCenter: _alignHCenter,
+                  onAlignRight: _alignRight,
+                  onAlignTop: _alignTop,
+                  onAlignVCenter: _alignVCenter,
+                  onAlignBottom: _alignBottom,
+                  onLockToggle: _toggleLockSelected,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     ]);
@@ -1174,11 +1016,11 @@ class _WorkspaceActionBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-                tooltip: 'Undo (Ctrl or Cmd+Z)',
+                tooltip: 'Undo',
                 icon: const Icon(Icons.undo),
                 onPressed: onUndo),
             IconButton(
-                tooltip: 'Redo (Ctrl+Y or Cmd+Shift+Z)',
+                tooltip: 'Redo',
                 icon: const Icon(Icons.redo),
                 onPressed: onRedo),
             const VerticalDivider(width: 12),
