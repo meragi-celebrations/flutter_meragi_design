@@ -5,6 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
+import 'package:flutter_meragi_design/src/components/canva/models.dart';
+import 'package:flutter_meragi_design/src/components/canva/utils.dart';
+import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
 class SimpleCanva extends StatefulWidget {
   const SimpleCanva({
@@ -38,11 +42,36 @@ class SimpleCanvaController {
   void addFromProvider(ImageProvider provider, {Offset? position, Size? size}) {
     _state?._addItem(
       CanvasItem(
-        id: _id(),
+        id: buildId(),
+        kind: CanvasItemKind.image,
         imageId: null,
         provider: provider,
         position: position ?? const Offset(40, 40),
         size: size ?? const Size(140, 140),
+      ),
+    );
+  }
+
+  void addText({
+    String text = 'Double-click to edit',
+    Offset? position,
+    Size? size,
+    double fontSize = 24,
+    Color color = Colors.black,
+    FontWeight weight = FontWeight.w600,
+    String? fontFamily,
+  }) {
+    _state?._addItem(
+      CanvasItem(
+        id: buildId(),
+        kind: CanvasItemKind.text,
+        text: text,
+        fontSize: fontSize,
+        fontColor: color,
+        fontWeight: weight,
+        fontFamily: fontFamily,
+        position: position ?? const Offset(40, 40),
+        size: size ?? const Size(220, 88),
       ),
     );
   }
@@ -57,7 +86,7 @@ class SimpleCanvaController {
         {
           'version': 1,
           'items': [],
-          'canvas': {'color': _colorToHex(Colors.white)}
+          'canvas': {'color': colorToHex(Colors.white)}
         };
     return pretty
         ? const JsonEncoder.withIndent('  ').convert(doc)
@@ -79,68 +108,6 @@ class SimpleCanvaController {
   void redo() => _state?._redoAction();
 }
 
-class CanvasPaletteImage {
-  final String id;
-  final ImageProvider provider;
-  final Size? preferredSize;
-  const CanvasPaletteImage(
-      {required this.id, required this.provider, this.preferredSize});
-}
-
-class CanvasItem {
-  final String id;
-  final String? imageId; // links to palette id when applicable
-  final ImageProvider provider;
-  Offset position;
-  Size size;
-  bool locked;
-
-  CanvasItem({
-    required this.id,
-    required this.imageId,
-    required this.provider,
-    required this.position,
-    required this.size,
-    this.locked = false,
-  });
-
-  CanvasItem copy() => CanvasItem(
-        id: id,
-        imageId: imageId,
-        provider: provider,
-        position: position,
-        size: size,
-        locked: locked,
-      );
-
-  Map<String, dynamic> toJson(int zIndex) => {
-        'id': id,
-        if (imageId != null) 'imageId': imageId,
-        'x': position.dx,
-        'y': position.dy,
-        'w': size.width,
-        'h': size.height,
-        'z': zIndex,
-        'locked': locked,
-        'src': _serializeProvider(provider),
-      };
-
-  static CanvasItem fromJson(
-      Map<String, dynamic> json, ImageProvider provider) {
-    return CanvasItem(
-      id: (json['id'] as String?) ?? _id(),
-      imageId: json['imageId'] as String?,
-      provider: provider,
-      position: Offset((json['x'] as num?)?.toDouble() ?? 0,
-          (json['y'] as num?)?.toDouble() ?? 0),
-      size: Size((json['w'] as num?)?.toDouble() ?? 100,
-          (json['h'] as num?)?.toDouble() ?? 100),
-      locked: (json['locked'] as bool?) ?? false,
-    );
-  }
-}
-
-// ——— IMPLEMENTATION ———
 class _SimpleCanvaState extends State<SimpleCanva> {
   final GlobalKey _repaintKey = GlobalKey(); // wraps only the canvas
   final GlobalKey _canvasBoxKey = GlobalKey();
@@ -168,8 +135,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   @override
   void didUpdateWidget(covariant SimpleCanva oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller)
+    if (oldWidget.controller != widget.controller) {
       widget.controller?._state = this;
+    }
   }
 
   // Selection helpers
@@ -288,9 +256,15 @@ class _SimpleCanvaState extends State<SimpleCanva> {
           ..position = it.position + const Offset(12, 12)
           ..locked = false;
         clones.add(CanvasItem(
-          id: _id(),
+          id: buildId(),
+          kind: dup.kind,
           imageId: dup.imageId,
           provider: dup.provider,
+          text: dup.text,
+          fontSize: dup.fontSize,
+          fontColor: dup.fontColor,
+          fontWeight: dup.fontWeight,
+          fontFamily: dup.fontFamily,
           position: dup.position,
           size: dup.size,
           locked: dup.locked,
@@ -348,8 +322,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     setState(() {
       for (final id in _selected) {
         final it = _byId(id);
-        if (!it.locked)
+        if (!it.locked) {
           it.position = Offset(cx - it.size.width / 2, it.position.dy);
+        }
       }
     });
     _notify();
@@ -366,8 +341,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     setState(() {
       for (final id in _selected) {
         final it = _byId(id);
-        if (!it.locked)
+        if (!it.locked) {
           it.position = Offset(it.position.dx, cy - it.size.height / 2);
+        }
       }
     });
     _notify();
@@ -383,8 +359,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     setState(() {
       for (final id in _selected) {
         final it = _byId(id);
-        if (!it.locked)
+        if (!it.locked) {
           it.position = Offset(right - it.size.width, it.position.dy);
+        }
       }
     });
     _notify();
@@ -400,8 +377,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     setState(() {
       for (final id in _selected) {
         final it = _byId(id);
-        if (!it.locked)
+        if (!it.locked) {
           it.position = Offset(it.position.dx, bottom - it.size.height);
+        }
       }
     });
     _notify();
@@ -419,20 +397,30 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _panSelected(Offset delta) {
-    _pushHistory();
     if (_selected.isEmpty) return;
-    final size = _canvasSize();
+
+    // Move ALL selected that aren’t locked, no clamping to canvas edges.
+    final movable =
+        _items.where((it) => _selected.contains(it.id) && !it.locked);
+    if (movable.isEmpty) return;
+
+    _pushHistory();
     setState(() {
-      for (final id in _selected) {
-        final it = _byId(id);
-        if (it.locked) continue;
-        final maxX = size.width - it.size.width;
-        final maxY = size.height - it.size.height;
-        final next = it.position + delta;
-        it.position = Offset(next.dx.clamp(0, maxX), next.dy.clamp(0, maxY));
+      for (final it in movable) {
+        it.position = it.position + delta;
       }
     });
     _notify();
+  }
+
+  Rect _boundsOf(Iterable<CanvasItem> items) {
+    Rect? r;
+    for (final it in items) {
+      final ir = Rect.fromLTWH(
+          it.position.dx, it.position.dy, it.size.width, it.size.height);
+      r = (r == null) ? ir : r.expandToInclude(ir);
+    }
+    return r ?? const Rect.fromLTWH(0, 0, 0, 0);
   }
 
   void _setCanvasColor(Color c) => setState(() => _canvasColor = c);
@@ -449,6 +437,19 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         ..add(item.id);
     });
     _notify();
+  }
+
+  void _addTextBox() {
+    _pushHistory();
+    _addItem(
+      CanvasItem(
+        id: buildId(),
+        kind: CanvasItemKind.text,
+        text: 'Double-click to edit',
+        position: const Offset(60, 60),
+        size: const Size(240, 96),
+      ),
+    );
   }
 
   void _clear() {
@@ -483,7 +484,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         'version': 1,
         'canvas': {
           'aspect': '16:9',
-          'color': _colorToHex(_canvasColor),
+          'color': colorToHex(_canvasColor),
         },
         'items': [for (int i = 0; i < _items.length; i++) _items[i].toJson(i)],
       };
@@ -492,7 +493,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     final canvas = (doc['canvas'] as Map?) ?? {};
     final colorHex = canvas['color'] as String?;
     if (colorHex != null) {
-      final c = _hexToColor(colorHex);
+      final c = hexToColor(colorHex);
       if (c != null) _canvasColor = c;
     }
 
@@ -500,12 +501,25 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         const <Map<String, dynamic>>[];
     final rebuilt = <CanvasItem>[];
     for (final j in rawItems) {
-      final imageId = j['imageId'] as String?;
+      final kindStr = (j['kind'] as String?) ?? 'image';
+      final kind = CanvasItemKind.values.firstWhere(
+        (e) => e.name == kindStr,
+        orElse: () => CanvasItemKind.image,
+      );
+
+      // Support new nested "props" and legacy flat fields
+      final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
+
       ImageProvider? provider;
-      if (imageId != null && _paletteById.containsKey(imageId))
-        provider = _paletteById[imageId]!.provider;
-      provider ??= _deserializeProvider(j['src']);
-      if (provider == null) continue;
+      if (kind == CanvasItemKind.image) {
+        final imageId =
+            (props['imageId'] as String?) ?? (j['imageId'] as String?);
+        if (imageId != null && _paletteById.containsKey(imageId)) {
+          provider = _paletteById[imageId]!.provider;
+        }
+        provider ??= deserializeProvider(props['src'] ?? j['src']);
+      }
+
       rebuilt.add(CanvasItem.fromJson(j, provider));
     }
     setState(() {
@@ -553,6 +567,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
   void _handleTapDownOnCanvas(TapDownDetails details) {
     final local = _toLocal(details.globalPosition);
+
+    // Find topmost hit item
     String? hitId;
     for (final item in _items.reversed) {
       final rect = Rect.fromLTWH(item.position.dx, item.position.dy,
@@ -562,6 +578,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         break;
       }
     }
+
+    // Modifier keys = additive selection
     final keys = HardwareKeyboard.instance.logicalKeysPressed;
     final additive = keys.contains(LogicalKeyboardKey.shiftLeft) ||
         keys.contains(LogicalKeyboardKey.shiftRight) ||
@@ -570,10 +588,25 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         keys.contains(LogicalKeyboardKey.metaLeft) ||
         keys.contains(LogicalKeyboardKey.metaRight);
 
-    if (hitId != null) {
-      additive ? _toggleSelect(hitId) : _selectOnly(hitId);
-    } else {
+    if (hitId == null) {
+      // Clicked empty space -> clear
       _clearSelection();
+      return;
+    }
+
+    final alreadySelected = _selected.contains(hitId);
+
+    if (additive) {
+      // Toggle the clicked item
+      _toggleSelect(hitId);
+    } else {
+      // No modifiers:
+      // If clicking an already-selected item, KEEP current multi-selection.
+      // If clicking an unselected item, select only that one.
+      if (!alreadySelected) {
+        _selectOnly(hitId);
+      }
+      // else: do nothing, preserve selection as-is
     }
   }
 
@@ -590,8 +623,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         width: widget.sidebarWidth,
         child: DecoratedBox(
           decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              border: Border(right: BorderSide(color: Colors.grey.shade300))),
+            color: Colors.grey.shade100,
+            border: Border(right: BorderSide(color: Colors.grey.shade300)),
+          ),
           child: ListView.separated(
             padding: const EdgeInsets.all(8),
             itemCount: widget.palette.length,
@@ -613,7 +647,6 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                     padding: const EdgeInsets.all(16),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        // Fit a 16:9 canvas inside available constraints with padding
                         final maxW = constraints.maxWidth;
                         final maxH = constraints.maxHeight;
                         final targetAspect = 16 / 9;
@@ -637,7 +670,6 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                               ],
                             ),
                             child: Stack(children: [
-                              // Canvas surface
                               Positioned.fill(
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.deferToChild,
@@ -663,7 +695,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                             final size = pal.preferredSize ??
                                                 const Size(160, 160);
                                             _addItem(CanvasItem(
-                                              id: _id(),
+                                              id: buildId(),
+                                              kind: CanvasItemKind.image,
                                               imageId: pal.id,
                                               provider: pal.provider,
                                               position: local -
@@ -676,7 +709,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                             final canvasSize = Size(w, h);
                                             return Stack(children: [
                                               for (final item in _items)
-                                                _CanvasItemWidget(
+                                                CanvasItemWidget(
                                                   key: ValueKey(item.id),
                                                   item: item,
                                                   canvasSize: canvasSize,
@@ -721,12 +754,13 @@ class _SimpleCanvaState extends State<SimpleCanva> {
               right: 0,
               child: Align(
                 alignment: Alignment.topCenter,
-                child: _WorkspaceActionBar(
+                child: WorkspaceActionBar(
                   selectedCount: _selected.length,
                   canvasColor: _canvasColor,
                   onUndo: _undoAction,
                   onRedo: _redoAction,
                   onColorPick: (c) => _setCanvasColor(c),
+                  onAddText: _addTextBox,
                   onDelete: _deleteSelected,
                   onDuplicate: _duplicateSelected,
                   onFront: _bringToFront,
@@ -757,8 +791,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
             boxShadow: const [BoxShadow(blurRadius: 2, color: Colors.black12)],
           ),
           child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image(image: provider, fit: BoxFit.cover)),
+            borderRadius: BorderRadius.circular(8),
+            child: Image(image: provider, fit: BoxFit.cover),
+          ),
         ),
       );
 
@@ -774,388 +809,13 @@ class _SimpleCanvaState extends State<SimpleCanva> {
               border: Border.all(color: Colors.black12),
             ),
             child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Opacity(
-                    opacity: 0.9,
-                    child: Image(image: provider, fit: BoxFit.cover))),
-          ),
-        ),
-      );
-}
-
-// ——— Item widget ———
-class _CanvasItemWidget extends StatefulWidget {
-  const _CanvasItemWidget({
-    super.key,
-    required this.item,
-    required this.canvasSize,
-    required this.isSelected,
-    required this.onPanMove,
-    required this.onResizeCommit,
-    required this.onPanStart,
-    required this.onPanEnd,
-    required this.onResizeStart,
-    required this.onResizeEnd,
-  });
-
-  final CanvasItem item;
-  final Size canvasSize;
-  final bool isSelected;
-  final void Function(Offset delta) onPanMove; // move ALL selected
-  final void Function(CanvasItem updated)
-      onResizeCommit; // resize only this item
-  final VoidCallback onPanStart;
-  final VoidCallback onPanEnd;
-  final VoidCallback onResizeStart;
-  final VoidCallback onResizeEnd;
-
-  @override
-  State<_CanvasItemWidget> createState() => _CanvasItemWidgetState();
-}
-
-class _CanvasItemWidgetState extends State<_CanvasItemWidget> {
-  static const double _handleSize = 14;
-  static const double _minSize = 40;
-
-  late CanvasItem _item;
-
-  @override
-  void initState() {
-    super.initState();
-    _item = widget.item.copy();
-  }
-
-  @override
-  void didUpdateWidget(covariant _CanvasItemWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _item = widget.item.copy();
-  }
-
-  void _resizeFromCorner(Offset delta, _Corner corner) {
-    if (_item.locked) return;
-    double left = _item.position.dx;
-    double top = _item.position.dy;
-    double width = _item.size.width;
-    double height = _item.size.height;
-
-    switch (corner) {
-      case _Corner.topLeft:
-        left += delta.dx;
-        top += delta.dy;
-        width -= delta.dx;
-        height -= delta.dy;
-        break;
-      case _Corner.topRight:
-        top += delta.dy;
-        width += delta.dx;
-        height -= delta.dy;
-        break;
-      case _Corner.bottomLeft:
-        left += delta.dx;
-        width -= delta.dx;
-        height += delta.dy;
-        break;
-      case _Corner.bottomRight:
-        width += delta.dx;
-        height += delta.dy;
-        break;
-    }
-
-    width = width.clamp(_minSize, widget.canvasSize.width);
-    height = height.clamp(_minSize, widget.canvasSize.height);
-
-    left = left.clamp(0, widget.canvasSize.width - width);
-    top = top.clamp(0, widget.canvasSize.height - height);
-
-    setState(() {
-      _item
-        ..position = Offset(left, top)
-        ..size = Size(width, height);
-    });
-    widget.onResizeCommit(_item);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: _item.position.dx,
-      top: _item.position.dy,
-      width: _item.size.width,
-      height: _item.size.height,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onPanStart: (_) => widget.onPanStart(),
-        onPanUpdate: (d) {
-          if (!widget.isSelected || _item.locked) return;
-          widget.onPanMove(d.delta);
-        },
-        onPanEnd: (_) => widget.onPanEnd(),
-        child: Stack(
-          clipBehavior: Clip.hardEdge,
-          children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  border: widget.isSelected
-                      ? Border.all(color: Colors.blueAccent, width: 1)
-                      : null,
-                  color: Colors.white,
-                ),
-                child: Image(image: _item.provider, fit: BoxFit.contain),
+              borderRadius: BorderRadius.circular(8),
+              child: Opacity(
+                opacity: 0.9,
+                child: Image(image: provider, fit: BoxFit.cover),
               ),
-            ),
-            if (widget.isSelected && !_item.locked) ...[
-              _handle(Alignment.topLeft, _Corner.topLeft),
-              _handle(Alignment.topRight, _Corner.topRight),
-              _handle(Alignment.bottomLeft, _Corner.bottomLeft),
-              _handle(Alignment.bottomRight, _Corner.bottomRight),
-            ],
-            if (_item.locked)
-              Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                  margin: const EdgeInsets.all(2),
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(4)),
-                  child: const Icon(Icons.lock, size: 12, color: Colors.white),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _handle(Alignment align, _Corner corner) => Align(
-        alignment: align,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onPanStart: (_) => widget.onResizeStart(),
-          onPanUpdate: (d) => _resizeFromCorner(d.delta, corner),
-          onPanEnd: (_) => widget.onResizeEnd(),
-          child: Container(
-            width: _handleSize,
-            height: _handleSize,
-            margin: const EdgeInsets.all(1.5),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.blueAccent, width: 1),
-              boxShadow: const [
-                BoxShadow(blurRadius: 2, color: Colors.black26)
-              ],
             ),
           ),
         ),
       );
-}
-
-enum _Corner { topLeft, topRight, bottomLeft, bottomRight }
-
-class _WorkspaceActionBar extends StatelessWidget {
-  const _WorkspaceActionBar({
-    required this.selectedCount,
-    required this.canvasColor,
-    required this.onUndo,
-    required this.onRedo,
-    required this.onColorPick,
-    required this.onDelete,
-    required this.onDuplicate,
-    required this.onFront,
-    required this.onBack,
-    required this.onAlignLeft,
-    required this.onAlignHCenter,
-    required this.onAlignRight,
-    required this.onAlignTop,
-    required this.onAlignVCenter,
-    required this.onAlignBottom,
-    required this.onLockToggle,
-  });
-
-  final int selectedCount;
-  final Color canvasColor;
-  final VoidCallback onUndo;
-  final VoidCallback onRedo;
-  final ValueChanged<Color> onColorPick;
-
-  final VoidCallback onDelete;
-  final VoidCallback onDuplicate;
-  final VoidCallback onFront;
-  final VoidCallback onBack;
-  final VoidCallback onAlignLeft;
-  final VoidCallback onAlignHCenter;
-  final VoidCallback onAlignRight;
-  final VoidCallback onAlignTop;
-  final VoidCallback onAlignVCenter;
-  final VoidCallback onAlignBottom;
-  final VoidCallback onLockToggle;
-
-  static const _swatches = <Color>[
-    Colors.white,
-    Color(0xFFF8FAFC),
-    Color(0xFFFFFBEB),
-    Color(0xFFEFEFEF),
-    Color(0xFFFFE4E6),
-    Color(0xFFECFEFF),
-    Color(0xFFF0FDF4),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(blurRadius: 8, color: Colors.black26)],
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-                tooltip: 'Undo',
-                icon: const Icon(Icons.undo),
-                onPressed: onUndo),
-            IconButton(
-                tooltip: 'Redo',
-                icon: const Icon(Icons.redo),
-                onPressed: onRedo),
-            const VerticalDivider(width: 12),
-            const Text('Canvas'),
-            const SizedBox(width: 6),
-            Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                    color: canvasColor,
-                    border: Border.all(color: Colors.black26),
-                    borderRadius: BorderRadius.circular(4))),
-            const SizedBox(width: 6),
-            PopupMenuButton<Color>(
-              tooltip: 'Pick canvas color',
-              onSelected: onColorPick,
-              itemBuilder: (_) => [
-                for (final c in _swatches)
-                  PopupMenuItem<Color>(
-                    value: c,
-                    child: Row(children: [
-                      Container(
-                          width: 16,
-                          height: 16,
-                          decoration: BoxDecoration(
-                              color: c,
-                              border: Border.all(color: Colors.black26),
-                              borderRadius: BorderRadius.circular(4))),
-                      const SizedBox(width: 8),
-                      Text(_colorToHex(c)),
-                    ]),
-                  ),
-              ],
-              child: const Icon(Icons.palette_outlined),
-            ),
-            if (selectedCount > 0) ...[
-              const VerticalDivider(width: 12),
-              Text('$selectedCount selected',
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
-              IconButton(
-                  tooltip: 'Delete',
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: onDelete),
-              IconButton(
-                  tooltip: 'Duplicate',
-                  icon: const Icon(Icons.control_point_duplicate_outlined),
-                  onPressed: onDuplicate),
-              const VerticalDivider(width: 12),
-              IconButton(
-                  tooltip: 'Bring to front',
-                  icon: const Icon(Icons.flip_to_front_outlined),
-                  onPressed: onFront),
-              IconButton(
-                  tooltip: 'Send to back',
-                  icon: const Icon(Icons.flip_to_back_outlined),
-                  onPressed: onBack),
-              const VerticalDivider(width: 12),
-              IconButton(
-                  tooltip: 'Align left',
-                  icon: const Icon(Icons.align_horizontal_left),
-                  onPressed: onAlignLeft),
-              IconButton(
-                  tooltip: 'Align center',
-                  icon: const Icon(Icons.align_horizontal_center),
-                  onPressed: onAlignHCenter),
-              IconButton(
-                  tooltip: 'Align right',
-                  icon: const Icon(Icons.align_horizontal_right),
-                  onPressed: onAlignRight),
-              IconButton(
-                  tooltip: 'Align top',
-                  icon: const Icon(Icons.align_vertical_top),
-                  onPressed: onAlignTop),
-              IconButton(
-                  tooltip: 'Align middle',
-                  icon: const Icon(Icons.align_vertical_center),
-                  onPressed: onAlignVCenter),
-              IconButton(
-                  tooltip: 'Align bottom',
-                  icon: const Icon(Icons.align_vertical_bottom),
-                  onPressed: onAlignBottom),
-              const VerticalDivider(width: 12),
-              IconButton(
-                  tooltip: 'Lock or unlock',
-                  icon: const Icon(Icons.lock_open),
-                  onPressed: onLockToggle),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ——— Helpers ———
-String _id() => DateTime.now().microsecondsSinceEpoch.toString();
-
-String _colorToHex(Color c) =>
-    '#${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
-Color? _hexToColor(String s) {
-  try {
-    var hex = s.replaceAll('#', '').trim();
-    if (hex.length == 6) hex = 'FF$hex';
-    final v = int.parse(hex, radix: 16);
-    return Color(v);
-  } catch (_) {
-    return null;
-  }
-}
-
-Map<String, dynamic>? _serializeProvider(ImageProvider provider) {
-  if (provider is NetworkImage) return {'type': 'network', 'url': provider.url};
-  if (provider is AssetImage)
-    return {
-      'type': 'asset',
-      'name': provider.assetName,
-      if (provider.package != null) 'package': provider.package
-    };
-  return null;
-}
-
-ImageProvider? _deserializeProvider(dynamic src) {
-  if (src is! Map) return null;
-  final type = src['type'];
-  switch (type) {
-    case 'network':
-      final url = src['url'] as String?;
-      if (url == null || url.isEmpty) return null;
-      return NetworkImage(url);
-    case 'asset':
-      final name = src['name'] as String?;
-      if (name == null || name.isEmpty) return null;
-      final pkg = src['package'] as String?;
-      return AssetImage(name, package: pkg);
-    default:
-      return null;
-  }
 }
