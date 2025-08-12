@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
 import 'package:flutter_meragi_design/src/components/canva/models.dart';
+import 'package:flutter_meragi_design/src/components/canva/property_sidebar.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
@@ -16,6 +17,7 @@ class SimpleCanva extends StatefulWidget {
     required this.palette,
     this.controller,
     this.sidebarWidth = 120,
+    this.inspectorWidth = 280,
     this.workspaceColor = const Color(0xFFF3F4F6),
     this.initialCanvasColor = Colors.white,
     this.onChanged,
@@ -24,6 +26,7 @@ class SimpleCanva extends StatefulWidget {
   final List<CanvasPaletteImage> palette;
   final SimpleCanvaController? controller;
   final double sidebarWidth;
+  final double inspectorWidth;
   final Color workspaceColor;
   final Color initialCanvasColor;
   final ValueChanged<List<CanvasItem>>? onChanged;
@@ -122,6 +125,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   bool _gestureHistoryPushed = false;
   static const int _historyLimit = 100;
 
+  bool _propsHistoryPushed = false;
+
   Map<String, CanvasPaletteImage> get _paletteById =>
       {for (final p in widget.palette) p.id: p};
 
@@ -143,12 +148,18 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   // Selection helpers
   bool _isSelected(String id) => _selected.contains(id);
 
+  CanvasItem? _singleSelected() {
+    if (_selected.length != 1) return null;
+    return _byId(_selected.first);
+  }
+
   void _selectOnly(String id) {
     setState(() {
       _selected
         ..clear()
         ..add(id);
     });
+    _propsHistoryPushed = false;
     _notify();
   }
 
@@ -156,12 +167,14 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     setState(() {
       _selected.contains(id) ? _selected.remove(id) : _selected.add(id);
     });
+    _propsHistoryPushed = false;
     _notify();
   }
 
   void _clearSelection() {
     if (_selected.isEmpty) return;
     setState(() => _selected.clear());
+    _propsHistoryPushed = false;
     _notify();
   }
 
@@ -171,6 +184,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
       _items.removeWhere((e) => _selected.contains(e.id));
       _selected.clear();
     });
+    _propsHistoryPushed = false;
     _notify();
   }
 
@@ -277,6 +291,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         ..clear()
         ..addAll(clones.map((e) => e.id));
     });
+    _propsHistoryPushed = false;
     _notify();
   }
 
@@ -413,14 +428,24 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     _notify();
   }
 
-  Rect _boundsOf(Iterable<CanvasItem> items) {
-    Rect? r;
-    for (final it in items) {
-      final ir = Rect.fromLTWH(
-          it.position.dx, it.position.dy, it.size.width, it.size.height);
-      r = (r == null) ? ir : r.expandToInclude(ir);
+  void _propChangeStart() {
+    if (!_propsHistoryPushed) {
+      _pushHistory();
+      _propsHistoryPushed = true;
     }
-    return r ?? const Rect.fromLTWH(0, 0, 0, 0);
+  }
+
+  void _propChangeEnd() {
+    _propsHistoryPushed = false;
+  }
+
+  void _propApply(CanvasItem updated) {
+    final idx = _items.indexWhere((e) => e.id == updated.id);
+    if (idx == -1) return;
+    setState(() {
+      _items[idx] = updated;
+    });
+    _notify();
   }
 
   void _setCanvasColor(Color c) => setState(() => _canvasColor = c);
@@ -528,6 +553,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         ..addAll(rebuilt);
       _selected.clear();
     });
+    _propsHistoryPushed = false;
     _notify();
   }
 
@@ -776,6 +802,17 @@ class _SimpleCanvaState extends State<SimpleCanva> {
               ),
             ),
           ],
+        ),
+      ),
+
+      // Right sidebar
+      SizedBox(
+        width: widget.inspectorWidth,
+        child: PropertiesSidebar(
+          item: _singleSelected(),
+          onChangeStart: _propChangeStart,
+          onChanged: _propApply,
+          onChangeEnd: _propChangeEnd,
         ),
       ),
     ]);
