@@ -74,6 +74,9 @@ class SimpleCanvaController {
   }
 
   void deleteSelected() => _state?._deleteSelected();
+
+  void undo() => _state?._undoAction();
+  void redo() => _state?._redoAction();
 }
 
 class CanvasPaletteImage {
@@ -182,6 +185,14 @@ class NudgeDownBigIntent extends Intent {
   const NudgeDownBigIntent();
 }
 
+class UndoIntent extends Intent {
+  const UndoIntent();
+}
+
+class RedoIntent extends Intent {
+  const RedoIntent();
+}
+
 // ——— IMPLEMENTATION ———
 class _SimpleCanvaState extends State<SimpleCanva> {
   final GlobalKey _repaintKey = GlobalKey(); // wraps only the canvas
@@ -190,6 +201,12 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   final List<CanvasItem> _items = [];
   final Set<String> _selected = <String>{};
   Color _canvasColor = Colors.white;
+
+  final List<String> _undoStack = [];
+  final List<String> _redoStack = [];
+  bool _suspendHistory = false;
+  bool _gestureHistoryPushed = false;
+  static const int _historyLimit = 100;
 
   Map<String, CanvasPaletteImage> get _paletteById =>
       {for (final p in widget.palette) p.id: p};
@@ -234,6 +251,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _deleteSelected() {
+    _pushHistory();
     setState(() {
       _items.removeWhere((e) => _selected.contains(e.id));
       _selected.clear();
@@ -241,7 +259,55 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     _notify();
   }
 
+  // Undo Redo
+  void _pushHistory() {
+    if (_suspendHistory) return;
+    final snap = jsonEncode(_toJsonDocument());
+    _undoStack.add(snap);
+    if (_undoStack.length > _historyLimit) _undoStack.removeAt(0);
+    _redoStack.clear();
+  }
+
+  void _undoAction() {
+    if (_undoStack.isEmpty) return;
+    _suspendHistory = true;
+    try {
+      final current = jsonEncode(_toJsonDocument());
+      _redoStack.add(current);
+      final prev = _undoStack.removeLast();
+      _loadFromJsonDocument(jsonDecode(prev) as Map<String, dynamic>);
+    } finally {
+      _suspendHistory = false;
+    }
+  }
+
+  void _redoAction() {
+    if (_redoStack.isEmpty) return;
+    _suspendHistory = true;
+    try {
+      final current = jsonEncode(_toJsonDocument());
+      _undoStack.add(current);
+      final next = _redoStack.removeLast();
+      _loadFromJsonDocument(jsonDecode(next) as Map<String, dynamic>);
+    } finally {
+      _suspendHistory = false;
+    }
+  }
+
+  // one-shot push at gesture begin, so drag or resize is a single undo step
+  void _gestureBegin() {
+    if (!_gestureHistoryPushed) {
+      _pushHistory();
+      _gestureHistoryPushed = true;
+    }
+  }
+
+  void _gestureEnd() {
+    _gestureHistoryPushed = false;
+  }
+
   void _bringToFront() {
+    _pushHistory();
     setState(() {
       final keep = _items.where((e) => !_selected.contains(e.id)).toList();
       final sel = _items.where((e) => _selected.contains(e.id)).toList();
@@ -254,6 +320,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _sendToBack() {
+    _pushHistory();
     setState(() {
       final keep = _items.where((e) => !_selected.contains(e.id)).toList();
       final sel = _items.where((e) => _selected.contains(e.id)).toList();
@@ -266,6 +333,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _duplicateSelected() {
+    _pushHistory();
     final clones = <CanvasItem>[];
     for (final it in _items) {
       if (_selected.contains(it.id)) {
@@ -293,6 +361,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
   // Align helpers
   void _alignLeft() {
+    _pushHistory();
     if (_selected.length < 2) return;
     final left = _selected
         .map((id) => _byId(id).position.dx)
@@ -307,6 +376,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _alignTop() {
+    _pushHistory();
     if (_selected.length < 2) return;
     final top = _selected
         .map((id) => _byId(id).position.dy)
@@ -321,6 +391,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _alignHCenter() {
+    _pushHistory();
     if (_selected.length < 2) return;
     final cx = _selected.map((id) {
           final it = _byId(id);
@@ -338,6 +409,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _alignVCenter() {
+    _pushHistory();
     if (_selected.length < 2) return;
     final cy = _selected.map((id) {
           final it = _byId(id);
@@ -355,6 +427,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _alignRight() {
+    _pushHistory();
     if (_selected.length < 2) return;
     final right = _selected.map((id) {
       final it = _byId(id);
@@ -371,6 +444,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _alignBottom() {
+    _pushHistory();
     if (_selected.length < 2) return;
     final bottom = _selected.map((id) {
       final it = _byId(id);
@@ -387,6 +461,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _toggleLockSelected() {
+    _pushHistory();
     setState(() {
       final anyUnlocked = _selected.any((id) => !_byId(id).locked);
       for (final id in _selected) {
@@ -397,6 +472,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _panSelected(Offset delta) {
+    _pushHistory();
     if (_selected.isEmpty) return;
     final size = _canvasSize();
     setState(() {
@@ -668,140 +744,159 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                   return null;
                 }),
               },
-              child: Container(
-                color: widget.workspaceColor,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Fit a 16:9 canvas inside available constraints with padding
-                        final maxW = constraints.maxWidth;
-                        final maxH = constraints.maxHeight;
-                        final targetAspect = 16 / 9;
-                        double w = maxW;
-                        double h = w / targetAspect;
-                        if (h > maxH) {
-                          h = maxH;
-                          w = h * targetAspect;
-                        }
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Container(
+                      color: widget.workspaceColor,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              // Fit a 16:9 canvas inside available constraints with padding
+                              final maxW = constraints.maxWidth;
+                              final maxH = constraints.maxHeight;
+                              final targetAspect = 16 / 9;
+                              double w = maxW;
+                              double h = w / targetAspect;
+                              if (h > maxH) {
+                                h = maxH;
+                                w = h * targetAspect;
+                              }
 
-                        return SizedBox(
-                          width: w,
-                          height: h,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: const [
-                                BoxShadow(
-                                    blurRadius: 18, color: Color(0x33000000))
-                              ],
-                            ),
-                            child: Stack(children: [
-                              // Canvas surface
-                              Positioned.fill(
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.deferToChild,
-                                  onTapDown: _handleTapDownOnCanvas,
-                                  child: RepaintBoundary(
-                                    key: _repaintKey,
-                                    child: Container(
-                                      key: _canvasBoxKey,
-                                      decoration: BoxDecoration(
-                                        color: _canvasColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border:
-                                            Border.all(color: Colors.black12),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: DragTarget<CanvasPaletteImage>(
-                                          onWillAccept: (_) => true,
-                                          onAcceptWithDetails: (details) {
-                                            final local =
-                                                _toLocal(details.offset);
-                                            final pal = details.data;
-                                            final size = pal.preferredSize ??
-                                                const Size(160, 160);
-                                            _addItem(CanvasItem(
-                                              id: _id(),
-                                              imageId: pal.id,
-                                              provider: pal.provider,
-                                              position: local -
-                                                  Offset(size.width / 2,
-                                                      size.height / 2),
-                                              size: size,
-                                            ));
-                                          },
-                                          builder: (context, _, __) {
-                                            final canvasSize = Size(w, h);
-                                            return Stack(children: [
-                                              for (final item in _items)
-                                                _CanvasItemWidget(
-                                                  key: ValueKey(item.id),
-                                                  item: item,
-                                                  canvasSize: canvasSize,
-                                                  isSelected:
-                                                      _isSelected(item.id),
-                                                  onPanMove: _panSelected,
-                                                  onResizeCommit: (updated) {
-                                                    setState(() {
-                                                      final idx = _items
-                                                          .indexWhere((e) =>
-                                                              e.id == item.id);
-                                                      if (idx != -1)
-                                                        _items[idx] = updated;
-                                                    });
-                                                    _notify();
-                                                  },
-                                                ),
-                                            ]);
-                                          },
+                              return SizedBox(
+                                width: w,
+                                height: h,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                          blurRadius: 18,
+                                          color: Color(0x33000000))
+                                    ],
+                                  ),
+                                  child: Stack(children: [
+                                    // Workspace action bar at top center
+
+                                    // Canvas surface
+                                    Positioned.fill(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.deferToChild,
+                                        onTapDown: _handleTapDownOnCanvas,
+                                        child: RepaintBoundary(
+                                          key: _repaintKey,
+                                          child: Container(
+                                            key: _canvasBoxKey,
+                                            decoration: BoxDecoration(
+                                              color: _canvasColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                  color: Colors.black12),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: DragTarget<
+                                                  CanvasPaletteImage>(
+                                                onWillAccept: (_) => true,
+                                                onAcceptWithDetails: (details) {
+                                                  final local =
+                                                      _toLocal(details.offset);
+                                                  final pal = details.data;
+                                                  final size =
+                                                      pal.preferredSize ??
+                                                          const Size(160, 160);
+                                                  _addItem(CanvasItem(
+                                                    id: _id(),
+                                                    imageId: pal.id,
+                                                    provider: pal.provider,
+                                                    position: local -
+                                                        Offset(size.width / 2,
+                                                            size.height / 2),
+                                                    size: size,
+                                                  ));
+                                                },
+                                                builder: (context, _, __) {
+                                                  final canvasSize = Size(w, h);
+                                                  return Stack(children: [
+                                                    for (final item in _items)
+                                                      _CanvasItemWidget(
+                                                        key: ValueKey(item.id),
+                                                        item: item,
+                                                        canvasSize: canvasSize,
+                                                        isSelected: _isSelected(
+                                                            item.id),
+                                                        onPanStart:
+                                                            _gestureBegin,
+                                                        onPanMove: _panSelected,
+                                                        onPanEnd: _gestureEnd,
+                                                        onResizeStart:
+                                                            _gestureBegin,
+                                                        onResizeCommit:
+                                                            (updated) {
+                                                          setState(() {
+                                                            final idx = _items
+                                                                .indexWhere(
+                                                                    (e) =>
+                                                                        e.id ==
+                                                                        item.id);
+                                                            if (idx != -1)
+                                                              _items[idx] =
+                                                                  updated;
+                                                          });
+                                                          _notify();
+                                                        },
+                                                        onResizeEnd:
+                                                            _gestureEnd,
+                                                      ),
+                                                  ]);
+                                                },
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  ]),
                                 ),
-                              ),
-
-                              // Actions bar inside canvas, top-left
-                              if (_selected.isNotEmpty)
-                                Positioned(
-                                  left: 12,
-                                  top: 12,
-                                  child: _ActionsBar(
-                                    count: _selected.length,
-                                    onDelete: _deleteSelected,
-                                    onDuplicate: _duplicateSelected,
-                                    onFront: _bringToFront,
-                                    onBack: _sendToBack,
-                                    onAlignLeft: _alignLeft,
-                                    onAlignHCenter: _alignHCenter,
-                                    onAlignRight: _alignRight,
-                                    onAlignTop: _alignTop,
-                                    onAlignVCenter: _alignVCenter,
-                                    onAlignBottom: _alignBottom,
-                                    onLockToggle: _toggleLockSelected,
-                                  ),
-                                ),
-
-                              // Canvas color control, always visible, top-right
-                              Positioned(
-                                right: 12,
-                                top: 12,
-                                child: _CanvasColorPicker(
-                                  color: _canvasColor,
-                                  onPick: (c) => _setCanvasColor(c),
-                                ),
-                              ),
-                            ]),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Positioned(
+                    top: 50,
+                    left: 0,
+                    right: 0,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: _WorkspaceActionBar(
+                        selectedCount: _selected.length,
+                        canvasColor: _canvasColor,
+                        onUndo: _undoAction,
+                        onRedo: _redoAction,
+                        onColorPick: (c) => _setCanvasColor(c),
+                        onDelete: _deleteSelected,
+                        onDuplicate: _duplicateSelected,
+                        onFront: _bringToFront,
+                        onBack: _sendToBack,
+                        onAlignLeft: _alignLeft,
+                        onAlignHCenter: _alignHCenter,
+                        onAlignRight: _alignRight,
+                        onAlignTop: _alignTop,
+                        onAlignVCenter: _alignVCenter,
+                        onAlignBottom: _alignBottom,
+                        onLockToggle: _toggleLockSelected,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -855,6 +950,10 @@ class _CanvasItemWidget extends StatefulWidget {
     required this.isSelected,
     required this.onPanMove,
     required this.onResizeCommit,
+    required this.onPanStart,
+    required this.onPanEnd,
+    required this.onResizeStart,
+    required this.onResizeEnd,
   });
 
   final CanvasItem item;
@@ -863,6 +962,10 @@ class _CanvasItemWidget extends StatefulWidget {
   final void Function(Offset delta) onPanMove; // move ALL selected
   final void Function(CanvasItem updated)
       onResizeCommit; // resize only this item
+  final VoidCallback onPanStart;
+  final VoidCallback onPanEnd;
+  final VoidCallback onResizeStart;
+  final VoidCallback onResizeEnd;
 
   @override
   State<_CanvasItemWidget> createState() => _CanvasItemWidgetState();
@@ -939,10 +1042,12 @@ class _CanvasItemWidgetState extends State<_CanvasItemWidget> {
       height: _item.size.height,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
+        onPanStart: (_) => widget.onPanStart(),
         onPanUpdate: (d) {
           if (!widget.isSelected || _item.locked) return;
           widget.onPanMove(d.delta);
         },
+        onPanEnd: (_) => widget.onPanEnd(),
         child: Stack(
           clipBehavior: Clip.hardEdge,
           children: [
@@ -985,7 +1090,9 @@ class _CanvasItemWidgetState extends State<_CanvasItemWidget> {
         alignment: align,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
+          onPanStart: (_) => widget.onResizeStart(),
           onPanUpdate: (d) => _resizeFromCorner(d.delta, corner),
+          onPanEnd: (_) => widget.onResizeEnd(),
           child: Container(
             width: _handleSize,
             height: _handleSize,
@@ -1004,10 +1111,13 @@ class _CanvasItemWidgetState extends State<_CanvasItemWidget> {
 
 enum _Corner { topLeft, topRight, bottomLeft, bottomRight }
 
-// ——— Actions bar ———
-class _ActionsBar extends StatelessWidget {
-  const _ActionsBar({
-    required this.count,
+class _WorkspaceActionBar extends StatelessWidget {
+  const _WorkspaceActionBar({
+    required this.selectedCount,
+    required this.canvasColor,
+    required this.onUndo,
+    required this.onRedo,
+    required this.onColorPick,
     required this.onDelete,
     required this.onDuplicate,
     required this.onFront,
@@ -1021,7 +1131,12 @@ class _ActionsBar extends StatelessWidget {
     required this.onLockToggle,
   });
 
-  final int count;
+  final int selectedCount;
+  final Color canvasColor;
+  final VoidCallback onUndo;
+  final VoidCallback onRedo;
+  final ValueChanged<Color> onColorPick;
+
   final VoidCallback onDelete;
   final VoidCallback onDuplicate;
   final VoidCallback onFront;
@@ -1034,94 +1149,14 @@ class _ActionsBar extends StatelessWidget {
   final VoidCallback onAlignBottom;
   final VoidCallback onLockToggle;
 
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(blurRadius: 8, color: Colors.black26)],
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Text('$count selected',
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
-            ),
-            IconButton(
-                tooltip: 'Delete',
-                icon: const Icon(Icons.delete_outline),
-                onPressed: onDelete),
-            IconButton(
-                tooltip: 'Duplicate',
-                icon: const Icon(Icons.control_point_duplicate_outlined),
-                onPressed: onDuplicate),
-            const VerticalDivider(width: 12),
-            IconButton(
-                tooltip: 'Bring to front',
-                icon: const Icon(Icons.flip_to_front_outlined),
-                onPressed: onFront),
-            IconButton(
-                tooltip: 'Send to back',
-                icon: const Icon(Icons.flip_to_back_outlined),
-                onPressed: onBack),
-            const VerticalDivider(width: 12),
-            IconButton(
-                tooltip: 'Align left',
-                icon: const Icon(Icons.align_horizontal_left),
-                onPressed: onAlignLeft),
-            IconButton(
-                tooltip: 'Align H center',
-                icon: const Icon(Icons.align_horizontal_center),
-                onPressed: onAlignHCenter),
-            IconButton(
-                tooltip: 'Align right',
-                icon: const Icon(Icons.align_horizontal_right),
-                onPressed: onAlignRight),
-            IconButton(
-                tooltip: 'Align top',
-                icon: const Icon(Icons.align_vertical_top),
-                onPressed: onAlignTop),
-            IconButton(
-                tooltip: 'Align V center',
-                icon: const Icon(Icons.align_vertical_center),
-                onPressed: onAlignVCenter),
-            IconButton(
-                tooltip: 'Align bottom',
-                icon: const Icon(Icons.align_vertical_bottom),
-                onPressed: onAlignBottom),
-            const VerticalDivider(width: 12),
-            IconButton(
-                tooltip: 'Lock or unlock',
-                icon: const Icon(Icons.lock_open),
-                onPressed: onLockToggle),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ——— Canvas color control ———
-class _CanvasColorPicker extends StatelessWidget {
-  const _CanvasColorPicker({required this.color, required this.onPick});
-  final Color color;
-  final ValueChanged<Color> onPick;
-
   static const _swatches = <Color>[
     Colors.white,
-    Color(0xFFF8FAFC), // slate-50
-    Color(0xFFFFFBEB), // amber-50
+    Color(0xFFF8FAFC),
+    Color(0xFFFFFBEB),
     Color(0xFFEFEFEF),
-    Color(0xFFFFE4E6), // rose-100
-    Color(0xFFECFEFF), // cyan-50
-    Color(0xFFF0FDF4), // green-50
-    Color(0xFFFFFFFF),
+    Color(0xFFFFE4E6),
+    Color(0xFFECFEFF),
+    Color(0xFFF0FDF4),
   ];
 
   @override
@@ -1134,41 +1169,105 @@ class _CanvasColorPicker extends StatelessWidget {
         border: Border.all(color: Colors.black12),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Text('Canvas'),
-          const SizedBox(width: 8),
-          Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                  color: color,
-                  border: Border.all(color: Colors.black26),
-                  borderRadius: BorderRadius.circular(4))),
-          const SizedBox(width: 6),
-          PopupMenuButton<Color>(
-            tooltip: 'Pick color',
-            onSelected: onPick,
-            itemBuilder: (context) => [
-              for (final c in _swatches)
-                PopupMenuItem<Color>(
-                  value: c,
-                  child: Row(children: [
-                    Container(
-                        width: 16,
-                        height: 16,
-                        decoration: BoxDecoration(
-                            color: c,
-                            border: Border.all(color: Colors.black26),
-                            borderRadius: BorderRadius.circular(4))),
-                    const SizedBox(width: 8),
-                    Text(_colorToHex(c)),
-                  ]),
-                ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+                tooltip: 'Undo (Ctrl or Cmd+Z)',
+                icon: const Icon(Icons.undo),
+                onPressed: onUndo),
+            IconButton(
+                tooltip: 'Redo (Ctrl+Y or Cmd+Shift+Z)',
+                icon: const Icon(Icons.redo),
+                onPressed: onRedo),
+            const VerticalDivider(width: 12),
+            const Text('Canvas'),
+            const SizedBox(width: 6),
+            Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                    color: canvasColor,
+                    border: Border.all(color: Colors.black26),
+                    borderRadius: BorderRadius.circular(4))),
+            const SizedBox(width: 6),
+            PopupMenuButton<Color>(
+              tooltip: 'Pick canvas color',
+              onSelected: onColorPick,
+              itemBuilder: (_) => [
+                for (final c in _swatches)
+                  PopupMenuItem<Color>(
+                    value: c,
+                    child: Row(children: [
+                      Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                              color: c,
+                              border: Border.all(color: Colors.black26),
+                              borderRadius: BorderRadius.circular(4))),
+                      const SizedBox(width: 8),
+                      Text(_colorToHex(c)),
+                    ]),
+                  ),
+              ],
+              child: const Icon(Icons.palette_outlined),
+            ),
+            if (selectedCount > 0) ...[
+              const VerticalDivider(width: 12),
+              Text('$selectedCount selected',
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              IconButton(
+                  tooltip: 'Delete',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: onDelete),
+              IconButton(
+                  tooltip: 'Duplicate',
+                  icon: const Icon(Icons.control_point_duplicate_outlined),
+                  onPressed: onDuplicate),
+              const VerticalDivider(width: 12),
+              IconButton(
+                  tooltip: 'Bring to front',
+                  icon: const Icon(Icons.flip_to_front_outlined),
+                  onPressed: onFront),
+              IconButton(
+                  tooltip: 'Send to back',
+                  icon: const Icon(Icons.flip_to_back_outlined),
+                  onPressed: onBack),
+              const VerticalDivider(width: 12),
+              IconButton(
+                  tooltip: 'Align left',
+                  icon: const Icon(Icons.align_horizontal_left),
+                  onPressed: onAlignLeft),
+              IconButton(
+                  tooltip: 'Align center',
+                  icon: const Icon(Icons.align_horizontal_center),
+                  onPressed: onAlignHCenter),
+              IconButton(
+                  tooltip: 'Align right',
+                  icon: const Icon(Icons.align_horizontal_right),
+                  onPressed: onAlignRight),
+              IconButton(
+                  tooltip: 'Align top',
+                  icon: const Icon(Icons.align_vertical_top),
+                  onPressed: onAlignTop),
+              IconButton(
+                  tooltip: 'Align middle',
+                  icon: const Icon(Icons.align_vertical_center),
+                  onPressed: onAlignVCenter),
+              IconButton(
+                  tooltip: 'Align bottom',
+                  icon: const Icon(Icons.align_vertical_bottom),
+                  onPressed: onAlignBottom),
+              const VerticalDivider(width: 12),
+              IconButton(
+                  tooltip: 'Lock or unlock',
+                  icon: const Icon(Icons.lock_open),
+                  onPressed: onLockToggle),
             ],
-            child: const Icon(Icons.palette_outlined),
-          )
-        ]),
+          ],
+        ),
       ),
     );
   }
