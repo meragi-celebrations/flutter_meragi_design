@@ -56,6 +56,8 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.format_align_center),
       label: 'Form',
     ),
+    MDNavigationRailDestination(
+        icon: const Icon(Icons.edit_note), label: 'Canva')
   ];
 
   @override
@@ -80,6 +82,7 @@ class _HomePageState extends State<HomePage> {
               const SelectStory(),
               const InputStory(),
               const FormStory(),
+              const CanvaStory(),
             ][_selectedIndex],
           ),
         ],
@@ -102,11 +105,11 @@ class CardStory extends StatelessWidget {
       ),
       body: ShadContextMenuRegion(
         items: [
-          ShadContextMenuItem(
-            child: const Text('Item 1'),
+          const ShadContextMenuItem(
+            child: Text('Item 1'),
           ),
-          ShadContextMenuItem(
-            child: const Text('Item 2'),
+          const ShadContextMenuItem(
+            child: Text('Item 2'),
           ),
         ],
         child: MDPanel(
@@ -535,6 +538,120 @@ class _InputStoryState extends State<InputStory> {
               label: const Text('Tickbox'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class CanvaStory extends StatelessWidget {
+  const CanvaStory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = SimpleCanvaController();
+    final palette = <CanvasPaletteImage>[
+      const CanvasPaletteImage(
+        id: 'panda',
+        provider: NetworkImage(
+          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=600',
+        ),
+      ),
+      const CanvasPaletteImage(
+        id: 'flower',
+        provider: NetworkImage(
+          'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=600',
+        ),
+      ),
+      const CanvasPaletteImage(
+        id: 'mountain',
+        provider: NetworkImage(
+          'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=600',
+        ),
+      ),
+    ];
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('SimpleCanva with Save/Load JSON'),
+          actions: [
+            IconButton(
+              tooltip: 'Export PNG',
+              icon: const Icon(Icons.download),
+              onPressed: () async {
+                final bytes = await controller.exportAsPng();
+                if (bytes != null) {
+                  debugPrint('Exported PNG bytes: ${bytes.length}');
+                }
+              },
+            ),
+            IconButton(
+              tooltip: 'Save JSON',
+              icon: const Icon(Icons.save_alt),
+              onPressed: () async {
+                final jsonStr = controller.exportAsJson(pretty: true);
+                // Show in dialog for demo
+                // In a real app, persist to disk or server
+                // ignore: use_build_context_synchronously
+                await showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    content: SingleChildScrollView(
+                      child: SelectableText(jsonStr),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Close'),
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              tooltip: 'Load JSON',
+              icon: const Icon(Icons.upload_file),
+              onPressed: () async {
+                final controllerText = TextEditingController();
+                // ignore: use_build_context_synchronously
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Paste JSON'),
+                    content: TextField(
+                      controller: controllerText,
+                      maxLines: 10,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: '{"version":1,"items":[...]}',
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Load'),
+                      ),
+                    ],
+                  ),
+                );
+                if (ok == true) {
+                  controller.loadFromJson(controllerText.text);
+                }
+              },
+            ),
+          ],
+        ),
+        body: SimpleCanva(
+          palette: palette,
+          controller: controller,
+          onChanged: (items) => debugPrint('Items on canvas: ${items.length}'),
         ),
       ),
     );
