@@ -578,6 +578,27 @@ class CanvaStory extends StatelessWidget {
           title: const Text('SimpleCanva with Save/Load JSON'),
           actions: [
             IconButton(
+              tooltip: 'Viewer',
+              icon: const Icon(Icons.visibility_outlined),
+              onPressed: () {
+                final jsonStr = controller.exportAsJson();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => Scaffold(
+                      appBar: AppBar(title: const Text('Viewer')),
+                      body: CanvaViewer.fromJsonString(
+                        jsonStr,
+                        palette: palette, // resolves imageId -> provider
+                        workspaceColor: const Color(0xFFF3F4F6),
+                        borderRadius: 12,
+                        showShadow: true,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            IconButton(
               tooltip: 'Export PNG',
               icon: const Icon(Icons.download),
               onPressed: () async {
@@ -592,8 +613,6 @@ class CanvaStory extends StatelessWidget {
               icon: const Icon(Icons.save_alt),
               onPressed: () async {
                 final jsonStr = controller.exportAsJson(pretty: true);
-                // Show in dialog for demo
-                // In a real app, persist to disk or server
                 // ignore: use_build_context_synchronously
                 await showDialog(
                   context: context,
