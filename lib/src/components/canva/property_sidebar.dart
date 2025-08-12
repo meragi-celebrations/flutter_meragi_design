@@ -184,7 +184,6 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                       fontFamily: _fontFamily,
                       onTextChanged: (v) {
                         _beginIfNeeded();
-                        // no setState here; the field already shows what the user types
                         _emit(item, (u) => u.text = v);
                       },
                       onFontChanged: (v) => setState(() {
