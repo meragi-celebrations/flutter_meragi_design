@@ -12,14 +12,16 @@ class SimpleCanva extends StatefulWidget {
     required this.palette,
     this.controller,
     this.sidebarWidth = 120,
-    this.canvasBackground = const Color(0xFFF7F7F7),
+    this.workspaceColor = const Color(0xFFF3F4F6),
+    this.initialCanvasColor = Colors.white,
     this.onChanged,
   });
 
   final List<CanvasPaletteImage> palette;
   final SimpleCanvaController? controller;
   final double sidebarWidth;
-  final Color canvasBackground;
+  final Color workspaceColor;
+  final Color initialCanvasColor;
   final ValueChanged<List<CanvasItem>>? onChanged;
 
   @override
@@ -45,11 +47,18 @@ class SimpleCanvaController {
     );
   }
 
+  void setCanvasColor(Color color) => _state?._setCanvasColor(color);
+
   Future<Uint8List?> exportAsPng({double pixelRatio = 3}) async =>
       _state?._exportAsPng(pixelRatio: pixelRatio);
 
   String exportAsJson({bool pretty = false}) {
-    final doc = _state?._toJsonDocument() ?? {'version': 1, 'items': []};
+    final doc = _state?._toJsonDocument() ??
+        {
+          'version': 1,
+          'items': [],
+          'canvas': {'color': _colorToHex(Colors.white)}
+        };
     return pretty
         ? const JsonEncoder.withIndent('  ').convert(doc)
         : jsonEncode(doc);
@@ -128,7 +137,7 @@ class CanvasItem {
   }
 }
 
-// ————— Intents for Shortcuts/Actions —————
+// ——— Intents for Shortcuts ———
 class DeleteIntent extends Intent {
   const DeleteIntent();
 }
@@ -173,13 +182,14 @@ class NudgeDownBigIntent extends Intent {
   const NudgeDownBigIntent();
 }
 
-// ————— IMPLEMENTATION —————
+// ——— IMPLEMENTATION ———
 class _SimpleCanvaState extends State<SimpleCanva> {
-  final GlobalKey _repaintKey = GlobalKey();
+  final GlobalKey _repaintKey = GlobalKey(); // wraps only the canvas
   final GlobalKey _canvasBoxKey = GlobalKey();
 
   final List<CanvasItem> _items = [];
   final Set<String> _selected = <String>{};
+  Color _canvasColor = Colors.white;
 
   Map<String, CanvasPaletteImage> get _paletteById =>
       {for (final p in widget.palette) p.id: p};
@@ -187,6 +197,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   @override
   void initState() {
     super.initState();
+    _canvasColor = widget.initialCanvasColor;
     widget.controller?._state = this;
   }
 
@@ -401,6 +412,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     _notify();
   }
 
+  void _setCanvasColor(Color c) => setState(() => _canvasColor = c);
+
   CanvasItem _byId(String id) => _items.firstWhere((e) => e.id == id);
 
   void _notify() => widget.onChanged?.call(List.unmodifiable(_items));
@@ -445,10 +458,21 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
   Map<String, dynamic> _toJsonDocument() => {
         'version': 1,
+        'canvas': {
+          'aspect': '16:9',
+          'color': _colorToHex(_canvasColor),
+        },
         'items': [for (int i = 0; i < _items.length; i++) _items[i].toJson(i)],
       };
 
   void _loadFromJsonDocument(Map<String, dynamic> doc) {
+    final canvas = (doc['canvas'] as Map?) ?? {};
+    final colorHex = canvas['color'] as String?;
+    if (colorHex != null) {
+      final c = _hexToColor(colorHex);
+      if (c != null) _canvasColor = c;
+    }
+
     final rawItems = (doc['items'] as List?)?.cast<Map<String, dynamic>>() ??
         const <Map<String, dynamic>>[];
     final rebuilt = <CanvasItem>[];
@@ -537,7 +561,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
   @override
   Widget build(BuildContext context) {
-    // Keyboard shortcuts using new KeyEvent system
+    // Keyboard shortcuts using KeyEvent system
     final shortcuts = <ShortcutActivator, Intent>{
       const SingleActivator(LogicalKeyboardKey.delete): const DeleteIntent(),
       const SingleActivator(LogicalKeyboardKey.backspace): const DeleteIntent(),
@@ -583,7 +607,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         ),
       ),
 
-      // Canvas + overlay
+      // Workspace and centered canvas
       Expanded(
         child: Focus(
           autofocus: true,
@@ -644,85 +668,140 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                   return null;
                 }),
               },
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final canvas = GestureDetector(
-                    behavior: HitTestBehavior.deferToChild,
-                    onTapDown: _handleTapDownOnCanvas,
-                    child: RepaintBoundary(
-                      key: _repaintKey,
-                      child: Container(
-                        key: _canvasBoxKey,
-                        color: widget.canvasBackground,
-                        child: DragTarget<CanvasPaletteImage>(
-                          onWillAccept: (_) => true,
-                          onAcceptWithDetails: (details) {
-                            final local = _toLocal(details.offset);
-                            final pal = details.data;
-                            final size =
-                                pal.preferredSize ?? const Size(160, 160);
-                            _addItem(CanvasItem(
-                              id: _id(),
-                              imageId: pal.id,
-                              provider: pal.provider,
-                              position: local -
-                                  Offset(size.width / 2, size.height / 2),
-                              size: size,
-                            ));
-                          },
-                          builder: (context, _, __) {
-                            final canvasSize = Size(
-                                constraints.maxWidth, constraints.maxHeight);
-                            return Stack(children: [
-                              for (final item in _items)
-                                _CanvasItemWidget(
-                                  key: ValueKey(item.id),
-                                  item: item,
-                                  canvasSize: canvasSize,
-                                  isSelected: _isSelected(item.id),
-                                  onPanMove: _panSelected,
-                                  onResizeCommit: (updated) {
-                                    setState(() {
-                                      final idx = _items
-                                          .indexWhere((e) => e.id == item.id);
-                                      if (idx != -1) _items[idx] = updated;
-                                    });
-                                    _notify();
-                                  },
+              child: Container(
+                color: widget.workspaceColor,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Fit a 16:9 canvas inside available constraints with padding
+                        final maxW = constraints.maxWidth;
+                        final maxH = constraints.maxHeight;
+                        final targetAspect = 16 / 9;
+                        double w = maxW;
+                        double h = w / targetAspect;
+                        if (h > maxH) {
+                          h = maxH;
+                          w = h * targetAspect;
+                        }
+
+                        return SizedBox(
+                          width: w,
+                          height: h,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: const [
+                                BoxShadow(
+                                    blurRadius: 18, color: Color(0x33000000))
+                              ],
+                            ),
+                            child: Stack(children: [
+                              // Canvas surface
+                              Positioned.fill(
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.deferToChild,
+                                  onTapDown: _handleTapDownOnCanvas,
+                                  child: RepaintBoundary(
+                                    key: _repaintKey,
+                                    child: Container(
+                                      key: _canvasBoxKey,
+                                      decoration: BoxDecoration(
+                                        color: _canvasColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border:
+                                            Border.all(color: Colors.black12),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: DragTarget<CanvasPaletteImage>(
+                                          onWillAccept: (_) => true,
+                                          onAcceptWithDetails: (details) {
+                                            final local =
+                                                _toLocal(details.offset);
+                                            final pal = details.data;
+                                            final size = pal.preferredSize ??
+                                                const Size(160, 160);
+                                            _addItem(CanvasItem(
+                                              id: _id(),
+                                              imageId: pal.id,
+                                              provider: pal.provider,
+                                              position: local -
+                                                  Offset(size.width / 2,
+                                                      size.height / 2),
+                                              size: size,
+                                            ));
+                                          },
+                                          builder: (context, _, __) {
+                                            final canvasSize = Size(w, h);
+                                            return Stack(children: [
+                                              for (final item in _items)
+                                                _CanvasItemWidget(
+                                                  key: ValueKey(item.id),
+                                                  item: item,
+                                                  canvasSize: canvasSize,
+                                                  isSelected:
+                                                      _isSelected(item.id),
+                                                  onPanMove: _panSelected,
+                                                  onResizeCommit: (updated) {
+                                                    setState(() {
+                                                      final idx = _items
+                                                          .indexWhere((e) =>
+                                                              e.id == item.id);
+                                                      if (idx != -1)
+                                                        _items[idx] = updated;
+                                                    });
+                                                    _notify();
+                                                  },
+                                                ),
+                                            ]);
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                            ]);
-                          },
-                        ),
-                      ),
+                              ),
+
+                              // Actions bar inside canvas, top-left
+                              if (_selected.isNotEmpty)
+                                Positioned(
+                                  left: 12,
+                                  top: 12,
+                                  child: _ActionsBar(
+                                    count: _selected.length,
+                                    onDelete: _deleteSelected,
+                                    onDuplicate: _duplicateSelected,
+                                    onFront: _bringToFront,
+                                    onBack: _sendToBack,
+                                    onAlignLeft: _alignLeft,
+                                    onAlignHCenter: _alignHCenter,
+                                    onAlignRight: _alignRight,
+                                    onAlignTop: _alignTop,
+                                    onAlignVCenter: _alignVCenter,
+                                    onAlignBottom: _alignBottom,
+                                    onLockToggle: _toggleLockSelected,
+                                  ),
+                                ),
+
+                              // Canvas color control, always visible, top-right
+                              Positioned(
+                                right: 12,
+                                top: 12,
+                                child: _CanvasColorPicker(
+                                  color: _canvasColor,
+                                  onPick: (c) => _setCanvasColor(c),
+                                ),
+                              ),
+                            ]),
+                          ),
+                        );
+                      },
                     ),
-                  );
-
-                  return Stack(children: [
-                    // Canvas area
-                    Positioned.fill(child: canvas),
-
-                    // Actions bar overlay. Outside the canvas GestureDetector, so clicks do not clear selection.
-                    if (_selected.isNotEmpty)
-                      Positioned(
-                        left: 16,
-                        top: 16,
-                        child: _ActionsBar(
-                          count: _selected.length,
-                          onDelete: _deleteSelected,
-                          onDuplicate: _duplicateSelected,
-                          onFront: _bringToFront,
-                          onBack: _sendToBack,
-                          onAlignLeft: _alignLeft,
-                          onAlignHCenter: _alignHCenter,
-                          onAlignRight: _alignRight,
-                          onAlignTop: _alignTop,
-                          onAlignVCenter: _alignVCenter,
-                          onAlignBottom: _alignBottom,
-                          onLockToggle: _toggleLockSelected,
-                        ),
-                      ),
-                  ]);
-                },
+                  ),
+                ),
               ),
             ),
           ),
@@ -767,7 +846,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
       );
 }
 
-// ————— Item widget —————
+// ——— Item widget ———
 class _CanvasItemWidget extends StatefulWidget {
   const _CanvasItemWidget({
     super.key,
@@ -925,7 +1004,7 @@ class _CanvasItemWidgetState extends State<_CanvasItemWidget> {
 
 enum _Corner { topLeft, topRight, bottomLeft, bottomRight }
 
-// ————— Actions bar —————
+// ——— Actions bar ———
 class _ActionsBar extends StatelessWidget {
   const _ActionsBar({
     required this.count,
@@ -1028,8 +1107,88 @@ class _ActionsBar extends StatelessWidget {
   }
 }
 
-// ————— Helpers —————
+// ——— Canvas color control ———
+class _CanvasColorPicker extends StatelessWidget {
+  const _CanvasColorPicker({required this.color, required this.onPick});
+  final Color color;
+  final ValueChanged<Color> onPick;
+
+  static const _swatches = <Color>[
+    Colors.white,
+    Color(0xFFF8FAFC), // slate-50
+    Color(0xFFFFFBEB), // amber-50
+    Color(0xFFEFEFEF),
+    Color(0xFFFFE4E6), // rose-100
+    Color(0xFFECFEFF), // cyan-50
+    Color(0xFFF0FDF4), // green-50
+    Color(0xFFFFFFFF),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [BoxShadow(blurRadius: 8, color: Colors.black26)],
+        border: Border.all(color: Colors.black12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Text('Canvas'),
+          const SizedBox(width: 8),
+          Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                  color: color,
+                  border: Border.all(color: Colors.black26),
+                  borderRadius: BorderRadius.circular(4))),
+          const SizedBox(width: 6),
+          PopupMenuButton<Color>(
+            tooltip: 'Pick color',
+            onSelected: onPick,
+            itemBuilder: (context) => [
+              for (final c in _swatches)
+                PopupMenuItem<Color>(
+                  value: c,
+                  child: Row(children: [
+                    Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                            color: c,
+                            border: Border.all(color: Colors.black26),
+                            borderRadius: BorderRadius.circular(4))),
+                    const SizedBox(width: 8),
+                    Text(_colorToHex(c)),
+                  ]),
+                ),
+            ],
+            child: const Icon(Icons.palette_outlined),
+          )
+        ]),
+      ),
+    );
+  }
+}
+
+// ——— Helpers ———
 String _id() => DateTime.now().microsecondsSinceEpoch.toString();
+
+String _colorToHex(Color c) =>
+    '#${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+Color? _hexToColor(String s) {
+  try {
+    var hex = s.replaceAll('#', '').trim();
+    if (hex.length == 6) hex = 'FF$hex';
+    final v = int.parse(hex, radix: 16);
+    return Color(v);
+  } catch (_) {
+    return null;
+  }
+}
 
 Map<String, dynamic>? _serializeProvider(ImageProvider provider) {
   if (provider is NetworkImage) return {'type': 'network', 'url': provider.url};
