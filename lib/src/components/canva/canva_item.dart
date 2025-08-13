@@ -56,7 +56,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
   BorderRadius _itemBorderRadius() {
     // If you have scale handler on the widget, use it. Otherwise use 1.0
     final s =
-        (context.findAncestorWidgetOfExactType<CanvasItemWidget>() as dynamic?)
+        (context.findAncestorWidgetOfExactType<CanvasItemWidget>() as dynamic)
                 ?.scale
                 ?.s ??
             1.0;
@@ -125,6 +125,25 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     }
   }
 
+  Widget _buildTextContent(CanvasItem item) {
+    final s = widget.scale.s; // render/base scale
+    final pad = 6.0 * s; // keep padding proportional
+    return Padding(
+      padding: EdgeInsets.all(pad),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: Text(
+          item.text ?? '',
+          maxLines: null,
+          softWrap: true,
+          overflow: TextOverflow.visible,
+          textScaleFactor: 1.0,
+          style: item.toRenderTextStyle(s), // scaled font size
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final posRender = widget.scale.baseToRender(_item.position);
@@ -164,19 +183,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
                             ? const SizedBox.shrink()
                             : Image(image: _item.provider!, fit: BoxFit.cover),
                       )
-                    : Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            _item.text ?? '',
-                            maxLines: null,
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                            style: _item.toTextStyle(),
-                          ),
-                        ),
-                      ),
+                    : _buildTextContent(_item),
               ),
             ),
             if (widget.isSelected && !_item.locked) ...[

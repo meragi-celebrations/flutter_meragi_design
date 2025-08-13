@@ -74,6 +74,11 @@ class CanvasItem {
         height: 1.2,
       );
 
+  TextStyle toRenderTextStyle(double scale) {
+    // scale is render/base from your CanvasScaleHandler.s
+    return toTextStyle().copyWith(fontSize: fontSize * scale);
+  }
+
   CanvasItem copy() => CanvasItem(
         id: id,
         kind: kind,

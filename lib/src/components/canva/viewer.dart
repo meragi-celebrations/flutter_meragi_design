@@ -211,6 +211,25 @@ class _CanvasItemView extends StatelessWidget {
   final CanvasItem item;
   final CanvasScaleHandler scale;
 
+  Widget _buildText(CanvasItem item, CanvasScaleHandler scale) {
+    final s = scale.s;
+    final pad = 6.0 * s;
+    return Padding(
+      padding: EdgeInsets.all(pad),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: Text(
+          item.text ?? '',
+          maxLines: null,
+          softWrap: true,
+          overflow: TextOverflow.visible,
+          textScaleFactor: 1.0,
+          style: item.toRenderTextStyle(s),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pos = scale.baseToRender(item.position);
@@ -241,21 +260,7 @@ class _CanvasItemView extends StatelessWidget {
         child: Image(image: provider, fit: BoxFit.cover),
       );
     } else {
-      return Padding(
-        padding: const EdgeInsets.all(6),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Text(
-            item.text ?? '',
-            maxLines: null,
-            softWrap: true,
-            overflow: TextOverflow.visible,
-            style: item.toTextStyle().copyWith(
-                  fontSize: scale.fontBaseToRender(item.fontSize),
-                ),
-          ),
-        ),
-      );
+      return _buildText(item, scale);
     }
   }
 }
