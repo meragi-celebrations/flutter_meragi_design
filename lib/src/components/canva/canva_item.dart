@@ -53,6 +53,21 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     _item = widget.item.copy();
   }
 
+  BorderRadius _itemBorderRadius() {
+    // If you have scale handler on the widget, use it. Otherwise use 1.0
+    final s =
+        (context.findAncestorWidgetOfExactType<CanvasItemWidget>() as dynamic?)
+                ?.scale
+                ?.s ??
+            1.0;
+    return BorderRadius.only(
+      topLeft: Radius.circular(_item.radiusTL * s),
+      topRight: Radius.circular(_item.radiusTR * s),
+      bottomLeft: Radius.circular(_item.radiusBL * s),
+      bottomRight: Radius.circular(_item.radiusBR * s),
+    );
+  }
+
   void _resizeFromCorner(Offset renderDelta, _Corner corner) {
     if (_item.locked) return;
 
@@ -139,12 +154,16 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
                   border: widget.isSelected
                       ? Border.all(color: Colors.blueAccent, width: 1)
                       : null,
-                  color: _item.kind == CanvasItemKind.image
-                      ? Colors.white
-                      : Colors.transparent,
+                  color: Colors.transparent,
                 ),
                 child: _item.kind == CanvasItemKind.image
-                    ? Image(image: _item.provider!, fit: BoxFit.contain)
+                    ? ClipRRect(
+                        clipBehavior: Clip.antiAlias, // smooth edges
+                        borderRadius: _itemBorderRadius(),
+                        child: _item.provider == null
+                            ? const SizedBox.shrink()
+                            : Image(image: _item.provider!, fit: BoxFit.cover),
+                      )
                     : Padding(
                         padding: const EdgeInsets.all(6),
                         child: Align(
@@ -154,10 +173,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
                             maxLines: null,
                             softWrap: true,
                             overflow: TextOverflow.visible,
-                            // Scale font at paint time
-                            style: _item.toTextStyle().copyWith(
-                                fontSize: widget.scale
-                                    .fontBaseToRender(_item.fontSize)),
+                            style: _item.toTextStyle(),
                           ),
                         ),
                       ),

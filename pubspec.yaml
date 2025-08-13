@@ -26,11 +26,11 @@ dependencies:
   flutter_quill: ^11.4.1
   vsc_quill_delta_to_html: ^1.0.5
   flutter_scatter: ^0.2.0
-  sprintf: ^7.0.0  
+  sprintf: ^7.0.0
   video_player: ^2.9.5
   provider: ^6.1.2
   sliver_tools: ^0.2.12
-  appflowy_editor:   
+  appflowy_editor:
     git:
       url: https://github.com/meragi-celebrations/appflowy-editor.git
       ref: main

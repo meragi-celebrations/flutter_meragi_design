@@ -229,7 +229,17 @@ class _CanvasItemView extends StatelessWidget {
     if (item.kind == CanvasItemKind.image) {
       final provider = item.provider;
       if (provider == null) return const SizedBox.shrink();
-      return Image(image: provider, fit: BoxFit.contain);
+      final s = scale.s;
+      final br = BorderRadius.only(
+        topLeft: Radius.circular(item.radiusTL * s),
+        topRight: Radius.circular(item.radiusTR * s),
+        bottomLeft: Radius.circular(item.radiusBL * s),
+        bottomRight: Radius.circular(item.radiusBR * s),
+      );
+      return ClipRRect(
+        borderRadius: br,
+        child: Image(image: provider, fit: BoxFit.cover),
+      );
     } else {
       return Padding(
         padding: const EdgeInsets.all(6),

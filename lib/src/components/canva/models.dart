@@ -36,6 +36,12 @@ class CanvasItem {
   Size size;
   bool locked;
 
+  // Shape for images (in base units)
+  double radiusTL;
+  double radiusTR;
+  double radiusBL;
+  double radiusBR;
+
   CanvasItem({
     required this.id,
     required this.kind,
@@ -51,6 +57,10 @@ class CanvasItem {
     required this.position,
     required this.size,
     this.locked = false,
+    this.radiusTL = 0,
+    this.radiusTR = 0,
+    this.radiusBL = 0,
+    this.radiusBR = 0,
   });
 
   TextStyle toTextStyle() => TextStyle(
@@ -79,6 +89,10 @@ class CanvasItem {
         position: position,
         size: size,
         locked: locked,
+        radiusTL: radiusTL,
+        radiusTR: radiusTR,
+        radiusBL: radiusBL,
+        radiusBR: radiusBR,
       );
 
   /// --- New: everything kind-specific lives under "props" ---
@@ -100,6 +114,12 @@ class CanvasItem {
         return {
           if (imageId != null) 'imageId': imageId,
           if (provider != null) 'src': serializeProvider(provider!),
+          'radii': {
+            'tl': radiusTL,
+            'tr': radiusTR,
+            'bl': radiusBL,
+            'br': radiusBR,
+          },
         };
       case CanvasItemKind.text:
         return {
@@ -145,6 +165,22 @@ class CanvasItem {
       ImageProvider? provider = providerFromOutside;
       provider ??= deserializeProvider(props['src'] ?? json['src']);
 
+      // Radii can be under props.radii or legacy flat keys if you add them later
+      final rmap =
+          (props['radii'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final rtl = (rmap['tl'] as num?)?.toDouble() ??
+          (props['rtl'] as num?)?.toDouble() ??
+          0;
+      final rtr = (rmap['tr'] as num?)?.toDouble() ??
+          (props['rtr'] as num?)?.toDouble() ??
+          0;
+      final rbl = (rmap['bl'] as num?)?.toDouble() ??
+          (props['rbl'] as num?)?.toDouble() ??
+          0;
+      final rbr = (rmap['br'] as num?)?.toDouble() ??
+          (props['rbr'] as num?)?.toDouble() ??
+          0;
+
       return CanvasItem(
         id: id,
         kind: kind,
@@ -153,6 +189,10 @@ class CanvasItem {
         position: pos,
         size: size,
         locked: locked,
+        radiusTL: rtl,
+        radiusTR: rtr,
+        radiusBL: rbl,
+        radiusBR: rbr,
       );
     } else {
       // Text

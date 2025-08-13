@@ -302,7 +302,13 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                             _emit(item, (u) => u.fontColor = c);
                           }),
                         ),
-                      CanvasItemKind.image => const _ImageProperties(),
+                      CanvasItemKind.image => _ImageProperties(
+                          item: item,
+                          onChange: (u) {
+                            _beginIfNeeded();
+                            widget.onChanged(u);
+                          },
+                        ),
                     },
                   ],
                 ),
@@ -626,16 +632,162 @@ class _TextProperties extends StatelessWidget {
   }
 }
 
-class _ImageProperties extends StatelessWidget {
-  const _ImageProperties();
+class _ImageProperties extends StatefulWidget {
+  const _ImageProperties({required this.item, required this.onChange});
+
+  final CanvasItem item;
+  final ValueChanged<CanvasItem> onChange;
+
+  @override
+  State<_ImageProperties> createState() => _ImagePropertiesState();
+}
+
+class _ImagePropertiesState extends State<_ImageProperties> {
+  late TextEditingController _tl;
+  late TextEditingController _tr;
+  late TextEditingController _bl;
+  late TextEditingController _br;
+
+  bool _linkAll = false; // when on, keep 4 corners equal
+
+  @override
+  void initState() {
+    super.initState();
+    _tl = TextEditingController(text: widget.item.radiusTL.toStringAsFixed(0));
+    _tr = TextEditingController(text: widget.item.radiusTR.toStringAsFixed(0));
+    _bl = TextEditingController(text: widget.item.radiusBL.toStringAsFixed(0));
+    _br = TextEditingController(text: widget.item.radiusBR.toStringAsFixed(0));
+  }
+
+  @override
+  void didUpdateWidget(covariant _ImageProperties oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item.id != widget.item.id) {
+      _tl.text = widget.item.radiusTL.toStringAsFixed(0);
+      _tr.text = widget.item.radiusTR.toStringAsFixed(0);
+      _bl.text = widget.item.radiusBL.toStringAsFixed(0);
+      _br.text = widget.item.radiusBR.toStringAsFixed(0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _tl.dispose();
+    _tr.dispose();
+    _bl.dispose();
+    _br.dispose();
+    super.dispose();
+  }
+
+  void _commit({double? tl, double? tr, double? bl, double? br}) {
+    final base = widget.item.copy();
+
+    // parse with fallback to current
+    double vtl = tl ?? double.tryParse(_tl.text.trim()) ?? base.radiusTL;
+    double vtr = tr ?? double.tryParse(_tr.text.trim()) ?? base.radiusTR;
+    double vbl = bl ?? double.tryParse(_bl.text.trim()) ?? base.radiusBL;
+    double vbr = br ?? double.tryParse(_br.text.trim()) ?? base.radiusBR;
+
+    if (_linkAll) {
+      final uni = tl ?? tr ?? bl ?? br ?? vtl;
+      vtl = vtr = vbl = vbr = uni;
+      _tl.text = uni.toStringAsFixed(0);
+      _tr.text = uni.toStringAsFixed(0);
+      _bl.text = uni.toStringAsFixed(0);
+      _br.text = uni.toStringAsFixed(0);
+    }
+
+    // Clamp to half of item size so corners are valid
+    final maxR = 0.5 *
+        (base.size.width < base.size.height
+            ? base.size.width
+            : base.size.height);
+    vtl = vtl.clamp(0, maxR);
+    vtr = vtr.clamp(0, maxR);
+    vbl = vbl.clamp(0, maxR);
+    vbr = vbr.clamp(0, maxR);
+
+    base
+      ..radiusTL = vtl
+      ..radiusTR = vtr
+      ..radiusBL = vbl
+      ..radiusBR = vbr;
+
+    widget.onChange(base);
+  }
+
+  Widget _num(String label, TextEditingController c, void Function() onDone) {
+    return Expanded(
+      child: TextField(
+        controller: c,
+        keyboardType:
+            const TextInputType.numberWithOptions(decimal: true, signed: false),
+        decoration: InputDecoration(
+          labelText: label,
+          isDense: true,
+          border: const OutlineInputBorder(),
+        ),
+        onSubmitted: (_) => onDone(),
+        onEditingComplete: onDone,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _SectionTitle('Image'),
-        Text('No editable properties yet.',
-            style: TextStyle(color: Colors.grey.shade600)),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Switch(
+              value: _linkAll,
+              onChanged: (v) => setState(() => _linkAll = v),
+            ),
+            const SizedBox(width: 6),
+            const Text('Link all corners'),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const _SectionTitle('Corner radius'),
+        Row(
+          children: [
+            _num('Top-Left', _tl, () => _commit()),
+            const SizedBox(width: 8),
+            _num('Top-Right', _tr, () => _commit()),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _num('Bottom-Left', _bl, () => _commit()),
+            const SizedBox(width: 8),
+            _num('Bottom-Right', _br, () => _commit()),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Quick slider to set all corners when linked
+        if (_linkAll)
+          Slider(
+            value: double.tryParse(_tl.text) ?? 0,
+            min: 0,
+            max: ((widget.item.size.width < widget.item.size.height
+                        ? widget.item.size.width
+                        : widget.item.size.height) /
+                    2)
+                .clamp(1, 5000),
+            onChanged: (v) {
+              setState(() {
+                _tl.text = v.toStringAsFixed(0);
+                _tr.text = v.toStringAsFixed(0);
+                _bl.text = v.toStringAsFixed(0);
+                _br.text = v.toStringAsFixed(0);
+              });
+              _commit(tl: v);
+            },
+          ),
       ],
     );
   }
