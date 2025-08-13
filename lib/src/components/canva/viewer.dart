@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/models.dart';
@@ -215,13 +216,24 @@ class _CanvasItemView extends StatelessWidget {
   Widget build(BuildContext context) {
     final pos = scale.baseToRender(item.position);
     final size = scale.baseToRenderSize(item.size);
+    final radians = item.rotationDeg * math.pi / 180.0;
 
     return Positioned(
       left: pos.dx,
       top: pos.dy,
       width: size.width,
       height: size.height,
-      child: _buildContent(),
+      child: Center(
+        child: Transform.rotate(
+          angle: radians,
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: size.width,
+            height: size.height,
+            child: _buildContent(),
+          ),
+        ),
+      ),
     );
   }
 

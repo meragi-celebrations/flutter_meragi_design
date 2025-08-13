@@ -39,11 +39,14 @@ class CanvasItem {
   Size size;
   bool locked;
 
-  // Image corner radii in base units
+  // Shape (image) in base units
   double radiusTL;
   double radiusTR;
   double radiusBL;
   double radiusBR;
+
+  // Rotation in DEGREES (stored in base model, rendered with scale unchanged)
+  double rotationDeg;
 
   CanvasItem({
     required this.id,
@@ -65,11 +68,12 @@ class CanvasItem {
     this.radiusTR = 0,
     this.radiusBL = 0,
     this.radiusBR = 0,
+    this.rotationDeg = 0,
   }) : paletteColors = paletteColors ??
             const [
-              Color(0xFF111827), // gray-900
-              Color(0xFF6B7280), // gray-500
-              Color(0xFFE5E7EB), // gray-200
+              Color(0xFF111827),
+              Color(0xFF6B7280),
+              Color(0xFFE5E7EB),
             ];
 
   TextStyle toTextStyle() => TextStyle(
@@ -107,6 +111,7 @@ class CanvasItem {
         radiusTR: radiusTR,
         radiusBL: radiusBL,
         radiusBR: radiusBR,
+        rotationDeg: rotationDeg,
       );
 
   Map<String, dynamic> toJson(int zIndex) => {
@@ -118,6 +123,7 @@ class CanvasItem {
         'h': size.height,
         'z': zIndex,
         'locked': locked,
+        'rot': rotationDeg, // NEW
         'props': _toProps(),
       };
 
@@ -174,6 +180,7 @@ class CanvasItem {
       (json['h'] as num?)?.toDouble() ?? 100,
     );
     final locked = (json['locked'] as bool?) ?? false;
+    final rot = (json['rot'] as num?)?.toDouble() ?? 0; // NEW
 
     if (kind == CanvasItemKind.image) {
       final imageId =
@@ -200,6 +207,7 @@ class CanvasItem {
         radiusTR: rtr,
         radiusBL: rbl,
         radiusBR: rbr,
+        rotationDeg: rot,
       );
     } else if (kind == CanvasItemKind.text) {
       final txt =
@@ -234,6 +242,7 @@ class CanvasItem {
         position: pos,
         size: size,
         locked: locked,
+        rotationDeg: rot,
       );
     } else {
       final list =
@@ -252,6 +261,7 @@ class CanvasItem {
         position: pos,
         size: size,
         locked: locked,
+        rotationDeg: rot,
       );
     }
   }

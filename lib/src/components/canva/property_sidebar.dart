@@ -68,6 +68,8 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
   late TextEditingController _wCtrl;
   late TextEditingController _hCtrl;
 
+  late TextEditingController _rotCtrl;
+
   static const _fontOptions = <String?>[
     null,
     'Inter',
@@ -140,6 +142,7 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
       _yCtrl.text = it.position.dy.toStringAsFixed(0);
       _wCtrl.text = it.size.width.toStringAsFixed(0);
       _hCtrl.text = it.size.height.toStringAsFixed(0);
+      _rotCtrl.text = (widget.item?.rotationDeg ?? 0).toStringAsFixed(0);
     }
   }
 
@@ -160,6 +163,9 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
         TextEditingController(text: (item?.size.width ?? 0).toStringAsFixed(0));
     _hCtrl = TextEditingController(
         text: (item?.size.height ?? 0).toStringAsFixed(0));
+
+    _rotCtrl = TextEditingController(
+        text: (widget.item?.rotationDeg ?? 0).toStringAsFixed(0));
   }
 
   void _disposeCtrls() {
@@ -168,6 +174,7 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
     _yCtrl.dispose();
     _wCtrl.dispose();
     _hCtrl.dispose();
+    _rotCtrl.dispose();
   }
 
   @override
@@ -248,13 +255,18 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                       yCtrl: _yCtrl,
                       wCtrl: _wCtrl,
                       hCtrl: _hCtrl,
-                      onCommit: (dx, dy, w, h) {
+                      rotCtrl: _rotCtrl,
+                      onRectCommit: (dx, dy, w, h) {
                         if (item == null) return;
                         _emit(item, (u) {
                           u
                             ..position = Offset(dx, dy)
                             ..size = Size(w < 1 ? 1 : w, h < 1 ? 1 : h);
                         });
+                      },
+                      onRotateCommit: (deg) {
+                        if (item == null) return;
+                        _emit(item, (u) => u.rotationDeg = deg);
                       },
                     ),
                     const SizedBox(height: 12),
@@ -440,26 +452,39 @@ class _GenericItemProps extends StatefulWidget {
     required this.yCtrl,
     required this.wCtrl,
     required this.hCtrl,
-    required this.onCommit,
+    required this.rotCtrl,
+    required this.onRectCommit,
+    required this.onRotateCommit,
   });
 
-  final TextEditingController xCtrl, yCtrl, wCtrl, hCtrl;
-  final void Function(double x, double y, double w, double h) onCommit;
+  final TextEditingController xCtrl, yCtrl, wCtrl, hCtrl, rotCtrl;
+  final void Function(double x, double y, double w, double h) onRectCommit;
+  final void Function(double rotationDeg) onRotateCommit;
 
   @override
   State<_GenericItemProps> createState() => _GenericItemPropsState();
 }
 
 class _GenericItemPropsState extends State<_GenericItemProps> {
-  void _commit() {
+  void _commitRect() {
     final dx = double.tryParse(widget.xCtrl.text.trim()) ?? 0;
     final dy = double.tryParse(widget.yCtrl.text.trim()) ?? 0;
     final w = double.tryParse(widget.wCtrl.text.trim()) ?? 1;
     final h = double.tryParse(widget.hCtrl.text.trim()) ?? 1;
-    widget.onCommit(dx, dy, w, h);
+    widget.onRectCommit(dx, dy, w, h);
   }
 
-  Widget _numField(String label, TextEditingController ctrl) {
+  void _commitRot() {
+    double r = double.tryParse(widget.rotCtrl.text.trim()) ?? 0;
+    // normalize 0..360
+    r = r % 360;
+    if (r < 0) r += 360;
+    widget.rotCtrl.text = r.toStringAsFixed(0);
+    widget.onRotateCommit(r);
+  }
+
+  Widget _numField(String label, TextEditingController ctrl,
+      {VoidCallback? onDone}) {
     return Expanded(
       child: TextField(
         controller: ctrl,
@@ -470,8 +495,8 @@ class _GenericItemPropsState extends State<_GenericItemProps> {
           isDense: true,
           border: const OutlineInputBorder(),
         ),
-        onSubmitted: (_) => _commit(),
-        onEditingComplete: _commit,
+        onSubmitted: (_) => onDone?.call(),
+        onEditingComplete: onDone,
       ),
     );
   }
@@ -481,16 +506,29 @@ class _GenericItemPropsState extends State<_GenericItemProps> {
     return Column(
       children: [
         Row(children: [
-          _numField('X', widget.xCtrl),
+          _numField('X', widget.xCtrl, onDone: _commitRect),
           const SizedBox(width: 8),
-          _numField('Y', widget.yCtrl),
+          _numField('Y', widget.yCtrl, onDone: _commitRect),
         ]),
         const SizedBox(height: 8),
         Row(children: [
-          _numField('W', widget.wCtrl),
+          _numField('W', widget.wCtrl, onDone: _commitRect),
           const SizedBox(width: 8),
-          _numField('H', widget.hCtrl),
+          _numField('H', widget.hCtrl, onDone: _commitRect),
         ]),
+        const SizedBox(height: 8),
+        Row(children: [
+          _numField('Rotation°', widget.rotCtrl, onDone: _commitRot),
+        ]),
+        Slider(
+          value: double.tryParse(widget.rotCtrl.text) ?? 0,
+          min: 0,
+          max: 360,
+          onChanged: (v) {
+            widget.rotCtrl.text = v.toStringAsFixed(0);
+            _commitRot();
+          },
+        ),
       ],
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/models.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
@@ -39,7 +41,18 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
   static const double _handleSize = 14;
   static const double _minSize = 40;
 
+  // Rotate handle inside the top edge
+  static const double _rotHandleSize = 16.0;
+  static const double _rotHandlePad = 2.0;
+
   late CanvasItem _item;
+
+  // rotation gesture state
+  late double _rotStartDeg; // model degrees at gesture start
+  late double _rotStartAngleRad; // pointer angle at gesture start (radians)
+
+  // local box key to convert global -> local for angle math
+  final GlobalKey _boxKey = GlobalKey();
 
   @override
   void initState() {
@@ -53,6 +66,8 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     _item = widget.item.copy();
   }
 
+  double get _radians => _item.rotationDeg * math.pi / 180.0;
+
   BorderRadius _itemBorderRadius() {
     final s = widget.scale.s;
     return BorderRadius.only(
@@ -63,10 +78,11 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     );
   }
 
+  // ---------- Resize ----------
   void _resizeFromCorner(Offset renderDelta, _Corner corner) {
     if (_item.locked) return;
 
-    // Convert to base-space delta first
+    // convert to base-space delta
     final delta = widget.scale.renderDeltaToBase(renderDelta);
 
     double left = _item.position.dx;
@@ -108,18 +124,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     widget.onResizeCommit(_item);
   }
 
-  Future<void> _editText() async {
-    if (_item.locked || _item.kind != CanvasItemKind.text) return;
-    final updated = await showDialog<CanvasItem>(
-      context: context,
-      builder: (context) => _TextEditorDialog(initial: _item),
-    );
-    if (updated != null) {
-      setState(() => _item = updated);
-      widget.onResizeCommit(updated);
-    }
-  }
-
+  // ---------- Text / Palette content ----------
   Widget _buildTextContent(CanvasItem item) {
     final s = widget.scale.s;
     final pad = 6.0 * s;
@@ -144,7 +149,6 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     final gap = 4.0 * s;
     final pad = 6.0 * s;
     final colors = _item.paletteColors;
-
     if (colors.isEmpty) return const SizedBox.shrink();
 
     final children = <Widget>[];
@@ -156,10 +160,91 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     return Padding(
       padding: EdgeInsets.all(pad),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: children,
+          crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+    );
+  }
+
+  // ---------- Rotation math ----------
+  Offset _globalToLocal(Offset global) {
+    final rb = _boxKey.currentContext?.findRenderObject() as RenderBox?;
+    if (rb == null) return global;
+    return rb.globalToLocal(global);
+  }
+
+  /// angle from item center to a local point (radians)
+  double _angleAtLocal(Offset local) {
+    final sizeRender = widget.scale.baseToRenderSize(_item.size);
+    final cx = sizeRender.width / 2;
+    final cy = sizeRender.height / 2;
+    final dx = local.dx - cx;
+    final dy = local.dy - cy;
+    return math.atan2(dy, dx);
+  }
+
+  void _onRotateStart(DragStartDetails d) {
+    if (_item.locked) return;
+    widget.onResizeStart();
+    _rotStartDeg = _item.rotationDeg;
+    final local = _globalToLocal(d.globalPosition);
+    _rotStartAngleRad = _angleAtLocal(local);
+  }
+
+  void _onRotateUpdate(DragUpdateDetails d) {
+    if (_item.locked) return;
+    final local = _globalToLocal(d.globalPosition);
+    final angle = _angleAtLocal(local);
+    final deltaRad = angle - _rotStartAngleRad;
+    final deltaDeg = deltaRad * 180.0 / math.pi;
+
+    setState(() {
+      _item.rotationDeg = (_rotStartDeg + deltaDeg) % 360.0;
+      if (_item.rotationDeg < 0) _item.rotationDeg += 360.0;
+    });
+    widget.onResizeCommit(_item);
+  }
+
+  void _onRotateEnd(DragEndDetails _) {
+    widget.onResizeEnd();
+  }
+
+  Widget _rotationHandle() {
+    // small circular handle at top center, inside bounds
+    return Positioned(
+      top: _rotHandlePad,
+      left: (widget.scale.baseToRenderSize(_item.size).width - _rotHandleSize) /
+          2,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onPanStart: _onRotateStart,
+        onPanUpdate: _onRotateUpdate,
+        onPanEnd: _onRotateEnd,
+        child: Container(
+          width: _rotHandleSize,
+          height: _rotHandleSize,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.blueAccent, width: 1),
+            boxShadow: const [BoxShadow(blurRadius: 2, color: Colors.black26)],
+          ),
+          child: const Icon(Icons.rotate_right,
+              size: 12, color: Colors.blueAccent),
+        ),
       ),
     );
+  }
+
+  // ---------- Text editor ----------
+  Future<void> _editText() async {
+    if (_item.locked || _item.kind != CanvasItemKind.text) return;
+    final updated = await showDialog<CanvasItem>(
+      context: context,
+      builder: (context) => _TextEditorDialog(initial: _item),
+    );
+    if (updated != null) {
+      setState(() => _item = updated);
+      widget.onResizeCommit(updated);
+    }
   }
 
   @override
@@ -177,14 +262,15 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
         onPanStart: (_) => widget.onPanStart(),
         onPanUpdate: (d) {
           if (!widget.isSelected || _item.locked) return;
-          // Convert render delta -> base delta
           widget.onPanMove(widget.scale.renderDeltaToBase(d.delta));
         },
         onPanEnd: (_) => widget.onPanEnd(),
         onDoubleTap: _item.kind == CanvasItemKind.text ? _editText : null,
         child: Stack(
-          clipBehavior: Clip.hardEdge,
+          key: _boxKey,
+          clipBehavior: Clip.none, // allow rotated content to overflow
           children: [
+            // selection border & content
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -193,25 +279,38 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
                       : null,
                   color: Colors.transparent,
                 ),
-                child: _item.kind == CanvasItemKind.image
-                    ? ClipRRect(
-                        clipBehavior: Clip.antiAlias,
-                        borderRadius: _itemBorderRadius(),
-                        child: _item.provider == null
-                            ? const SizedBox.shrink()
-                            : Image(image: _item.provider!, fit: BoxFit.cover),
-                      )
-                    : (_item.kind == CanvasItemKind.text
-                        ? _buildTextContent(_item)
-                        : _buildPaletteContent()),
+                child: Center(
+                  child: Transform.rotate(
+                    angle: _radians,
+                    alignment: Alignment.center,
+                    child: SizedBox.expand(
+                      child: switch (_item.kind) {
+                        CanvasItemKind.image => ClipRRect(
+                            clipBehavior: Clip.antiAlias,
+                            borderRadius: _itemBorderRadius(),
+                            child: _item.provider == null
+                                ? const SizedBox.shrink()
+                                : Image(
+                                    image: _item.provider!, fit: BoxFit.cover),
+                          ),
+                        CanvasItemKind.text => _buildTextContent(_item),
+                        CanvasItemKind.palette => _buildPaletteContent(),
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
+
+            // resize handles
             if (widget.isSelected && !_item.locked) ...[
               _handle(Alignment.topLeft, _Corner.topLeft),
               _handle(Alignment.topRight, _Corner.topRight),
               _handle(Alignment.bottomLeft, _Corner.bottomLeft),
               _handle(Alignment.bottomRight, _Corner.bottomRight),
+              _rotationHandle(), // NEW
             ],
+
             if (_item.locked)
               Align(
                 alignment: Alignment.topLeft,
