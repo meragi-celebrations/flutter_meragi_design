@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/models.dart';
+import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 /// Read-only viewer for a SimpleCanva document.
@@ -50,7 +51,26 @@ class CanvaViewer extends StatelessWidget {
     final colorHex = canvasInfo['color'] as String?;
     final bgColor =
         (colorHex != null ? hexToColor(colorHex) : null) ?? Colors.white;
-    final aspect = _parseAspect(canvasInfo['aspect']) ?? (16 / 9);
+
+    // Prefer explicit base size
+    Size baseSize = const Size(1920, 1080);
+    final base = (canvasInfo['base'] as Map?)?.cast<String, dynamic>();
+    if (base != null) {
+      final bw = (base['w'] as num?)?.toDouble();
+      final bh = (base['h'] as num?)?.toDouble();
+      if (bw != null && bw > 0 && bh != null && bh > 0) {
+        baseSize = Size(bw, bh);
+      }
+    }
+
+    // Fallback if only aspect is present
+    double aspect = baseSize.width / baseSize.height;
+    final parsedAspect = _parseAspect(canvasInfo['aspect']);
+    if (parsedAspect != null) {
+      aspect = parsedAspect;
+      // keep base height 1080 for deterministic scaling when base missing
+      if (base == null) baseSize = Size(1080 * aspect, 1080);
+    }
 
     final items = _buildItems(document);
 
@@ -67,6 +87,11 @@ class CanvaViewer extends StatelessWidget {
             w = h * aspect;
           }
 
+          final scale = CanvasScaleHandler(
+            baseSize: baseSize,
+            renderSize: Size(w, h),
+          );
+
           final canvas = Container(
             decoration: BoxDecoration(
               color: bgColor,
@@ -81,6 +106,7 @@ class CanvaViewer extends StatelessWidget {
               child: _CanvasStack(
                 items: items,
                 canvasSize: Size(w, h),
+                scale: scale,
               ),
             ),
           );
@@ -153,10 +179,12 @@ class _CanvasStack extends StatelessWidget {
   const _CanvasStack({
     required this.items,
     required this.canvasSize,
+    required this.scale,
   });
 
   final List<CanvasItem> items;
   final Size canvasSize;
+  final CanvasScaleHandler scale;
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +194,11 @@ class _CanvasStack extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.hardEdge, // clip overflowing items
         children: [
-          for (final item in items) _CanvasItemView(item: item),
+          for (final item in items)
+            _CanvasItemView(
+              item: item,
+              scale: scale,
+            ),
         ],
       ),
     );
@@ -174,29 +206,31 @@ class _CanvasStack extends StatelessWidget {
 }
 
 class _CanvasItemView extends StatelessWidget {
-  const _CanvasItemView({required this.item});
+  const _CanvasItemView({required this.item, required this.scale});
 
   final CanvasItem item;
+  final CanvasScaleHandler scale;
 
   @override
   Widget build(BuildContext context) {
+    final pos = scale.baseToRender(item.position);
+    final size = scale.baseToRenderSize(item.size);
+
     return Positioned(
-      left: item.position.dx,
-      top: item.position.dy,
-      width: item.size.width,
-      height: item.size.height,
+      left: pos.dx,
+      top: pos.dy,
+      width: size.width,
+      height: size.height,
       child: _buildContent(),
     );
   }
 
   Widget _buildContent() {
     if (item.kind == CanvasItemKind.image) {
-      // If provider is null (bad JSON), show nothing.
       final provider = item.provider;
       if (provider == null) return const SizedBox.shrink();
       return Image(image: provider, fit: BoxFit.contain);
     } else {
-      // Text
       return Padding(
         padding: const EdgeInsets.all(6),
         child: Align(
@@ -206,7 +240,9 @@ class _CanvasItemView extends StatelessWidget {
             maxLines: null,
             softWrap: true,
             overflow: TextOverflow.visible,
-            style: item.toTextStyle(),
+            style: item.toTextStyle().copyWith(
+                  fontSize: scale.fontBaseToRender(item.fontSize),
+                ),
           ),
         ),
       );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/models.dart';
+import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 
 enum _Corner { topLeft, topRight, bottomLeft, bottomRight }
 
@@ -15,6 +16,7 @@ class CanvasItemWidget extends StatefulWidget {
     required this.onPanEnd,
     required this.onResizeStart,
     required this.onResizeEnd,
+    required this.scale,
   });
 
   final CanvasItem item;
@@ -27,6 +29,7 @@ class CanvasItemWidget extends StatefulWidget {
   final VoidCallback onPanEnd;
   final VoidCallback onResizeStart;
   final VoidCallback onResizeEnd;
+  final CanvasScaleHandler scale;
 
   @override
   State<CanvasItemWidget> createState() => _CanvasItemWidgetState();
@@ -50,8 +53,12 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     _item = widget.item.copy();
   }
 
-  void _resizeFromCorner(Offset delta, _Corner corner) {
+  void _resizeFromCorner(Offset renderDelta, _Corner corner) {
     if (_item.locked) return;
+
+    // Convert to base-space delta first
+    final delta = widget.scale.renderDeltaToBase(renderDelta);
+
     double left = _item.position.dx;
     double top = _item.position.dy;
     double width = _item.size.width;
@@ -83,13 +90,9 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     width = width < _minSize ? _minSize : width;
     height = height < _minSize ? _minSize : height;
 
-// No clamping to canvas edges:
-    final newLeft = left;
-    final newTop = top;
-
     setState(() {
       _item
-        ..position = Offset(newLeft, newTop)
+        ..position = Offset(left, top)
         ..size = Size(width, height);
     });
     widget.onResizeCommit(_item);
@@ -109,17 +112,21 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final posRender = widget.scale.baseToRender(_item.position);
+    final sizeRender = widget.scale.baseToRenderSize(_item.size);
+
     return Positioned(
-      left: _item.position.dx,
-      top: _item.position.dy,
-      width: _item.size.width,
-      height: _item.size.height,
+      left: posRender.dx,
+      top: posRender.dy,
+      width: sizeRender.width,
+      height: sizeRender.height,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onPanStart: (_) => widget.onPanStart(),
         onPanUpdate: (d) {
           if (!widget.isSelected || _item.locked) return;
-          widget.onPanMove(d.delta);
+          // Convert render delta -> base delta
+          widget.onPanMove(widget.scale.renderDeltaToBase(d.delta));
         },
         onPanEnd: (_) => widget.onPanEnd(),
         onDoubleTap: _item.kind == CanvasItemKind.text ? _editText : null,
@@ -147,7 +154,10 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
                             maxLines: null,
                             softWrap: true,
                             overflow: TextOverflow.visible,
-                            style: _item.toTextStyle(),
+                            // Scale font at paint time
+                            style: _item.toTextStyle().copyWith(
+                                fontSize: widget.scale
+                                    .fontBaseToRender(_item.fontSize)),
                           ),
                         ),
                       ),

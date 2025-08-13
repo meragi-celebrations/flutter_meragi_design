@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
 import 'package:flutter_meragi_design/src/components/canva/models.dart';
 import 'package:flutter_meragi_design/src/components/canva/property_sidebar.dart';
+import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
@@ -21,6 +22,7 @@ class SimpleCanva extends StatefulWidget {
     this.workspaceColor = const Color(0xFFF3F4F6),
     this.initialCanvasColor = Colors.white,
     this.onChanged,
+    this.baseCanvasSize = const Size(1920, 1080),
   });
 
   final List<CanvasPaletteImage> palette;
@@ -30,6 +32,7 @@ class SimpleCanva extends StatefulWidget {
   final Color workspaceColor;
   final Color initialCanvasColor;
   final ValueChanged<List<CanvasItem>>? onChanged;
+  final Size baseCanvasSize;
 
   @override
   State<SimpleCanva> createState() => _SimpleCanvaState();
@@ -127,12 +130,16 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
   bool _propsHistoryPushed = false;
 
+  late Size _baseSize;
+  CanvasScaleHandler? _scale;
+
   Map<String, CanvasPaletteImage> get _paletteById =>
       {for (final p in widget.palette) p.id: p};
 
   @override
   void initState() {
     super.initState();
+    _baseSize = widget.baseCanvasSize;
     _canvasColor = widget.initialCanvasColor;
     widget.controller?._state = this;
   }
@@ -506,9 +513,10 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   Map<String, dynamic> _toJsonDocument() => {
-        'version': 1,
+        'version': 2,
         'canvas': {
-          'aspect': '16:9',
+          'base': {'w': _baseSize.width, 'h': _baseSize.height},
+          'aspect': _baseSize.width / _baseSize.height, // keep for fallback
           'color': colorToHex(_canvasColor),
         },
         'items': [for (int i = 0; i < _items.length; i++) _items[i].toJson(i)],
@@ -522,6 +530,16 @@ class _SimpleCanvaState extends State<SimpleCanva> {
       if (c != null) _canvasColor = c;
     }
 
+    // NEW: base size
+    final base = (canvas['base'] as Map?)?.cast<String, dynamic>();
+    if (base != null) {
+      final bw = (base['w'] as num?)?.toDouble();
+      final bh = (base['h'] as num?)?.toDouble();
+      if (bw != null && bw > 0 && bh != null && bh > 0) {
+        _baseSize = Size(bw, bh);
+      }
+    }
+
     final rawItems = (doc['items'] as List?)?.cast<Map<String, dynamic>>() ??
         const <Map<String, dynamic>>[];
     final rebuilt = <CanvasItem>[];
@@ -532,7 +550,6 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         orElse: () => CanvasItemKind.image,
       );
 
-      // Support new nested "props" and legacy flat fields
       final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
 
       ImageProvider? provider;
@@ -592,20 +609,24 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   }
 
   void _handleTapDownOnCanvas(TapDownDetails details) {
-    final local = _toLocal(details.globalPosition);
+    final localRender = _toLocal(details.globalPosition);
+    final scale = _scale;
+    if (scale == null) return;
 
-    // Find topmost hit item
+    // Convert pointer to base units for consistent hit tests
+    final localBase = scale.renderToBase(localRender);
+
+    // Find topmost hit item in BASE coordinates
     String? hitId;
     for (final item in _items.reversed) {
       final rect = Rect.fromLTWH(item.position.dx, item.position.dy,
           item.size.width, item.size.height);
-      if (rect.contains(local)) {
+      if (rect.contains(localBase)) {
         hitId = item.id;
         break;
       }
     }
 
-    // Modifier keys = additive selection
     final keys = HardwareKeyboard.instance.logicalKeysPressed;
     final additive = keys.contains(LogicalKeyboardKey.shiftLeft) ||
         keys.contains(LogicalKeyboardKey.shiftRight) ||
@@ -615,24 +636,15 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         keys.contains(LogicalKeyboardKey.metaRight);
 
     if (hitId == null) {
-      // Clicked empty space -> clear
       _clearSelection();
       return;
     }
 
     final alreadySelected = _selected.contains(hitId);
-
     if (additive) {
-      // Toggle the clicked item
       _toggleSelect(hitId);
     } else {
-      // No modifiers:
-      // If clicking an already-selected item, KEEP current multi-selection.
-      // If clicking an unselected item, select only that one.
-      if (!alreadySelected) {
-        _selectOnly(hitId);
-      }
-      // else: do nothing, preserve selection as-is
+      if (!alreadySelected) _selectOnly(hitId);
     }
   }
 
@@ -675,13 +687,18 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                       builder: (context, constraints) {
                         final maxW = constraints.maxWidth;
                         final maxH = constraints.maxHeight;
-                        final targetAspect = 16 / 9;
+                        final targetAspect = _baseSize.width / _baseSize.height;
                         double w = maxW;
                         double h = w / targetAspect;
                         if (h > maxH) {
                           h = maxH;
                           w = h * targetAspect;
                         }
+
+                        _scale = CanvasScaleHandler(
+                          baseSize: _baseSize,
+                          renderSize: Size(w, h),
+                        );
 
                         return SizedBox(
                           width: w,
@@ -715,20 +732,32 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                         child: DragTarget<CanvasPaletteImage>(
                                           onWillAccept: (_) => true,
                                           onAcceptWithDetails: (details) {
-                                            final local =
+                                            final scale = _scale;
+                                            if (scale == null) return;
+
+                                            // Pointer where the image was dropped (render pixels)
+                                            final localRender =
                                                 _toLocal(details.offset);
+
+                                            // Convert to base
+                                            final baseDrop =
+                                                scale.renderToBase(localRender);
+
                                             final pal = details.data;
-                                            final size = pal.preferredSize ??
-                                                const Size(160, 160);
+                                            // Treat preferredSize as BASE units
+                                            final baseSize =
+                                                pal.preferredSize ??
+                                                    const Size(160, 160);
+
                                             _addItem(CanvasItem(
                                               id: buildId(),
                                               kind: CanvasItemKind.image,
                                               imageId: pal.id,
                                               provider: pal.provider,
-                                              position: local -
-                                                  Offset(size.width / 2,
-                                                      size.height / 2),
-                                              size: size,
+                                              position: baseDrop -
+                                                  Offset(baseSize.width / 2,
+                                                      baseSize.height / 2),
+                                              size: baseSize,
                                             ));
                                           },
                                           builder: (context, _, __) {
@@ -756,6 +785,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                                     _notify();
                                                   },
                                                   onResizeEnd: _gestureEnd,
+                                                  scale: _scale!,
                                                 ),
                                             ]);
                                           },
