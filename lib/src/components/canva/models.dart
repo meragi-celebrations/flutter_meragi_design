@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
-enum CanvasItemKind { image, text }
+enum CanvasItemKind { image, text, palette }
 
 class CanvasPaletteImage {
   final String id;
@@ -18,11 +18,11 @@ class CanvasItem {
   final String id;
   final CanvasItemKind kind;
 
-  /// IMAGE fields
-  final String? imageId; // links to palette id when applicable
+  // IMAGE fields
+  final String? imageId;
   final ImageProvider? provider;
 
-  /// TEXT fields
+  // TEXT fields
   String? text;
   double fontSize;
   Color fontColor;
@@ -31,12 +31,15 @@ class CanvasItem {
   bool fontItalic;
   bool fontUnderline;
 
-  /// Common fields
+  // PALETTE fields
+  List<Color> paletteColors;
+
+  // Common fields
   Offset position;
   Size size;
   bool locked;
 
-  // Shape for images (in base units)
+  // Image corner radii in base units
   double radiusTL;
   double radiusTR;
   double radiusBL;
@@ -54,6 +57,7 @@ class CanvasItem {
     this.fontFamily,
     this.fontItalic = false,
     this.fontUnderline = false,
+    List<Color>? paletteColors,
     required this.position,
     required this.size,
     this.locked = false,
@@ -61,7 +65,12 @@ class CanvasItem {
     this.radiusTR = 0,
     this.radiusBL = 0,
     this.radiusBR = 0,
-  });
+  }) : paletteColors = paletteColors ??
+            const [
+              Color(0xFF111827), // gray-900
+              Color(0xFF6B7280), // gray-500
+              Color(0xFFE5E7EB), // gray-200
+            ];
 
   TextStyle toTextStyle() => TextStyle(
         fontSize: fontSize,
@@ -75,7 +84,6 @@ class CanvasItem {
       );
 
   TextStyle toRenderTextStyle(double scale) {
-    // scale is render/base from your CanvasScaleHandler.s
     return toTextStyle().copyWith(fontSize: fontSize * scale);
   }
 
@@ -91,6 +99,7 @@ class CanvasItem {
         fontFamily: fontFamily,
         fontItalic: fontItalic,
         fontUnderline: fontUnderline,
+        paletteColors: List<Color>.from(paletteColors),
         position: position,
         size: size,
         locked: locked,
@@ -100,7 +109,6 @@ class CanvasItem {
         radiusBR: radiusBR,
       );
 
-  /// --- New: everything kind-specific lives under "props" ---
   Map<String, dynamic> toJson(int zIndex) => {
         'id': id,
         'kind': kind.name,
@@ -136,10 +144,13 @@ class CanvasItem {
           'fi': fontItalic,
           'fu': fontUnderline,
         };
+      case CanvasItemKind.palette:
+        return {
+          'colors': [for (final c in paletteColors) colorToHex(c)],
+        };
     }
   }
 
-  /// Backward compatible loader: prefers "props", falls back to legacy flat fields.
   static CanvasItem fromJson(
     Map<String, dynamic> json,
     ImageProvider? providerFromOutside,
@@ -152,8 +163,8 @@ class CanvasItem {
 
     final props = (json['props'] as Map?)?.cast<String, dynamic>() ?? const {};
 
-    // Common
-    final id = (json['id'] as String?) ?? buildId();
+    final id = (json['id'] as String?) ??
+        DateTime.now().microsecondsSinceEpoch.toString();
     final pos = Offset(
       (json['x'] as num?)?.toDouble() ?? 0,
       (json['y'] as num?)?.toDouble() ?? 0,
@@ -170,21 +181,12 @@ class CanvasItem {
       ImageProvider? provider = providerFromOutside;
       provider ??= deserializeProvider(props['src'] ?? json['src']);
 
-      // Radii can be under props.radii or legacy flat keys if you add them later
       final rmap =
           (props['radii'] as Map?)?.cast<String, dynamic>() ?? const {};
-      final rtl = (rmap['tl'] as num?)?.toDouble() ??
-          (props['rtl'] as num?)?.toDouble() ??
-          0;
-      final rtr = (rmap['tr'] as num?)?.toDouble() ??
-          (props['rtr'] as num?)?.toDouble() ??
-          0;
-      final rbl = (rmap['bl'] as num?)?.toDouble() ??
-          (props['rbl'] as num?)?.toDouble() ??
-          0;
-      final rbr = (rmap['br'] as num?)?.toDouble() ??
-          (props['rbr'] as num?)?.toDouble() ??
-          0;
+      final rtl = (rmap['tl'] as num?)?.toDouble() ?? 0;
+      final rtr = (rmap['tr'] as num?)?.toDouble() ?? 0;
+      final rbl = (rmap['bl'] as num?)?.toDouble() ?? 0;
+      final rbr = (rmap['br'] as num?)?.toDouble() ?? 0;
 
       return CanvasItem(
         id: id,
@@ -199,8 +201,7 @@ class CanvasItem {
         radiusBL: rbl,
         radiusBR: rbr,
       );
-    } else {
-      // Text
+    } else if (kind == CanvasItemKind.text) {
       final txt =
           (props['text'] as String?) ?? (json['text'] as String?) ?? 'Text';
       final fs = (props['fs'] as num?)?.toDouble() ??
@@ -230,6 +231,24 @@ class CanvasItem {
         fontFamily: ff,
         fontItalic: fi,
         fontUnderline: fu,
+        position: pos,
+        size: size,
+        locked: locked,
+      );
+    } else {
+      final list =
+          (props['colors'] as List?)?.cast<String>() ?? const <String>[];
+      final colors = list
+          .map((h) => hexToColor(h))
+          .whereType<Color>()
+          .toList(growable: false);
+      final safe = colors.isNotEmpty
+          ? colors
+          : const [Color(0xFF111827), Color(0xFF6B7280), Color(0xFFE5E7EB)];
+      return CanvasItem(
+        id: id,
+        kind: kind,
+        paletteColors: List<Color>.from(safe),
         position: pos,
         size: size,
         locked: locked,

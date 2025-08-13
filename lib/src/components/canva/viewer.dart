@@ -211,25 +211,6 @@ class _CanvasItemView extends StatelessWidget {
   final CanvasItem item;
   final CanvasScaleHandler scale;
 
-  Widget _buildText(CanvasItem item, CanvasScaleHandler scale) {
-    final s = scale.s;
-    final pad = 6.0 * s;
-    return Padding(
-      padding: EdgeInsets.all(pad),
-      child: Align(
-        alignment: Alignment.topLeft,
-        child: Text(
-          item.text ?? '',
-          maxLines: null,
-          softWrap: true,
-          overflow: TextOverflow.visible,
-          textScaleFactor: 1.0,
-          style: item.toRenderTextStyle(s),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final pos = scale.baseToRender(item.position);
@@ -257,10 +238,47 @@ class _CanvasItemView extends StatelessWidget {
       );
       return ClipRRect(
         borderRadius: br,
+        clipBehavior: Clip.antiAlias,
         child: Image(image: provider, fit: BoxFit.cover),
       );
-    } else {
-      return _buildText(item, scale);
     }
+
+    if (item.kind == CanvasItemKind.text) {
+      final s = scale.s;
+      final pad = 6.0 * s;
+      return Padding(
+        padding: EdgeInsets.all(pad),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Text(
+            item.text ?? '',
+            maxLines: null,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+            textScaleFactor: 1.0,
+            style: item.toRenderTextStyle(s),
+          ),
+        ),
+      );
+    }
+
+    // palette
+    final s = scale.s;
+    final gap = 4.0 * s;
+    final pad = 6.0 * s;
+    final colors = item.paletteColors;
+    if (colors.isEmpty) return const SizedBox.shrink();
+
+    final children = <Widget>[];
+    for (int i = 0; i < colors.length; i++) {
+      if (i > 0) children.add(SizedBox(width: gap));
+      children.add(Expanded(child: Container(color: colors[i])));
+    }
+
+    return Padding(
+      padding: EdgeInsets.all(pad),
+      child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+    );
   }
 }

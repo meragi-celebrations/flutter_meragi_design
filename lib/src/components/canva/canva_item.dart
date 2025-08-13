@@ -54,12 +54,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
   }
 
   BorderRadius _itemBorderRadius() {
-    // If you have scale handler on the widget, use it. Otherwise use 1.0
-    final s =
-        (context.findAncestorWidgetOfExactType<CanvasItemWidget>() as dynamic)
-                ?.scale
-                ?.s ??
-            1.0;
+    final s = widget.scale.s;
     return BorderRadius.only(
       topLeft: Radius.circular(_item.radiusTL * s),
       topRight: Radius.circular(_item.radiusTR * s),
@@ -126,8 +121,8 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
   }
 
   Widget _buildTextContent(CanvasItem item) {
-    final s = widget.scale.s; // render/base scale
-    final pad = 6.0 * s; // keep padding proportional
+    final s = widget.scale.s;
+    final pad = 6.0 * s;
     return Padding(
       padding: EdgeInsets.all(pad),
       child: Align(
@@ -138,8 +133,31 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
           softWrap: true,
           overflow: TextOverflow.visible,
           textScaleFactor: 1.0,
-          style: item.toRenderTextStyle(s), // scaled font size
+          style: item.toRenderTextStyle(s),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPaletteContent() {
+    final s = widget.scale.s;
+    final gap = 4.0 * s;
+    final pad = 6.0 * s;
+    final colors = _item.paletteColors;
+
+    if (colors.isEmpty) return const SizedBox.shrink();
+
+    final children = <Widget>[];
+    for (int i = 0; i < colors.length; i++) {
+      if (i > 0) children.add(SizedBox(width: gap));
+      children.add(Expanded(child: Container(color: colors[i])));
+    }
+
+    return Padding(
+      padding: EdgeInsets.all(pad),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
       ),
     );
   }
@@ -177,13 +195,15 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
                 ),
                 child: _item.kind == CanvasItemKind.image
                     ? ClipRRect(
-                        clipBehavior: Clip.antiAlias, // smooth edges
+                        clipBehavior: Clip.antiAlias,
                         borderRadius: _itemBorderRadius(),
                         child: _item.provider == null
                             ? const SizedBox.shrink()
                             : Image(image: _item.provider!, fit: BoxFit.cover),
                       )
-                    : _buildTextContent(_item),
+                    : (_item.kind == CanvasItemKind.text
+                        ? _buildTextContent(_item)
+                        : _buildPaletteContent()),
               ),
             ),
             if (widget.isSelected && !_item.locked) ...[

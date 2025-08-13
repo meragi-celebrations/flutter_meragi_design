@@ -309,7 +309,14 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                             widget.onChanged(u);
                           },
                         ),
-                    },
+                      CanvasItemKind.palette => _PaletteProperties(
+                          item: item,
+                          onChange: (u) {
+                            _beginIfNeeded();
+                            widget.onChanged(u);
+                          },
+                        ),
+                    }
                   ],
                 ),
               ),
@@ -830,4 +837,158 @@ class _SectionTitle extends StatelessWidget {
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
     );
   }
+}
+
+class _PaletteProperties extends StatefulWidget {
+  const _PaletteProperties({required this.item, required this.onChange});
+  final CanvasItem item;
+  final ValueChanged<CanvasItem> onChange;
+
+  @override
+  State<_PaletteProperties> createState() => _PalettePropertiesState();
+}
+
+class _PalettePropertiesState extends State<_PaletteProperties> {
+  final _rows = <_PaletteRow>[];
+
+  @override
+  void initState() {
+    super.initState();
+    for (final c in widget.item.paletteColors) {
+      _rows.add(_PaletteRow(initial: _colorToHex(c)));
+    }
+    if (_rows.isEmpty) _rows.add(_PaletteRow(initial: '#FF000000'));
+  }
+
+  @override
+  void didUpdateWidget(covariant _PaletteProperties oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item.id != widget.item.id) {
+      _rows
+        ..clear()
+        ..addAll(widget.item.paletteColors
+            .map((c) => _PaletteRow(initial: _colorToHex(c))));
+      if (_rows.isEmpty) _rows.add(_PaletteRow(initial: '#FF000000'));
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final r in _rows) {
+      r.ctrl.dispose();
+    }
+    super.dispose();
+  }
+
+  String _colorToHex(Color c) =>
+      '#${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+
+  Color? _parseHex(String s) {
+    try {
+      var hex = s.replaceAll('#', '').trim();
+      if (hex.length == 6) hex = 'FF$hex';
+      final v = int.parse(hex, radix: 16);
+      return Color(v);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _commit() {
+    final list = <Color>[];
+    for (final r in _rows) {
+      final c = _parseHex(r.ctrl.text);
+      if (c != null) list.add(c);
+    }
+    if (list.isEmpty) return;
+    final u = widget.item.copy()..paletteColors = list;
+    widget.onChange(u);
+  }
+
+  void _addRow() {
+    setState(() => _rows.add(_PaletteRow(initial: '#FFFFFFFF')));
+    _commit();
+  }
+
+  void _removeRow(int i) {
+    if (_rows.length <= 1) return;
+    setState(() => _rows.removeAt(i));
+    _commit();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const _SectionTitle('Palette'),
+      ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _rows.length,
+        itemBuilder: (context, i) {
+          final row = _rows[i];
+          final preview = _parseHex(row.ctrl.text);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(children: [
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: preview ?? Colors.transparent,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: preview == null ? Colors.red : Colors.black26,
+                    width: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: row.ctrl,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                    labelText: 'Hex color',
+                    hintText: '#RRGGBB or #AARRGGBB',
+                  ),
+                  onSubmitted: (_) => _commit(),
+                  onEditingComplete: _commit,
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                tooltip: 'Remove',
+                icon: const Icon(Icons.remove_circle_outline),
+                onPressed: () => _removeRow(i),
+              ),
+            ]),
+          );
+        },
+      ),
+      const SizedBox(height: 8),
+      Row(children: [
+        ElevatedButton.icon(
+          onPressed: _addRow,
+          icon: const Icon(Icons.add),
+          label: const Text('Add color'),
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black87,
+            side: const BorderSide(color: Colors.black12),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text('${_rows.length} color${_rows.length == 1 ? '' : 's'}'),
+      ]),
+    ]);
+  }
+}
+
+class _PaletteRow {
+  _PaletteRow({required String initial})
+      : ctrl = TextEditingController(text: initial);
+  final TextEditingController ctrl;
 }

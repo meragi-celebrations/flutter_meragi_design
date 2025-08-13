@@ -9,6 +9,7 @@ class WorkspaceActionBar extends StatelessWidget {
     required this.onRedo,
     required this.onColorPick,
     required this.onAddText,
+    required this.onAddPalette,
   });
 
   final Color canvasColor;
@@ -16,6 +17,7 @@ class WorkspaceActionBar extends StatelessWidget {
   final VoidCallback onRedo;
   final ValueChanged<Color> onColorPick;
   final VoidCallback onAddText;
+  final VoidCallback onAddPalette;
 
   static const _swatches = <Color>[
     Colors.white,
@@ -93,6 +95,20 @@ class WorkspaceActionBar extends StatelessWidget {
               onPressed: onAddText,
               icon: const Icon(Icons.text_fields),
               label: const Text('Text'),
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+                side: const BorderSide(color: Colors.black12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: onAddPalette,
+              icon: const Icon(Icons.color_lens_outlined),
+              label: const Text('Palette'),
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: Colors.white,

@@ -82,6 +82,27 @@ class SimpleCanvaController {
     );
   }
 
+  void addPalette({
+    List<Color>? colors,
+    Offset? position,
+    Size? size,
+  }) {
+    _state?._addItem(
+      CanvasItem(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        kind: CanvasItemKind.palette,
+        paletteColors: colors ??
+            const [
+              Color(0xFF111827),
+              Color(0xFF6B7280),
+              Color(0xFFE5E7EB),
+            ],
+        position: position ?? const Offset(40, 40),
+        size: size ?? const Size(320, 64),
+      ),
+    );
+  }
+
   void setCanvasColor(Color color) => _state?._setCanvasColor(color);
 
   Future<Uint8List?> exportAsPng({double pixelRatio = 3}) async =>
@@ -484,6 +505,23 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     );
   }
 
+  void _addPaletteBox() {
+    _pushHistory();
+    _addItem(
+      CanvasItem(
+        id: buildId(),
+        kind: CanvasItemKind.palette,
+        paletteColors: const [
+          Color(0xFF111827), // gray-900
+          Color(0xFF6B7280), // gray-500
+          Color(0xFFE5E7EB), // gray-200
+        ],
+        position: const Offset(60, 60),
+        size: const Size(320, 64),
+      ),
+    );
+  }
+
   void _clear() {
     setState(() {
       _items.clear();
@@ -816,6 +854,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                   onRedo: _redoAction,
                   onColorPick: (c) => _setCanvasColor(c),
                   onAddText: _addTextBox,
+                  onAddPalette: _addPaletteBox,
                 ),
               ),
             ),
