@@ -2,11 +2,10 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/src/components/canva/models.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
-/// Read-only viewer for a SimpleCanva document.
 class CanvaViewer extends StatelessWidget {
   const CanvaViewer({
     super.key,
@@ -17,7 +16,6 @@ class CanvaViewer extends StatelessWidget {
     this.showShadow = true,
   });
 
-  /// Convenience: construct from a JSON string.
   factory CanvaViewer.fromJsonString(
     String jsonString, {
     Key? key,
@@ -53,7 +51,7 @@ class CanvaViewer extends StatelessWidget {
     final bgColor =
         (colorHex != null ? hexToColor(colorHex) : null) ?? Colors.white;
 
-    // Prefer explicit base size
+    // Prefer explicit base size if present
     Size baseSize = const Size(1920, 1080);
     final base = (canvasInfo['base'] as Map?)?.cast<String, dynamic>();
     if (base != null) {
@@ -64,12 +62,10 @@ class CanvaViewer extends StatelessWidget {
       }
     }
 
-    // Fallback if only aspect is present
     double aspect = baseSize.width / baseSize.height;
     final parsedAspect = _parseAspect(canvasInfo['aspect']);
     if (parsedAspect != null) {
       aspect = parsedAspect;
-      // keep base height 1080 for deterministic scaling when base missing
       if (base == null) baseSize = Size(1080 * aspect, 1080);
     }
 
@@ -80,7 +76,6 @@ class CanvaViewer extends StatelessWidget {
       alignment: Alignment.center,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Fit canvas inside available space, preserving aspect ratio
           double w = constraints.maxWidth;
           double h = w / aspect;
           if (h > constraints.maxHeight) {
@@ -115,15 +110,13 @@ class CanvaViewer extends StatelessWidget {
           return SizedBox(
             width: w,
             height: h,
-            child:
-                IgnorePointer(ignoring: true, child: canvas), // no interaction
+            child: IgnorePointer(ignoring: true, child: canvas),
           );
         },
       ),
     );
   }
 
-  /// Parse 'W:H' or a number. Returns null if invalid.
   double? _parseAspect(dynamic value) {
     if (value == null) return null;
     if (value is num) return value.toDouble();
@@ -147,27 +140,17 @@ class CanvaViewer extends StatelessWidget {
   List<CanvasItem> _buildItems(Map<String, dynamic> doc) {
     final raw =
         (doc['items'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
-
     final items = <CanvasItem>[];
     for (final j in raw) {
-      final kindStr = (j['kind'] as String?) ?? 'image';
-      final kind = CanvasItemKind.values.firstWhere(
-        (e) => e.name == kindStr,
-        orElse: () => CanvasItemKind.image,
-      );
-
-      // Support new nested "props" and legacy flat fields
-      final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
-
+      // resolve provider from palette
       ImageProvider? provider;
-      if (kind == CanvasItemKind.image) {
-        final imageId =
-            (props['imageId'] as String?) ?? (j['imageId'] as String?);
-        if (imageId != null && _paletteById.containsKey(imageId)) {
-          provider = _paletteById[imageId]!.provider;
-        }
-        provider ??= deserializeProvider(props['src'] ?? j['src']);
+      final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final imageId =
+          (props['imageId'] as String?) ?? (j['imageId'] as String?);
+      if (imageId != null && _paletteById.containsKey(imageId)) {
+        provider = _paletteById[imageId]!.provider;
       }
+      provider ??= deserializeProvider(props['src'] ?? j['src']);
 
       items.add(CanvasItem.fromJson(j, provider));
     }
@@ -175,7 +158,6 @@ class CanvaViewer extends StatelessWidget {
   }
 }
 
-/// Internal: paints items at absolute positions with clipping handled by parent.
 class _CanvasStack extends StatelessWidget {
   const _CanvasStack({
     required this.items,
@@ -193,7 +175,7 @@ class _CanvasStack extends StatelessWidget {
       width: canvasSize.width,
       height: canvasSize.height,
       child: Stack(
-        clipBehavior: Clip.hardEdge, // clip overflowing items
+        clipBehavior: Clip.hardEdge,
         children: [
           for (final item in items)
             _CanvasItemView(
@@ -208,7 +190,6 @@ class _CanvasStack extends StatelessWidget {
 
 class _CanvasItemView extends StatelessWidget {
   const _CanvasItemView({required this.item, required this.scale});
-
   final CanvasItem item;
   final CanvasScaleHandler scale;
 
@@ -230,67 +211,10 @@ class _CanvasItemView extends StatelessWidget {
           child: SizedBox(
             width: size.width,
             height: size.height,
-            child: _buildContent(),
+            child: item.buildContent(scale),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildContent() {
-    if (item.kind == CanvasItemKind.image) {
-      final provider = item.provider;
-      if (provider == null) return const SizedBox.shrink();
-      final s = scale.s;
-      final br = BorderRadius.only(
-        topLeft: Radius.circular(item.radiusTL * s),
-        topRight: Radius.circular(item.radiusTR * s),
-        bottomLeft: Radius.circular(item.radiusBL * s),
-        bottomRight: Radius.circular(item.radiusBR * s),
-      );
-      return ClipRRect(
-        borderRadius: br,
-        clipBehavior: Clip.antiAlias,
-        child: Image(image: provider, fit: BoxFit.cover),
-      );
-    }
-
-    if (item.kind == CanvasItemKind.text) {
-      final s = scale.s;
-      final pad = 6.0 * s;
-      return Padding(
-        padding: EdgeInsets.all(pad),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Text(
-            item.text ?? '',
-            maxLines: null,
-            softWrap: true,
-            overflow: TextOverflow.visible,
-            textScaleFactor: 1.0,
-            style: item.toRenderTextStyle(s),
-          ),
-        ),
-      );
-    }
-
-    // palette
-    final s = scale.s;
-    final gap = 4.0 * s;
-    final pad = 6.0 * s;
-    final colors = item.paletteColors;
-    if (colors.isEmpty) return const SizedBox.shrink();
-
-    final children = <Widget>[];
-    for (int i = 0; i < colors.length; i++) {
-      if (i > 0) children.add(SizedBox(width: gap));
-      children.add(Expanded(child: Container(color: colors[i])));
-    }
-
-    return Padding(
-      padding: EdgeInsets.all(pad),
-      child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
     );
   }
 }

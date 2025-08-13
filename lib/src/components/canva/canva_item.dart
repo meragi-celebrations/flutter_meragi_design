@@ -25,8 +25,7 @@ class CanvasItemWidget extends StatefulWidget {
   final Size canvasSize;
   final bool isSelected;
   final void Function(Offset delta) onPanMove; // move ALL selected
-  final void Function(CanvasItem updated)
-      onResizeCommit; // resize / text edit commit
+  final void Function(CanvasItem updated) onResizeCommit; // resize / edits
   final VoidCallback onPanStart;
   final VoidCallback onPanEnd;
   final VoidCallback onResizeStart;
@@ -57,26 +56,16 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
   @override
   void initState() {
     super.initState();
-    _item = widget.item.copy();
+    _item = widget.item.cloneWith(); // defensive local copy
   }
 
   @override
   void didUpdateWidget(covariant CanvasItemWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _item = widget.item.copy();
+    _item = widget.item.cloneWith();
   }
 
   double get _radians => _item.rotationDeg * math.pi / 180.0;
-
-  BorderRadius _itemBorderRadius() {
-    final s = widget.scale.s;
-    return BorderRadius.only(
-      topLeft: Radius.circular(_item.radiusTL * s),
-      topRight: Radius.circular(_item.radiusTR * s),
-      bottomLeft: Radius.circular(_item.radiusBL * s),
-      bottomRight: Radius.circular(_item.radiusBR * s),
-    );
-  }
 
   // ---------- Resize ----------
   void _resizeFromCorner(Offset renderDelta, _Corner corner) {
@@ -124,46 +113,6 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     widget.onResizeCommit(_item);
   }
 
-  // ---------- Text / Palette content ----------
-  Widget _buildTextContent(CanvasItem item) {
-    final s = widget.scale.s;
-    final pad = 6.0 * s;
-    return Padding(
-      padding: EdgeInsets.all(pad),
-      child: Align(
-        alignment: Alignment.topLeft,
-        child: Text(
-          item.text ?? '',
-          maxLines: null,
-          softWrap: true,
-          overflow: TextOverflow.visible,
-          textScaleFactor: 1.0,
-          style: item.toRenderTextStyle(s),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaletteContent() {
-    final s = widget.scale.s;
-    final gap = 4.0 * s;
-    final pad = 6.0 * s;
-    final colors = _item.paletteColors;
-    if (colors.isEmpty) return const SizedBox.shrink();
-
-    final children = <Widget>[];
-    for (int i = 0; i < colors.length; i++) {
-      if (i > 0) children.add(SizedBox(width: gap));
-      children.add(Expanded(child: Container(color: colors[i])));
-    }
-
-    return Padding(
-      padding: EdgeInsets.all(pad),
-      child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
-    );
-  }
-
   // ---------- Rotation math ----------
   Offset _globalToLocal(Offset global) {
     final rb = _boxKey.currentContext?.findRenderObject() as RenderBox?;
@@ -171,7 +120,6 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     return rb.globalToLocal(global);
   }
 
-  /// angle from item center to a local point (radians)
   double _angleAtLocal(Offset local) {
     final sizeRender = widget.scale.baseToRenderSize(_item.size);
     final cx = sizeRender.width / 2;
@@ -234,15 +182,11 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     );
   }
 
-  // ---------- Text editor ----------
-  Future<void> _editText() async {
-    if (_item.locked || _item.kind != CanvasItemKind.text) return;
-    final updated = await showDialog<CanvasItem>(
-      context: context,
-      builder: (context) => _TextEditorDialog(initial: _item),
-    );
+  // ---------- Double tap -> item-specific edit ----------
+  Future<void> _handleDoubleTap() async {
+    final updated = await _item.handleDoubleTap(context);
     if (updated != null) {
-      setState(() => _item = updated);
+      setState(() => _item = updated.cloneWith());
       widget.onResizeCommit(updated);
     }
   }
@@ -265,7 +209,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
           widget.onPanMove(widget.scale.renderDeltaToBase(d.delta));
         },
         onPanEnd: (_) => widget.onPanEnd(),
-        onDoubleTap: _item.kind == CanvasItemKind.text ? _editText : null,
+        onDoubleTap: _handleDoubleTap,
         child: Stack(
           key: _boxKey,
           clipBehavior: Clip.none, // allow rotated content to overflow
@@ -284,18 +228,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
                     angle: _radians,
                     alignment: Alignment.center,
                     child: SizedBox.expand(
-                      child: switch (_item.kind) {
-                        CanvasItemKind.image => ClipRRect(
-                            clipBehavior: Clip.antiAlias,
-                            borderRadius: _itemBorderRadius(),
-                            child: _item.provider == null
-                                ? const SizedBox.shrink()
-                                : Image(
-                                    image: _item.provider!, fit: BoxFit.cover),
-                          ),
-                        CanvasItemKind.text => _buildTextContent(_item),
-                        CanvasItemKind.palette => _buildPaletteContent(),
-                      },
+                      child: _item.buildContent(widget.scale),
                     ),
                   ),
                 ),
@@ -308,7 +241,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
               _handle(Alignment.topRight, _Corner.topRight),
               _handle(Alignment.bottomLeft, _Corner.bottomLeft),
               _handle(Alignment.bottomRight, _Corner.bottomRight),
-              _rotationHandle(), // NEW
+              _rotationHandle(),
             ],
 
             if (_item.locked)
@@ -351,319 +284,4 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
           ),
         ),
       );
-}
-
-/// ------------------ Text Editor Dialog ------------------
-
-class _TextEditorDialog extends StatefulWidget {
-  const _TextEditorDialog({required this.initial});
-
-  final CanvasItem initial;
-
-  @override
-  State<_TextEditorDialog> createState() => _TextEditorDialogState();
-}
-
-class _TextEditorDialogState extends State<_TextEditorDialog> {
-  late TextEditingController _ctrl;
-  late double _fontSize;
-  late Color _fontColor;
-  late FontWeight _fontWeight;
-  late bool _italic;
-  late bool _underline;
-  String? _fontFamily;
-
-  static const _swatches = <Color>[
-    Colors.black,
-    Colors.white,
-    Color(0xFF111827), // gray-900
-    Color(0xFF374151), // gray-700
-    Color(0xFF6B7280), // gray-500
-    Color(0xFFEF4444), // red-500
-    Color(0xFFF59E0B), // amber-500
-    Color(0xFF10B981), // emerald-500
-    Color(0xFF3B82F6), // blue-500
-    Color(0xFF8B5CF6), // violet-500
-  ];
-
-  // Include fonts you actually ship with your app or via google_fonts.
-  static const _fontOptions = <String?>[
-    null, // System default
-    'Inter',
-    'Roboto',
-    'Montserrat',
-    'Merriweather',
-    'Poppins',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = TextEditingController(text: widget.initial.text ?? '');
-    _fontSize = widget.initial.fontSize;
-    _fontColor = widget.initial.fontColor;
-    _fontWeight = widget.initial.fontWeight;
-    _italic = widget.initial.fontItalic;
-    _underline = widget.initial.fontUnderline;
-    _fontFamily = widget.initial.fontFamily;
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  void _toggleBold() {
-    setState(() {
-      _fontWeight = _fontWeight.index >= FontWeight.w600.index
-          ? FontWeight.w400
-          : FontWeight.w700;
-    });
-  }
-
-  void _toggleItalic() {
-    setState(() => _italic = !_italic);
-  }
-
-  void _toggleUnderline() {
-    setState(() => _underline = !_underline);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final previewStyle = TextStyle(
-      fontSize: _fontSize,
-      color: _fontColor,
-      fontWeight: _fontWeight,
-      fontStyle: _italic ? FontStyle.italic : FontStyle.normal,
-      decoration: _underline ? TextDecoration.underline : TextDecoration.none,
-      fontFamily: _fontFamily,
-      height: 1.2,
-    );
-
-    return AlertDialog(
-      title: const Text('Edit text'),
-      content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Content
-            TextField(
-              controller: _ctrl,
-              autofocus: true,
-              maxLines: null,
-              decoration: const InputDecoration(
-                hintText: 'Enter text',
-                border: OutlineInputBorder(),
-                isDense: true,
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Font family + size
-            Row(
-              children: [
-                Expanded(
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Font',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String?>(
-                        value: _fontFamily,
-                        isDense: true,
-                        items: _fontOptions
-                            .map((f) => DropdownMenuItem<String?>(
-                                  value: f,
-                                  child: Text(f ?? 'System'),
-                                ))
-                            .toList(),
-                        onChanged: (v) => setState(() => _fontFamily = v),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          const Text('Size'),
-                          const SizedBox(width: 8),
-                          Text(_fontSize.toStringAsFixed(0)),
-                        ],
-                      ),
-                      Slider(
-                        value: _fontSize.clamp(8, 144),
-                        min: 8,
-                        max: 144,
-                        divisions: 136,
-                        label: _fontSize.toStringAsFixed(0),
-                        onChanged: (v) => setState(() => _fontSize = v),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Style toggles
-            Row(
-              children: [
-                _StyleToggle(
-                  tooltip: 'Bold',
-                  selected: _fontWeight.index >= FontWeight.w600.index,
-                  icon: Icons.format_bold,
-                  onTap: _toggleBold,
-                ),
-                const SizedBox(width: 8),
-                _StyleToggle(
-                  tooltip: 'Italic',
-                  selected: _italic,
-                  icon: Icons.format_italic,
-                  onTap: _toggleItalic,
-                ),
-                const SizedBox(width: 8),
-                _StyleToggle(
-                  tooltip: 'Underline',
-                  selected: _underline,
-                  icon: Icons.format_underline,
-                  onTap: _toggleUnderline,
-                ),
-                const Spacer(),
-                // Color swatches
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    for (final c in _swatches)
-                      _ColorDot(
-                        color: c,
-                        selected: c.value == _fontColor.value,
-                        onTap: () => setState(() => _fontColor = c),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-            // Preview
-            Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(minHeight: 64),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                border: Border.all(color: Colors.black12),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(_ctrl.text, style: previewStyle),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel')),
-        FilledButton(
-          onPressed: () {
-            final updated = widget.initial.copy()
-              ..text = _ctrl.text.trim()
-              ..fontSize = _fontSize
-              ..fontColor = _fontColor
-              ..fontWeight = _fontWeight
-              ..fontFamily = _fontFamily
-              ..fontItalic = _italic
-              ..fontUnderline = _underline;
-            Navigator.pop(context, updated);
-          },
-          child: const Text('Save'),
-        ),
-      ],
-    );
-  }
-}
-
-class _StyleToggle extends StatelessWidget {
-  const _StyleToggle({
-    required this.tooltip,
-    required this.selected,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String tooltip;
-  final bool selected;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = selected
-        ? Theme.of(context).colorScheme.primary.withOpacity(0.12)
-        : Colors.transparent;
-    final fg = selected ? Theme.of(context).colorScheme.primary : null;
-    return Tooltip(
-      message: tooltip,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-                color: selected
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.black12),
-          ),
-          child: Icon(icon, size: 20, color: fg),
-        ),
-      ),
-    );
-  }
-}
-
-class _ColorDot extends StatelessWidget {
-  const _ColorDot({
-    required this.color,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final Color color;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final borderColor =
-        color.computeLuminance() < 0.5 ? Colors.white : Colors.black26;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 22,
-        height: 22,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color:
-                selected ? Theme.of(context).colorScheme.primary : borderColor,
-            width: selected ? 2 : 1,
-          ),
-        ),
-      ),
-    );
-  }
 }

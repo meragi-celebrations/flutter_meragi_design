@@ -12,6 +12,17 @@ import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
+class CanvasPaletteImage {
+  final String id;
+  final ImageProvider provider;
+  final Size? preferredSize;
+  const CanvasPaletteImage({
+    required this.id,
+    required this.provider,
+    this.preferredSize,
+  });
+}
+
 class SimpleCanva extends StatefulWidget {
   const SimpleCanva({
     super.key,
@@ -47,9 +58,8 @@ class SimpleCanvaController {
 
   void addFromProvider(ImageProvider provider, {Offset? position, Size? size}) {
     _state?._addItem(
-      CanvasItem(
+      ImageItem(
         id: buildId(),
-        kind: CanvasItemKind.image,
         imageId: null,
         provider: provider,
         position: position ?? const Offset(40, 40),
@@ -68,9 +78,8 @@ class SimpleCanvaController {
     String? fontFamily,
   }) {
     _state?._addItem(
-      CanvasItem(
+      TextItem(
         id: buildId(),
-        kind: CanvasItemKind.text,
         text: text,
         fontSize: fontSize,
         fontColor: color,
@@ -88,15 +97,10 @@ class SimpleCanvaController {
     Size? size,
   }) {
     _state?._addItem(
-      CanvasItem(
-        id: DateTime.now().microsecondsSinceEpoch.toString(),
-        kind: CanvasItemKind.palette,
+      PaletteItem(
+        id: buildId(),
         paletteColors: colors ??
-            const [
-              Color(0xFF111827),
-              Color(0xFF6B7280),
-              Color(0xFFE5E7EB),
-            ],
+            const [Color(0xFF111827), Color(0xFF6B7280), Color(0xFFE5E7EB)],
         position: position ?? const Offset(40, 40),
         size: size ?? const Size(320, 64),
       ),
@@ -294,23 +298,10 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     final clones = <CanvasItem>[];
     for (final it in _items) {
       if (_selected.contains(it.id)) {
-        final dup = it.copy()
+        final dup = it.cloneWith(id: buildId())
           ..position = it.position + const Offset(12, 12)
           ..locked = false;
-        clones.add(CanvasItem(
-          id: buildId(),
-          kind: dup.kind,
-          imageId: dup.imageId,
-          provider: dup.provider,
-          text: dup.text,
-          fontSize: dup.fontSize,
-          fontColor: dup.fontColor,
-          fontWeight: dup.fontWeight,
-          fontFamily: dup.fontFamily,
-          position: dup.position,
-          size: dup.size,
-          locked: dup.locked,
-        ));
+        clones.add(dup);
       }
     }
     setState(() {
@@ -441,8 +432,6 @@ class _SimpleCanvaState extends State<SimpleCanva> {
 
   void _panSelected(Offset delta) {
     if (_selected.isEmpty) return;
-
-    // Move ALL selected that aren’t locked, no clamping to canvas edges.
     final movable =
         _items.where((it) => _selected.contains(it.id) && !it.locked);
     if (movable.isEmpty) return;
@@ -495,9 +484,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   void _addTextBox() {
     _pushHistory();
     _addItem(
-      CanvasItem(
+      TextItem(
         id: buildId(),
-        kind: CanvasItemKind.text,
         text: 'Double-click to edit',
         position: const Offset(60, 60),
         size: const Size(240, 96),
@@ -508,13 +496,12 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   void _addPaletteBox() {
     _pushHistory();
     _addItem(
-      CanvasItem(
+      PaletteItem(
         id: buildId(),
-        kind: CanvasItemKind.palette,
         paletteColors: const [
-          Color(0xFF111827), // gray-900
-          Color(0xFF6B7280), // gray-500
-          Color(0xFFE5E7EB), // gray-200
+          Color(0xFF111827),
+          Color(0xFF6B7280),
+          Color(0xFFE5E7EB),
         ],
         position: const Offset(60, 60),
         size: const Size(320, 64),
@@ -554,7 +541,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         'version': 2,
         'canvas': {
           'base': {'w': _baseSize.width, 'h': _baseSize.height},
-          'aspect': _baseSize.width / _baseSize.height, // keep for fallback
+          'aspect': _baseSize.width / _baseSize.height,
           'color': colorToHex(_canvasColor),
         },
         'items': [for (int i = 0; i < _items.length; i++) _items[i].toJson(i)],
@@ -568,7 +555,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
       if (c != null) _canvasColor = c;
     }
 
-    // NEW: base size
+    // base size
     final base = (canvas['base'] as Map?)?.cast<String, dynamic>();
     if (base != null) {
       final bw = (base['w'] as num?)?.toDouble();
@@ -578,27 +565,19 @@ class _SimpleCanvaState extends State<SimpleCanva> {
       }
     }
 
-    final rawItems = (doc['items'] as List?)?.cast<Map<String, dynamic>>() ??
-        const <Map<String, dynamic>>[];
+    final rawItems =
+        (doc['items'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
     final rebuilt = <CanvasItem>[];
     for (final j in rawItems) {
-      final kindStr = (j['kind'] as String?) ?? 'image';
-      final kind = CanvasItemKind.values.firstWhere(
-        (e) => e.name == kindStr,
-        orElse: () => CanvasItemKind.image,
-      );
-
-      final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
-
+      // Resolve provider from palette id if present
       ImageProvider? provider;
-      if (kind == CanvasItemKind.image) {
-        final imageId =
-            (props['imageId'] as String?) ?? (j['imageId'] as String?);
-        if (imageId != null && _paletteById.containsKey(imageId)) {
-          provider = _paletteById[imageId]!.provider;
-        }
-        provider ??= deserializeProvider(props['src'] ?? j['src']);
+      final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final imageId =
+          (props['imageId'] as String?) ?? (j['imageId'] as String?);
+      if (imageId != null && _paletteById.containsKey(imageId)) {
+        provider = _paletteById[imageId]!.provider;
       }
+      provider ??= deserializeProvider(props['src'] ?? j['src']);
 
       rebuilt.add(CanvasItem.fromJson(j, provider));
     }
@@ -651,10 +630,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     final scale = _scale;
     if (scale == null) return;
 
-    // Convert pointer to base units for consistent hit tests
     final localBase = scale.renderToBase(localRender);
 
-    // Find topmost hit item in BASE coordinates
     String? hitId;
     for (final item in _items.reversed) {
       final rect = Rect.fromLTWH(item.position.dx, item.position.dy,
@@ -684,11 +661,6 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     } else {
       if (!alreadySelected) _selectOnly(hitId);
     }
-  }
-
-  Size _canvasSize() {
-    final rb = _canvasBoxKey.currentContext?.findRenderObject() as RenderBox?;
-    return rb?.size ?? const Size(1, 1);
   }
 
   @override
@@ -773,23 +745,18 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                             final scale = _scale;
                                             if (scale == null) return;
 
-                                            // Pointer where the image was dropped (render pixels)
                                             final localRender =
                                                 _toLocal(details.offset);
-
-                                            // Convert to base
                                             final baseDrop =
                                                 scale.renderToBase(localRender);
 
                                             final pal = details.data;
-                                            // Treat preferredSize as BASE units
                                             final baseSize =
                                                 pal.preferredSize ??
                                                     const Size(160, 160);
 
-                                            _addItem(CanvasItem(
+                                            _addItem(ImageItem(
                                               id: buildId(),
-                                              kind: CanvasItemKind.image,
                                               imageId: pal.id,
                                               provider: pal.provider,
                                               position: baseDrop -
@@ -868,7 +835,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         child: PropertiesSidebar(
           item: _singleSelected(),
           selectedCount: _selected.length,
-          // actions moved from action bar
+          // actions
           onDelete: _deleteSelected,
           onDuplicate: _duplicateSelected,
           onFront: _bringToFront,
@@ -879,8 +846,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
           onAlignTop: _alignTop,
           onAlignVCenter: _alignVCenter,
           onAlignBottom: _alignBottom,
-          onLockToggle: _toggleLockSelected, // NEW
-          // existing property change hooks
+          onLockToggle: _toggleLockSelected,
+          // property change hooks
           onChangeStart: _propChangeStart,
           onChanged: _propApply,
           onChangeEnd: _propChangeEnd,
