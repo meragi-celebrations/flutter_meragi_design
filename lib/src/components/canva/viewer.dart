@@ -71,7 +71,7 @@ class CanvaViewer extends StatelessWidget {
         (colorHex != null ? hexToColor(colorHex) : null) ?? Colors.white;
 
     // Prefer explicit base size if present
-    Size baseSize = const Size(1920, 1080);
+    Size baseSize = const Size(960, 540);
     final base = (canvasInfo['base'] as Map?)?.cast<String, dynamic>();
     if (base != null) {
       final bw = (base['w'] as num?)?.toDouble();

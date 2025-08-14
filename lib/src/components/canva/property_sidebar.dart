@@ -17,6 +17,8 @@ class PropertiesSidebar extends StatefulWidget {
     required this.onAlignTop,
     required this.onAlignVCenter,
     required this.onAlignBottom,
+    required this.onAlignCanvasHCenter,
+    required this.onAlignCanvasVCenter,
     required this.onLockToggle,
     // property change lifecycle
     required this.onChangeStart,
@@ -39,6 +41,8 @@ class PropertiesSidebar extends StatefulWidget {
   final VoidCallback onAlignTop;
   final VoidCallback onAlignVCenter;
   final VoidCallback onAlignBottom;
+  final VoidCallback onAlignCanvasHCenter;
+  final VoidCallback onAlignCanvasVCenter;
   final VoidCallback onLockToggle;
 
   // Property change lifecycle
@@ -160,6 +164,8 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                 onAlignTop: widget.onAlignTop,
                 onAlignVCenter: widget.onAlignVCenter,
                 onAlignBottom: widget.onAlignBottom,
+                onAlignCanvasHCenter: widget.onAlignCanvasHCenter,
+                onAlignCanvasVCenter: widget.onAlignCanvasVCenter,
                 onLockToggle: widget.onLockToggle,
               ),
             _ => SingleChildScrollView(
@@ -178,6 +184,8 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                       onAlignTop: widget.onAlignTop,
                       onAlignVCenter: widget.onAlignVCenter,
                       onAlignBottom: widget.onAlignBottom,
+                      onAlignCanvasHCenter: widget.onAlignCanvasHCenter,
+                      onAlignCanvasVCenter: widget.onAlignCanvasVCenter,
                       onLockToggle: widget.onLockToggle,
                     ),
                     const SizedBox(height: 12),
@@ -251,6 +259,8 @@ class _ActionsOnly extends StatelessWidget {
     required this.onAlignTop,
     required this.onAlignVCenter,
     required this.onAlignBottom,
+    required this.onAlignCanvasHCenter,
+    required this.onAlignCanvasVCenter,
     required this.onLockToggle,
   });
 
@@ -265,6 +275,8 @@ class _ActionsOnly extends StatelessWidget {
   final VoidCallback onAlignTop;
   final VoidCallback onAlignVCenter;
   final VoidCallback onAlignBottom;
+  final VoidCallback onAlignCanvasHCenter;
+  final VoidCallback onAlignCanvasVCenter;
   final VoidCallback onLockToggle;
 
   @override
@@ -309,6 +321,21 @@ class _ActionsOnly extends StatelessWidget {
                 many ? onAlignVCenter : null),
             _iconBtn(Icons.align_vertical_bottom, 'Align bottom',
                 many ? onAlignBottom : null),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _iconBtn(
+              Icons.center_focus_strong,
+              'Center horizontally in canvas',
+              onAlignCanvasHCenter,
+            ),
+            _iconBtn(
+              Icons.center_focus_weak,
+              'Center vertically in canvas',
+              onAlignCanvasVCenter,
+            ),
           ],
         ),
         const SizedBox(height: 6),

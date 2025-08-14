@@ -34,7 +34,7 @@ class SimpleCanva extends StatefulWidget {
     this.workspaceColor = const Color(0xFFF3F4F6),
     this.initialCanvasColor = Colors.white,
     this.onChanged,
-    this.baseCanvasSize = const Size(1920, 1080),
+    this.baseCanvasSize = const Size(960, 540),
   });
 
   final List<CanvasPaletteImage> palette;
@@ -417,6 +417,36 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         final it = _byId(id);
         if (!it.locked) {
           it.position = Offset(it.position.dx, bottom - it.size.height);
+        }
+      }
+    });
+    _notify();
+  }
+
+  void _alignCanvasHCenter() {
+    if (_selected.isEmpty) return;
+    _pushHistory();
+    final cx = _baseSize.width / 2;
+    setState(() {
+      for (final id in _selected) {
+        final it = _byId(id);
+        if (!it.locked) {
+          it.position = Offset(cx - it.size.width / 2, it.position.dy);
+        }
+      }
+    });
+    _notify();
+  }
+
+  void _alignCanvasVCenter() {
+    if (_selected.isEmpty) return;
+    _pushHistory();
+    final cy = _baseSize.height / 2;
+    setState(() {
+      for (final id in _selected) {
+        final it = _byId(id);
+        if (!it.locked) {
+          it.position = Offset(it.position.dx, cy - it.size.height / 2);
         }
       }
     });
@@ -873,6 +903,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
           onAlignTop: _alignTop,
           onAlignVCenter: _alignVCenter,
           onAlignBottom: _alignBottom,
+          onAlignCanvasHCenter: _alignCanvasHCenter,
+          onAlignCanvasVCenter: _alignCanvasVCenter,
           onLockToggle: _toggleLockSelected,
           // property change hooks
           onChangeStart: _propChangeStart,
