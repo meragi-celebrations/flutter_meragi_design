@@ -6,6 +6,12 @@ import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
+// Resolve interactions per item at runtime if needed.
+typedef CanvasInteractionResolver = CanvasItemInteractions? Function(
+  BuildContext context,
+  CanvasItem item,
+);
+
 class CanvaViewer extends StatelessWidget {
   const CanvaViewer({
     super.key,
@@ -14,6 +20,8 @@ class CanvaViewer extends StatelessWidget {
     this.workspaceColor = const Color(0xFFF3F4F6),
     this.borderRadius = 12,
     this.showShadow = true,
+    this.interactions,
+    this.interactionResolver,
   });
 
   factory CanvaViewer.fromJsonString(
@@ -23,6 +31,8 @@ class CanvaViewer extends StatelessWidget {
     Color workspaceColor = const Color(0xFFF3F4F6),
     double borderRadius = 12,
     bool showShadow = true,
+    CanvasItemInteractions? interactions,
+    CanvasInteractionResolver? interactionResolver,
   }) {
     final doc = jsonDecode(jsonString) as Map<String, dynamic>;
     return CanvaViewer(
@@ -32,6 +42,8 @@ class CanvaViewer extends StatelessWidget {
       workspaceColor: workspaceColor,
       borderRadius: borderRadius,
       showShadow: showShadow,
+      interactions: interactions,
+      interactionResolver: interactionResolver,
     );
   }
 
@@ -40,6 +52,13 @@ class CanvaViewer extends StatelessWidget {
   final Color workspaceColor;
   final double borderRadius;
   final bool showShadow;
+
+  /// Optional default interactions for all items.
+  final CanvasItemInteractions? interactions;
+
+  /// Optional resolver to decide interactions per item.
+  /// If provided, it overrides [interactions] for that item.
+  final CanvasInteractionResolver? interactionResolver;
 
   Map<String, CanvasPaletteImage> get _paletteById =>
       {for (final p in palette) p.id: p};
@@ -103,6 +122,8 @@ class CanvaViewer extends StatelessWidget {
                 items: items,
                 canvasSize: Size(w, h),
                 scale: scale,
+                interactions: interactions,
+                interactionResolver: interactionResolver,
               ),
             ),
           );
@@ -110,7 +131,7 @@ class CanvaViewer extends StatelessWidget {
           return SizedBox(
             width: w,
             height: h,
-            child: IgnorePointer(ignoring: true, child: canvas),
+            child: canvas,
           );
         },
       ),
@@ -163,11 +184,16 @@ class _CanvasStack extends StatelessWidget {
     required this.items,
     required this.canvasSize,
     required this.scale,
+    this.interactions,
+    this.interactionResolver,
   });
 
   final List<CanvasItem> items;
   final Size canvasSize;
   final CanvasScaleHandler scale;
+
+  final CanvasItemInteractions? interactions;
+  final CanvasInteractionResolver? interactionResolver;
 
   @override
   Widget build(BuildContext context) {
@@ -181,6 +207,8 @@ class _CanvasStack extends StatelessWidget {
             _CanvasItemView(
               item: item,
               scale: scale,
+              interactions: interactions,
+              interactionResolver: interactionResolver,
             ),
         ],
       ),
@@ -189,9 +217,17 @@ class _CanvasStack extends StatelessWidget {
 }
 
 class _CanvasItemView extends StatelessWidget {
-  const _CanvasItemView({required this.item, required this.scale});
+  const _CanvasItemView({
+    required this.item,
+    required this.scale,
+    this.interactions,
+    this.interactionResolver,
+  });
+
   final CanvasItem item;
   final CanvasScaleHandler scale;
+  final CanvasItemInteractions? interactions;
+  final CanvasInteractionResolver? interactionResolver;
 
   @override
   Widget build(BuildContext context) {
@@ -200,21 +236,25 @@ class _CanvasItemView extends StatelessWidget {
     final radians = item.rotationDeg * math.pi / 180.0;
 
     return Positioned(
-      left: pos.dx,
-      top: pos.dy,
-      width: size.width,
-      height: size.height,
-      child: Center(
-        child: Transform.rotate(
-          angle: radians,
-          alignment: Alignment.center,
-          child: SizedBox(
-            width: size.width,
-            height: size.height,
-            child: item.buildContent(scale),
+        left: pos.dx,
+        top: pos.dy,
+        width: size.width,
+        height: size.height,
+        child: Center(
+          child: Transform.rotate(
+            angle: radians,
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: size.width,
+              height: size.height,
+              child: item.buildViewerContent(
+                context,
+                scale,
+                interactions:
+                    interactionResolver?.call(context, item) ?? interactions,
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

@@ -6,6 +6,119 @@ import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 enum CanvasItemKind { image, text, palette }
 
+/// Generic interaction hooks you can provide from the viewer.
+/// Items can also override handling by overriding buildViewerContent.
+typedef CanvasInteractionTap = void Function(
+  BuildContext context,
+  CanvasItem item,
+  TapUpDetails details,
+  CanvasScaleHandler scale,
+);
+
+typedef CanvasInteractionTapDown = void Function(
+  BuildContext context,
+  CanvasItem item,
+  TapDownDetails details,
+  CanvasScaleHandler scale,
+);
+
+typedef CanvasInteractionLongPressStart = void Function(
+  BuildContext context,
+  CanvasItem item,
+  LongPressStartDetails details,
+  CanvasScaleHandler scale,
+);
+
+typedef CanvasInteractionLongPressEnd = void Function(
+  BuildContext context,
+  CanvasItem item,
+  LongPressEndDetails details,
+  CanvasScaleHandler scale,
+);
+
+typedef CanvasInteractionNoDetails = void Function(
+  BuildContext context,
+  CanvasItem item,
+  CanvasScaleHandler scale,
+);
+
+class CanvasItemInteractions {
+  final CanvasInteractionTap? onTap; // primary click or tap
+  final CanvasInteractionTapDown? onTapDown; // when you need down-pos
+  final CanvasInteractionNoDetails? onDoubleTap; // fast double-tap
+  final CanvasInteractionTapDown? onDoubleTapDown; // double-tap with pos
+  final CanvasInteractionTap? onSecondaryTap; // right-click or secondary
+  final CanvasInteractionLongPressStart? onLongPressStart;
+  final CanvasInteractionLongPressEnd? onLongPressEnd;
+
+  const CanvasItemInteractions({
+    this.onTap,
+    this.onTapDown,
+    this.onDoubleTap,
+    this.onDoubleTapDown,
+    this.onSecondaryTap,
+    this.onLongPressStart,
+    this.onLongPressEnd,
+  });
+
+  bool get hasAny =>
+      onTap != null ||
+      onTapDown != null ||
+      onDoubleTap != null ||
+      onDoubleTapDown != null ||
+      onSecondaryTap != null ||
+      onLongPressStart != null ||
+      onLongPressEnd != null;
+}
+
+/// Internal generic wrapper that wires GestureDetector to the provided hooks.
+class _CanvasItemGestureWrapper extends StatelessWidget {
+  const _CanvasItemGestureWrapper({
+    required this.item,
+    required this.scale,
+    required this.child,
+    required this.interactions,
+  });
+
+  final CanvasItem item;
+  final CanvasScaleHandler scale;
+  final Widget child;
+  final CanvasItemInteractions? interactions;
+
+  @override
+  Widget build(BuildContext context) {
+    final i = interactions;
+    // If no interactions are provided, return the child as-is to avoid extra
+    // gesture arena overhead.
+    if (i == null || !i.hasAny) return child;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: i.onTapDown == null
+          ? null
+          : (d) => i.onTapDown!(context, item, d, scale),
+      onTapUp:
+          i.onTap == null ? null : (d) => i.onTap!(context, item, d, scale),
+      onDoubleTap: i.onDoubleTap == null
+          ? null
+          : () => i.onDoubleTap!(context, item, scale),
+      onDoubleTapDown: i.onDoubleTapDown == null
+          ? null
+          : (d) => i.onDoubleTapDown!(context, item, d, scale),
+      onSecondaryTapUp: i.onSecondaryTap == null
+          ? null
+          : (d) => i.onSecondaryTap!(context, item, d, scale),
+      onLongPressStart: i.onLongPressStart == null
+          ? null
+          : (d) => i.onLongPressStart!(context, item, d, scale),
+      onLongPressEnd: i.onLongPressEnd == null
+          ? null
+          : (d) => i.onLongPressEnd!(context, item, d, scale),
+      child: child,
+    );
+  }
+}
+
 /// Polymorphic base item. Subclasses own:
 /// - buildContent
 /// - buildPropertiesEditor
@@ -43,6 +156,24 @@ abstract class CanvasItem {
     required ValueChanged<CanvasItem> onChanged,
     required VoidCallback onChangeEnd,
   });
+
+  /// Viewer-only builder that returns an *interactive* child. By default we
+  /// wrap buildContent(...) in a gesture layer so viewers can wire generic
+  /// interactions without the editor code path changing.
+  ///
+  /// Items may override this to customize or block interactions.
+  Widget buildViewerContent(
+    BuildContext context,
+    CanvasScaleHandler scale, {
+    CanvasItemInteractions? interactions,
+  }) {
+    return _CanvasItemGestureWrapper(
+      item: this,
+      scale: scale,
+      interactions: interactions,
+      child: buildContent(scale),
+    );
+  }
 
   /// Optional per-item gesture editing (like text editor on double tap).
   /// Return an updated item to commit or null to ignore.

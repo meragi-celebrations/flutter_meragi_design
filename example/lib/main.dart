@@ -592,6 +592,12 @@ class CanvaStory extends StatelessWidget {
                         workspaceColor: const Color(0xFFF3F4F6),
                         borderRadius: 12,
                         showShadow: true,
+                        interactions: CanvasItemInteractions(
+                          onTap: (c, it, d, scale) => debugPrint(
+                              'tap -> ${it.toJson(1)} at ${d.localPosition}'),
+                          onDoubleTap: (context, item, scale) =>
+                              debugPrint('double tap -> ${item.id}'),
+                        ),
                       ),
                     ),
                   ),
