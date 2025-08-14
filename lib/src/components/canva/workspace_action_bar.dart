@@ -10,6 +10,11 @@ class WorkspaceActionBar extends StatelessWidget {
     required this.onColorPick,
     required this.onAddText,
     required this.onAddPalette,
+    // Grid
+    required this.gridVisible,
+    required this.gridSpacing,
+    required this.onGridToggle,
+    required this.onGridSpacingChanged,
   });
 
   final Color canvasColor;
@@ -18,6 +23,12 @@ class WorkspaceActionBar extends StatelessWidget {
   final ValueChanged<Color> onColorPick;
   final VoidCallback onAddText;
   final VoidCallback onAddPalette;
+
+  // Grid
+  final bool gridVisible;
+  final double gridSpacing;
+  final VoidCallback onGridToggle;
+  final ValueChanged<double> onGridSpacingChanged;
 
   static const _swatches = <Color>[
     Colors.white,
@@ -28,6 +39,41 @@ class WorkspaceActionBar extends StatelessWidget {
     Color(0xFFECFEFF),
     Color(0xFFF0FDF4),
   ];
+
+  // Grid Spacing Helper
+  static const _gridPresets = <double>[4, 8, 10, 12, 16, 20, 24, 32, 40, 48];
+
+  Future<void> _promptCustomGridSpacing(BuildContext context) async {
+    final ctrl = TextEditingController(text: gridSpacing.toStringAsFixed(0));
+    final v = await showDialog<double>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Grid spacing'),
+        content: TextField(
+          controller: ctrl,
+          keyboardType: const TextInputType.numberWithOptions(
+              decimal: true, signed: false),
+          decoration: const InputDecoration(
+              isDense: true,
+              border: OutlineInputBorder(),
+              hintText: 'Spacing in pixels (base units)'),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              final val = double.tryParse(ctrl.text.trim());
+              Navigator.pop(context, val);
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+    if (v != null && v > 0) onGridSpacingChanged(v);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +162,53 @@ class WorkspaceActionBar extends StatelessWidget {
                 side: const BorderSide(color: Colors.black12),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              ),
+            ),
+            const VerticalDivider(width: 12),
+
+            // Grid toggle
+            IconButton(
+              tooltip: gridVisible ? 'Hide grid' : 'Show grid',
+              onPressed: onGridToggle,
+              icon: Icon(gridVisible ? Icons.grid_on : Icons.grid_off),
+              color: gridVisible ? Theme.of(context).colorScheme.primary : null,
+            ),
+
+            // Grid spacing menu
+            PopupMenuButton<double>(
+              tooltip: 'Grid spacing',
+              onSelected: (v) {
+                if (v <= 0) {
+                  _promptCustomGridSpacing(context);
+                } else {
+                  onGridSpacingChanged(v);
+                }
+              },
+              itemBuilder: (_) => [
+                for (final v in _gridPresets)
+                  PopupMenuItem<double>(
+                    value: v,
+                    child: Text('${v.toStringAsFixed(0)} px'),
+                  ),
+                const PopupMenuDivider(),
+                const PopupMenuItem<double>(
+                  value: -1, // sentinel for custom
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 18),
+                      SizedBox(width: 8),
+                      Text('Custom…'),
+                    ],
+                  ),
+                ),
+              ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.grid_3x3),
+                  const SizedBox(width: 6),
+                  Text('${gridSpacing.toStringAsFixed(0)}'),
+                ],
               ),
             ),
           ],

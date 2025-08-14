@@ -9,6 +9,7 @@ import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
 import 'package:flutter_meragi_design/src/components/canva/models.dart';
 import 'package:flutter_meragi_design/src/components/canva/property_sidebar.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/grid_painter.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
@@ -154,6 +155,9 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   static const int _historyLimit = 100;
 
   bool _propsHistoryPushed = false;
+
+  bool _gridVisible = false; // grid toggle
+  double _gridSpacingBase = 24; // spacing in BASE canvas units (px)
 
   late Size _baseSize;
   CanvasScaleHandler? _scale;
@@ -768,6 +772,21 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                           builder: (context, _, __) {
                                             final canvasSize = Size(w, h);
                                             return Stack(children: [
+                                              if (_gridVisible &&
+                                                  _scale != null)
+                                                Positioned.fill(
+                                                  child: CustomPaint(
+                                                    painter: GridPainter(
+                                                      spacingBase:
+                                                          _gridSpacingBase,
+                                                      scale: _scale!,
+                                                      color: Colors.black
+                                                          .withOpacity(0.06),
+                                                      boldEvery:
+                                                          5, // thicker line every 5 cells
+                                                    ),
+                                                  ),
+                                                ),
                                               for (final item in _items)
                                                 CanvasItemWidget(
                                                   key: ValueKey(item.id),
@@ -822,6 +841,14 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                   onColorPick: (c) => _setCanvasColor(c),
                   onAddText: _addTextBox,
                   onAddPalette: _addPaletteBox,
+                  gridVisible: _gridVisible,
+                  gridSpacing: _gridSpacingBase,
+                  onGridToggle: () =>
+                      setState(() => _gridVisible = !_gridVisible),
+                  onGridSpacingChanged: (v) => setState(() {
+                    // sane bounds in base units
+                    _gridSpacingBase = v.clamp(2.0, 400.0);
+                  }),
                 ),
               ),
             ),
