@@ -70,6 +70,45 @@ class ShapeItem extends CanvasItem {
       );
 
   @override
+  List<Handle> getHandles() {
+    switch (shapeType) {
+      case ShapeType.line:
+      case ShapeType.arrow:
+        return [
+          const Handle(key: 'start', alignment: Alignment.topLeft),
+          const Handle(key: 'end', alignment: Alignment.bottomRight),
+        ];
+      default:
+        return super.getHandles();
+    }
+  }
+
+  @override
+  CanvasItem resizeWithHandle(
+    String handleKey,
+    Offset delta,
+    CanvasScaleHandler scale,
+  ) {
+    if (shapeType == ShapeType.line || shapeType == ShapeType.arrow) {
+      final newItem = cloneWith();
+      if (handleKey == 'start') {
+        newItem.position += delta;
+        newItem.size = Size(
+          newItem.size.width - delta.dx,
+          newItem.size.height - delta.dy,
+        );
+      } else {
+        newItem.size = Size(
+          newItem.size.width + delta.dx,
+          newItem.size.height + delta.dy,
+        );
+      }
+      return newItem;
+    }
+    return super.resizeWithHandle(handleKey, delta, scale);
+  }
+
+  @override
   Map<String, dynamic> propsToJson() => {
         'shapeType': shapeType.index,
         'color': colorToHex(color),

@@ -4,6 +4,18 @@ import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 
 enum CanvasItemKind { image, text, palette, shape }
 
+class Handle {
+  const Handle({
+    required this.key,
+    required this.alignment,
+    this.cursor = SystemMouseCursors.basic,
+  });
+
+  final String key;
+  final Alignment alignment;
+  final MouseCursor cursor;
+}
+
 typedef CanvasInteractionTap = void Function(
   BuildContext context,
   CanvasItem item,
@@ -148,6 +160,53 @@ abstract class CanvasItem {
   });
 
   Future<CanvasItem?> handleDoubleTap(BuildContext context) async => null;
+
+  List<Handle> getHandles() => const [
+        Handle(key: 'topLeft', alignment: Alignment.topLeft),
+        Handle(key: 'topRight', alignment: Alignment.topRight),
+        Handle(key: 'bottomLeft', alignment: Alignment.bottomLeft),
+        Handle(key: 'bottomRight', alignment: Alignment.bottomRight),
+      ];
+
+  CanvasItem resizeWithHandle(
+    String handleKey,
+    Offset delta,
+    CanvasScaleHandler scale,
+  ) {
+    // Default implementation for rectangular items
+    final newItem = cloneWith();
+    var left = newItem.position.dx;
+    var top = newItem.position.dy;
+    var width = newItem.size.width;
+    var height = newItem.size.height;
+
+    switch (handleKey) {
+      case 'topLeft':
+        left += delta.dx;
+        top += delta.dy;
+        width -= delta.dx;
+        height -= delta.dy;
+        break;
+      case 'topRight':
+        top += delta.dy;
+        width += delta.dx;
+        height -= delta.dy;
+        break;
+      case 'bottomLeft':
+        left += delta.dx;
+        width -= delta.dx;
+        height += delta.dy;
+        break;
+      case 'bottomRight':
+        width += delta.dx;
+        height += delta.dy;
+        break;
+    }
+
+    newItem.position = Offset(left, top);
+    newItem.size = Size(width, height);
+    return newItem;
+  }
 
   CanvasItem cloneWith({String? id});
 

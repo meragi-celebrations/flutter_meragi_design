@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 
-enum _Corner { topLeft, topRight, bottomLeft, bottomRight }
-
 class CanvasItemWidget extends StatefulWidget {
   const CanvasItemWidget({
     super.key,
@@ -68,47 +66,14 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
   double get _radians => _item.rotationDeg * math.pi / 180.0;
 
   // ---------- Resize ----------
-  void _resizeFromCorner(Offset renderDelta, _Corner corner) {
+  void _resizeFromHandle(Offset renderDelta, Handle handle) {
     if (_item.locked) return;
 
-    // convert to base-space delta
     final delta = widget.scale.renderDeltaToBase(renderDelta);
-
-    double left = _item.position.dx;
-    double top = _item.position.dy;
-    double width = _item.size.width;
-    double height = _item.size.height;
-
-    switch (corner) {
-      case _Corner.topLeft:
-        left += delta.dx;
-        top += delta.dy;
-        width -= delta.dx;
-        height -= delta.dy;
-        break;
-      case _Corner.topRight:
-        top += delta.dy;
-        width += delta.dx;
-        height -= delta.dy;
-        break;
-      case _Corner.bottomLeft:
-        left += delta.dx;
-        width -= delta.dx;
-        height += delta.dy;
-        break;
-      case _Corner.bottomRight:
-        width += delta.dx;
-        height += delta.dy;
-        break;
-    }
-
-    width = width < _minSize ? _minSize : width;
-    height = height < _minSize ? _minSize : height;
+    final updated = _item.resizeWithHandle(handle.key, delta, widget.scale);
 
     setState(() {
-      _item
-        ..position = Offset(left, top)
-        ..size = Size(width, height);
+      _item = updated;
     });
     widget.onResizeCommit(_item);
   }
@@ -237,10 +202,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
 
             // resize handles
             if (widget.isSelected && !_item.locked) ...[
-              _handle(Alignment.topLeft, _Corner.topLeft),
-              _handle(Alignment.topRight, _Corner.topRight),
-              _handle(Alignment.bottomLeft, _Corner.bottomLeft),
-              _handle(Alignment.bottomRight, _Corner.bottomRight),
+              for (final handle in _item.getHandles()) _handle(handle),
               _rotationHandle(),
             ],
 
@@ -263,23 +225,26 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
     );
   }
 
-  Widget _handle(Alignment align, _Corner corner) => Align(
-        alignment: align,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onPanStart: (_) => widget.onResizeStart(),
-          onPanUpdate: (d) => _resizeFromCorner(d.delta, corner),
-          onPanEnd: (_) => widget.onResizeEnd(),
-          child: Container(
-            width: _handleSize,
-            height: _handleSize,
-            margin: const EdgeInsets.all(1.5),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.blueAccent, width: 1),
-              boxShadow: const [
-                BoxShadow(blurRadius: 2, color: Colors.black26)
-              ],
+  Widget _handle(Handle handle) => Align(
+        alignment: handle.alignment,
+        child: MouseRegion(
+          cursor: handle.cursor,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onPanStart: (_) => widget.onResizeStart(),
+            onPanUpdate: (d) => _resizeFromHandle(d.delta, handle),
+            onPanEnd: (_) => widget.onResizeEnd(),
+            child: Container(
+              width: _handleSize,
+              height: _handleSize,
+              margin: const EdgeInsets.all(1.5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.blueAccent, width: 1),
+                boxShadow: const [
+                  BoxShadow(blurRadius: 2, color: Colors.black26)
+                ],
+              ),
             ),
           ),
         ),
