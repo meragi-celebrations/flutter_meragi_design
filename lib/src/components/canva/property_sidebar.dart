@@ -99,6 +99,8 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
               onAlignCanvasHCenter: () => _alignCanvasHCenter(doc),
               onAlignCanvasVCenter: () => _alignCanvasVCenter(doc),
               onLockToggle: () => _toggleLock(doc),
+              onDistributeHorizontally: () => _distributeHorizontally(doc),
+              onDistributeVertically: () => _distributeVertically(doc),
             ),
           _ => SingleChildScrollView(
               child: Column(
@@ -119,6 +121,9 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                     onAlignCanvasHCenter: () => _alignCanvasHCenter(doc),
                     onAlignCanvasVCenter: () => _alignCanvasVCenter(doc),
                     onLockToggle: () => _toggleLock(doc),
+                    onDistributeHorizontally: () =>
+                        _distributeHorizontally(doc),
+                    onDistributeVertically: () => _distributeVertically(doc),
                   ),
                   MDDivider(),
                   const _SectionTitle('Item'),
@@ -448,6 +453,86 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
     ]);
     doc.commitUndoGroup();
   }
+
+  void _distributeHorizontally(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+
+    final items = ids.map((id) => doc.itemById(id)).toList();
+    items.sort((a, b) => a.position.dx.compareTo(b.position.dx));
+
+    final minX =
+        items.map((e) => e.position.dx).reduce((a, b) => a < b ? a : b);
+    final maxX = items
+        .map((e) => e.position.dx + e.size.width)
+        .reduce((a, b) => a > b ? a : b);
+
+    final totalWidth =
+        items.fold<double>(0, (sum, item) => sum + item.size.width);
+    final totalSpace = maxX - minX;
+
+    if (items.length <= 1) return;
+    final gap = (totalSpace - totalWidth) / (items.length - 1);
+    if (!gap.isFinite) return;
+
+    doc.beginUndoGroup('Distribute horizontally');
+
+    double currentX = minX;
+    final patches = <Map<String, dynamic>>[];
+    for (final item in items) {
+      patches.add({
+        'type': 'update',
+        'id': item.id,
+        'changes': {
+          'position': {'x': currentX, 'y': item.position.dy}
+        }
+      });
+      currentX += item.size.width + gap;
+    }
+
+    doc.applyPatch(patches);
+    doc.commitUndoGroup();
+  }
+
+  void _distributeVertically(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+
+    final items = ids.map((id) => doc.itemById(id)).toList();
+    items.sort((a, b) => a.position.dy.compareTo(b.position.dy));
+
+    final minY =
+        items.map((e) => e.position.dy).reduce((a, b) => a < b ? a : b);
+    final maxY = items
+        .map((e) => e.position.dy + e.size.height)
+        .reduce((a, b) => a > b ? a : b);
+
+    final totalHeight =
+        items.fold<double>(0, (sum, item) => sum + item.size.height);
+    final totalSpace = maxY - minY;
+
+    if (items.length <= 1) return;
+    final gap = (totalSpace - totalHeight) / (items.length - 1);
+    if (!gap.isFinite) return;
+
+    doc.beginUndoGroup('Distribute vertically');
+
+    double currentY = minY;
+    final patches = <Map<String, dynamic>>[];
+    for (final item in items) {
+      patches.add({
+        'type': 'update',
+        'id': item.id,
+        'changes': {
+          'position': {'x': item.position.dx, 'y': currentY}
+        }
+      });
+      currentY += item.size.height + gap;
+    }
+
+    doc.applyPatch(patches);
+    doc.commitUndoGroup();
+  }
 }
 
 class _EmptyPanel extends StatelessWidget {
@@ -479,6 +564,8 @@ class _ActionsOnly extends StatelessWidget {
     required this.onAlignCanvasHCenter,
     required this.onAlignCanvasVCenter,
     required this.onLockToggle,
+    required this.onDistributeHorizontally,
+    required this.onDistributeVertically,
   });
 
   final int count;
@@ -495,6 +582,8 @@ class _ActionsOnly extends StatelessWidget {
   final VoidCallback onAlignCanvasHCenter;
   final VoidCallback onAlignCanvasVCenter;
   final VoidCallback onLockToggle;
+  final VoidCallback onDistributeHorizontally;
+  final VoidCallback onDistributeVertically;
 
   @override
   Widget build(BuildContext context) {
@@ -549,9 +638,14 @@ class _ActionsOnly extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 4), child: w))
               .toList(),
         ),
+        const SizedBox(height: 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _iconBtn(Icons.horizontal_distribute, 'Distribute horizontally',
+                onDistributeHorizontally),
+            _iconBtn(Icons.vertical_distribute, 'Distribute vertically',
+                onDistributeVertically),
             _iconBtn(Icons.center_focus_strong, 'Center horizontally in canvas',
                 onAlignCanvasHCenter),
             _iconBtn(Icons.center_focus_weak, 'Center vertically in canvas',

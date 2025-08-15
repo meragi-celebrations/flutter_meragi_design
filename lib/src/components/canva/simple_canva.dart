@@ -224,6 +224,10 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   late final CanvasDoc _doc;
   CanvasScaleHandler? _scale;
 
+  // for drag-selection
+  Rect? _selectionRect;
+  Offset? _dragSelectionStart;
+
   Map<String, CanvasPaletteImage> get _paletteById =>
       {for (final p in widget.palette) p.id: p};
 
@@ -273,61 +277,6 @@ class _SimpleCanvaState extends State<SimpleCanva> {
     final rb = _canvasBoxKey.currentContext?.findRenderObject() as RenderBox?;
     if (rb == null) return global;
     return rb.globalToLocal(global);
-  }
-
-  // pass CanvasDoc explicitly so we don't rely on the State's context
-  void _handlePointerDown(PointerDownEvent event, CanvasDoc doc) {
-    final scale = _scale;
-    if (scale == null) return;
-
-    final localRender = _toLocal(event.position);
-    final localBase = scale.renderToBase(localRender);
-
-    String? hitId;
-    for (final item in doc.items.reversed) {
-      final rect = Rect.fromLTWH(
-        item.position.dx,
-        item.position.dy,
-        item.size.width,
-        item.size.height,
-      );
-      if (rect.contains(localBase)) {
-        hitId = item.id;
-        break;
-      }
-    }
-
-    final keys = HardwareKeyboard.instance.logicalKeysPressed;
-    final additive = keys.contains(LogicalKeyboardKey.shiftLeft) ||
-        keys.contains(LogicalKeyboardKey.shiftRight) ||
-        keys.contains(LogicalKeyboardKey.controlLeft) ||
-        keys.contains(LogicalKeyboardKey.controlRight) ||
-        keys.contains(LogicalKeyboardKey.metaLeft) ||
-        keys.contains(LogicalKeyboardKey.metaRight);
-
-    if (hitId == null) {
-      // clear selection on empty canvas
-      doc.applyPatch([
-        {'type': 'selection.set', 'ids': <String>[]}
-      ]);
-      return;
-    }
-
-    if (additive) {
-      final ids = doc.selectedIds.contains(hitId)
-          ? doc.selectedIds.where((e) => e != hitId).toList()
-          : [...doc.selectedIds, hitId];
-      doc.applyPatch([
-        {'type': 'selection.set', 'ids': ids}
-      ]);
-    } else {
-      doc.applyPatch([
-        {
-          'type': 'selection.set',
-          'ids': [hitId]
-        }
-      ]);
-    }
   }
 
   bool _immediateDragPlatform() {
@@ -566,9 +515,153 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                   Positioned.fill(
                                     child: Listener(
                                       behavior: HitTestBehavior.translucent,
-                                      onPointerDown: (e) {
-                                        // pass doc captured from builder
-                                        _handlePointerDown(e, doc);
+                                      onPointerDown: (event) {
+                                        final scale = _scale;
+                                        if (scale == null) return;
+
+                                        final localRender =
+                                            _toLocal(event.position);
+                                        final localBase =
+                                            scale.renderToBase(localRender);
+
+                                        String? hitId;
+                                        for (final item in doc.items.reversed) {
+                                          final rect = Rect.fromLTWH(
+                                            item.position.dx,
+                                            item.position.dy,
+                                            item.size.width,
+                                            item.size.height,
+                                          );
+                                          if (rect.contains(localBase)) {
+                                            hitId = item.id;
+                                            break;
+                                          }
+                                        }
+
+                                        if (hitId == null) {
+                                          setState(() {
+                                            _dragSelectionStart = localRender;
+                                            _selectionRect = Rect.fromLTWH(
+                                                localRender.dx,
+                                                localRender.dy,
+                                                0,
+                                                0);
+                                          });
+                                        }
+                                      },
+                                      onPointerMove: (event) {
+                                        final start = _dragSelectionStart;
+                                        if (start == null) return;
+                                        final pos = _toLocal(event.position);
+                                        setState(() {
+                                          _selectionRect =
+                                              Rect.fromPoints(start, pos);
+                                        });
+                                      },
+                                      onPointerUp: (event) {
+                                        final scale = _scale;
+                                        final rect = _selectionRect;
+                                        final start = _dragSelectionStart;
+
+                                        if (scale != null &&
+                                            rect != null &&
+                                            start != null) {
+                                          final baseRect = Rect.fromPoints(
+                                            scale.renderToBase(rect.topLeft),
+                                            scale
+                                                .renderToBase(rect.bottomRight),
+                                          );
+
+                                          final selected = <String>{};
+                                          for (final item in doc.items) {
+                                            final itemRect = Rect.fromLTWH(
+                                              item.position.dx,
+                                              item.position.dy,
+                                              item.size.width,
+                                              item.size.height,
+                                            );
+                                            if (baseRect.overlaps(itemRect)) {
+                                              selected.add(item.id);
+                                            }
+                                          }
+                                          doc.applyPatch([
+                                            {
+                                              'type': 'selection.set',
+                                              'ids': selected.toList()
+                                            }
+                                          ]);
+                                        } else {
+                                          // no drag, handle tap
+                                          final localRender =
+                                              _toLocal(event.position);
+                                          final localBase =
+                                              scale!.renderToBase(localRender);
+
+                                          String? hitId;
+                                          for (final item
+                                              in doc.items.reversed) {
+                                            final rect = Rect.fromLTWH(
+                                              item.position.dx,
+                                              item.position.dy,
+                                              item.size.width,
+                                              item.size.height,
+                                            );
+                                            if (rect.contains(localBase)) {
+                                              hitId = item.id;
+                                              break;
+                                            }
+                                          }
+
+                                          final keys = HardwareKeyboard
+                                              .instance.logicalKeysPressed;
+                                          final additive = keys.contains(
+                                                  LogicalKeyboardKey
+                                                      .shiftLeft) ||
+                                              keys.contains(LogicalKeyboardKey
+                                                  .shiftRight) ||
+                                              keys.contains(LogicalKeyboardKey
+                                                  .controlLeft) ||
+                                              keys.contains(LogicalKeyboardKey
+                                                  .controlRight) ||
+                                              keys.contains(LogicalKeyboardKey
+                                                  .metaLeft) ||
+                                              keys.contains(
+                                                  LogicalKeyboardKey.metaRight);
+
+                                          if (hitId == null) {
+                                            doc.applyPatch([
+                                              {
+                                                'type': 'selection.set',
+                                                'ids': <String>[]
+                                              }
+                                            ]);
+                                          } else if (additive) {
+                                            final ids = doc.selectedIds
+                                                    .contains(hitId)
+                                                ? doc.selectedIds
+                                                    .where((e) => e != hitId)
+                                                    .toList()
+                                                : [...doc.selectedIds, hitId];
+                                            doc.applyPatch([
+                                              {
+                                                'type': 'selection.set',
+                                                'ids': ids
+                                              }
+                                            ]);
+                                          } else {
+                                            doc.applyPatch([
+                                              {
+                                                'type': 'selection.set',
+                                                'ids': [hitId]
+                                              }
+                                            ]);
+                                          }
+                                        }
+
+                                        setState(() {
+                                          _dragSelectionStart = null;
+                                          _selectionRect = null;
+                                        });
                                       },
                                       child: const SizedBox.expand(),
                                     ),
@@ -632,6 +725,22 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                                           const SizedBox.expand(),
                                     ),
                                   ),
+
+                                  // Selection box
+                                  if (_selectionRect != null)
+                                    Positioned.fromRect(
+                                      rect: _selectionRect!,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.blueAccent
+                                              .withOpacity(0.1),
+                                          border: Border.all(
+                                            color: Colors.blueAccent,
+                                            width: 1,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
