@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/item_registry.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 
-enum CanvasItemKind { image, text, palette }
+enum CanvasItemKind { image, text, palette, shape }
 
 typedef CanvasInteractionTap = void Function(
   BuildContext context,

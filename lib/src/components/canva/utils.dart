@@ -45,3 +45,22 @@ ImageProvider? deserializeProvider(dynamic src) {
       return null;
   }
 }
+
+Map<String, dynamic> shadowToJson(Shadow s) => {
+      'c': colorToHex(s.color),
+      'x': s.offset.dx,
+      'y': s.offset.dy,
+      'b': s.blurRadius,
+    };
+
+Shadow? shadowFromJson(dynamic j) {
+  if (j is! Map) return null;
+  final c = hexToColor((j['c'] as String?) ?? '#FF000000');
+  if (c == null) return null;
+  return Shadow(
+    color: c,
+    offset: Offset(
+        (j['x'] as num?)?.toDouble() ?? 0, (j['y'] as num?)?.toDouble() ?? 0),
+    blurRadius: (j['b'] as num?)?.toDouble() ?? 0,
+  );
+}

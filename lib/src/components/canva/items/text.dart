@@ -16,6 +16,16 @@ class TextItem extends CanvasItem {
     this.fontFamily,
     this.fontItalic = false,
     this.fontUnderline = false,
+    this.fontStrikethrough = false,
+    this.decorationStyle = TextDecorationStyle.solid,
+    this.decorationColor,
+    this.decorationThickness = 1.0,
+    this.shadows,
+    this.backgroundColor,
+    this.textAlign = TextAlign.left,
+    this.lineHeight = 1.2,
+    this.letterSpacing = 0.0,
+    this.wordSpacing = 0.0,
     super.locked = false,
     super.rotationDeg = 0,
   });
@@ -27,6 +37,16 @@ class TextItem extends CanvasItem {
   String? fontFamily;
   bool fontItalic;
   bool fontUnderline;
+  bool fontStrikethrough;
+  TextDecorationStyle decorationStyle;
+  Color? decorationColor;
+  double decorationThickness;
+  List<Shadow>? shadows;
+  Color? backgroundColor;
+  TextAlign textAlign;
+  double lineHeight;
+  double letterSpacing;
+  double wordSpacing;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.text;
@@ -37,9 +57,18 @@ class TextItem extends CanvasItem {
         fontWeight: fontWeight,
         fontFamily: fontFamily,
         fontStyle: fontItalic ? FontStyle.italic : FontStyle.normal,
-        decoration:
-            fontUnderline ? TextDecoration.underline : TextDecoration.none,
-        height: 1.2,
+        decoration: TextDecoration.combine([
+          if (fontUnderline) TextDecoration.underline,
+          if (fontStrikethrough) TextDecoration.lineThrough,
+        ]),
+        decorationStyle: decorationStyle,
+        decorationColor: decorationColor,
+        decorationThickness: decorationThickness,
+        shadows: shadows,
+        backgroundColor: backgroundColor,
+        height: lineHeight,
+        letterSpacing: letterSpacing,
+        wordSpacing: wordSpacing,
       );
 
   @override
@@ -47,10 +76,10 @@ class TextItem extends CanvasItem {
     final pad = 6.0 * scale.s;
     return Padding(
       padding: EdgeInsets.all(pad),
-      child: Align(
-        alignment: Alignment.topLeft,
+      child: SizedBox.expand(
         child: Text(
           text ?? '',
+          textAlign: textAlign,
           maxLines: null,
           softWrap: true,
           overflow: TextOverflow.visible,
@@ -85,6 +114,16 @@ class TextItem extends CanvasItem {
         fontFamily: fontFamily,
         fontItalic: fontItalic,
         fontUnderline: fontUnderline,
+        fontStrikethrough: fontStrikethrough,
+        decorationStyle: decorationStyle,
+        decorationColor: decorationColor,
+        decorationThickness: decorationThickness,
+        shadows: shadows,
+        backgroundColor: backgroundColor,
+        textAlign: textAlign,
+        lineHeight: lineHeight,
+        letterSpacing: letterSpacing,
+        wordSpacing: wordSpacing,
         locked: locked,
         rotationDeg: rotationDeg,
       );
@@ -98,6 +137,16 @@ class TextItem extends CanvasItem {
         if (fontFamily != null) 'ff': fontFamily,
         'fi': fontItalic,
         'fu': fontUnderline,
+        'fst': fontStrikethrough,
+        'ds': decorationStyle.index,
+        if (decorationColor != null) 'dc': colorToHex(decorationColor!),
+        'dt': decorationThickness,
+        'sh': shadows?.map((e) => shadowToJson(e)).toList(),
+        if (backgroundColor != null) 'bg': colorToHex(backgroundColor!),
+        'ta': textAlign.index,
+        'lh': lineHeight,
+        'ls': letterSpacing,
+        'ws': wordSpacing,
       };
 
   static TextItem fromJson(Map<String, dynamic> j) {
@@ -106,6 +155,7 @@ class TextItem extends CanvasItem {
     final fwVal = (p['fw'] as int?) ?? FontWeight.w600.value;
     final fw = FontWeight.values
         .firstWhere((w) => w.value == fwVal, orElse: () => FontWeight.w600);
+    final ta = TextAlign.values[(p['ta'] as int?) ?? 0];
     return TextItem(
       id: (j['id'] as String?) ??
           DateTime.now().microsecondsSinceEpoch.toString(),
@@ -122,6 +172,19 @@ class TextItem extends CanvasItem {
       fontFamily: (p['ff'] as String?),
       fontItalic: (p['fi'] as bool?) ?? false,
       fontUnderline: (p['fu'] as bool?) ?? false,
+      fontStrikethrough: (p['fst'] as bool?) ?? false,
+      decorationStyle: TextDecorationStyle.values[(p['ds'] as int?) ?? 0],
+      decorationColor: hexToColor(p['dc'] as String? ?? ''),
+      decorationThickness: (p['dt'] as num?)?.toDouble() ?? 1.0,
+      shadows: (p['sh'] as List?)
+          ?.map((e) => shadowFromJson(e))
+          .whereType<Shadow>()
+          .toList(),
+      backgroundColor: hexToColor(p['bg'] as String? ?? ''),
+      textAlign: ta,
+      lineHeight: (p['lh'] as num?)?.toDouble() ?? 1.2,
+      letterSpacing: (p['ls'] as num?)?.toDouble() ?? 0.0,
+      wordSpacing: (p['ws'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -171,7 +234,17 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
   late FontWeight _fontWeight;
   late bool _italic;
   late bool _underline;
+  late bool _strikethrough;
+  late TextDecorationStyle _decorationStyle;
+  late Color? _decorationColor;
+  late double _decorationThickness;
   String? _fontFamily;
+  late TextAlign _textAlign;
+  late double _lineHeight;
+  late double _letterSpacing;
+  late double _wordSpacing;
+  late List<Shadow> _shadows;
+  late Color? _backgroundColor;
 
   bool _begun = false;
   void _begin() {
@@ -189,7 +262,17 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
     _fontWeight = widget.item.fontWeight;
     _italic = widget.item.fontItalic;
     _underline = widget.item.fontUnderline;
+    _strikethrough = widget.item.fontStrikethrough;
+    _decorationStyle = widget.item.decorationStyle;
+    _decorationColor = widget.item.decorationColor;
+    _decorationThickness = widget.item.decorationThickness;
     _fontFamily = widget.item.fontFamily;
+    _textAlign = widget.item.textAlign;
+    _lineHeight = widget.item.lineHeight;
+    _letterSpacing = widget.item.letterSpacing;
+    _wordSpacing = widget.item.wordSpacing;
+    _shadows = widget.item.shadows ?? [];
+    _backgroundColor = widget.item.backgroundColor;
   }
 
   @override
@@ -206,7 +289,17 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       _fontWeight = widget.item.fontWeight;
       _italic = widget.item.fontItalic;
       _underline = widget.item.fontUnderline;
+      _strikethrough = widget.item.fontStrikethrough;
+      _decorationStyle = widget.item.decorationStyle;
+      _decorationColor = widget.item.decorationColor;
+      _decorationThickness = widget.item.decorationThickness;
       _fontFamily = widget.item.fontFamily;
+      _textAlign = widget.item.textAlign;
+      _lineHeight = widget.item.lineHeight;
+      _letterSpacing = widget.item.letterSpacing;
+      _wordSpacing = widget.item.wordSpacing;
+      _shadows = widget.item.shadows ?? [];
+      _backgroundColor = widget.item.backgroundColor;
       setState(() {});
     }
   }
@@ -226,7 +319,17 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ..fontWeight = _fontWeight
       ..fontItalic = _italic
       ..fontUnderline = _underline
-      ..fontFamily = _fontFamily;
+      ..fontStrikethrough = _strikethrough
+      ..decorationStyle = _decorationStyle
+      ..decorationColor = _decorationColor
+      ..decorationThickness = _decorationThickness
+      ..fontFamily = _fontFamily
+      ..textAlign = _textAlign
+      ..lineHeight = _lineHeight
+      ..letterSpacing = _letterSpacing
+      ..wordSpacing = _wordSpacing
+      ..shadows = _shadows
+      ..backgroundColor = _backgroundColor;
     widget.onChange(u);
   }
 
@@ -277,8 +380,98 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
                 Text(_fontSize.toStringAsFixed(0), textAlign: TextAlign.right)),
       ]),
       const SizedBox(height: 12),
+      const SectionTitle('Line height'),
+      Row(children: [
+        Expanded(
+          child: Slider(
+            value: _lineHeight.clamp(0.5, 3.0),
+            min: 0.5,
+            max: 3.0,
+            label: _lineHeight.toStringAsFixed(1),
+            onChanged: (v) {
+              setState(() => _lineHeight = v);
+              _emit();
+            },
+          ),
+        ),
+        SizedBox(
+            width: 48,
+            child: Text(_lineHeight.toStringAsFixed(1),
+                textAlign: TextAlign.right)),
+      ]),
+      const SizedBox(height: 12),
+      const SectionTitle('Letter spacing'),
+      Row(children: [
+        Expanded(
+          child: Slider(
+            value: _letterSpacing.clamp(-10, 10),
+            min: -10,
+            max: 10,
+            label: _letterSpacing.toStringAsFixed(1),
+            onChanged: (v) {
+              setState(() => _letterSpacing = v);
+              _emit();
+            },
+          ),
+        ),
+        SizedBox(
+            width: 48,
+            child: Text(_letterSpacing.toStringAsFixed(1),
+                textAlign: TextAlign.right)),
+      ]),
+      const SizedBox(height: 12),
+      const SectionTitle('Word spacing'),
+      Row(children: [
+        Expanded(
+          child: Slider(
+            value: _wordSpacing.clamp(-10, 20),
+            min: -10,
+            max: 20,
+            label: _wordSpacing.toStringAsFixed(1),
+            onChanged: (v) {
+              setState(() => _wordSpacing = v);
+              _emit();
+            },
+          ),
+        ),
+        SizedBox(
+            width: 48,
+            child: Text(_wordSpacing.toStringAsFixed(1),
+                textAlign: TextAlign.right)),
+      ]),
+      const SizedBox(height: 12),
       const SectionTitle('Style'),
       Row(children: [
+        _StyleToggle(
+          tooltip: 'Align left',
+          selected: _textAlign == TextAlign.left,
+          icon: Icons.format_align_left,
+          onTap: () {
+            setState(() => _textAlign = TextAlign.left);
+            _emit();
+          },
+        ),
+        const SizedBox(width: 4),
+        _StyleToggle(
+          tooltip: 'Align center',
+          selected: _textAlign == TextAlign.center,
+          icon: Icons.format_align_center,
+          onTap: () {
+            setState(() => _textAlign = TextAlign.center);
+            _emit();
+          },
+        ),
+        const SizedBox(width: 4),
+        _StyleToggle(
+          tooltip: 'Align right',
+          selected: _textAlign == TextAlign.right,
+          icon: Icons.format_align_right,
+          onTap: () {
+            setState(() => _textAlign = TextAlign.right);
+            _emit();
+          },
+        ),
+        const SizedBox(width: 12),
         _chip('B', selected: _fontWeight.index >= FontWeight.w600.index,
             onTap: () {
           setState(() {
@@ -298,10 +491,67 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
           setState(() => _underline = !_underline);
           _emit();
         }),
+        const SizedBox(width: 8),
+        _chip('S', selected: _strikethrough, onTap: () {
+          setState(() => _strikethrough = !_strikethrough);
+          _emit();
+        }),
         const Spacer(),
         if (_begun)
           TextButton(onPressed: widget.onEnd, child: const Text('Done')),
       ]),
+      const SizedBox(height: 12),
+      const SectionTitle('Decoration style'),
+      DropdownButtonFormField<TextDecorationStyle>(
+        value: _decorationStyle,
+        decoration:
+            const InputDecoration(isDense: true, border: OutlineInputBorder()),
+        items: TextDecorationStyle.values
+            .map((f) => DropdownMenuItem(value: f, child: Text(f.name)))
+            .toList(),
+        onChanged: (v) {
+          if (v == null) return;
+          setState(() => _decorationStyle = v);
+          _emit();
+        },
+      ),
+      const SizedBox(height: 12),
+      const SectionTitle('Decoration thickness'),
+      Row(children: [
+        Expanded(
+          child: Slider(
+            value: _decorationThickness.clamp(0.0, 10.0),
+            min: 0.0,
+            max: 10.0,
+            label: _decorationThickness.toStringAsFixed(1),
+            onChanged: (v) {
+              setState(() => _decorationThickness = v);
+              _emit();
+            },
+          ),
+        ),
+        SizedBox(
+            width: 48,
+            child: Text(_decorationThickness.toStringAsFixed(1),
+                textAlign: TextAlign.right)),
+      ]),
+      const SizedBox(height: 12),
+      const SectionTitle('Decoration color'),
+      Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          for (final c in _swatches)
+            ColorDot(
+              color: c,
+              selected: c.value == (_decorationColor?.value ?? -1),
+              onTap: () {
+                setState(() => _decorationColor = c);
+                _emit();
+              },
+            ),
+        ],
+      ),
       const SizedBox(height: 12),
       const SectionTitle('Color'),
       Wrap(
@@ -314,6 +564,42 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
               selected: c.value == _fontColor.value,
               onTap: () {
                 setState(() => _fontColor = c);
+                _emit();
+              },
+            ),
+        ],
+      ),
+      const SizedBox(height: 12),
+      const SectionTitle('Shadow'),
+      SwitchListTile(
+        value: _shadows.isNotEmpty,
+        title: const Text('Enable shadow'),
+        onChanged: (v) {
+          setState(() {
+            if (v) {
+              _shadows = [
+                const Shadow(
+                    color: Colors.black, offset: Offset(2, 2), blurRadius: 4)
+              ];
+            } else {
+              _shadows = [];
+            }
+          });
+          _emit();
+        },
+      ),
+      const SizedBox(height: 12),
+      const SectionTitle('Background color'),
+      Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          for (final c in _swatches)
+            ColorDot(
+              color: c,
+              selected: c.value == (_backgroundColor?.value ?? -1),
+              onTap: () {
+                setState(() => _backgroundColor = c);
                 _emit();
               },
             ),

@@ -1,6 +1,7 @@
 // lib/src/components/canva/workspace_action_bar.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/shape.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 import '../canva/canvas_doc.dart';
@@ -181,6 +182,43 @@ class WorkspaceActionBar extends StatelessWidget {
               },
               icon: const Icon(PhosphorIconsRegular.swatches),
               child: const Text('Palette'),
+            ),
+            const SizedBox(width: 8),
+            PopupMenuButton<ShapeType>(
+              tooltip: 'Add Shape',
+              onSelected: (shapeType) {
+                final id = doc.newId();
+                final item = ShapeItem(
+                  id: id,
+                  shapeType: shapeType,
+                  position: const Offset(60, 60),
+                  size: const Size(120, 120),
+                );
+                doc.beginUndoGroup('Add Shape');
+                doc.applyPatch([
+                  {'type': 'insert', 'item': item.toJson(0)},
+                  {
+                    'type': 'selection.set',
+                    'ids': [id]
+                  },
+                ]);
+                doc.commitUndoGroup();
+              },
+              itemBuilder: (_) => [
+                for (final type in ShapeType.values)
+                  PopupMenuItem<ShapeType>(
+                    value: type,
+                    child: Text(type.name),
+                  ),
+              ],
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(PhosphorIconsRegular.square),
+                  SizedBox(width: 6),
+                  Text('Shape'),
+                ],
+              ),
             ),
             const VerticalDivider(width: 12),
 
