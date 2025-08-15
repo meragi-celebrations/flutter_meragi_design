@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/src/components/canva/models.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 
 enum _Corner { topLeft, topRight, bottomLeft, bottomRight }

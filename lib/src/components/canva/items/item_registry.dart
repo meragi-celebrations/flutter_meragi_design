@@ -1,6 +1,6 @@
 // lib/src/components/canva/item_registry.dart
 import 'package:flutter/foundation.dart';
-import 'package:flutter_meragi_design/src/components/canva/models.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 
 typedef CanvasItemFactory = CanvasItem Function(Map<String, dynamic> json);
 

@@ -6,12 +6,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/palette.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/registered_items.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/text.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
 import 'canva_item.dart';
 import 'canvas_doc.dart';
 import 'canvas_scope.dart';
-import 'models.dart';
 import 'property_sidebar.dart';
 import 'scaling.dart';
 import 'ui/grid_painter.dart';

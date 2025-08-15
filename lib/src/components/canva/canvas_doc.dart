@@ -2,8 +2,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 
-import 'models.dart';
 import 'utils.dart';
 
 /// Minimal, generic kernel. Widgets compose their own actions using patches.
