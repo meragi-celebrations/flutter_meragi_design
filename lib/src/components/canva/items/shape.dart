@@ -1,10 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/color_dot.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
-enum ShapeType { rectangle, circle, oval }
+enum ShapeType { rectangle, circle, oval, line, arrow }
 
 class ShapeItem extends CanvasItem {
   ShapeItem({
@@ -140,6 +142,28 @@ class _ShapePainter extends CustomPainter {
       case ShapeType.oval:
         canvas.drawOval(rect, paint);
         if (strokeWidth > 0) canvas.drawOval(rect, strokePaint);
+        break;
+      case ShapeType.line:
+        canvas.drawLine(rect.topLeft, rect.bottomRight, strokePaint);
+        break;
+      case ShapeType.arrow:
+        final p1 = rect.topLeft;
+        final p2 = rect.bottomRight;
+        canvas.drawLine(p1, p2, strokePaint);
+        final angle = (p2 - p1).direction;
+        final arrowSize = 10 + strokeWidth;
+        final path = Path()
+          ..moveTo(p2.dx, p2.dy)
+          ..lineTo(
+            p2.dx - arrowSize * 1.5 * math.cos(angle - 0.5),
+            p2.dy - arrowSize * 1.5 * math.sin(angle - 0.5),
+          )
+          ..lineTo(
+            p2.dx - arrowSize * 1.5 * math.cos(angle + 0.5),
+            p2.dy - arrowSize * 1.5 * math.sin(angle + 0.5),
+          )
+          ..close();
+        canvas.drawPath(path, strokePaint..style = PaintingStyle.fill);
         break;
     }
   }
