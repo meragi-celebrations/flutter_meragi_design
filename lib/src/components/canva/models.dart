@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/number_input.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 enum CanvasItemKind { image, text, palette }
@@ -417,22 +419,13 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
     widget.onChange(u);
   }
 
-  Widget _num(String label, TextEditingController c, VoidCallback done) {
-    return Expanded(
-      child: TextField(
+  Widget _num(Widget prefix, TextEditingController c, VoidCallback done) {
+    return CanvaNumberProperty(
         controller: c,
-        keyboardType:
-            const TextInputType.numberWithOptions(decimal: true, signed: false),
-        decoration: InputDecoration(
-          labelText: label,
-          isDense: true,
-          border: const OutlineInputBorder(),
-        ),
+        prefix: prefix,
         onChanged: (_) => _commit(),
         onSubmitted: (_) => done(),
-        onEditingComplete: done,
-      ),
-    );
+        onEditingComplete: done);
   }
 
   @override
@@ -442,7 +435,7 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
       const SizedBox(height: 6),
       Row(
         children: [
-          Switch(
+          MDToggle(
               value: _linkAll, onChanged: (v) => setState(() => _linkAll = v)),
           const SizedBox(width: 6),
           const Text('Link all corners'),
@@ -454,15 +447,15 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
       const SizedBox(height: 8),
       const _SectionTitle('Corner radius'),
       Row(children: [
-        _num('Top-Left', _tl, () {}),
+        _num(Text("TL"), _tl, () {}),
         const SizedBox(width: 8),
-        _num('Top-Right', _tr, () {}),
+        _num(Text("TR"), _tr, () {}),
       ]),
       const SizedBox(height: 8),
       Row(children: [
-        _num('Bottom-Left', _bl, () {}),
+        _num(Text("BL"), _bl, () {}),
         const SizedBox(width: 8),
-        _num('Bottom-Right', _br, () {}),
+        _num(Text("BR"), _br, () {}),
       ]),
       if (_linkAll) ...[
         const SizedBox(height: 8),
@@ -722,36 +715,25 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const _SectionTitle('Text'),
-      TextField(
+      MDInput(
         controller: _textCtrl,
         maxLines: 5,
         minLines: 3,
         onChanged: (_) => _emit(),
-        decoration: const InputDecoration(
-          isDense: true,
-          border: OutlineInputBorder(),
-          hintText: 'Your text...',
-        ),
       ),
       const SizedBox(height: 12),
       const _SectionTitle('Font'),
-      InputDecorator(
-        decoration:
-            const InputDecoration(border: OutlineInputBorder(), isDense: true),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String?>(
-            value: _fontFamily,
-            isDense: true,
-            items: _fontOptions
-                .map((f) => DropdownMenuItem<String?>(
-                    value: f, child: Text(f ?? 'System')))
-                .toList(),
-            onChanged: (v) {
-              setState(() => _fontFamily = v);
-              _emit();
-            },
-          ),
-        ),
+      MDSelect<String?>(
+        options: _fontOptions
+            .map((f) => MDOption(value: f, child: Text(f ?? 'System')))
+            .toList(),
+        placeholder: const Text('Select'),
+        initialValue: _fontFamily,
+        selectedOptionBuilder: (context, value) => Text(value ?? 'System'),
+        onChanged: (v) {
+          setState(() => _fontFamily = v);
+          _emit();
+        },
       ),
       const SizedBox(height: 12),
       const _SectionTitle('Size'),
@@ -761,7 +743,6 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             value: _fontSize.clamp(8, 144),
             min: 8,
             max: 144,
-            divisions: 136,
             label: _fontSize.toStringAsFixed(0),
             onChanged: (v) {
               setState(() => _fontSize = v);
@@ -1297,23 +1278,17 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: TextField(
+                child: MDInput(
                   controller: row.ctrl,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                    labelText: 'Hex color',
-                    hintText: '#RRGGBB or #AARRGGBB',
-                  ),
+                  placeholder: Text("Hex Color"),
                   onChanged: (_) => _commit(),
                   onSubmitted: (_) => _commit(),
                   onEditingComplete: _commit,
                 ),
               ),
               const SizedBox(width: 8),
-              IconButton(
-                tooltip: 'Remove',
-                icon: const Icon(Icons.remove_circle_outline),
+              MDTap.ghost(
+                icon: const Icon(PhosphorIconsRegular.minusCircle),
                 onPressed: () => _removeRow(i),
               ),
             ]),
@@ -1322,16 +1297,11 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
       ),
       const SizedBox(height: 8),
       Row(children: [
-        ElevatedButton.icon(
+        MDTap.outline(
           onPressed: _addRow,
           icon: const Icon(Icons.add),
-          label: const Text('Add color'),
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black87,
-            side: const BorderSide(color: Colors.black12),
-          ),
+          child: const Text('Add color'),
+          size: ShadButtonSize.sm,
         ),
         const SizedBox(width: 8),
         Text('${_rows.length} color${_rows.length == 1 ? '' : 's'}'),

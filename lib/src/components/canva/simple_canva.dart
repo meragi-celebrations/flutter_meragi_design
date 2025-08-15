@@ -705,7 +705,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
         width: widget.sidebarWidth,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: Colors.white,
             border: Border(right: BorderSide(color: Colors.grey.shade300)),
           ),
           child: ListView.separated(
@@ -753,7 +753,10 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: const [
                                 BoxShadow(
-                                    blurRadius: 18, color: Color(0x33000000))
+                                  blurRadius: 5,
+                                  color: Color(0x33000000),
+                                  offset: Offset(0, 5),
+                                )
                               ],
                             ),
                             child: Stack(children: [
@@ -859,11 +862,11 @@ class _SimpleCanvaState extends State<SimpleCanva> {
               ),
             ),
             Positioned(
-              top: 50,
+              bottom: 20,
               left: 0,
               right: 0,
               child: Align(
-                alignment: Alignment.topCenter,
+                alignment: Alignment.bottomCenter,
                 child: WorkspaceActionBar(
                   canvasColor: _canvasColor,
                   onUndo: _undoAction,

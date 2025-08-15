@@ -37,7 +37,7 @@ class CanvasItemWidget extends StatefulWidget {
 }
 
 class _CanvasItemWidgetState extends State<CanvasItemWidget> {
-  static const double _handleSize = 14;
+  static const double _handleSize = 8;
   static const double _minSize = 40;
 
   // Rotate handle inside the top edge
