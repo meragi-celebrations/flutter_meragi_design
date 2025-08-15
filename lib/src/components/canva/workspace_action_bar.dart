@@ -1,35 +1,13 @@
+// lib/src/components/canva/workspace_action_bar.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
+import '../canva/canvas_doc.dart';
+import '../canva/canvas_scope.dart';
+
 class WorkspaceActionBar extends StatelessWidget {
-  const WorkspaceActionBar({
-    super.key,
-    required this.canvasColor,
-    required this.onUndo,
-    required this.onRedo,
-    required this.onColorPick,
-    required this.onAddText,
-    required this.onAddPalette,
-    // Grid
-    required this.gridVisible,
-    required this.gridSpacing,
-    required this.onGridToggle,
-    required this.onGridSpacingChanged,
-  });
-
-  final Color canvasColor;
-  final VoidCallback onUndo;
-  final VoidCallback onRedo;
-  final ValueChanged<Color> onColorPick;
-  final VoidCallback onAddText;
-  final VoidCallback onAddPalette;
-
-  // Grid
-  final bool gridVisible;
-  final double gridSpacing;
-  final VoidCallback onGridToggle;
-  final ValueChanged<double> onGridSpacingChanged;
+  const WorkspaceActionBar({super.key});
 
   static const _swatches = <Color>[
     Colors.white,
@@ -41,11 +19,12 @@ class WorkspaceActionBar extends StatelessWidget {
     Color(0xFFF0FDF4),
   ];
 
-  // Grid Spacing Helper
   static const _gridPresets = <double>[4, 8, 10, 12, 16, 20, 24, 32, 40, 48];
 
-  Future<void> _promptCustomGridSpacing(BuildContext context) async {
-    final ctrl = TextEditingController(text: gridSpacing.toStringAsFixed(0));
+  Future<void> _promptCustomGridSpacing(
+      BuildContext context, CanvasDoc doc) async {
+    final ctrl =
+        TextEditingController(text: doc.gridSpacing.toStringAsFixed(0));
     final v = await showDialog<double>(
       context: context,
       builder: (_) => AlertDialog(
@@ -73,22 +52,26 @@ class WorkspaceActionBar extends StatelessWidget {
         ],
       ),
     );
-    if (v != null && v > 0) onGridSpacingChanged(v);
+    if (v != null && v > 0) {
+      doc.applyPatch([
+        {
+          'type': 'canvas.update',
+          'changes': {'gridSpacing': v}
+        }
+      ]);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final doc = CanvasScope.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        // border: Border.all(color: Colors.black12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            blurRadius: 5,
-            color: const Color(0x33000000),
-            offset: const Offset(-2, 3),
-          )
+              blurRadius: 5, color: Color(0x33000000), offset: Offset(-2, 3))
         ],
       ),
       child: Padding(
@@ -97,19 +80,22 @@ class WorkspaceActionBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             MDTap.ghost(
-                icon: const Icon(PhosphorIconsRegular.arrowArcLeft),
-                onPressed: onUndo),
+              icon: const Icon(PhosphorIconsRegular.arrowArcLeft),
+              onPressed: doc.undo,
+            ),
             MDTap.ghost(
-                icon: const Icon(PhosphorIconsRegular.arrowArcRight),
-                onPressed: onRedo),
+              icon: const Icon(PhosphorIconsRegular.arrowArcRight),
+              onPressed: doc.redo,
+            ),
             const VerticalDivider(width: 12),
+
             const Text('Canvas'),
             const SizedBox(width: 6),
             Container(
               width: 20,
               height: 20,
               decoration: BoxDecoration(
-                color: canvasColor,
+                color: doc.canvasColor,
                 border: Border.all(color: Colors.black26),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -117,7 +103,12 @@ class WorkspaceActionBar extends StatelessWidget {
             const SizedBox(width: 6),
             PopupMenuButton<Color>(
               tooltip: 'Pick canvas color',
-              onSelected: onColorPick,
+              onSelected: (c) => doc.applyPatch([
+                {
+                  'type': 'canvas.update',
+                  'changes': {'color': colorToHex(c)}
+                }
+              ]),
               itemBuilder: (_) => [
                 for (final c in _swatches)
                   PopupMenuItem<Color>(
@@ -143,32 +134,78 @@ class WorkspaceActionBar extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             MDTap.outline(
-              onPressed: onAddText,
+              onPressed: () {
+                final id = doc.newId();
+                final item = TextItem(
+                  id: id,
+                  text: 'Double-click to edit',
+                  position: const Offset(60, 60),
+                  size: const Size(240, 96),
+                );
+                doc.beginUndoGroup('Add Text');
+                doc.applyPatch([
+                  {'type': 'insert', 'item': item.toJson(0)},
+                  {
+                    'type': 'selection.set',
+                    'ids': [id]
+                  },
+                ]);
+                doc.commitUndoGroup();
+              },
               icon: const Icon(PhosphorIconsRegular.textT),
               child: const Text('Text'),
             ),
             const SizedBox(width: 8),
             MDTap.outline(
-              onPressed: onAddPalette,
+              onPressed: () {
+                final id = doc.newId();
+                final item = PaletteItem(
+                  id: id,
+                  paletteColors: const [
+                    Color(0xFF111827),
+                    Color(0xFF6B7280),
+                    Color(0xFFE5E7EB)
+                  ],
+                  position: const Offset(60, 60),
+                  size: const Size(320, 64),
+                );
+                doc.beginUndoGroup('Add Palette');
+                doc.applyPatch([
+                  {'type': 'insert', 'item': item.toJson(0)},
+                  {
+                    'type': 'selection.set',
+                    'ids': [id]
+                  },
+                ]);
+                doc.commitUndoGroup();
+              },
               icon: const Icon(PhosphorIconsRegular.swatches),
               child: const Text('Palette'),
             ),
             const VerticalDivider(width: 12),
 
-            // Grid toggle
+            // Grid
             MDTap.ghost(
-              onPressed: onGridToggle,
-              icon: Icon(gridVisible ? Icons.grid_on : Icons.grid_off),
+              onPressed: () => doc.applyPatch([
+                {
+                  'type': 'canvas.update',
+                  'changes': {'gridVisible': !doc.gridVisible}
+                }
+              ]),
+              icon: Icon(doc.gridVisible ? Icons.grid_on : Icons.grid_off),
             ),
-
-            // Grid spacing menu
             PopupMenuButton<double>(
               tooltip: 'Grid spacing',
               onSelected: (v) {
                 if (v <= 0) {
-                  _promptCustomGridSpacing(context);
+                  _promptCustomGridSpacing(context, doc);
                 } else {
-                  onGridSpacingChanged(v);
+                  doc.applyPatch([
+                    {
+                      'type': 'canvas.update',
+                      'changes': {'gridSpacing': v}
+                    }
+                  ]);
                 }
               },
               itemBuilder: (_) => [
@@ -179,12 +216,12 @@ class WorkspaceActionBar extends StatelessWidget {
                   ),
                 const PopupMenuDivider(),
                 const PopupMenuItem<double>(
-                  value: -1, // sentinel for custom
+                  value: -1,
                   child: Row(
                     children: [
                       Icon(Icons.edit, size: 18),
                       SizedBox(width: 8),
-                      Text('Custom…'),
+                      Text('Custom…')
                     ],
                   ),
                 ),
@@ -194,7 +231,7 @@ class WorkspaceActionBar extends StatelessWidget {
                 children: [
                   const Icon(Icons.grid_3x3),
                   const SizedBox(width: 6),
-                  Text('${gridSpacing.toStringAsFixed(0)}'),
+                  Text('${doc.gridSpacing.toStringAsFixed(0)}'),
                 ],
               ),
             ),

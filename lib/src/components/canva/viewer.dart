@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/flutter_meragi_design.dart';
-import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
-import 'package:flutter_meragi_design/src/components/canva/utils.dart';
+import 'package:flutter_meragi_design/src/components/canva/models.dart';
 
-// Resolve interactions per item at runtime if needed.
+import 'scaling.dart';
+import 'utils.dart';
+
+/// Resolve interactions per item at runtime if needed.
 typedef CanvasInteractionResolver = CanvasItemInteractions? Function(
   BuildContext context,
   CanvasItem item,
@@ -16,7 +17,6 @@ class CanvaViewer extends StatelessWidget {
   const CanvaViewer({
     super.key,
     required this.document,
-    this.palette = const [],
     this.workspaceColor = const Color(0xFFF3F4F6),
     this.borderRadius = 12,
     this.showShadow = true,
@@ -27,7 +27,6 @@ class CanvaViewer extends StatelessWidget {
   factory CanvaViewer.fromJsonString(
     String jsonString, {
     Key? key,
-    List<CanvasPaletteImage> palette = const [],
     Color workspaceColor = const Color(0xFFF3F4F6),
     double borderRadius = 12,
     bool showShadow = true,
@@ -38,7 +37,6 @@ class CanvaViewer extends StatelessWidget {
     return CanvaViewer(
       key: key,
       document: doc,
-      palette: palette,
       workspaceColor: workspaceColor,
       borderRadius: borderRadius,
       showShadow: showShadow,
@@ -48,7 +46,6 @@ class CanvaViewer extends StatelessWidget {
   }
 
   final Map<String, dynamic> document;
-  final List<CanvasPaletteImage> palette;
   final Color workspaceColor;
   final double borderRadius;
   final bool showShadow;
@@ -60,11 +57,11 @@ class CanvaViewer extends StatelessWidget {
   /// If provided, it overrides [interactions] for that item.
   final CanvasInteractionResolver? interactionResolver;
 
-  Map<String, CanvasPaletteImage> get _paletteById =>
-      {for (final p in palette) p.id: p};
-
   @override
   Widget build(BuildContext context) {
+    // Ensure item kinds are registered somewhere during app init:
+    // registerBuiltInCanvasItems();
+
     final canvasInfo = (document['canvas'] as Map?) ?? const {};
     final colorHex = canvasInfo['color'] as String?;
     final bgColor =
@@ -88,7 +85,7 @@ class CanvaViewer extends StatelessWidget {
       if (base == null) baseSize = Size(1080 * aspect, 1080);
     }
 
-    final items = _buildItems(document);
+    final items = _decodeItems(document);
 
     return Container(
       color: workspaceColor,
@@ -128,11 +125,7 @@ class CanvaViewer extends StatelessWidget {
             ),
           );
 
-          return SizedBox(
-            width: w,
-            height: h,
-            child: canvas,
-          );
+          return SizedBox(width: w, height: h, child: canvas);
         },
       ),
     );
@@ -158,24 +151,12 @@ class CanvaViewer extends StatelessWidget {
     return null;
   }
 
-  List<CanvasItem> _buildItems(Map<String, dynamic> doc) {
+  List<CanvasItem> _decodeItems(Map<String, dynamic> doc) {
     final raw =
         (doc['items'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
-    final items = <CanvasItem>[];
-    for (final j in raw) {
-      // resolve provider from palette
-      ImageProvider? provider;
-      final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
-      final imageId =
-          (props['imageId'] as String?) ?? (j['imageId'] as String?);
-      if (imageId != null && _paletteById.containsKey(imageId)) {
-        provider = _paletteById[imageId]!.provider;
-      }
-      provider ??= deserializeProvider(props['src'] ?? j['src']);
-
-      items.add(CanvasItem.fromJson(j, provider));
-    }
-    return items;
+    return [
+      for (final j in raw) CanvasItem.fromJson(j),
+    ];
   }
 }
 
@@ -236,25 +217,26 @@ class _CanvasItemView extends StatelessWidget {
     final radians = item.rotationDeg * math.pi / 180.0;
 
     return Positioned(
-        left: pos.dx,
-        top: pos.dy,
-        width: size.width,
-        height: size.height,
-        child: Center(
-          child: Transform.rotate(
-            angle: radians,
-            alignment: Alignment.center,
-            child: SizedBox(
-              width: size.width,
-              height: size.height,
-              child: item.buildViewerContent(
-                context,
-                scale,
-                interactions:
-                    interactionResolver?.call(context, item) ?? interactions,
-              ),
+      left: pos.dx,
+      top: pos.dy,
+      width: size.width,
+      height: size.height,
+      child: Center(
+        child: Transform.rotate(
+          angle: radians,
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: size.width,
+            height: size.height,
+            child: item.buildViewerContent(
+              context,
+              scale,
+              interactions:
+                  interactionResolver?.call(context, item) ?? interactions,
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

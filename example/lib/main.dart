@@ -553,21 +553,18 @@ class CanvaStory extends StatelessWidget {
     final palette = <CanvasPaletteImage>[
       const CanvasPaletteImage(
         id: 'panda',
-        provider: NetworkImage(
-          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=600',
-        ),
+        srcUri:
+            'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=600',
       ),
       const CanvasPaletteImage(
         id: 'flower',
-        provider: NetworkImage(
-          'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=600',
-        ),
+        srcUri:
+            'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=600',
       ),
       const CanvasPaletteImage(
         id: 'mountain',
-        provider: NetworkImage(
-          'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=600',
-        ),
+        srcUri:
+            'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=600',
       ),
     ];
 
@@ -586,7 +583,6 @@ class CanvaStory extends StatelessWidget {
                     appBar: AppBar(title: const Text('Viewer')),
                     body: CanvaViewer.fromJsonString(
                       jsonStr,
-                      palette: palette, // resolves imageId -> provider
                       workspaceColor: const Color(0xFFF3F4F6),
                       borderRadius: 12,
                       showShadow: true,

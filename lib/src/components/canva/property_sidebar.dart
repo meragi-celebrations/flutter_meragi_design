@@ -1,55 +1,13 @@
+// lib/src/components/canva/property_sidebar.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/number_input.dart';
 
+import 'canvas_doc.dart';
+import 'canvas_scope.dart';
+
 class PropertiesSidebar extends StatefulWidget {
-  const PropertiesSidebar({
-    super.key,
-    required this.item,
-    required this.selectedCount,
-    // actions
-    required this.onDelete,
-    required this.onDuplicate,
-    required this.onFront,
-    required this.onBack,
-    required this.onAlignLeft,
-    required this.onAlignHCenter,
-    required this.onAlignRight,
-    required this.onAlignTop,
-    required this.onAlignVCenter,
-    required this.onAlignBottom,
-    required this.onAlignCanvasHCenter,
-    required this.onAlignCanvasVCenter,
-    required this.onLockToggle,
-    // property change lifecycle
-    required this.onChangeStart,
-    required this.onChanged,
-    required this.onChangeEnd,
-  });
-
-  /// Selected item when exactly one is selected, else null.
-  final CanvasItem? item;
-  final int selectedCount;
-
-  // Actions for selection (apply to 1 or many)
-  final VoidCallback onDelete;
-  final VoidCallback onDuplicate;
-  final VoidCallback onFront;
-  final VoidCallback onBack;
-  final VoidCallback onAlignLeft;
-  final VoidCallback onAlignHCenter;
-  final VoidCallback onAlignRight;
-  final VoidCallback onAlignTop;
-  final VoidCallback onAlignVCenter;
-  final VoidCallback onAlignBottom;
-  final VoidCallback onAlignCanvasHCenter;
-  final VoidCallback onAlignCanvasVCenter;
-  final VoidCallback onLockToggle;
-
-  // Property change lifecycle
-  final VoidCallback onChangeStart;
-  final ValueChanged<CanvasItem> onChanged;
-  final VoidCallback onChangeEnd;
+  const PropertiesSidebar({super.key});
 
   @override
   State<PropertiesSidebar> createState() => _PropertiesSidebarState();
@@ -58,7 +16,6 @@ class PropertiesSidebar extends StatefulWidget {
 class _PropertiesSidebarState extends State<PropertiesSidebar> {
   bool _begun = false;
 
-  // Generic geom controllers (single selection only)
   late TextEditingController _xCtrl;
   late TextEditingController _yCtrl;
   late TextEditingController _wCtrl;
@@ -68,78 +25,53 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
   @override
   void initState() {
     super.initState();
-    _initFromItem(widget.item);
+    _xCtrl = TextEditingController();
+    _yCtrl = TextEditingController();
+    _wCtrl = TextEditingController();
+    _hCtrl = TextEditingController();
+    _rotCtrl = TextEditingController();
   }
 
   @override
-  void didUpdateWidget(covariant PropertiesSidebar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.item?.id != widget.item?.id) {
-      if (_begun) {
-        widget.onChangeEnd();
-        _begun = false;
-      }
-      _disposeCtrls();
-      _initFromItem(widget.item);
-      return;
+  void dispose() {
+    if (_begun) {
+      final doc = CanvasScope.of(context, listen: false);
+      doc.commitUndoGroup();
     }
-
-    if (widget.item != null) {
-      final it = widget.item!;
-      _xCtrl.text = it.position.dx.toStringAsFixed(0);
-      _yCtrl.text = it.position.dy.toStringAsFixed(0);
-      _wCtrl.text = it.size.width.toStringAsFixed(0);
-      _hCtrl.text = it.size.height.toStringAsFixed(0);
-      _rotCtrl.text = it.rotationDeg.toStringAsFixed(0);
-    }
-  }
-
-  void _initFromItem(CanvasItem? item) {
-    _xCtrl = TextEditingController(
-        text: (item?.position.dx ?? 0).toStringAsFixed(0));
-    _yCtrl = TextEditingController(
-        text: (item?.position.dy ?? 0).toStringAsFixed(0));
-    _wCtrl =
-        TextEditingController(text: (item?.size.width ?? 0).toStringAsFixed(0));
-    _hCtrl = TextEditingController(
-        text: (item?.size.height ?? 0).toStringAsFixed(0));
-    _rotCtrl = TextEditingController(
-        text: (item?.rotationDeg ?? 0).toStringAsFixed(0));
-  }
-
-  void _disposeCtrls() {
     _xCtrl.dispose();
     _yCtrl.dispose();
     _wCtrl.dispose();
     _hCtrl.dispose();
     _rotCtrl.dispose();
-  }
-
-  @override
-  void dispose() {
-    if (_begun) widget.onChangeEnd();
-    _disposeCtrls();
     super.dispose();
   }
 
-  void _beginIfNeeded() {
+  void _beginIfNeeded(CanvasDoc doc, String label) {
     if (_begun) return;
     _begun = true;
-    widget.onChangeStart();
+    doc.beginUndoGroup(label);
   }
 
-  void _emit(CanvasItem base, void Function(CanvasItem) apply) {
-    _beginIfNeeded();
-    final updated = base.cloneWith();
-    apply(updated);
-    widget.onChanged(updated);
+  void _endIfNeeded(CanvasDoc doc) {
+    if (!_begun) return;
+    _begun = false;
+    doc.commitUndoGroup();
   }
 
   @override
   Widget build(BuildContext context) {
-    final item = widget.item;
-    final count = widget.selectedCount;
+    final doc = CanvasScope.of(context);
+    final count = doc.selectedCount;
+    final item = count == 1 ? doc.itemById(doc.selectedIds.first) : null;
+
+    // keep controllers in sync
+    if (item != null) {
+      _xCtrl.text = item.position.dx.toStringAsFixed(0);
+      _yCtrl.text = item.position.dy.toStringAsFixed(0);
+      _wCtrl.text = item.size.width.toStringAsFixed(0);
+      _hCtrl.text = item.size.height.toStringAsFixed(0);
+      _rotCtrl.text = item.rotationDeg.toStringAsFixed(0);
+    }
 
     return Container(
       height: double.infinity,
@@ -154,19 +86,19 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
           0 => _EmptyPanel(),
           int c when c > 1 => _ActionsOnly(
               count: c,
-              onDelete: widget.onDelete,
-              onDuplicate: widget.onDuplicate,
-              onFront: widget.onFront,
-              onBack: widget.onBack,
-              onAlignLeft: widget.onAlignLeft,
-              onAlignHCenter: widget.onAlignHCenter,
-              onAlignRight: widget.onAlignRight,
-              onAlignTop: widget.onAlignTop,
-              onAlignVCenter: widget.onAlignVCenter,
-              onAlignBottom: widget.onAlignBottom,
-              onAlignCanvasHCenter: widget.onAlignCanvasHCenter,
-              onAlignCanvasVCenter: widget.onAlignCanvasVCenter,
-              onLockToggle: widget.onLockToggle,
+              onDelete: () => _deleteSelected(doc),
+              onDuplicate: () => _duplicateSelected(doc),
+              onFront: () => _bringToFront(doc),
+              onBack: () => _sendToBack(doc),
+              onAlignLeft: () => _alignLeft(doc),
+              onAlignHCenter: () => _alignHCenter(doc),
+              onAlignRight: () => _alignRight(doc),
+              onAlignTop: () => _alignTop(doc),
+              onAlignVCenter: () => _alignVCenter(doc),
+              onAlignBottom: () => _alignBottom(doc),
+              onAlignCanvasHCenter: () => _alignCanvasHCenter(doc),
+              onAlignCanvasVCenter: () => _alignCanvasVCenter(doc),
+              onLockToggle: () => _toggleLock(doc),
             ),
           _ => SingleChildScrollView(
               child: Column(
@@ -174,19 +106,19 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                 children: [
                   _ActionsOnly(
                     count: 1,
-                    onDelete: widget.onDelete,
-                    onDuplicate: widget.onDuplicate,
-                    onFront: widget.onFront,
-                    onBack: widget.onBack,
-                    onAlignLeft: widget.onAlignLeft,
-                    onAlignHCenter: widget.onAlignHCenter,
-                    onAlignRight: widget.onAlignRight,
-                    onAlignTop: widget.onAlignTop,
-                    onAlignVCenter: widget.onAlignVCenter,
-                    onAlignBottom: widget.onAlignBottom,
-                    onAlignCanvasHCenter: widget.onAlignCanvasHCenter,
-                    onAlignCanvasVCenter: widget.onAlignCanvasVCenter,
-                    onLockToggle: widget.onLockToggle,
+                    onDelete: () => _deleteSelected(doc),
+                    onDuplicate: () => _duplicateSelected(doc),
+                    onFront: () => _bringToFront(doc),
+                    onBack: () => _sendToBack(doc),
+                    onAlignLeft: () => _alignLeft(doc),
+                    onAlignHCenter: () => _alignHCenter(doc),
+                    onAlignRight: () => _alignRight(doc),
+                    onAlignTop: () => _alignTop(doc),
+                    onAlignVCenter: () => _alignVCenter(doc),
+                    onAlignBottom: () => _alignBottom(doc),
+                    onAlignCanvasHCenter: () => _alignCanvasHCenter(doc),
+                    onAlignCanvasVCenter: () => _alignCanvasVCenter(doc),
+                    onLockToggle: () => _toggleLock(doc),
                   ),
                   MDDivider(),
                   const _SectionTitle('Item'),
@@ -197,16 +129,34 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                     hCtrl: _hCtrl,
                     rotCtrl: _rotCtrl,
                     onRectCommit: (dx, dy, w, h) {
-                      if (item == null) return;
-                      _emit(item, (u) {
-                        u
-                          ..position = Offset(dx, dy)
-                          ..size = Size(w < 1 ? 1 : w, h < 1 ? 1 : h);
-                      });
+                      final it = item;
+                      if (it == null) return;
+                      _beginIfNeeded(doc, 'Edit geometry');
+                      doc.applyPatch([
+                        {
+                          'type': 'update',
+                          'id': it.id,
+                          'changes': {
+                            'position': {'x': dx, 'y': dy},
+                            'size': {'w': w, 'h': h},
+                          }
+                        }
+                      ]);
                     },
                     onRotateCommit: (deg) {
-                      if (item == null) return;
-                      _emit(item, (u) => u.rotationDeg = deg);
+                      final it = item;
+                      if (it == null) return;
+                      _beginIfNeeded(doc, 'Rotate');
+                      doc.applyPatch([
+                        {
+                          'type': 'update',
+                          'id': it.id,
+                          'changes': {'rotationDeg': deg}
+                        }
+                      ]);
+                    },
+                    onEnd: () {
+                      _endIfNeeded(doc);
                     },
                   ),
                   MDDivider(),
@@ -214,14 +164,13 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
                   if (item != null)
                     item.buildPropertiesEditor(
                       context,
-                      onChangeStart: _beginIfNeeded,
-                      onChanged: (u) => widget.onChanged(u),
-                      onChangeEnd: () {
-                        if (_begun) {
-                          widget.onChangeEnd();
-                          _begun = false;
-                        }
+                      onChangeStart: () => _beginIfNeeded(doc, 'Edit props'),
+                      onChanged: (updated) {
+                        doc.applyPatch([
+                          {'type': 'replace', 'item': updated.toJson(0)}
+                        ]);
                       },
+                      onChangeEnd: () => _endIfNeeded(doc),
                     ),
                 ],
               ),
@@ -229,6 +178,275 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
         },
       ),
     );
+  }
+
+  // Actions implemented purely with patches
+
+  void _deleteSelected(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.isEmpty) return;
+    doc.beginUndoGroup('Delete');
+    doc.applyPatch([
+      for (final id in ids) {'type': 'remove', 'id': id},
+      {'type': 'selection.set', 'ids': <String>[]},
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _duplicateSelected(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.isEmpty) return;
+
+    final newJsons = <Map<String, dynamic>>[];
+    for (final id in ids) {
+      final src = doc.itemById(id);
+      final dup = src.cloneWith(id: doc.newId())
+        ..position = src.position + const Offset(12, 12)
+        ..locked = false;
+      newJsons.add(dup.toJson(0));
+    }
+
+    doc.beginUndoGroup('Duplicate');
+    doc.applyPatch([
+      for (final j in newJsons) {'type': 'insert', 'item': j, 'index': null},
+      {
+        'type': 'selection.set',
+        'ids': newJsons.map((e) => e['id'] as String).toList(),
+      }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _bringToFront(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.isEmpty) return;
+    doc.beginUndoGroup('Bring front');
+    // Remove then re-insert at end to preserve relative order
+    final items = [
+      for (final id in doc.items.map((e) => e.id))
+        if (ids.contains(id)) doc.itemById(id)
+    ];
+    doc.applyPatch([
+      for (final it in items) {'type': 'remove', 'id': it.id},
+      for (final it in items)
+        {'type': 'insert', 'item': it.toJson(0), 'index': null},
+      {'type': 'selection.set', 'ids': ids},
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _sendToBack(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.isEmpty) return;
+    doc.beginUndoGroup('Send back');
+    final items = [
+      for (final id in doc.items.map((e) => e.id))
+        if (ids.contains(id)) doc.itemById(id)
+    ];
+    doc.applyPatch([
+      for (final it in items) {'type': 'remove', 'id': it.id},
+      // insert at start in the same relative order
+      for (int i = 0; i < items.length; i++)
+        {'type': 'insert', 'item': items[i].toJson(0), 'index': i},
+      {'type': 'selection.set', 'ids': ids},
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _toggleLock(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.isEmpty) return;
+    final anyUnlocked = ids.any((id) => !doc.itemById(id).locked);
+    doc.beginUndoGroup('Lock toggle');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {'locked': anyUnlocked}
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignLeft(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+    final left = ids
+        .map((id) => doc.itemById(id).position.dx)
+        .reduce((a, b) => a < b ? a : b);
+    doc.beginUndoGroup('Align left');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {'x': left, 'y': doc.itemById(id).position.dy}
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignTop(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+    final top = ids
+        .map((id) => doc.itemById(id).position.dy)
+        .reduce((a, b) => a < b ? a : b);
+    doc.beginUndoGroup('Align top');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {'x': doc.itemById(id).position.dx, 'y': top}
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignRight(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+    final right = ids.map((id) {
+      final it = doc.itemById(id);
+      return it.position.dx + it.size.width;
+    }).reduce((a, b) => a > b ? a : b);
+    doc.beginUndoGroup('Align right');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {
+              'x': right - doc.itemById(id).size.width,
+              'y': doc.itemById(id).position.dy
+            }
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignBottom(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+    final bottom = ids.map((id) {
+      final it = doc.itemById(id);
+      return it.position.dy + it.size.height;
+    }).reduce((a, b) => a > b ? a : b);
+    doc.beginUndoGroup('Align bottom');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {
+              'x': doc.itemById(id).position.dx,
+              'y': bottom - doc.itemById(id).size.height
+            }
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignHCenter(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+    final cx = ids.map((id) {
+          final it = doc.itemById(id);
+          return it.position.dx + it.size.width / 2;
+        }).reduce((a, b) => a + b) /
+        ids.length;
+    doc.beginUndoGroup('Align center');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {
+              'x': cx - doc.itemById(id).size.width / 2,
+              'y': doc.itemById(id).position.dy
+            }
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignVCenter(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.length < 2) return;
+    final cy = ids.map((id) {
+          final it = doc.itemById(id);
+          return it.position.dy + it.size.height / 2;
+        }).reduce((a, b) => a + b) /
+        ids.length;
+    doc.beginUndoGroup('Align middle');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {
+              'x': doc.itemById(id).position.dx,
+              'y': cy - doc.itemById(id).size.height / 2
+            }
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignCanvasHCenter(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.isEmpty) return;
+    final cx = doc.baseSize.width / 2;
+    doc.beginUndoGroup('Center in canvas H');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {
+              'x': cx - doc.itemById(id).size.width / 2,
+              'y': doc.itemById(id).position.dy
+            }
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
+  }
+
+  void _alignCanvasVCenter(CanvasDoc doc) {
+    final ids = doc.selectedIds.toList();
+    if (ids.isEmpty) return;
+    final cy = doc.baseSize.height / 2;
+    doc.beginUndoGroup('Center in canvas V');
+    doc.applyPatch([
+      for (final id in ids)
+        {
+          'type': 'update',
+          'id': id,
+          'changes': {
+            'position': {
+              'x': doc.itemById(id).position.dx,
+              'y': cy - doc.itemById(id).size.height / 2
+            }
+          }
+        }
+    ]);
+    doc.commitUndoGroup();
   }
 }
 
@@ -245,7 +463,6 @@ class _EmptyPanel extends StatelessWidget {
   }
 }
 
-/// Actions section shown for both single and multi selection
 class _ActionsOnly extends StatelessWidget {
   const _ActionsOnly({
     required this.count,
@@ -281,7 +498,6 @@ class _ActionsOnly extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final many = count > 1;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -301,58 +517,55 @@ class _ActionsOnly extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(2),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(color: Colors.grey.shade50),
               child: Row(
                 children: [
                   _iconBtn(PhosphorIconsRegular.alignLeft, 'Align left',
-                      many ? onAlignLeft : null),
+                      onAlignLeft),
                   _iconBtn(PhosphorIconsRegular.alignCenterHorizontal,
-                      'Align center', many ? onAlignHCenter : null),
+                      'Align center', onAlignHCenter),
                   _iconBtn(PhosphorIconsRegular.alignRight, 'Align right',
-                      many ? onAlignRight : null),
+                      onAlignRight),
                 ],
               ),
             ),
             Container(
-              padding: EdgeInsets.all(2),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(color: Colors.grey.shade50),
               child: Row(
                 children: [
-                  _iconBtn(PhosphorIconsRegular.alignTop, 'Align top',
-                      many ? onAlignTop : null),
+                  _iconBtn(
+                      PhosphorIconsRegular.alignTop, 'Align top', onAlignTop),
                   _iconBtn(PhosphorIconsRegular.alignCenterVertical,
-                      'Align middle', many ? onAlignVCenter : null),
+                      'Align middle', onAlignVCenter),
                   _iconBtn(PhosphorIconsRegular.alignBottom, 'Align bottom',
-                      many ? onAlignBottom : null),
+                      onAlignBottom),
                 ],
               ),
             ),
-          ].withSpaceBetween(width: 8),
+          ]
+              .map((w) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4), child: w))
+              .toList(),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _iconBtn(
-              Icons.center_focus_strong,
-              'Center horizontally in canvas',
-              onAlignCanvasHCenter,
-            ),
-            _iconBtn(
-              Icons.center_focus_weak,
-              'Center vertically in canvas',
-              onAlignCanvasVCenter,
-            ),
+            _iconBtn(Icons.center_focus_strong, 'Center horizontally in canvas',
+                onAlignCanvasHCenter),
+            _iconBtn(Icons.center_focus_weak, 'Center vertically in canvas',
+                onAlignCanvasVCenter),
           ],
         ),
         const SizedBox(height: 6),
         Text(count == 1 ? '1 selected' : '$count selected',
             style: const TextStyle(fontWeight: FontWeight.w600)),
-      ].withSpaceBetween(height: 8),
+      ],
     );
   }
 
-  Widget _iconBtn(IconData icon, String tip, VoidCallback? onTap) {
+  Widget _iconBtn(IconData icon, String tip, VoidCallback onTap) {
     return MDTap.ghost(
       onPressed: onTap,
       icon: Icon(icon),
@@ -370,11 +583,13 @@ class _GenericItemProps extends StatefulWidget {
     required this.rotCtrl,
     required this.onRectCommit,
     required this.onRotateCommit,
+    required this.onEnd,
   });
 
   final TextEditingController xCtrl, yCtrl, wCtrl, hCtrl, rotCtrl;
   final void Function(double x, double y, double w, double h) onRectCommit;
   final void Function(double rotationDeg) onRotateCommit;
+  final VoidCallback onEnd;
 
   @override
   State<_GenericItemProps> createState() => _GenericItemPropsState();
@@ -397,33 +612,48 @@ class _GenericItemPropsState extends State<_GenericItemProps> {
     widget.onRotateCommit(r);
   }
 
-  // NOTE: no Expanded here. Parent Rows wrap each panel in Expanded once.
-  Widget _numField(Widget prefix, TextEditingController ctrl,
-      {VoidCallback? onDone}) {
-    return CanvaNumberProperty(
-        controller: ctrl,
-        prefix: prefix,
-        onSubmitted: (_) => onDone?.call(),
-        onEditingComplete: onDone);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(children: [
       Row(children: [
-        _numField(const Text('X'), widget.xCtrl, onDone: _commitRect),
+        CanvaNumberProperty(
+          controller: widget.xCtrl,
+          prefix: const Text('X'),
+          onSubmitted: (_) => _commitRect(),
+          onEditingComplete: _commitRect,
+        ),
         const SizedBox(width: 8),
-        _numField(const Text('Y'), widget.yCtrl, onDone: _commitRect),
+        CanvaNumberProperty(
+          controller: widget.yCtrl,
+          prefix: const Text('Y'),
+          onSubmitted: (_) => _commitRect(),
+          onEditingComplete: _commitRect,
+        ),
       ]),
       const SizedBox(height: 8),
       Row(children: [
-        _numField(const Text('W'), widget.wCtrl, onDone: _commitRect),
+        CanvaNumberProperty(
+          controller: widget.wCtrl,
+          prefix: const Text('W'),
+          onSubmitted: (_) => _commitRect(),
+          onEditingComplete: _commitRect,
+        ),
         const SizedBox(width: 8),
-        _numField(const Text('H'), widget.hCtrl, onDone: _commitRect),
+        CanvaNumberProperty(
+          controller: widget.hCtrl,
+          prefix: const Text('H'),
+          onSubmitted: (_) => _commitRect(),
+          onEditingComplete: _commitRect,
+        ),
       ]),
       const SizedBox(height: 8),
       Row(children: [
-        _numField(const Text('Rotation°'), widget.rotCtrl, onDone: _commitRot),
+        CanvaNumberProperty(
+          controller: widget.rotCtrl,
+          prefix: const Text('Rotation°'),
+          onSubmitted: (_) => _commitRot(),
+          onEditingComplete: _commitRot,
+        ),
       ]),
       Slider(
         value: double.tryParse(widget.rotCtrl.text) ?? 0,
@@ -433,6 +663,7 @@ class _GenericItemPropsState extends State<_GenericItemProps> {
           widget.rotCtrl.text = v.toStringAsFixed(0);
           _commitRot();
         },
+        onChangeEnd: (_) => widget.onEnd(),
       ),
     ]);
   }
