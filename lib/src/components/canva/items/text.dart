@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
+import 'package:flutter_meragi_design/src/components/canva/canvas_scope.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/color_preview.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/common_color_picker.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 class TextItem extends CanvasItem {
@@ -491,18 +494,46 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ),
       const SizedBox(height: 12),
       const SectionTitle('Decoration color'),
-      MDTap(
-        onPressed: () async {
+      ColorPreview(
+        color: _decorationColor,
+        onTap: () async {
+          final doc = CanvasScope.of(context, listen: false);
           final color = await showDialog<Color>(
             context: context,
             builder: (context) => AlertDialog(
-              content: MDColorPicker(
-                initialColor: _decorationColor,
-                onColorChanged: (c) {
+              content: CommonColorPicker(
+                documentColors: doc.documentColors,
+                onColorSelected: (c) {
                   setState(() => _decorationColor = c);
                   _emit();
+                  Navigator.pop(context, c);
                 },
-                onDone: (c) => Navigator.pop(context, c),
+                onOpenColorPicker: () async {
+                  Navigator.pop(context);
+                  final newColor = await showDialog<Color>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: MDColorPicker(
+                        initialColor: _decorationColor,
+                        onColorChanged: (c) {
+                          setState(() => _decorationColor = c);
+                          _emit();
+                        },
+                        onDone: (c) => Navigator.pop(context, c),
+                      ),
+                    ),
+                  );
+                  if (newColor != null) {
+                    doc.applyPatch([
+                      {
+                        'type': 'doc.colors.add',
+                        'color': colorToHex(newColor),
+                      }
+                    ]);
+                    setState(() => _decorationColor = newColor);
+                    _emit();
+                  }
+                },
               ),
             ),
           );
@@ -511,29 +542,49 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             _emit();
           }
         },
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: _decorationColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-        ),
       ),
       const SizedBox(height: 12),
       const SectionTitle('Color'),
-      MDTap(
-        onPressed: () async {
+      ColorPreview(
+        color: _fontColor,
+        onTap: () async {
+          final doc = CanvasScope.of(context, listen: false);
           final color = await showDialog<Color>(
             context: context,
             builder: (context) => AlertDialog(
-              content: MDColorPicker(
-                initialColor: _fontColor,
-                onColorChanged: (c) {
+              content: CommonColorPicker(
+                documentColors: doc.documentColors,
+                onColorSelected: (c) {
                   setState(() => _fontColor = c);
                   _emit();
+                  Navigator.pop(context, c);
                 },
-                onDone: (c) => Navigator.pop(context, c),
+                onOpenColorPicker: () async {
+                  Navigator.pop(context);
+                  final newColor = await showDialog<Color>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: MDColorPicker(
+                        initialColor: _fontColor,
+                        onColorChanged: (c) {
+                          setState(() => _fontColor = c);
+                          _emit();
+                        },
+                        onDone: (c) => Navigator.pop(context, c),
+                      ),
+                    ),
+                  );
+                  if (newColor != null) {
+                    doc.applyPatch([
+                      {
+                        'type': 'doc.colors.add',
+                        'color': colorToHex(newColor),
+                      }
+                    ]);
+                    setState(() => _fontColor = newColor);
+                    _emit();
+                  }
+                },
               ),
             ),
           );
@@ -542,14 +593,6 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             _emit();
           }
         },
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: _fontColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-        ),
       ),
       const SizedBox(height: 12),
       const SectionTitle('Shadow'),
@@ -572,18 +615,46 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ),
       const SizedBox(height: 12),
       const SectionTitle('Background color'),
-      MDTap(
-        onPressed: () async {
+      ColorPreview(
+        color: _backgroundColor,
+        onTap: () async {
+          final doc = CanvasScope.of(context, listen: false);
           final color = await showDialog<Color>(
             context: context,
             builder: (context) => AlertDialog(
-              content: MDColorPicker(
-                initialColor: _backgroundColor,
-                onColorChanged: (c) {
+              content: CommonColorPicker(
+                documentColors: doc.documentColors,
+                onColorSelected: (c) {
                   setState(() => _backgroundColor = c);
                   _emit();
+                  Navigator.pop(context, c);
                 },
-                onDone: (c) => Navigator.pop(context, c),
+                onOpenColorPicker: () async {
+                  Navigator.pop(context);
+                  final newColor = await showDialog<Color>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: MDColorPicker(
+                        initialColor: _backgroundColor,
+                        onColorChanged: (c) {
+                          setState(() => _backgroundColor = c);
+                          _emit();
+                        },
+                        onDone: (c) => Navigator.pop(context, c),
+                      ),
+                    ),
+                  );
+                  if (newColor != null) {
+                    doc.applyPatch([
+                      {
+                        'type': 'doc.colors.add',
+                        'color': colorToHex(newColor),
+                      }
+                    ]);
+                    setState(() => _backgroundColor = newColor);
+                    _emit();
+                  }
+                },
               ),
             ),
           );
@@ -592,14 +663,6 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             _emit();
           }
         },
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: _backgroundColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-        ),
       ),
       const SizedBox(height: 12),
       SliderWithInput(

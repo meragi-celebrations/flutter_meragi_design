@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/shape.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/common_color_picker.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 import '../canva/canvas_doc.dart';
@@ -97,17 +98,49 @@ class WorkspaceActionBar extends StatelessWidget {
                 final color = await showDialog<Color>(
                   context: context,
                   builder: (context) => AlertDialog(
-                    content: MDColorPicker(
-                      initialColor: doc.canvasColor,
-                      onColorChanged: (c) {
+                    content: CommonColorPicker(
+                      documentColors: doc.documentColors,
+                      onColorSelected: (c) {
                         doc.applyPatch([
                           {
                             'type': 'canvas.update',
                             'changes': {'color': colorToHex(c)}
                           }
                         ]);
+                        Navigator.pop(context, c);
                       },
-                      onDone: (c) => Navigator.pop(context, c),
+                      onOpenColorPicker: () async {
+                        Navigator.pop(context); // Close the common picker
+                        final newColor = await showDialog<Color>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            content: MDColorPicker(
+                              initialColor: doc.canvasColor,
+                              onColorChanged: (c) {
+                                doc.applyPatch([
+                                  {
+                                    'type': 'canvas.update',
+                                    'changes': {'color': colorToHex(c)}
+                                  }
+                                ]);
+                              },
+                              onDone: (c) => Navigator.pop(context, c),
+                            ),
+                          ),
+                        );
+                        if (newColor != null) {
+                          doc.applyPatch([
+                            {
+                              'type': 'canvas.update',
+                              'changes': {'color': colorToHex(newColor)}
+                            },
+                            {
+                              'type': 'doc.colors.add',
+                              'color': colorToHex(newColor)
+                            }
+                          ]);
+                        }
+                      },
                     ),
                   ),
                 );

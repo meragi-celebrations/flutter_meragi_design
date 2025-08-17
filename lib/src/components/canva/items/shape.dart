@@ -2,7 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart' hide Path;
+import 'package:flutter_meragi_design/src/components/canva/canvas_scope.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/color_preview.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/common_color_picker.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 enum ShapeType { rectangle, circle, oval, line, arrow }
@@ -312,18 +315,46 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
         ),
         const SizedBox(height: 12),
         const SectionTitle('Fill Color'),
-        MDTap(
-          onPressed: () async {
+        ColorPreview(
+          color: _color,
+          onTap: () async {
+            final doc = CanvasScope.of(context, listen: false);
             final color = await showDialog<Color>(
               context: context,
               builder: (context) => AlertDialog(
-                content: MDColorPicker(
-                  initialColor: _color,
-                  onColorChanged: (c) {
+                content: CommonColorPicker(
+                  documentColors: doc.documentColors,
+                  onColorSelected: (c) {
                     setState(() => _color = c);
                     _emit();
+                    Navigator.pop(context, c);
                   },
-                  onDone: (c) => Navigator.pop(context, c),
+                  onOpenColorPicker: () async {
+                    Navigator.pop(context);
+                    final newColor = await showDialog<Color>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        content: MDColorPicker(
+                          initialColor: _color,
+                          onColorChanged: (c) {
+                            setState(() => _color = c);
+                            _emit();
+                          },
+                          onDone: (c) => Navigator.pop(context, c),
+                        ),
+                      ),
+                    );
+                    if (newColor != null) {
+                      doc.applyPatch([
+                        {
+                          'type': 'doc.colors.add',
+                          'color': colorToHex(newColor),
+                        }
+                      ]);
+                      setState(() => _color = newColor);
+                      _emit();
+                    }
+                  },
                 ),
               ),
             );
@@ -332,29 +363,49 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
               _emit();
             }
           },
-          child: Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: _color,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-          ),
         ),
         const SizedBox(height: 12),
         const SectionTitle('Stroke Color'),
-        MDTap(
-          onPressed: () async {
+        ColorPreview(
+          color: _strokeColor,
+          onTap: () async {
+            final doc = CanvasScope.of(context, listen: false);
             final color = await showDialog<Color>(
               context: context,
               builder: (context) => AlertDialog(
-                content: MDColorPicker(
-                  initialColor: _strokeColor,
-                  onColorChanged: (c) {
+                content: CommonColorPicker(
+                  documentColors: doc.documentColors,
+                  onColorSelected: (c) {
                     setState(() => _strokeColor = c);
                     _emit();
+                    Navigator.pop(context, c);
                   },
-                  onDone: (c) => Navigator.pop(context, c),
+                  onOpenColorPicker: () async {
+                    Navigator.pop(context);
+                    final newColor = await showDialog<Color>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        content: MDColorPicker(
+                          initialColor: _strokeColor,
+                          onColorChanged: (c) {
+                            setState(() => _strokeColor = c);
+                            _emit();
+                          },
+                          onDone: (c) => Navigator.pop(context, c),
+                        ),
+                      ),
+                    );
+                    if (newColor != null) {
+                      doc.applyPatch([
+                        {
+                          'type': 'doc.colors.add',
+                          'color': colorToHex(newColor),
+                        }
+                      ]);
+                      setState(() => _strokeColor = newColor);
+                      _emit();
+                    }
+                  },
                 ),
               ),
             );
@@ -363,14 +414,6 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
               _emit();
             }
           },
-          child: Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: _strokeColor,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-          ),
         ),
         const SizedBox(height: 12),
         const SectionTitle('Stroke Width'),

@@ -22,6 +22,7 @@ class CanvasDoc extends ChangeNotifier {
   // State
   final List<CanvasItem> _items = [];
   final Set<String> _selected = <String>{};
+  final List<Color> _documentColors = [];
 
   Size _baseSize;
   Color _canvasColor;
@@ -37,6 +38,7 @@ class CanvasDoc extends ChangeNotifier {
   Color get canvasColor => _canvasColor;
   bool get gridVisible => _gridVisible;
   double get gridSpacing => _gridSpacing;
+  List<Color> get documentColors => List.unmodifiable(_documentColors);
 
   // Ids
   String newId() => buildId();
@@ -105,6 +107,7 @@ class CanvasDoc extends ChangeNotifier {
   ///  - {'type':'selection.add', 'ids': [..]}
   ///  - {'type':'selection.remove', 'ids': [..]}
   ///  - {'type':'canvas.update', 'changes': {'base': {'w':..,'h':..}, 'color':'#RRGGBB', 'gridVisible': bool, 'gridSpacing': double}}
+  ///  - {'type':'doc.colors.add', 'color': '#RRGGBB'}
   void applyPatch(List<Map<String, dynamic>> ops) {
     final implicit = !_groupOpen;
     if (implicit) beginUndoGroup('Change');
@@ -140,6 +143,9 @@ class CanvasDoc extends ChangeNotifier {
           break;
         case 'canvas.update':
           _opCanvasUpdate(op);
+          break;
+        case 'doc.colors.add':
+          _opAddColor(op);
           break;
         default:
           debugPrint('Unknown op: ${op['type']}');
@@ -252,6 +258,15 @@ class CanvasDoc extends ChangeNotifier {
     if (gs != null) _gridSpacing = gs.clamp(2.0, 400.0);
   }
 
+  void _opAddColor(Map<String, dynamic> op) {
+    final colorHex = op['color'] as String?;
+    if (colorHex == null) return;
+    final color = hexToColor(colorHex);
+    if (color != null && !_documentColors.contains(color)) {
+      _documentColors.add(color);
+    }
+  }
+
   // Serialization
   Map<String, dynamic> toJson() => {
         'version': 2,
@@ -260,6 +275,7 @@ class CanvasDoc extends ChangeNotifier {
           'aspect': _baseSize.width / _baseSize.height,
           'color': colorToHex(_canvasColor),
           'grid': {'visible': _gridVisible, 'spacing': _gridSpacing},
+          'docColors': _documentColors.map(colorToHex).toList(),
         },
         'items': [for (int i = 0; i < _items.length; i++) _items[i].toJson(i)],
       };
@@ -289,6 +305,12 @@ class CanvasDoc extends ChangeNotifier {
       final spacing = (grid['spacing'] as num?)?.toDouble();
       if (spacing != null) _gridSpacing = spacing.clamp(2.0, 400.0);
     }
+
+    final docColors =
+        (canvas['docColors'] as List?)?.cast<String>() ?? const [];
+    _documentColors
+      ..clear()
+      ..addAll(docColors.map((e) => hexToColor(e)).whereType<Color>());
 
     final rawItems =
         (doc['items'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
