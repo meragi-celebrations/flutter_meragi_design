@@ -6,7 +6,9 @@ import 'widgets/color_input_fields.dart';
 import 'widgets/color_preview.dart';
 import 'widgets/color_spectrum_box.dart';
 import 'widgets/hue_slider.dart';
+import 'widgets/opacity_slider.dart';
 import 'widgets/palette_view.dart';
+import 'widgets/value_slider.dart';
 
 class MDColorPicker extends StatefulWidget {
   const MDColorPicker({
@@ -30,11 +32,13 @@ class MDColorPicker extends StatefulWidget {
 
 class _MDColorPickerState extends State<MDColorPicker> {
   late HSVColor _hsvColor;
+  late double _opacity;
 
   @override
   void initState() {
     super.initState();
     _hsvColor = HSVColor.fromColor(widget.initialColor ?? Colors.red);
+    _opacity = (widget.initialColor ?? Colors.red).opacity;
   }
 
   @override
@@ -57,7 +61,9 @@ class _MDColorPickerState extends State<MDColorPicker> {
               setState(() {
                 _hsvColor = hsvColor;
               });
-              widget.onColorChanged(_hsvColor.toColor());
+              widget.onColorChanged(
+                _hsvColor.toColor().withOpacity(_opacity),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -67,20 +73,48 @@ class _MDColorPickerState extends State<MDColorPicker> {
               setState(() {
                 _hsvColor = HSVColor(hue, _hsvColor.s, _hsvColor.v);
               });
-              widget.onColorChanged(_hsvColor.toColor());
+              widget.onColorChanged(
+                _hsvColor.toColor().withOpacity(_opacity),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          ValueSlider(
+            hsvColor: _hsvColor,
+            onValueChanged: (value) {
+              setState(() {
+                _hsvColor = HSVColor(_hsvColor.h, _hsvColor.s, value);
+              });
+              widget.onColorChanged(
+                _hsvColor.toColor().withOpacity(_opacity),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          OpacitySlider(
+            hsvColor: _hsvColor,
+            opacity: _opacity,
+            onOpacityChanged: (opacity) {
+              setState(() {
+                _opacity = opacity;
+              });
+              widget.onColorChanged(
+                _hsvColor.toColor().withOpacity(_opacity),
+              );
             },
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              ColorPreview(color: _hsvColor.toColor()),
+              ColorPreview(color: _hsvColor.toColor().withOpacity(_opacity)),
               const SizedBox(width: 16),
               Expanded(
                 child: ColorInputFields(
-                  color: _hsvColor.toColor(),
+                  color: _hsvColor.toColor().withOpacity(_opacity),
                   onColorChanged: (color) {
                     setState(() {
                       _hsvColor = HSVColor.fromColor(color);
+                      _opacity = color.opacity;
                     });
                     widget.onColorChanged(color);
                   },
@@ -95,6 +129,7 @@ class _MDColorPickerState extends State<MDColorPicker> {
               onColorSelected: (color) {
                 setState(() {
                   _hsvColor = HSVColor.fromColor(color);
+                  _opacity = color.opacity;
                 });
                 widget.onColorChanged(color);
               },
