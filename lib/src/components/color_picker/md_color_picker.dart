@@ -18,9 +18,13 @@ class MDColorPicker extends StatefulWidget {
     this.paletteColors = const [],
     this.onDone,
     this.doneButtonChild,
+    this.showOpacitySlider = true,
+    this.showValueSlider = true,
   });
 
   final Color? initialColor;
+  final bool showOpacitySlider;
+  final bool showValueSlider;
   final ValueChanged<Color> onColorChanged;
   final List<Color> paletteColors;
   final ValueChanged<Color>? onDone;
@@ -78,31 +82,35 @@ class _MDColorPickerState extends State<MDColorPicker> {
               );
             },
           ),
-          const SizedBox(height: 16),
-          ValueSlider(
-            hsvColor: _hsvColor,
-            onValueChanged: (value) {
-              setState(() {
-                _hsvColor = HSVColor(_hsvColor.h, _hsvColor.s, value);
-              });
-              widget.onColorChanged(
-                _hsvColor.toColor().withOpacity(_opacity),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          OpacitySlider(
-            hsvColor: _hsvColor,
-            opacity: _opacity,
-            onOpacityChanged: (opacity) {
-              setState(() {
-                _opacity = opacity;
-              });
-              widget.onColorChanged(
-                _hsvColor.toColor().withOpacity(_opacity),
-              );
-            },
-          ),
+          if (widget.showValueSlider) ...[
+            const SizedBox(height: 16),
+            ValueSlider(
+              hsvColor: _hsvColor,
+              onValueChanged: (value) {
+                setState(() {
+                  _hsvColor = HSVColor(_hsvColor.h, _hsvColor.s, value);
+                });
+                widget.onColorChanged(
+                  _hsvColor.toColor().withOpacity(_opacity),
+                );
+              },
+            ),
+          ],
+          if (widget.showOpacitySlider) ...[
+            const SizedBox(height: 16),
+            OpacitySlider(
+              hsvColor: _hsvColor,
+              opacity: _opacity,
+              onOpacityChanged: (opacity) {
+                setState(() {
+                  _opacity = opacity;
+                });
+                widget.onColorChanged(
+                  _hsvColor.toColor().withOpacity(_opacity),
+                );
+              },
+            ),
+          ],
           const SizedBox(height: 16),
           Row(
             children: [

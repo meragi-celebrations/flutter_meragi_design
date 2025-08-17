@@ -12,6 +12,8 @@ class _ColorPickerStoryState extends State<ColorPickerStory> {
   final List<Color> _palette = [];
   Color _selectedColor = Colors.red;
   Color _selectedColor2 = Colors.blue;
+  bool _showOpacitySlider = true;
+  bool _showValueSlider = true;
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +29,38 @@ class _ColorPickerStoryState extends State<ColorPickerStory> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _showOpacitySlider,
+                      onChanged: (value) {
+                        setState(() {
+                          _showOpacitySlider = value!;
+                        });
+                      },
+                    ),
+                    const Text('Show Opacity Slider'),
+                    const SizedBox(width: 24),
+                    Checkbox(
+                      value: _showValueSlider,
+                      onChanged: (value) {
+                        setState(() {
+                          _showValueSlider = value!;
+                        });
+                      },
+                    ),
+                    const Text('Show Value Slider'),
+                  ],
+                ),
+                const SizedBox(height: 24),
                 SizedBox(
                   width: 450,
                   child: MDColorPicker(
                     initialColor: _selectedColor,
                     paletteColors: _palette,
+                    showOpacitySlider: _showOpacitySlider,
+                    showValueSlider: _showValueSlider,
                     onColorChanged: (color) {
                       setState(() {
                         _selectedColor = color;
