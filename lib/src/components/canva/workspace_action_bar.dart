@@ -112,31 +112,37 @@ class WorkspaceActionBar extends StatelessWidget {
                       ]);
                     },
                     onOpenColorPicker: () {
-                      dialogManager.close(dialog);
+                      // dialogManager.close(dialog);
                       late DraggableDialog colorPickerDialog;
                       colorPickerDialog = DraggableDialog(
                         title: 'Select Color',
                         onClose: () => dialogManager.close(colorPickerDialog),
-                        child: MDColorPicker(
-                          initialColor: doc.canvasColor,
-                          onColorChanged: (c) {
-                            doc.applyPatch([
-                              {
-                                'type': 'canvas.update',
-                                'changes': {'color': colorToHex(c)}
-                              }
-                            ]);
-                          },
-                          onDone: (c) {
-                            doc.applyPatch([
-                              {
-                                'type': 'canvas.update',
-                                'changes': {'color': colorToHex(c)}
-                              },
-                              {'type': 'doc.colors.add', 'color': colorToHex(c)}
-                            ]);
-                            dialogManager.close(colorPickerDialog);
-                          },
+                        child: SizedBox(
+                          width: 300,
+                          child: MDColorPicker(
+                            initialColor: doc.canvasColor,
+                            onColorChanged: (c) {
+                              doc.applyPatch([
+                                {
+                                  'type': 'canvas.update',
+                                  'changes': {'color': colorToHex(c)}
+                                }
+                              ]);
+                            },
+                            onDone: (c) {
+                              doc.applyPatch([
+                                {
+                                  'type': 'canvas.update',
+                                  'changes': {'color': colorToHex(c)}
+                                },
+                                {
+                                  'type': 'doc.colors.add',
+                                  'color': colorToHex(c)
+                                }
+                              ]);
+                              dialogManager.close(colorPickerDialog);
+                            },
+                          ),
                         ),
                       );
                       dialogManager.show(colorPickerDialog);

@@ -21,16 +21,19 @@ class CommonColorPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildDocumentColors(context),
-        const SizedBox(height: 16),
-        _PhotoColors(doc: doc, onColorSelected: onColorSelected),
-        const SizedBox(height: 16),
-        _buildSolidColors(context),
-      ],
+    return MDPanel(
+      width: 350,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildDocumentColors(context),
+          const SizedBox(height: 16),
+          _PhotoColors(doc: doc, onColorSelected: onColorSelected),
+          const SizedBox(height: 16),
+          _buildSolidColors(context),
+        ],
+      ),
     );
   }
 
