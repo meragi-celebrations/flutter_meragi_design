@@ -16,6 +16,7 @@ export 'src/components/canva/items/text.dart';
 export 'src/components/canva/palette_sidebar.dart';
 export 'src/components/canva/simple_canva.dart';
 export 'src/components/canva/simple_canva_controller.dart';
+export 'src/components/canva/ui/slider_with_input.dart';
 export 'src/components/canva/viewer.dart';
 export 'src/components/card.dart';
 export 'src/components/carousel.dart';

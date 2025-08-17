@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/slider_with_input.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 class TextItem extends CanvasItem {
@@ -324,12 +325,10 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const SectionTitle('Text'),
-      TextField(
+      MDInput(
         controller: _textCtrl,
         maxLines: 5,
         minLines: 3,
-        decoration:
-            const InputDecoration(border: OutlineInputBorder(), isDense: true),
         onChanged: (_) => _emit(),
       ),
       const SizedBox(height: 12),
@@ -348,85 +347,49 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
         },
       ),
       const SizedBox(height: 12),
-      const SectionTitle('Size'),
-      Row(children: [
-        Expanded(
-          child: Slider(
-            value: _fontSize.clamp(8, 144),
-            min: 8,
-            max: 144,
-            label: _fontSize.toStringAsFixed(0),
-            onChanged: (v) {
-              setState(() => _fontSize = v);
-              _emit();
-            },
-          ),
-        ),
-        SizedBox(
-            width: 48,
-            child:
-                Text(_fontSize.toStringAsFixed(0), textAlign: TextAlign.right)),
-      ]),
+      SliderWithInput(
+        label: 'Size',
+        value: _fontSize,
+        min: 8,
+        max: 144,
+        onChanged: (v) {
+          setState(() => _fontSize = v);
+          _emit();
+        },
+      ),
       const SizedBox(height: 12),
-      const SectionTitle('Line height'),
-      Row(children: [
-        Expanded(
-          child: Slider(
-            value: _lineHeight.clamp(0.5, 3.0),
-            min: 0.5,
-            max: 3.0,
-            label: _lineHeight.toStringAsFixed(1),
-            onChanged: (v) {
-              setState(() => _lineHeight = v);
-              _emit();
-            },
-          ),
-        ),
-        SizedBox(
-            width: 48,
-            child: Text(_lineHeight.toStringAsFixed(1),
-                textAlign: TextAlign.right)),
-      ]),
+      SliderWithInput(
+        label: 'Line height',
+        value: _lineHeight,
+        min: 0.5,
+        max: 3.0,
+        onChanged: (v) {
+          setState(() => _lineHeight = v);
+          _emit();
+        },
+      ),
       const SizedBox(height: 12),
-      const SectionTitle('Letter spacing'),
-      Row(children: [
-        Expanded(
-          child: Slider(
-            value: _letterSpacing.clamp(-10, 10),
-            min: -10,
-            max: 10,
-            label: _letterSpacing.toStringAsFixed(1),
-            onChanged: (v) {
-              setState(() => _letterSpacing = v);
-              _emit();
-            },
-          ),
-        ),
-        SizedBox(
-            width: 48,
-            child: Text(_letterSpacing.toStringAsFixed(1),
-                textAlign: TextAlign.right)),
-      ]),
+      SliderWithInput(
+        label: 'Letter spacing',
+        value: _letterSpacing,
+        min: -10,
+        max: 10,
+        onChanged: (v) {
+          setState(() => _letterSpacing = v);
+          _emit();
+        },
+      ),
       const SizedBox(height: 12),
-      const SectionTitle('Word spacing'),
-      Row(children: [
-        Expanded(
-          child: Slider(
-            value: _wordSpacing.clamp(-10, 20),
-            min: -10,
-            max: 20,
-            label: _wordSpacing.toStringAsFixed(1),
-            onChanged: (v) {
-              setState(() => _wordSpacing = v);
-              _emit();
-            },
-          ),
-        ),
-        SizedBox(
-            width: 48,
-            child: Text(_wordSpacing.toStringAsFixed(1),
-                textAlign: TextAlign.right)),
-      ]),
+      SliderWithInput(
+        label: 'Word spacing',
+        value: _wordSpacing,
+        min: -10,
+        max: 20,
+        onChanged: (v) {
+          setState(() => _wordSpacing = v);
+          _emit();
+        },
+      ),
       const SizedBox(height: 12),
       const SectionTitle('Style'),
       Row(children: [
@@ -505,25 +468,16 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
         },
       ),
       const SizedBox(height: 12),
-      const SectionTitle('Decoration thickness'),
-      Row(children: [
-        Expanded(
-          child: Slider(
-            value: _decorationThickness.clamp(0.0, 10.0),
-            min: 0.0,
-            max: 10.0,
-            label: _decorationThickness.toStringAsFixed(1),
-            onChanged: (v) {
-              setState(() => _decorationThickness = v);
-              _emit();
-            },
-          ),
-        ),
-        SizedBox(
-            width: 48,
-            child: Text(_decorationThickness.toStringAsFixed(1),
-                textAlign: TextAlign.right)),
-      ]),
+      SliderWithInput(
+        label: 'Decoration thickness',
+        value: _decorationThickness,
+        min: 0.0,
+        max: 10.0,
+        onChanged: (v) {
+          setState(() => _decorationThickness = v);
+          _emit();
+        },
+      ),
       const SizedBox(height: 12),
       const SectionTitle('Decoration color'),
       MDTap(
