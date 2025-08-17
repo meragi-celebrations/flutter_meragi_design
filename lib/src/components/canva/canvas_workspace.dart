@@ -525,6 +525,29 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
 
     const snapThreshold = 2.0;
 
+    // Canvas centers
+    final canvasCenter = doc.baseSize.center(Offset.zero);
+
+    // Horizontal canvas center check
+    if ((movingBounds.center.dx - canvasCenter.dx).abs() < snapThreshold) {
+      _snapOffset = Offset(canvasCenter.dx - movingBounds.center.dx, 0);
+      newGuidelines.add(_Guideline(
+        axis: Axis.vertical,
+        start: Offset(canvasCenter.dx, 0),
+        end: Offset(canvasCenter.dx, doc.baseSize.height),
+      ));
+    }
+
+    // Vertical canvas center check
+    if ((movingBounds.center.dy - canvasCenter.dy).abs() < snapThreshold) {
+      _snapOffset = Offset(0, canvasCenter.dy - movingBounds.center.dy);
+      newGuidelines.add(_Guideline(
+        axis: Axis.horizontal,
+        start: Offset(0, canvasCenter.dy),
+        end: Offset(doc.baseSize.width, canvasCenter.dy),
+      ));
+    }
+
     for (final staticItem in staticItems) {
       final staticBounds = staticItem.rect;
 
