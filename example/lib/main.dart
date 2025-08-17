@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
+import 'color_picker_story.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -57,7 +59,9 @@ class _HomePageState extends State<HomePage> {
       label: 'Form',
     ),
     MDNavigationRailDestination(
-        icon: const Icon(Icons.edit_note), label: 'Canva')
+        icon: const Icon(Icons.edit_note), label: 'Canva'),
+    MDNavigationRailDestination(
+        icon: const Icon(Icons.color_lens), label: 'Color Picker')
   ];
 
   @override
@@ -83,6 +87,7 @@ class _HomePageState extends State<HomePage> {
               const InputStory(),
               const FormStory(),
               const CanvaStory(),
+              const ColorPickerStory(),
             ][_selectedIndex],
           ),
         ],

@@ -19,6 +19,7 @@ export 'src/components/canva/simple_canva_controller.dart';
 export 'src/components/canva/viewer.dart';
 export 'src/components/card.dart';
 export 'src/components/carousel.dart';
+export 'src/components/color_picker/md_color_picker.dart';
 export 'src/components/description.dart';
 export 'src/components/divider.dart';
 export 'src/components/drawer.dart';
