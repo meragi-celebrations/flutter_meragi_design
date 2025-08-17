@@ -99,7 +99,7 @@ class WorkspaceActionBar extends StatelessWidget {
                   context: context,
                   builder: (context) => AlertDialog(
                     content: CommonColorPicker(
-                      documentColors: doc.documentColors,
+                      doc: doc,
                       onColorSelected: (c) {
                         doc.applyPatch([
                           {

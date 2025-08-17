@@ -502,7 +502,7 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             context: context,
             builder: (context) => AlertDialog(
               content: CommonColorPicker(
-                documentColors: doc.documentColors,
+                doc: doc,
                 onColorSelected: (c) {
                   setState(() => _decorationColor = c);
                   _emit();
@@ -553,7 +553,7 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             context: context,
             builder: (context) => AlertDialog(
               content: CommonColorPicker(
-                documentColors: doc.documentColors,
+                doc: doc,
                 onColorSelected: (c) {
                   setState(() => _fontColor = c);
                   _emit();
@@ -623,7 +623,7 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             context: context,
             builder: (context) => AlertDialog(
               content: CommonColorPicker(
-                documentColors: doc.documentColors,
+                doc: doc,
                 onColorSelected: (c) {
                   setState(() => _backgroundColor = c);
                   _emit();

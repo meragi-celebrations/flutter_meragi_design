@@ -323,7 +323,7 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
               context: context,
               builder: (context) => AlertDialog(
                 content: CommonColorPicker(
-                  documentColors: doc.documentColors,
+                  doc: doc,
                   onColorSelected: (c) {
                     setState(() => _color = c);
                     _emit();
@@ -374,7 +374,7 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
               context: context,
               builder: (context) => AlertDialog(
                 content: CommonColorPicker(
-                  documentColors: doc.documentColors,
+                  doc: doc,
                   onColorSelected: (c) {
                     setState(() => _strokeColor = c);
                     _emit();

@@ -231,7 +231,7 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
                     context: context,
                     builder: (context) => AlertDialog(
                       content: CommonColorPicker(
-                        documentColors: doc.documentColors,
+                        doc: doc,
                         onColorSelected: (c) {
                           row.ctrl.text = colorToHex(c);
                           _commit();

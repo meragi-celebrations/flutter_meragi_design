@@ -3,9 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_doc.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_scope.dart';
+import 'package:flutter_meragi_design/src/components/canva/color_extractor.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/image.dart';
 import 'package:flutter_meragi_design/src/components/canva/palette_sidebar.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/grid_painter.dart';
+import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
 class CanvasWorkspace extends StatefulWidget {
@@ -336,7 +339,7 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                               Positioned.fill(
                                 child: DragTarget<CanvasPaletteImage>(
                                   onWillAccept: (_) => true,
-                                  onAcceptWithDetails: (details) {
+                                  onAcceptWithDetails: (details) async {
                                     final scale = _scale;
                                     if (scale == null) return;
 
@@ -370,6 +373,34 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                         },
                                       },
                                     };
+
+                                    final tempItem =
+                                        ImageItem.fromJson(itemJson);
+                                    final provider = tempItem.resolveProvider();
+                                    if (provider == null) {
+                                      // Handle case where image provider can't be resolved
+                                      widget.doc.beginUndoGroup('Add Image');
+                                      widget.doc.applyPatch([
+                                        {
+                                          'type': 'insert',
+                                          'item': itemJson,
+                                          'index': null
+                                        },
+                                        {
+                                          'type': 'selection.set',
+                                          'ids': [id]
+                                        },
+                                      ]);
+                                      widget.doc.commitUndoGroup();
+                                      return;
+                                    }
+                                    final colors =
+                                        await getColorsFromImage(provider);
+                                    final colorHexes = colors
+                                        .map((c) => colorToHex(c))
+                                        .toList();
+                                    (itemJson['props'] as Map<String, dynamic>)[
+                                        'extractedColors'] = colorHexes;
 
                                     widget.doc.beginUndoGroup('Add Image');
                                     widget.doc.applyPatch([

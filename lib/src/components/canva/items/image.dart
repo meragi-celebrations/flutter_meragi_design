@@ -26,9 +26,11 @@ class ImageItem extends CanvasItem {
     super.locked = false,
     super.rotationDeg = 0,
     this.opacity = 1.0,
+    this.extractedColors = const [],
   }) : borderColor = borderColor ?? const Color(0xFF000000);
 
   String src;
+  final List<Color> extractedColors;
   double radiusTL, radiusTR, radiusBL, radiusBR;
 
   // Border
@@ -46,7 +48,7 @@ class ImageItem extends CanvasItem {
   @override
   CanvasItemKind get kind => CanvasItemKind.image;
 
-  ImageProvider? _resolveProvider() {
+  ImageProvider? resolveProvider() {
     if (src.isEmpty) return null;
     if (_cachedProvider != null && _cachedSrcKey == src) return _cachedProvider;
 
@@ -75,7 +77,7 @@ class ImageItem extends CanvasItem {
 
   @override
   Widget buildContent(CanvasScaleHandler scale) {
-    final p = _resolveProvider();
+    final p = resolveProvider();
     final s = scale.s;
     final outerBorderRadius = BorderRadius.only(
       topLeft: Radius.circular(radiusTL * s),
@@ -161,6 +163,7 @@ class ImageItem extends CanvasItem {
         locked: locked,
         rotationDeg: rotationDeg,
         opacity: opacity,
+        extractedColors: extractedColors,
       );
 
   @override
@@ -179,12 +182,16 @@ class ImageItem extends CanvasItem {
           'style': borderStyle.name,
         },
         'opacity': opacity,
+        'extractedColors': extractedColors.map((c) => _colorToHex(c)).toList(),
       };
 
   static ImageItem fromJson(Map<String, dynamic> j) {
     final props = (j['props'] as Map?)?.cast<String, dynamic>() ?? const {};
     final r = (props['radii'] as Map?)?.cast<String, dynamic>() ?? const {};
     final b = (props['border'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final extractedColorsRaw =
+        (props['extractedColors'] as List?)?.cast<String>() ?? const [];
+    final extractedColors = extractedColorsRaw.map(_parseHexColor).toList();
 
     return ImageItem(
       id: (j['id'] as String?) ??
@@ -212,6 +219,7 @@ class ImageItem extends CanvasItem {
         orElse: () => BorderStyle.solid,
       ),
       opacity: (props['opacity'] as num?)?.toDouble() ?? 1.0,
+      extractedColors: extractedColors,
     );
   }
 
