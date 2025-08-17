@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/shape.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/common_color_picker.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/draggable_dialog.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 import '../canva/canvas_doc.dart';
 import '../canva/canvas_scope.dart';
+import 'ui/dialog_manager_scope.dart';
 
 class WorkspaceActionBar extends StatelessWidget {
   const WorkspaceActionBar({super.key});
@@ -57,6 +59,7 @@ class WorkspaceActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final doc = CanvasScope.of(context);
+    final dialogManager = DialogManagerScope.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -94,64 +97,54 @@ class WorkspaceActionBar extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             MDTap.ghost(
-              onPressed: () async {
-                final color = await showDialog<Color>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    content: CommonColorPicker(
-                      doc: doc,
-                      onColorSelected: (c) {
-                        doc.applyPatch([
-                          {
-                            'type': 'canvas.update',
-                            'changes': {'color': colorToHex(c)}
-                          }
-                        ]);
-                        Navigator.pop(context, c);
-                      },
-                      onOpenColorPicker: () async {
-                        Navigator.pop(context); // Close the common picker
-                        final newColor = await showDialog<Color>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            content: MDColorPicker(
-                              initialColor: doc.canvasColor,
-                              onColorChanged: (c) {
-                                doc.applyPatch([
-                                  {
-                                    'type': 'canvas.update',
-                                    'changes': {'color': colorToHex(c)}
-                                  }
-                                ]);
-                              },
-                              onDone: (c) => Navigator.pop(context, c),
-                            ),
-                          ),
-                        );
-                        if (newColor != null) {
-                          doc.applyPatch([
-                            {
-                              'type': 'canvas.update',
-                              'changes': {'color': colorToHex(newColor)}
-                            },
-                            {
-                              'type': 'doc.colors.add',
-                              'color': colorToHex(newColor)
-                            }
-                          ]);
+              onPressed: () {
+                late DraggableDialog dialog;
+                dialog = DraggableDialog(
+                  onClose: () => dialogManager.close(dialog),
+                  child: CommonColorPicker(
+                    doc: doc,
+                    onColorSelected: (c) {
+                      doc.applyPatch([
+                        {
+                          'type': 'canvas.update',
+                          'changes': {'color': colorToHex(c)}
                         }
-                      },
-                    ),
+                      ]);
+                      dialogManager.close(dialog);
+                    },
+                    onOpenColorPicker: () {
+                      dialogManager.close(dialog);
+                      late DraggableDialog colorPickerDialog;
+                      colorPickerDialog = DraggableDialog(
+                        title: 'Select Color',
+                        onClose: () => dialogManager.close(colorPickerDialog),
+                        child: MDColorPicker(
+                          initialColor: doc.canvasColor,
+                          onColorChanged: (c) {
+                            doc.applyPatch([
+                              {
+                                'type': 'canvas.update',
+                                'changes': {'color': colorToHex(c)}
+                              }
+                            ]);
+                          },
+                          onDone: (c) {
+                            doc.applyPatch([
+                              {
+                                'type': 'canvas.update',
+                                'changes': {'color': colorToHex(c)}
+                              },
+                              {'type': 'doc.colors.add', 'color': colorToHex(c)}
+                            ]);
+                            dialogManager.close(colorPickerDialog);
+                          },
+                        ),
+                      );
+                      dialogManager.show(colorPickerDialog);
+                    },
                   ),
                 );
-                if (color != null) {
-                  doc.applyPatch([
-                    {
-                      'type': 'canvas.update',
-                      'changes': {'color': colorToHex(color)}
-                    }
-                  ]);
-                }
+                dialogManager.show(dialog);
               },
               icon: const Icon(PhosphorIconsRegular.palette),
             ),

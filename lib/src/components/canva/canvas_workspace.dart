@@ -7,6 +7,7 @@ import 'package:flutter_meragi_design/src/components/canva/color_extractor.dart'
 import 'package:flutter_meragi_design/src/components/canva/items/image.dart';
 import 'package:flutter_meragi_design/src/components/canva/palette_sidebar.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/dialog_manager_scope.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/grid_painter.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
@@ -38,6 +39,7 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
 
   @override
   Widget build(BuildContext context) {
+    final dialogManager = DialogManagerScope.of(context);
     return Expanded(
       child: Stack(
         children: [
@@ -459,6 +461,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
               ),
             ),
           ),
+          // Draggable dialogs
+          ...dialogManager.dialogs,
         ],
       ),
     );

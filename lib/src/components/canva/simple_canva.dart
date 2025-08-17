@@ -10,6 +10,8 @@ import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/registered_items.dart';
 import 'package:flutter_meragi_design/src/components/canva/palette_sidebar.dart';
 import 'package:flutter_meragi_design/src/components/canva/simple_canva_controller.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/dialog_manager.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/dialog_manager_scope.dart';
 
 import 'canvas_doc.dart';
 import 'canvas_scope.dart';
@@ -46,6 +48,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   final GlobalKey _canvasBoxKey = GlobalKey();
 
   late final CanvasDoc _doc;
+  late final DialogManager _dialogManager;
 
   @override
   void initState() {
@@ -55,6 +58,8 @@ class _SimpleCanvaState extends State<SimpleCanva> {
       baseSize: widget.baseCanvasSize,
       canvasColor: widget.initialCanvasColor,
     );
+    _dialogManager = DialogManager();
+    _dialogManager.addListener(() => setState(() {}));
     widget.controller?.doc = _doc;
     widget.controller?.exportAsPngFunc = _exportAsPng;
     if (widget.onChanged != null) {
@@ -74,6 +79,7 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   @override
   void dispose() {
     _doc.dispose();
+    _dialogManager.dispose();
     super.dispose();
   }
 
@@ -100,54 +106,61 @@ class _SimpleCanvaState extends State<SimpleCanva> {
   @override
   Widget build(BuildContext context) {
     // IMPORTANT: read doc via CanvasScope to make this subtree reactive
-    return CanvasScope(
-      doc: _doc,
-      child: Focus(
-        autofocus: true,
-        child: Shortcuts(
-          shortcuts: <LogicalKeySet, Intent>{
-            LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyZ):
-                const UndoIntent(),
-            LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyZ):
-                const UndoIntent(),
-            LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.shift,
-                LogicalKeyboardKey.keyZ): const RedoIntent(),
-            LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.shift,
-                LogicalKeyboardKey.keyZ): const RedoIntent(),
-            LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyY):
-                const RedoIntent(),
-          },
-          child: Actions(
-            actions: <Type, Action<Intent>>{
-              UndoIntent: CallbackAction<UndoIntent>(
-                onInvoke: (UndoIntent intent) => _doc.undo(),
-              ),
-              RedoIntent: CallbackAction<RedoIntent>(
-                onInvoke: (RedoIntent intent) => _doc.redo(),
-              ),
+    return DialogManagerScope(
+      manager: _dialogManager,
+      child: CanvasScope(
+        doc: _doc,
+        child: Focus(
+          autofocus: true,
+          child: Shortcuts(
+            shortcuts: <LogicalKeySet, Intent>{
+              LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyZ):
+                  const UndoIntent(),
+              LogicalKeySet(
+                      LogicalKeyboardKey.control, LogicalKeyboardKey.keyZ):
+                  const UndoIntent(),
+              LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.shift,
+                  LogicalKeyboardKey.keyZ): const RedoIntent(),
+              LogicalKeySet(
+                  LogicalKeyboardKey.control,
+                  LogicalKeyboardKey.shift,
+                  LogicalKeyboardKey.keyZ): const RedoIntent(),
+              LogicalKeySet(
+                      LogicalKeyboardKey.control, LogicalKeyboardKey.keyY):
+                  const RedoIntent(),
             },
-            child: Row(children: [
-              // Sidebar
-              PaletteSidebar(
-                palette: widget.palette,
-                sidebarWidth: widget.sidebarWidth,
-              ),
+            child: Actions(
+              actions: <Type, Action<Intent>>{
+                UndoIntent: CallbackAction<UndoIntent>(
+                  onInvoke: (UndoIntent intent) => _doc.undo(),
+                ),
+                RedoIntent: CallbackAction<RedoIntent>(
+                  onInvoke: (RedoIntent intent) => _doc.redo(),
+                ),
+              },
+              child: Row(children: [
+                // Sidebar
+                PaletteSidebar(
+                  palette: widget.palette,
+                  sidebarWidth: widget.sidebarWidth,
+                ),
 
-              // Workspace and centered canvas
-              CanvasWorkspace(
-                doc: _doc,
-                workspaceColor: widget.workspaceColor,
-                repaintKey: _repaintKey,
-                canvasBoxKey: _canvasBoxKey,
-                toLocal: _toLocal,
-              ),
+                // Workspace and centered canvas
+                CanvasWorkspace(
+                  doc: _doc,
+                  workspaceColor: widget.workspaceColor,
+                  repaintKey: _repaintKey,
+                  canvasBoxKey: _canvasBoxKey,
+                  toLocal: _toLocal,
+                ),
 
-              // Right sidebar
-              SizedBox(
-                width: widget.inspectorWidth,
-                child: const PropertiesSidebar(),
-              ),
-            ]),
+                // Right sidebar
+                SizedBox(
+                  width: widget.inspectorWidth,
+                  child: const PropertiesSidebar(),
+                ),
+              ]),
+            ),
           ),
         ),
       ),

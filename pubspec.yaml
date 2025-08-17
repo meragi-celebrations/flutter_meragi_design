@@ -28,7 +28,6 @@ dependencies:
   flutter_scatter: ^0.2.0
   sprintf: ^7.0.0
   video_player: ^2.9.5
-  provider: ^6.1.2
   sliver_tools: ^0.2.12
   appflowy_editor:
     git:
