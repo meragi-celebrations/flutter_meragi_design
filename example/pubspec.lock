@@ -114,6 +114,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  colornames:
+    dependency: transitive
+    description:
+      name: colornames
+      sha256: "9f6426c310ed80857061206f9ac14091ed6c0e65d54c8e832082b7073cbe38a1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   cross_file:
     dependency: transitive
     description:

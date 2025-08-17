@@ -43,6 +43,7 @@ dependencies:
   chewie: ^1.11.3
   pointer_interceptor: ^0.10.1+2
   flutter_quill_delta_from_html: ^1.5.2
+  colornames: ^0.2.0
 
 dev_dependencies:
   flutter_test:

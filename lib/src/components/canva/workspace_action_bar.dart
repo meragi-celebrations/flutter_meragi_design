@@ -161,7 +161,7 @@ class WorkspaceActionBar extends StatelessWidget {
                 final id = doc.newId();
                 final item = TextItem(
                   id: id,
-                  text: 'Double-click to edit',
+                  text: 'Add a Text',
                   position: const Offset(60, 60),
                   size: const Size(240, 96),
                 );

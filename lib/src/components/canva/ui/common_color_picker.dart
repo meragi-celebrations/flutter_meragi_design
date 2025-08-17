@@ -1,7 +1,11 @@
+import 'package:colornames/colornames.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_doc.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/image.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
+
+const CIRCLE_SIZE = 45.0;
 
 class CommonColorPicker extends StatelessWidget {
   const CommonColorPicker({
@@ -41,33 +45,20 @@ class CommonColorPicker extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            GestureDetector(
+            MDGestureDetector(
               onTap: onOpenColorPicker,
               child: Container(
-                width: 24,
-                height: 24,
+                width: CIRCLE_SIZE,
+                height: CIRCLE_SIZE,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: const Icon(Icons.add, size: 16),
+                child: const Icon(Icons.add, size: CIRCLE_SIZE / 2),
               ),
             ),
             for (final color in doc.documentColors)
-              GestureDetector(
-                onTap: () => onColorSelected(color),
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    border: color == Colors.white
-                        ? Border.all(color: Colors.grey.shade300)
-                        : null,
-                  ),
-                ),
-              ),
+              _ColorSwatch(color: color, onColorSelected: onColorSelected),
           ],
         ),
       ],
@@ -101,20 +92,7 @@ class CommonColorPicker extends StatelessWidget {
           runSpacing: 8,
           children: [
             for (final color in solidColors)
-              GestureDetector(
-                onTap: () => onColorSelected(color),
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    border: color == Colors.white
-                        ? Border.all(color: Colors.grey.shade300)
-                        : null,
-                  ),
-                ),
-              ),
+              _ColorSwatch(color: color, onColorSelected: onColorSelected),
           ],
         ),
       ],
@@ -148,8 +126,8 @@ class _PhotoColors extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    width: 32,
-                    height: 32,
+                    width: CIRCLE_SIZE,
+                    height: CIRCLE_SIZE,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
                       child: item.buildContent(
@@ -167,20 +145,8 @@ class _PhotoColors extends StatelessWidget {
                       runSpacing: 8,
                       children: [
                         for (final color in item.extractedColors)
-                          GestureDetector(
-                            onTap: () => onColorSelected(color),
-                            child: Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: color,
-                                shape: BoxShape.circle,
-                                border: color == Colors.white
-                                    ? Border.all(color: Colors.grey.shade300)
-                                    : null,
-                              ),
-                            ),
-                          ),
+                          _ColorSwatch(
+                              color: color, onColorSelected: onColorSelected),
                       ],
                     ),
                   ),
@@ -188,6 +154,58 @@ class _PhotoColors extends StatelessWidget {
               ),
             ),
       ],
+    );
+  }
+}
+
+class _ColorSwatch extends StatefulWidget {
+  const _ColorSwatch({
+    required this.color,
+    required this.onColorSelected,
+  });
+
+  final Color color;
+  final ValueChanged<Color> onColorSelected;
+
+  @override
+  State<_ColorSwatch> createState() => _ColorSwatchState();
+}
+
+class _ColorSwatchState extends State<_ColorSwatch> {
+  bool _isHovered = false;
+
+  String get hexColor =>
+      '#${widget.color.value.toRadixString(16).substring(2).toUpperCase()}';
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: '${widget.color.colorName}\n$hexColor',
+      child: MDGestureDetector(
+        onTap: () => widget.onColorSelected(widget.color),
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          child: Container(
+            width: CIRCLE_SIZE,
+            height: CIRCLE_SIZE,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: widget.color == Colors.white
+                  ? Border.all(color: Colors.grey.shade300)
+                  : Border.all(color: widget.color),
+            ),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              margin: EdgeInsets.all(_isHovered ? 3.0 : 0.0),
+              decoration: BoxDecoration(
+                color: widget.color,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

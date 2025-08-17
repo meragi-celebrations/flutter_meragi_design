@@ -59,7 +59,7 @@ class SimpleCanvaController {
   }
 
   void addText({
-    String text = 'Double-click to edit',
+    String text = 'Add a Text',
     Offset? position,
     Size? size,
     double fontSize = 24,
