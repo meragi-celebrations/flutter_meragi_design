@@ -5,6 +5,9 @@ import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/number_input.dart';
 import 'package:flutter_meragi_design/src/components/fields/toggle.dart';
+import 'package:flutter_meragi_design/src/theme/theme.dart';
+
+enum BorderStyle { none, solid, dashed, moreDashed, dotted }
 
 class ImageItem extends CanvasItem {
   ImageItem({
@@ -18,6 +21,7 @@ class ImageItem extends CanvasItem {
     this.radiusBR = 0,
     this.borderEnabled = false,
     this.borderWidth = 0,
+    this.borderStyle = BorderStyle.solid,
     Color? borderColor,
     super.locked = false,
     super.rotationDeg = 0,
@@ -30,6 +34,7 @@ class ImageItem extends CanvasItem {
   bool borderEnabled;
   double borderWidth; // logical px at base scale
   Color borderColor;
+  BorderStyle borderStyle;
 
   ImageProvider? _cachedProvider;
   String? _cachedSrcKey;
@@ -68,7 +73,7 @@ class ImageItem extends CanvasItem {
   Widget buildContent(CanvasScaleHandler scale) {
     final p = _resolveProvider();
     final s = scale.s;
-    final br = BorderRadius.only(
+    final outerBorderRadius = BorderRadius.only(
       topLeft: Radius.circular(radiusTL * s),
       topRight: Radius.circular(radiusTR * s),
       bottomLeft: Radius.circular(radiusBL * s),
@@ -77,6 +82,9 @@ class ImageItem extends CanvasItem {
 
     final double bw =
         borderEnabled ? (borderWidth * s).clamp(0, 5000).toDouble() : 0;
+
+    final innerBorderRadius =
+        outerBorderRadius.subtract(BorderRadius.circular(bw));
 
     Widget inner;
     if (p == null) {
@@ -89,15 +97,27 @@ class ImageItem extends CanvasItem {
       inner = Image(image: p, fit: BoxFit.cover);
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: br,
-        border: bw > 0 ? Border.all(color: borderColor, width: bw) : null,
-      ),
-      child: ClipRRect(
-        borderRadius: br,
-        clipBehavior: Clip.antiAlias,
-        child: inner,
+    return CustomPaint(
+      painter: borderStyle != BorderStyle.solid
+          ? DashedBorderPainter(
+              borderRadius: outerBorderRadius,
+              strokeWidth: bw,
+              color: borderColor,
+              borderStyle: borderStyle,
+            )
+          : null,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: outerBorderRadius,
+          border: borderStyle == BorderStyle.solid && bw > 0
+              ? Border.all(color: borderColor, width: bw)
+              : null,
+        ),
+        child: ClipRRect(
+          borderRadius: innerBorderRadius,
+          clipBehavior: Clip.antiAlias,
+          child: inner,
+        ),
       ),
     );
   }
@@ -130,6 +150,7 @@ class ImageItem extends CanvasItem {
         borderEnabled: borderEnabled,
         borderWidth: borderWidth,
         borderColor: borderColor,
+        borderStyle: borderStyle,
         locked: locked,
         rotationDeg: rotationDeg,
       );
@@ -147,6 +168,7 @@ class ImageItem extends CanvasItem {
           'enabled': borderEnabled,
           'width': borderWidth,
           'color': _colorToHex(borderColor),
+          'style': borderStyle.name,
         },
       };
 
@@ -176,6 +198,10 @@ class ImageItem extends CanvasItem {
       borderEnabled: (b['enabled'] as bool?) ?? false,
       borderWidth: (b['width'] as num?)?.toDouble() ?? 0,
       borderColor: _parseHexColor((b['color'] as String?) ?? '#000000'),
+      borderStyle: BorderStyle.values.firstWhere(
+        (e) => e.name == (b['style'] as String?),
+        orElse: () => BorderStyle.solid,
+      ),
     );
   }
 
@@ -197,6 +223,75 @@ class ImageItem extends CanvasItem {
     final val = int.tryParse(hex, radix: 16) ?? 0xFF000000;
     return Color(val);
   }
+}
+
+class DashedBorderPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final double strokeWidth;
+  final Color color;
+  final BorderStyle borderStyle;
+
+  DashedBorderPainter({
+    required this.borderRadius,
+    required this.strokeWidth,
+    required this.color,
+    required this.borderStyle,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndCorners(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          topLeft: borderRadius.topLeft,
+          topRight: borderRadius.topRight,
+          bottomLeft: borderRadius.bottomLeft,
+          bottomRight: borderRadius.bottomRight,
+        ),
+      );
+
+    Path dashPath;
+
+    switch (borderStyle) {
+      case BorderStyle.dashed:
+        dashPath = _getDashedPath(path, 10, 5);
+        break;
+      case BorderStyle.moreDashed:
+        dashPath = _getDashedPath(path, 5, 3);
+        break;
+      case BorderStyle.dotted:
+        dashPath = _getDashedPath(path, 2, 2);
+        break;
+      default:
+        dashPath = path;
+    }
+
+    canvas.drawPath(dashPath, paint);
+  }
+
+  Path _getDashedPath(Path source, double dashLength, double dashSpace) {
+    final path = Path();
+    for (final metric in source.computeMetrics()) {
+      double distance = 0.0;
+      while (distance < metric.length) {
+        path.addPath(
+          metric.extractPath(distance, distance + dashLength),
+          Offset.zero,
+        );
+        distance += dashLength + dashSpace;
+      }
+    }
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
 
 class _ImagePropsEditor extends StatefulWidget {
@@ -223,7 +318,7 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
   late TextEditingController _bw; // border width
   late TextEditingController _bc; // border color hex
 
-  bool _borderEnabled = false;
+  BorderStyle _borderStyle = BorderStyle.none;
   bool _linkAll = false;
   bool _begun = false;
 
@@ -248,7 +343,8 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
         TextEditingController(text: widget.item.borderWidth.toStringAsFixed(0));
     _bc = TextEditingController(
         text: ImageItem._colorToHex(widget.item.borderColor));
-    _borderEnabled = widget.item.borderEnabled;
+    _borderStyle =
+        widget.item.borderEnabled ? widget.item.borderStyle : BorderStyle.none;
   }
 
   @override
@@ -265,7 +361,9 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
       _br.text = widget.item.radiusBR.toStringAsFixed(0);
       _bw.text = widget.item.borderWidth.toStringAsFixed(0);
       _bc.text = ImageItem._colorToHex(widget.item.borderColor);
-      _borderEnabled = widget.item.borderEnabled;
+      _borderStyle = widget.item.borderEnabled
+          ? widget.item.borderStyle
+          : BorderStyle.none;
       _linkAll = false;
     }
   }
@@ -328,9 +426,10 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
     final bc = ImageItem._parseHexColor(_bc.text.trim());
 
     u
-      ..borderEnabled = _borderEnabled
+      ..borderEnabled = _borderStyle != BorderStyle.none
       ..borderWidth = bw
-      ..borderColor = bc;
+      ..borderColor = bc
+      ..borderStyle = _borderStyle;
 
     _queueChange(u);
   }
@@ -381,6 +480,57 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
 
   Text _h(String text) => Text(text,
       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12));
+
+  Widget _buildBorderStyleSelector() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: BorderStyle.values.map((style) {
+        return GestureDetector(
+          onTap: () {
+            setState(() => _borderStyle = style);
+            _commit();
+          },
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: _borderStyle == style
+                  ? MeragiTheme.of(context).token.primaryColor.withOpacity(0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _borderStyle == style
+                    ? MeragiTheme.of(context).token.primaryColor
+                    : Colors.grey.shade300,
+                width: 1.5,
+              ),
+            ),
+            child: Icon(
+              _getIconForBorderStyle(style),
+              color: _borderStyle == style
+                  ? MeragiTheme.of(context).token.primaryColor
+                  : Colors.grey.shade600,
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  IconData _getIconForBorderStyle(BorderStyle style) {
+    switch (style) {
+      case BorderStyle.none:
+        return Icons.not_interested;
+      case BorderStyle.solid:
+        return Icons.remove;
+      case BorderStyle.dashed:
+        return Icons.horizontal_rule;
+      case BorderStyle.moreDashed:
+        return Icons.drag_handle;
+      case BorderStyle.dotted:
+        return Icons.more_horiz;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -454,23 +604,33 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
         ],
         const SizedBox(height: 12),
         _h('Border'),
-        Row(
-          children: [
-            MDToggle(
-              value: _borderEnabled,
-              onChanged: (v) {
-                setState(() => _borderEnabled = v);
-                _commit(); // queued
-              },
-            ),
-            const SizedBox(width: 6),
-            const Text('Enable border'),
-          ],
-        ),
         const SizedBox(height: 8),
-        if (_borderEnabled) ...[
-          _num(const Text('Width'), _bw),
+        _buildBorderStyleSelector(),
+        if (_borderStyle != BorderStyle.none) ...[
+          const SizedBox(height: 16),
+          _h('Stroke weight'),
           const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Slider(
+                  value: (double.tryParse(_bw.text) ?? 0.0).clamp(0.0, 100.0),
+                  min: 0.0,
+                  max: 100.0,
+                  onChanged: (v) {
+                    setState(() => _bw.text = v.toStringAsFixed(0));
+                    _commit();
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 60,
+                child: _num(const SizedBox.shrink(), _bw),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           _borderColorField(),
         ],
       ],
