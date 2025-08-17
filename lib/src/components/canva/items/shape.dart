@@ -6,6 +6,8 @@ import 'package:flutter_meragi_design/src/components/canva/canvas_scope.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/color_preview.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/common_color_picker.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/dialog_manager_scope.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/draggable_dialog.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 enum ShapeType { rectangle, circle, oval, line, arrow }
@@ -317,102 +319,96 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
         const SectionTitle('Fill Color'),
         ColorPreview(
           color: _color,
-          onTap: () async {
+          onTap: () {
             final doc = CanvasScope.of(context, listen: false);
-            final color = await showDialog<Color>(
-              context: context,
-              builder: (context) => AlertDialog(
-                content: CommonColorPicker(
-                  doc: doc,
-                  onColorSelected: (c) {
-                    setState(() => _color = c);
-                    _emit();
-                    Navigator.pop(context, c);
-                  },
-                  onOpenColorPicker: () async {
-                    Navigator.pop(context);
-                    final newColor = await showDialog<Color>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        content: MDColorPicker(
-                          initialColor: _color,
-                          onColorChanged: (c) {
-                            setState(() => _color = c);
-                            _emit();
-                          },
-                          onDone: (c) => Navigator.pop(context, c),
-                        ),
-                      ),
-                    );
-                    if (newColor != null) {
-                      doc.applyPatch([
-                        {
-                          'type': 'doc.colors.add',
-                          'color': colorToHex(newColor),
-                        }
-                      ]);
-                      setState(() => _color = newColor);
-                      _emit();
-                    }
-                  },
-                ),
+            final dialogManager = DialogManagerScope.of(context);
+            late DraggableDialog dialog;
+            dialog = DraggableDialog(
+              onClose: () => dialogManager.close(dialog),
+              child: CommonColorPicker(
+                doc: doc,
+                onColorSelected: (c) {
+                  setState(() => _color = c);
+                  _emit();
+                },
+                onOpenColorPicker: () {
+                  dialogManager.close(dialog);
+                  late DraggableDialog colorPickerDialog;
+                  colorPickerDialog = DraggableDialog(
+                    title: 'Select Color',
+                    onClose: () => dialogManager.close(colorPickerDialog),
+                    child: MDColorPicker(
+                      initialColor: _color,
+                      onColorChanged: (c) {
+                        setState(() => _color = c);
+                        _emit();
+                      },
+                      onDone: (c) {
+                        doc.applyPatch([
+                          {
+                            'type': 'doc.colors.add',
+                            'color': colorToHex(c),
+                          }
+                        ]);
+                        setState(() => _color = c);
+                        _emit();
+                        dialogManager.close(colorPickerDialog);
+                      },
+                    ),
+                  );
+                  dialogManager.show(colorPickerDialog);
+                },
               ),
             );
-            if (color != null) {
-              setState(() => _color = color);
-              _emit();
-            }
+            dialogManager.show(dialog);
           },
         ),
         const SizedBox(height: 12),
         const SectionTitle('Stroke Color'),
         ColorPreview(
           color: _strokeColor,
-          onTap: () async {
+          onTap: () {
             final doc = CanvasScope.of(context, listen: false);
-            final color = await showDialog<Color>(
-              context: context,
-              builder: (context) => AlertDialog(
-                content: CommonColorPicker(
-                  doc: doc,
-                  onColorSelected: (c) {
-                    setState(() => _strokeColor = c);
-                    _emit();
-                    Navigator.pop(context, c);
-                  },
-                  onOpenColorPicker: () async {
-                    Navigator.pop(context);
-                    final newColor = await showDialog<Color>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        content: MDColorPicker(
-                          initialColor: _strokeColor,
-                          onColorChanged: (c) {
-                            setState(() => _strokeColor = c);
-                            _emit();
-                          },
-                          onDone: (c) => Navigator.pop(context, c),
-                        ),
-                      ),
-                    );
-                    if (newColor != null) {
-                      doc.applyPatch([
-                        {
-                          'type': 'doc.colors.add',
-                          'color': colorToHex(newColor),
-                        }
-                      ]);
-                      setState(() => _strokeColor = newColor);
-                      _emit();
-                    }
-                  },
-                ),
+            final dialogManager = DialogManagerScope.of(context);
+            late DraggableDialog dialog;
+            dialog = DraggableDialog(
+              onClose: () => dialogManager.close(dialog),
+              child: CommonColorPicker(
+                doc: doc,
+                onColorSelected: (c) {
+                  setState(() => _strokeColor = c);
+                  _emit();
+                },
+                onOpenColorPicker: () {
+                  dialogManager.close(dialog);
+                  late DraggableDialog colorPickerDialog;
+                  colorPickerDialog = DraggableDialog(
+                    title: 'Select Color',
+                    onClose: () => dialogManager.close(colorPickerDialog),
+                    child: MDColorPicker(
+                      initialColor: _strokeColor,
+                      onColorChanged: (c) {
+                        setState(() => _strokeColor = c);
+                        _emit();
+                      },
+                      onDone: (c) {
+                        doc.applyPatch([
+                          {
+                            'type': 'doc.colors.add',
+                            'color': colorToHex(c),
+                          }
+                        ]);
+                        setState(() => _strokeColor = c);
+                        _emit();
+                        dialogManager.close(colorPickerDialog);
+                      },
+                    ),
+                  );
+                  dialogManager.show(colorPickerDialog);
+                },
               ),
             );
-            if (color != null) {
-              setState(() => _strokeColor = color);
-              _emit();
-            }
+            dialogManager.show(dialog);
           },
         ),
         const SizedBox(height: 12),

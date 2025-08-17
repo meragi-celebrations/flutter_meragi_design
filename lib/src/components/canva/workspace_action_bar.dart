@@ -110,7 +110,6 @@ class WorkspaceActionBar extends StatelessWidget {
                           'changes': {'color': colorToHex(c)}
                         }
                       ]);
-                      dialogManager.close(dialog);
                     },
                     onOpenColorPicker: () {
                       dialogManager.close(dialog);

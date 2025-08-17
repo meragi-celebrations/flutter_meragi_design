@@ -4,6 +4,8 @@ import 'package:flutter_meragi_design/src/components/canva/canvas_scope.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/color_preview.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/common_color_picker.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/dialog_manager_scope.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/draggable_dialog.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 class PaletteItem extends CanvasItem {
@@ -225,51 +227,48 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
               const SizedBox(width: 8),
               ColorPreview(
                 color: hexToColor(row.ctrl.text),
-                onTap: () async {
+                onTap: () {
                   final doc = CanvasScope.of(context, listen: false);
-                  final color = await showDialog<Color>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      content: CommonColorPicker(
-                        doc: doc,
-                        onColorSelected: (c) {
-                          row.ctrl.text = colorToHex(c);
-                          _commit();
-                          Navigator.pop(context, c);
-                        },
-                        onOpenColorPicker: () async {
-                          Navigator.pop(context);
-                          final newColor = await showDialog<Color>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              content: MDColorPicker(
-                                initialColor: hexToColor(row.ctrl.text),
-                                onColorChanged: (c) {
-                                  row.ctrl.text = colorToHex(c);
-                                  _commit();
-                                },
-                                onDone: (c) => Navigator.pop(context, c),
-                              ),
-                            ),
-                          );
-                          if (newColor != null) {
-                            doc.applyPatch([
-                              {
-                                'type': 'doc.colors.add',
-                                'color': colorToHex(newColor),
-                              }
-                            ]);
-                            row.ctrl.text = colorToHex(newColor);
-                            _commit();
-                          }
-                        },
-                      ),
+                  final dialogManager = DialogManagerScope.of(context);
+                  late DraggableDialog dialog;
+                  dialog = DraggableDialog(
+                    onClose: () => dialogManager.close(dialog),
+                    child: CommonColorPicker(
+                      doc: doc,
+                      onColorSelected: (c) {
+                        row.ctrl.text = colorToHex(c);
+                        _commit();
+                      },
+                      onOpenColorPicker: () {
+                        dialogManager.close(dialog);
+                        late DraggableDialog colorPickerDialog;
+                        colorPickerDialog = DraggableDialog(
+                          title: 'Select Color',
+                          onClose: () => dialogManager.close(colorPickerDialog),
+                          child: MDColorPicker(
+                            initialColor: hexToColor(row.ctrl.text),
+                            onColorChanged: (c) {
+                              row.ctrl.text = colorToHex(c);
+                              _commit();
+                            },
+                            onDone: (c) {
+                              doc.applyPatch([
+                                {
+                                  'type': 'doc.colors.add',
+                                  'color': colorToHex(c),
+                                }
+                              ]);
+                              row.ctrl.text = colorToHex(c);
+                              _commit();
+                              dialogManager.close(colorPickerDialog);
+                            },
+                          ),
+                        );
+                        dialogManager.show(colorPickerDialog);
+                      },
                     ),
                   );
-                  if (color != null) {
-                    row.ctrl.text = colorToHex(color);
-                    _commit();
-                  }
+                  dialogManager.show(dialog);
                 },
               ),
               IconButton(
