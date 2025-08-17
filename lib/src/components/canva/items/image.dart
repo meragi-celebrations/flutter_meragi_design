@@ -25,6 +25,7 @@ class ImageItem extends CanvasItem {
     Color? borderColor,
     super.locked = false,
     super.rotationDeg = 0,
+    this.opacity = 1.0,
   }) : borderColor = borderColor ?? const Color(0xFF000000);
 
   String src;
@@ -35,6 +36,9 @@ class ImageItem extends CanvasItem {
   double borderWidth; // logical px at base scale
   Color borderColor;
   BorderStyle borderStyle;
+
+  // Opacity
+  double opacity;
 
   ImageProvider? _cachedProvider;
   String? _cachedSrcKey;
@@ -97,26 +101,29 @@ class ImageItem extends CanvasItem {
       inner = Image(image: p, fit: BoxFit.cover);
     }
 
-    return CustomPaint(
-      painter: borderStyle != BorderStyle.solid
-          ? DashedBorderPainter(
-              borderRadius: outerBorderRadius,
-              strokeWidth: bw,
-              color: borderColor,
-              borderStyle: borderStyle,
-            )
-          : null,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: outerBorderRadius,
-          border: borderStyle == BorderStyle.solid && bw > 0
-              ? Border.all(color: borderColor, width: bw)
-              : null,
-        ),
-        child: ClipRRect(
-          borderRadius: innerBorderRadius,
-          clipBehavior: Clip.antiAlias,
-          child: inner,
+    return Opacity(
+      opacity: opacity,
+      child: CustomPaint(
+        painter: borderStyle != BorderStyle.solid
+            ? DashedBorderPainter(
+                borderRadius: outerBorderRadius,
+                strokeWidth: bw,
+                color: borderColor,
+                borderStyle: borderStyle,
+              )
+            : null,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: outerBorderRadius,
+            border: borderStyle == BorderStyle.solid && bw > 0
+                ? Border.all(color: borderColor, width: bw)
+                : null,
+          ),
+          child: ClipRRect(
+            borderRadius: innerBorderRadius,
+            clipBehavior: Clip.antiAlias,
+            child: inner,
+          ),
         ),
       ),
     );
@@ -153,6 +160,7 @@ class ImageItem extends CanvasItem {
         borderStyle: borderStyle,
         locked: locked,
         rotationDeg: rotationDeg,
+        opacity: opacity,
       );
 
   @override
@@ -170,6 +178,7 @@ class ImageItem extends CanvasItem {
           'color': _colorToHex(borderColor),
           'style': borderStyle.name,
         },
+        'opacity': opacity,
       };
 
   static ImageItem fromJson(Map<String, dynamic> j) {
@@ -202,6 +211,7 @@ class ImageItem extends CanvasItem {
         (e) => e.name == (b['style'] as String?),
         orElse: () => BorderStyle.solid,
       ),
+      opacity: (props['opacity'] as num?)?.toDouble() ?? 1.0,
     );
   }
 
@@ -317,6 +327,7 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
   late TextEditingController _br;
   late TextEditingController _bw; // border width
   late TextEditingController _bc; // border color hex
+  late TextEditingController _opacity;
 
   BorderStyle _borderStyle = BorderStyle.none;
   bool _linkAll = false;
@@ -343,6 +354,8 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
         TextEditingController(text: widget.item.borderWidth.toStringAsFixed(0));
     _bc = TextEditingController(
         text: ImageItem._colorToHex(widget.item.borderColor));
+    _opacity =
+        TextEditingController(text: widget.item.opacity.toStringAsFixed(2));
     _borderStyle =
         widget.item.borderEnabled ? widget.item.borderStyle : BorderStyle.none;
   }
@@ -361,6 +374,7 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
       _br.text = widget.item.radiusBR.toStringAsFixed(0);
       _bw.text = widget.item.borderWidth.toStringAsFixed(0);
       _bc.text = ImageItem._colorToHex(widget.item.borderColor);
+      _opacity.text = widget.item.opacity.toStringAsFixed(2);
       _borderStyle = widget.item.borderEnabled
           ? widget.item.borderStyle
           : BorderStyle.none;
@@ -376,6 +390,7 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
     _br.dispose();
     _bw.dispose();
     _bc.dispose();
+    _opacity.dispose();
     super.dispose();
   }
 
@@ -424,12 +439,15 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
         .clamp(0, 5000)
         .toDouble();
     final bc = ImageItem._parseHexColor(_bc.text.trim());
+    final opacity =
+        (double.tryParse(_opacity.text.trim()) ?? u.opacity).clamp(0.0, 1.0);
 
     u
       ..borderEnabled = _borderStyle != BorderStyle.none
       ..borderWidth = bw
       ..borderColor = bc
-      ..borderStyle = _borderStyle;
+      ..borderStyle = _borderStyle
+      ..opacity = opacity;
 
     _queueChange(u);
   }
@@ -447,8 +465,7 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
   // No Expanded/Flexible/Spacer here; avoids ParentDataWidget misuse.
   Widget _borderColorField() {
     final color = ImageItem._parseHexColor(_bc.text);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
         Container(
           width: 24,
@@ -459,9 +476,8 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
             border: Border.all(color: Colors.black12),
           ),
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
+        const SizedBox(width: 8),
+        Expanded(
           child: TextField(
             controller: _bc,
             decoration: const InputDecoration(
@@ -633,6 +649,18 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
           const SizedBox(height: 16),
           _borderColorField(),
         ],
+        const SizedBox(height: 12),
+        _h('Transparency'),
+        const SizedBox(height: 8),
+        Slider(
+          value: (double.tryParse(_opacity.text) ?? 1.0).clamp(0.0, 1.0),
+          min: 0.0,
+          max: 1.0,
+          onChanged: (v) {
+            setState(() => _opacity.text = v.toStringAsFixed(2));
+            _commit();
+          },
+        ),
       ],
     );
   }
