@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
-import 'package:flutter_meragi_design/src/components/canva/ui/number_input.dart';
+import 'package:flutter_meragi_design/src/components/canva/ui/slider_with_input.dart';
 import 'package:flutter_meragi_design/src/components/fields/toggle.dart';
 import 'package:flutter_meragi_design/src/theme/theme.dart';
 
@@ -453,12 +453,15 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
   }
 
   Widget _num(Widget prefix, TextEditingController c) {
-    return CanvaNumberProperty(
-      controller: c,
-      prefix: prefix,
-      onChanged: (_) => _commit(),
-      onSubmitted: (_) => _commit(),
-      onEditingComplete: _commit,
+    return SizedBox(
+      width: 60,
+      child: TextField(
+        controller: c,
+        textAlign: TextAlign.right,
+        keyboardType: TextInputType.number,
+        onChanged: (_) => _commit(),
+        onSubmitted: (_) => _commit(),
+      ),
     );
   }
 
@@ -602,7 +605,8 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
         ]),
         if (_linkAll) ...[
           const SizedBox(height: 8),
-          Slider(
+          SliderWithInput(
+            label: 'Radius',
             value: sliderVal.clamp(0.0, maxRadius.toDouble()),
             min: 0.0,
             max: maxRadius.toDouble(),
@@ -624,35 +628,22 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
         _buildBorderStyleSelector(),
         if (_borderStyle != BorderStyle.none) ...[
           const SizedBox(height: 16),
-          _h('Stroke weight'),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Slider(
-                  value: (double.tryParse(_bw.text) ?? 0.0).clamp(0.0, 100.0),
-                  min: 0.0,
-                  max: 100.0,
-                  onChanged: (v) {
-                    setState(() => _bw.text = v.toStringAsFixed(0));
-                    _commit();
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 60,
-                child: _num(const SizedBox.shrink(), _bw),
-              ),
-            ],
+          SliderWithInput(
+            label: 'Stroke weight',
+            value: (double.tryParse(_bw.text) ?? 0.0).clamp(0.0, 100.0),
+            min: 0.0,
+            max: 100.0,
+            onChanged: (v) {
+              setState(() => _bw.text = v.toStringAsFixed(0));
+              _commit();
+            },
           ),
           const SizedBox(height: 16),
           _borderColorField(),
         ],
         const SizedBox(height: 12),
-        _h('Transparency'),
-        const SizedBox(height: 8),
-        Slider(
+        SliderWithInput(
+          label: 'Transparency',
           value: (double.tryParse(_opacity.text) ?? 1.0).clamp(0.0, 1.0),
           min: 0.0,
           max: 1.0,

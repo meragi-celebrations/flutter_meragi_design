@@ -59,7 +59,7 @@ class _SliderWithInputState extends State<SliderWithInput> {
             SectionTitle(widget.label),
             const Spacer(),
             SizedBox(
-              width: 48,
+              width: 60,
               child: MDInput(
                 controller: _controller,
                 textAlign: TextAlign.right,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
-import 'package:flutter_meragi_design/src/components/canva/ui/slider_with_input.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 class TextItem extends CanvasItem {
@@ -28,6 +27,7 @@ class TextItem extends CanvasItem {
     this.wordSpacing = 0.0,
     super.locked = false,
     super.rotationDeg = 0,
+    this.opacity = 1.0,
   });
 
   String? text;
@@ -47,6 +47,7 @@ class TextItem extends CanvasItem {
   double lineHeight;
   double letterSpacing;
   double wordSpacing;
+  double opacity;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.text;
@@ -74,17 +75,20 @@ class TextItem extends CanvasItem {
   @override
   Widget buildContent(CanvasScaleHandler scale) {
     final pad = 6.0 * scale.s;
-    return Padding(
-      padding: EdgeInsets.all(pad),
-      child: SizedBox.expand(
-        child: Text(
-          text ?? '',
-          textAlign: textAlign,
-          maxLines: null,
-          softWrap: true,
-          overflow: TextOverflow.visible,
-          textScaleFactor: 1.0,
-          style: _textStyle().copyWith(fontSize: fontSize * scale.s),
+    return Opacity(
+      opacity: opacity,
+      child: Padding(
+        padding: EdgeInsets.all(pad),
+        child: SizedBox.expand(
+          child: Text(
+            text ?? '',
+            textAlign: textAlign,
+            maxLines: null,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+            textScaleFactor: 1.0,
+            style: _textStyle().copyWith(fontSize: fontSize * scale.s),
+          ),
         ),
       ),
     );
@@ -126,6 +130,7 @@ class TextItem extends CanvasItem {
         wordSpacing: wordSpacing,
         locked: locked,
         rotationDeg: rotationDeg,
+        opacity: opacity,
       );
 
   @override
@@ -147,6 +152,7 @@ class TextItem extends CanvasItem {
         'lh': lineHeight,
         'ls': letterSpacing,
         'ws': wordSpacing,
+        'o': opacity,
       };
 
   static TextItem fromJson(Map<String, dynamic> j) {
@@ -185,6 +191,7 @@ class TextItem extends CanvasItem {
       lineHeight: (p['lh'] as num?)?.toDouble() ?? 1.2,
       letterSpacing: (p['ls'] as num?)?.toDouble() ?? 0.0,
       wordSpacing: (p['ws'] as num?)?.toDouble() ?? 0.0,
+      opacity: (p['o'] as num?)?.toDouble() ?? 1.0,
     );
   }
 }
@@ -233,6 +240,7 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
   late double _wordSpacing;
   late List<Shadow> _shadows;
   late Color? _backgroundColor;
+  late double _opacity;
 
   bool _begun = false;
   void _begin() {
@@ -261,6 +269,7 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
     _wordSpacing = widget.item.wordSpacing;
     _shadows = widget.item.shadows ?? [];
     _backgroundColor = widget.item.backgroundColor;
+    _opacity = widget.item.opacity;
   }
 
   @override
@@ -288,6 +297,7 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       _wordSpacing = widget.item.wordSpacing;
       _shadows = widget.item.shadows ?? [];
       _backgroundColor = widget.item.backgroundColor;
+      _opacity = widget.item.opacity;
       setState(() {});
     }
   }
@@ -317,7 +327,8 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ..letterSpacing = _letterSpacing
       ..wordSpacing = _wordSpacing
       ..shadows = _shadows
-      ..backgroundColor = _backgroundColor;
+      ..backgroundColor = _backgroundColor
+      ..opacity = _opacity;
     widget.onChange(u);
   }
 
@@ -589,6 +600,17 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
             border: Border.all(color: Colors.grey.shade300),
           ),
         ),
+      ),
+      const SizedBox(height: 12),
+      SliderWithInput(
+        label: 'Transparency',
+        value: _opacity,
+        min: 0.0,
+        max: 1.0,
+        onChanged: (v) {
+          setState(() => _opacity = v);
+          _emit();
+        },
       ),
     ]);
   }
