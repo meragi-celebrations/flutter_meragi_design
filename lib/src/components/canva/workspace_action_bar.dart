@@ -10,16 +10,6 @@ import '../canva/canvas_scope.dart';
 class WorkspaceActionBar extends StatelessWidget {
   const WorkspaceActionBar({super.key});
 
-  static const _swatches = <Color>[
-    Colors.white,
-    Color(0xFFF8FAFC),
-    Color(0xFFFFFBEB),
-    Color(0xFFEFEFEF),
-    Color(0xFFFFE4E6),
-    Color(0xFFECFEFF),
-    Color(0xFFF0FDF4),
-  ];
-
   static const _gridPresets = <double>[4, 8, 10, 12, 16, 20, 24, 32, 40, 48];
 
   Future<void> _promptCustomGridSpacing(
@@ -102,36 +92,35 @@ class WorkspaceActionBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 6),
-            PopupMenuButton<Color>(
-              tooltip: 'Pick canvas color',
-              onSelected: (c) => doc.applyPatch([
-                {
-                  'type': 'canvas.update',
-                  'changes': {'color': colorToHex(c)}
-                }
-              ]),
-              itemBuilder: (_) => [
-                for (final c in _swatches)
-                  PopupMenuItem<Color>(
-                    value: c,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 16,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: c,
-                            border: Border.all(color: Colors.black26),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(colorToHex(c)),
-                      ],
+            MDTap.ghost(
+              onPressed: () async {
+                final color = await showDialog<Color>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    content: MDColorPicker(
+                      initialColor: doc.canvasColor,
+                      onColorChanged: (c) {
+                        doc.applyPatch([
+                          {
+                            'type': 'canvas.update',
+                            'changes': {'color': colorToHex(c)}
+                          }
+                        ]);
+                      },
+                      onDone: (c) => Navigator.pop(context, c),
                     ),
                   ),
-              ],
-              child: const Icon(PhosphorIconsRegular.palette),
+                );
+                if (color != null) {
+                  doc.applyPatch([
+                    {
+                      'type': 'canvas.update',
+                      'changes': {'color': colorToHex(color)}
+                    }
+                  ]);
+                }
+              },
+              icon: const Icon(PhosphorIconsRegular.palette),
             ),
             const SizedBox(width: 8),
             MDTap.outline(

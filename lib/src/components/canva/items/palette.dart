@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
@@ -220,6 +220,28 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
                 ),
               ),
               const SizedBox(width: 8),
+              IconButton(
+                onPressed: () async {
+                  final color = await showDialog<Color>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: MDColorPicker(
+                        initialColor: hexToColor(row.ctrl.text),
+                        onColorChanged: (c) {
+                          row.ctrl.text = colorToHex(c);
+                          _commit();
+                        },
+                        onDone: (c) => Navigator.pop(context, c),
+                      ),
+                    ),
+                  );
+                  if (color != null) {
+                    row.ctrl.text = colorToHex(color);
+                    _commit();
+                  }
+                },
+                icon: const Icon(Icons.color_lens_outlined),
+              ),
               IconButton(
                 onPressed: () => _removeRow(i),
                 icon: const Icon(Icons.remove_circle_outline),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
-import 'package:flutter_meragi_design/src/components/canva/ui/color_dot.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 class TextItem extends CanvasItem {
@@ -214,18 +213,6 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
     'Montserrat',
     'Merriweather',
     'Poppins'
-  ];
-  static const _swatches = <Color>[
-    Colors.black,
-    Colors.white,
-    Color(0xFF111827),
-    Color(0xFF374151),
-    Color(0xFF6B7280),
-    Color(0xFFEF4444),
-    Color(0xFFF59E0B),
-    Color(0xFF10B981),
-    Color(0xFF3B82F6),
-    Color(0xFF8B5CF6),
   ];
 
   late TextEditingController _textCtrl;
@@ -537,37 +524,65 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ]),
       const SizedBox(height: 12),
       const SectionTitle('Decoration color'),
-      Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          for (final c in _swatches)
-            ColorDot(
-              color: c,
-              selected: c.value == (_decorationColor?.value ?? -1),
-              onTap: () {
-                setState(() => _decorationColor = c);
-                _emit();
-              },
+      MDTap(
+        onPressed: () async {
+          final color = await showDialog<Color>(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: MDColorPicker(
+                initialColor: _decorationColor,
+                onColorChanged: (c) {
+                  setState(() => _decorationColor = c);
+                  _emit();
+                },
+                onDone: (c) => Navigator.pop(context, c),
+              ),
             ),
-        ],
+          );
+          if (color != null) {
+            setState(() => _decorationColor = color);
+            _emit();
+          }
+        },
+        child: Container(
+          height: 48,
+          decoration: BoxDecoration(
+            color: _decorationColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+        ),
       ),
       const SizedBox(height: 12),
       const SectionTitle('Color'),
-      Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          for (final c in _swatches)
-            ColorDot(
-              color: c,
-              selected: c.value == _fontColor.value,
-              onTap: () {
-                setState(() => _fontColor = c);
-                _emit();
-              },
+      MDTap(
+        onPressed: () async {
+          final color = await showDialog<Color>(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: MDColorPicker(
+                initialColor: _fontColor,
+                onColorChanged: (c) {
+                  setState(() => _fontColor = c);
+                  _emit();
+                },
+                onDone: (c) => Navigator.pop(context, c),
+              ),
             ),
-        ],
+          );
+          if (color != null) {
+            setState(() => _fontColor = color);
+            _emit();
+          }
+        },
+        child: Container(
+          height: 48,
+          decoration: BoxDecoration(
+            color: _fontColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+        ),
       ),
       const SizedBox(height: 12),
       const SectionTitle('Shadow'),
@@ -590,20 +605,34 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ),
       const SizedBox(height: 12),
       const SectionTitle('Background color'),
-      Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          for (final c in _swatches)
-            ColorDot(
-              color: c,
-              selected: c.value == (_backgroundColor?.value ?? -1),
-              onTap: () {
-                setState(() => _backgroundColor = c);
-                _emit();
-              },
+      MDTap(
+        onPressed: () async {
+          final color = await showDialog<Color>(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: MDColorPicker(
+                initialColor: _backgroundColor,
+                onColorChanged: (c) {
+                  setState(() => _backgroundColor = c);
+                  _emit();
+                },
+                onDone: (c) => Navigator.pop(context, c),
+              ),
             ),
-        ],
+          );
+          if (color != null) {
+            setState(() => _backgroundColor = color);
+            _emit();
+          }
+        },
+        child: Container(
+          height: 48,
+          decoration: BoxDecoration(
+            color: _backgroundColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+        ),
       ),
     ]);
   }

@@ -1,9 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart' hide Path;
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
-import 'package:flutter_meragi_design/src/components/canva/ui/color_dot.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 enum ShapeType { rectangle, circle, oval, line, arrow }
@@ -168,41 +167,49 @@ class _ShapePainter extends CustomPainter {
 
     switch (shapeType) {
       case ShapeType.rectangle:
-        canvas.drawRect(rect, paint);
-        if (strokeWidth > 0) canvas.drawRect(rect, strokePaint);
+        if (color.alpha > 0) canvas.drawRect(rect, paint);
+        if (strokeWidth > 0 && strokeColor.alpha > 0) {
+          canvas.drawRect(rect, strokePaint);
+        }
         break;
       case ShapeType.circle:
         final radius = size.width / 2;
-        canvas.drawCircle(rect.center, radius, paint);
-        if (strokeWidth > 0) {
+        if (color.alpha > 0) canvas.drawCircle(rect.center, radius, paint);
+        if (strokeWidth > 0 && strokeColor.alpha > 0) {
           canvas.drawCircle(rect.center, radius, strokePaint);
         }
         break;
       case ShapeType.oval:
-        canvas.drawOval(rect, paint);
-        if (strokeWidth > 0) canvas.drawOval(rect, strokePaint);
+        if (color.alpha > 0) canvas.drawOval(rect, paint);
+        if (strokeWidth > 0 && strokeColor.alpha > 0) {
+          canvas.drawOval(rect, strokePaint);
+        }
         break;
       case ShapeType.line:
-        canvas.drawLine(rect.topLeft, rect.bottomRight, strokePaint);
+        if (strokeWidth > 0 && strokeColor.alpha > 0) {
+          canvas.drawLine(rect.topLeft, rect.bottomRight, strokePaint);
+        }
         break;
       case ShapeType.arrow:
-        final p1 = rect.topLeft;
-        final p2 = rect.bottomRight;
-        canvas.drawLine(p1, p2, strokePaint);
-        final angle = (p2 - p1).direction;
-        final arrowSize = 10 + strokeWidth;
-        final path = Path()
-          ..moveTo(p2.dx, p2.dy)
-          ..lineTo(
-            p2.dx - arrowSize * 1.5 * math.cos(angle - 0.5),
-            p2.dy - arrowSize * 1.5 * math.sin(angle - 0.5),
-          )
-          ..lineTo(
-            p2.dx - arrowSize * 1.5 * math.cos(angle + 0.5),
-            p2.dy - arrowSize * 1.5 * math.sin(angle + 0.5),
-          )
-          ..close();
-        canvas.drawPath(path, strokePaint..style = PaintingStyle.fill);
+        if (strokeWidth > 0 && strokeColor.alpha > 0) {
+          final p1 = rect.topLeft;
+          final p2 = rect.bottomRight;
+          canvas.drawLine(p1, p2, strokePaint);
+          final angle = (p2 - p1).direction;
+          final arrowSize = 10 + strokeWidth;
+          final path = Path()
+            ..moveTo(p2.dx, p2.dy)
+            ..lineTo(
+              p2.dx - arrowSize * 1.5 * math.cos(angle - 0.5),
+              p2.dy - arrowSize * 1.5 * math.sin(angle - 0.5),
+            )
+            ..lineTo(
+              p2.dx - arrowSize * 1.5 * math.cos(angle + 0.5),
+              p2.dy - arrowSize * 1.5 * math.sin(angle + 0.5),
+            )
+            ..close();
+          canvas.drawPath(path, strokePaint..style = PaintingStyle.fill);
+        }
         break;
     }
   }
@@ -233,19 +240,6 @@ class _ShapePropsEditor extends StatefulWidget {
 }
 
 class _ShapePropsEditorState extends State<_ShapePropsEditor> {
-  static const _swatches = <Color>[
-    Colors.black,
-    Colors.white,
-    Color(0xFF111827),
-    Color(0xFF374151),
-    Color(0xFF6B7280),
-    Color(0xFFEF4444),
-    Color(0xFFF59E0B),
-    Color(0xFF10B981),
-    Color(0xFF3B82F6),
-    Color(0xFF8B5CF6),
-  ];
-
   late ShapeType _shapeType;
   late Color _color;
   late Color _strokeColor;
@@ -319,37 +313,65 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
         ),
         const SizedBox(height: 12),
         const SectionTitle('Fill Color'),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            for (final c in _swatches)
-              ColorDot(
-                color: c,
-                selected: c.value == _color.value,
-                onTap: () {
-                  setState(() => _color = c);
-                  _emit();
-                },
+        MDTap(
+          onPressed: () async {
+            final color = await showDialog<Color>(
+              context: context,
+              builder: (context) => AlertDialog(
+                content: MDColorPicker(
+                  initialColor: _color,
+                  onColorChanged: (c) {
+                    setState(() => _color = c);
+                    _emit();
+                  },
+                  onDone: (c) => Navigator.pop(context, c),
+                ),
               ),
-          ],
+            );
+            if (color != null) {
+              setState(() => _color = color);
+              _emit();
+            }
+          },
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: _color,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+          ),
         ),
         const SizedBox(height: 12),
         const SectionTitle('Stroke Color'),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            for (final c in _swatches)
-              ColorDot(
-                color: c,
-                selected: c.value == _strokeColor.value,
-                onTap: () {
-                  setState(() => _strokeColor = c);
-                  _emit();
-                },
+        MDTap(
+          onPressed: () async {
+            final color = await showDialog<Color>(
+              context: context,
+              builder: (context) => AlertDialog(
+                content: MDColorPicker(
+                  initialColor: _strokeColor,
+                  onColorChanged: (c) {
+                    setState(() => _strokeColor = c);
+                    _emit();
+                  },
+                  onDone: (c) => Navigator.pop(context, c),
+                ),
               ),
-          ],
+            );
+            if (color != null) {
+              setState(() => _strokeColor = color);
+              _emit();
+            }
+          },
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: _strokeColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+          ),
         ),
         const SizedBox(height: 12),
         const SectionTitle('Stroke Width'),
