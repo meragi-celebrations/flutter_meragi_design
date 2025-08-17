@@ -135,6 +135,9 @@ abstract class CanvasItem {
   bool locked;
   double rotationDeg;
 
+  Rect get rect =>
+      Rect.fromLTWH(position.dx, position.dy, size.width, size.height);
+
   CanvasItemKind get kind;
 
   Widget buildContent(CanvasScaleHandler scale);

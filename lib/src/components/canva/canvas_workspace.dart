@@ -11,6 +11,17 @@ import 'package:flutter_meragi_design/src/components/canva/ui/grid_painter.dart'
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
+class _Guideline {
+  const _Guideline({
+    required this.axis,
+    required this.start,
+    required this.end,
+  });
+  final Axis axis;
+  final Offset start;
+  final Offset end;
+}
+
 class CanvasWorkspace extends StatefulWidget {
   const CanvasWorkspace({
     super.key,
@@ -35,6 +46,9 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
   CanvasScaleHandler? _scale;
   Rect? _selectionRect;
   Offset? _dragSelectionStart;
+
+  final List<_Guideline> _guidelines = [];
+  Offset _snapOffset = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -122,13 +136,19 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                             canvasSize: canvasSize,
                                             isSelected: doc.selectedIds
                                                 .contains(item.id),
-                                            onPanStart: () =>
-                                                doc.beginUndoGroup('Drag'),
+                                            onPanStart: () {
+                                              doc.beginUndoGroup('Drag');
+                                              setState(() {
+                                                _guidelines.clear();
+                                              });
+                                            },
                                             onPanMove: (delta) {
                                               final moving =
                                                   doc.selectedIds.isEmpty
                                                       ? <String>{item.id}
                                                       : doc.selectedIds;
+                                              _calculateGuidelines(
+                                                  doc, moving, delta);
                                               doc.applyPatch([
                                                 for (final id in moving)
                                                   {
@@ -140,19 +160,25 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                                                 .itemById(id)
                                                                 .position
                                                                 .dx +
-                                                            delta.dx,
+                                                            delta.dx +
+                                                            _snapOffset.dx,
                                                         'y': doc
                                                                 .itemById(id)
                                                                 .position
                                                                 .dy +
-                                                            delta.dy,
+                                                            delta.dy +
+                                                            _snapOffset.dy,
                                                       }
                                                     }
                                                   }
                                               ]);
                                             },
-                                            onPanEnd: () =>
-                                                doc.commitUndoGroup(),
+                                            onPanEnd: () {
+                                              doc.commitUndoGroup();
+                                              setState(() {
+                                                _guidelines.clear();
+                                              });
+                                            },
                                             onResizeStart: () =>
                                                 doc.beginUndoGroup('Resize'),
                                             onResizeCommit: (updated) {
@@ -184,6 +210,17 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                   ),
                                 ),
                               ),
+
+                              // Guidelines
+                              if (_guidelines.isNotEmpty)
+                                Positioned.fill(
+                                  child: CustomPaint(
+                                    painter: _GuidelinePainter(
+                                      guidelines: _guidelines,
+                                      scale: _scale!,
+                                    ),
+                                  ),
+                                ),
 
                               // Selection capture
                               Positioned.fill(
@@ -463,4 +500,172 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
       ),
     );
   }
+
+  void _calculateGuidelines(
+      CanvasDoc doc, Set<String> movingIds, Offset delta) {
+    final newGuidelines = <_Guideline>[];
+    _snapOffset = Offset.zero;
+
+    if (_scale == null) return;
+
+    final movingItems = movingIds.map((id) => doc.itemById(id)).toList();
+    final staticItems =
+        doc.items.where((item) => !movingIds.contains(item.id)).toList();
+
+    if (staticItems.isEmpty) {
+      setState(() => _guidelines.clear());
+      return;
+    }
+
+    Rect movingBounds = movingItems.first.rect;
+    for (int i = 1; i < movingItems.length; i++) {
+      movingBounds = movingBounds.expandToInclude(movingItems[i].rect);
+    }
+    movingBounds = movingBounds.translate(delta.dx, delta.dy);
+
+    const snapThreshold = 2.0;
+
+    for (final staticItem in staticItems) {
+      final staticBounds = staticItem.rect;
+
+      // Horizontal checks
+      final dyLeft = (staticBounds.left - movingBounds.left).abs();
+      final dyRight = (staticBounds.right - movingBounds.right).abs();
+      final dyCenter = (staticBounds.center.dx - movingBounds.center.dx).abs();
+
+      if (dyLeft < snapThreshold) {
+        _snapOffset = Offset(staticBounds.left - movingBounds.left, 0);
+        newGuidelines.add(_Guideline(
+          axis: Axis.vertical,
+          start: Offset(
+              staticBounds.left,
+              staticBounds.top < movingBounds.top
+                  ? staticBounds.top
+                  : movingBounds.top),
+          end: Offset(
+              staticBounds.left,
+              staticBounds.bottom > movingBounds.bottom
+                  ? staticBounds.bottom
+                  : movingBounds.bottom),
+        ));
+      }
+      if (dyRight < snapThreshold) {
+        _snapOffset = Offset(staticBounds.right - movingBounds.right, 0);
+        newGuidelines.add(_Guideline(
+          axis: Axis.vertical,
+          start: Offset(
+              staticBounds.right,
+              staticBounds.top < movingBounds.top
+                  ? staticBounds.top
+                  : movingBounds.top),
+          end: Offset(
+              staticBounds.right,
+              staticBounds.bottom > movingBounds.bottom
+                  ? staticBounds.bottom
+                  : movingBounds.bottom),
+        ));
+      }
+      if (dyCenter < snapThreshold) {
+        _snapOffset =
+            Offset(staticBounds.center.dx - movingBounds.center.dx, 0);
+        newGuidelines.add(_Guideline(
+          axis: Axis.vertical,
+          start: Offset(
+              staticBounds.center.dx,
+              staticBounds.top < movingBounds.top
+                  ? staticBounds.top
+                  : movingBounds.top),
+          end: Offset(
+              staticBounds.center.dx,
+              staticBounds.bottom > movingBounds.bottom
+                  ? staticBounds.bottom
+                  : movingBounds.bottom),
+        ));
+      }
+
+      // Vertical checks
+      final dxTop = (staticBounds.top - movingBounds.top).abs();
+      final dxBottom = (staticBounds.bottom - movingBounds.bottom).abs();
+      final dxCenter = (staticBounds.center.dy - movingBounds.center.dy).abs();
+
+      if (dxTop < snapThreshold) {
+        _snapOffset = Offset(0, staticBounds.top - movingBounds.top);
+        newGuidelines.add(_Guideline(
+          axis: Axis.horizontal,
+          start: Offset(
+              staticBounds.left < movingBounds.left
+                  ? staticBounds.left
+                  : movingBounds.left,
+              staticBounds.top),
+          end: Offset(
+              staticBounds.right > movingBounds.right
+                  ? staticBounds.right
+                  : movingBounds.right,
+              staticBounds.top),
+        ));
+      }
+      if (dxBottom < snapThreshold) {
+        _snapOffset = Offset(0, staticBounds.bottom - movingBounds.bottom);
+        newGuidelines.add(_Guideline(
+          axis: Axis.horizontal,
+          start: Offset(
+              staticBounds.left < movingBounds.left
+                  ? staticBounds.left
+                  : movingBounds.left,
+              staticBounds.bottom),
+          end: Offset(
+              staticBounds.right > movingBounds.right
+                  ? staticBounds.right
+                  : movingBounds.right,
+              staticBounds.bottom),
+        ));
+      }
+      if (dxCenter < snapThreshold) {
+        _snapOffset =
+            Offset(0, staticBounds.center.dy - movingBounds.center.dy);
+        newGuidelines.add(_Guideline(
+          axis: Axis.horizontal,
+          start: Offset(
+              staticBounds.left < movingBounds.left
+                  ? staticBounds.left
+                  : movingBounds.left,
+              staticBounds.center.dy),
+          end: Offset(
+              staticBounds.right > movingBounds.right
+                  ? staticBounds.right
+                  : movingBounds.right,
+              staticBounds.center.dy),
+        ));
+      }
+    }
+
+    setState(() {
+      _guidelines
+        ..clear()
+        ..addAll(newGuidelines);
+    });
+  }
+}
+
+class _GuidelinePainter extends CustomPainter {
+  _GuidelinePainter({required this.guidelines, required this.scale});
+
+  final List<_Guideline> guidelines;
+  final CanvasScaleHandler scale;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 1;
+
+    for (final g in guidelines) {
+      final p1 = scale.baseToRender(g.start);
+      final p2 = scale.baseToRender(g.end);
+      canvas.drawLine(p1, p2, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GuidelinePainter oldDelegate) => true;
 }
