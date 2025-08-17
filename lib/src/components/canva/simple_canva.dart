@@ -138,28 +138,33 @@ class _SimpleCanvaState extends State<SimpleCanva> {
                   onInvoke: (RedoIntent intent) => _doc.redo(),
                 ),
               },
-              child: Row(children: [
-                // Sidebar
-                PaletteSidebar(
-                  palette: widget.palette,
-                  sidebarWidth: widget.sidebarWidth,
-                ),
+              child: Stack(
+                children: [
+                  Row(children: [
+                    // Sidebar
+                    PaletteSidebar(
+                      palette: widget.palette,
+                      sidebarWidth: widget.sidebarWidth,
+                    ),
 
-                // Workspace and centered canvas
-                CanvasWorkspace(
-                  doc: _doc,
-                  workspaceColor: widget.workspaceColor,
-                  repaintKey: _repaintKey,
-                  canvasBoxKey: _canvasBoxKey,
-                  toLocal: _toLocal,
-                ),
+                    // Workspace and centered canvas
+                    CanvasWorkspace(
+                      doc: _doc,
+                      workspaceColor: widget.workspaceColor,
+                      repaintKey: _repaintKey,
+                      canvasBoxKey: _canvasBoxKey,
+                      toLocal: _toLocal,
+                    ),
 
-                // Right sidebar
-                SizedBox(
-                  width: widget.inspectorWidth,
-                  child: const PropertiesSidebar(),
-                ),
-              ]),
+                    // Right sidebar
+                    SizedBox(
+                      width: widget.inspectorWidth,
+                      child: const PropertiesSidebar(),
+                    ),
+                  ]),
+                  ..._dialogManager.dialogs,
+                ],
+              ),
             ),
           ),
         ),
