@@ -294,21 +294,20 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionTitle('Shape'),
-        DropdownButtonFormField<ShapeType>(
-          value: _shapeType,
-          decoration: const InputDecoration(
-            isDense: true,
-            border: OutlineInputBorder(),
-          ),
-          items: ShapeType.values
-              .map(
-                (f) => DropdownMenuItem(value: f, child: Text(f.name)),
-              )
-              .toList(),
+        MDSelect<ShapeType>(
+          initialValue: _shapeType,
           onChanged: (v) {
             if (v == null) return;
             setState(() => _shapeType = v);
             _emit();
+          },
+          options: ShapeType.values
+              .map(
+                (f) => MDOption(value: f, child: Text(f.name)),
+              )
+              .toList(),
+          selectedOptionBuilder: (context, value) {
+            return Text(value.name);
           },
         ),
         const SizedBox(height: 12),

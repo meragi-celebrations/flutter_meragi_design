@@ -334,16 +334,17 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ),
       const SizedBox(height: 12),
       const SectionTitle('Font'),
-      DropdownButtonFormField<String?>(
-        value: _fontFamily,
-        decoration:
-            const InputDecoration(isDense: true, border: OutlineInputBorder()),
-        items: _fontOptions
-            .map((f) => DropdownMenuItem(value: f, child: Text(f ?? 'System')))
+      MDSelect<String?>(
+        initialValue: _fontFamily,
+        options: _fontOptions
+            .map((f) => MDOption(value: f, child: Text(f ?? 'System')))
             .toList(),
         onChanged: (v) {
           setState(() => _fontFamily = v);
           _emit();
+        },
+        selectedOptionBuilder: (context, value) {
+          return Text(value ?? 'System');
         },
       ),
       const SizedBox(height: 12),
@@ -489,17 +490,18 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
       ]),
       const SizedBox(height: 12),
       const SectionTitle('Decoration style'),
-      DropdownButtonFormField<TextDecorationStyle>(
-        value: _decorationStyle,
-        decoration:
-            const InputDecoration(isDense: true, border: OutlineInputBorder()),
-        items: TextDecorationStyle.values
-            .map((f) => DropdownMenuItem(value: f, child: Text(f.name)))
+      MDSelect<TextDecorationStyle>(
+        initialValue: _decorationStyle,
+        options: TextDecorationStyle.values
+            .map((f) => MDOption(value: f, child: Text(f.name)))
             .toList(),
         onChanged: (v) {
           if (v == null) return;
           setState(() => _decorationStyle = v);
           _emit();
+        },
+        selectedOptionBuilder: (context, value) {
+          return Text(value.name);
         },
       ),
       const SizedBox(height: 12),

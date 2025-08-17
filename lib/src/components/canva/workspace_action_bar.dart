@@ -173,40 +173,50 @@ class WorkspaceActionBar extends StatelessWidget {
               child: const Text('Palette'),
             ),
             const SizedBox(width: 8),
-            PopupMenuButton<ShapeType>(
-              tooltip: 'Add Shape',
-              onSelected: (shapeType) {
-                final id = doc.newId();
-                final item = ShapeItem(
-                  id: id,
-                  shapeType: shapeType,
-                  position: const Offset(60, 60),
-                  size: const Size(120, 120),
-                );
-                doc.beginUndoGroup('Add Shape');
-                doc.applyPatch([
-                  {'type': 'insert', 'item': item.toJson(0)},
-                  {
-                    'type': 'selection.set',
-                    'ids': [id]
-                  },
-                ]);
-                doc.commitUndoGroup();
-              },
-              itemBuilder: (_) => [
-                for (final type in ShapeType.values)
-                  PopupMenuItem<ShapeType>(
-                    value: type,
-                    child: Text(type.name),
-                  ),
-              ],
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(PhosphorIconsRegular.square),
-                  SizedBox(width: 6),
-                  Text('Shape'),
-                ],
+            SizedBox(
+              width: 120,
+              child: MDSelect<ShapeType>(
+                placeholder: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(PhosphorIconsRegular.square),
+                    SizedBox(width: 6),
+                    Text('Shape'),
+                  ],
+                ),
+                onChanged: (shapeType) {
+                  if (shapeType == null) return;
+                  final id = doc.newId();
+                  final item = ShapeItem(
+                    id: id,
+                    shapeType: shapeType,
+                    position: const Offset(60, 60),
+                    size: const Size(120, 120),
+                  );
+                  doc.beginUndoGroup('Add Shape');
+                  doc.applyPatch([
+                    {'type': 'insert', 'item': item.toJson(0)},
+                    {
+                      'type': 'selection.set',
+                      'ids': [id]
+                    },
+                  ]);
+                  doc.commitUndoGroup();
+                },
+                options: ShapeType.values
+                    .map((e) =>
+                        MDOption<ShapeType>(value: e, child: Text(e.name)))
+                    .toList(),
+                selectedOptionBuilder: (context, value) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(PhosphorIconsRegular.square),
+                      const SizedBox(width: 6),
+                      Text(value.name),
+                    ],
+                  );
+                },
               ),
             ),
             const VerticalDivider(width: 12),
@@ -221,47 +231,50 @@ class WorkspaceActionBar extends StatelessWidget {
               ]),
               icon: Icon(doc.gridVisible ? Icons.grid_on : Icons.grid_off),
             ),
-            PopupMenuButton<double>(
-              tooltip: 'Grid spacing',
-              onSelected: (v) {
-                if (v <= 0) {
-                  _promptCustomGridSpacing(context, doc);
-                } else {
-                  doc.applyPatch([
-                    {
-                      'type': 'canvas.update',
-                      'changes': {'gridSpacing': v}
-                    }
-                  ]);
-                }
-              },
-              itemBuilder: (_) => [
-                for (final v in _gridPresets)
-                  PopupMenuItem<double>(
-                    value: v,
-                    child: Text('${v.toStringAsFixed(0)} px'),
-                  ),
-                const PopupMenuDivider(),
-                const PopupMenuItem<double>(
-                  value: -1,
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, size: 18),
-                      SizedBox(width: 8),
-                      Text('Custom…')
-                    ],
-                  ),
+            SizedBox(
+              width: 120,
+              child: MDSelect<double>(
+                placeholder: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.grid_3x3),
+                    const SizedBox(width: 6),
+                    Text('${doc.gridSpacing.toStringAsFixed(0)}'),
+                  ],
                 ),
-              ],
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.grid_3x3),
-                  const SizedBox(width: 6),
-                  Text('${doc.gridSpacing.toStringAsFixed(0)}'),
-                ],
+                onChanged: (v) {
+                  if (v == null) return;
+                  if (v <= 0) {
+                    _promptCustomGridSpacing(context, doc);
+                  } else {
+                    doc.applyPatch([
+                      {
+                        'type': 'canvas.update',
+                        'changes': {'gridSpacing': v}
+                      }
+                    ]);
+                  }
+                },
+                options: _gridPresets
+                    .map((e) => MDOption<double>(
+                        value: e, child: Text('${e.toStringAsFixed(0)} px')))
+                    .toList(),
+                selectedOptionBuilder: (context, value) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.grid_3x3),
+                      const SizedBox(width: 6),
+                      Text('${value.toStringAsFixed(0)}'),
+                    ],
+                  );
+                },
               ),
             ),
+            MDTap.ghost(
+              onPressed: () => _promptCustomGridSpacing(context, doc),
+              icon: const Icon(Icons.edit),
+            )
           ],
         ),
       ),
