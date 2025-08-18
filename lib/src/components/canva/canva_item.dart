@@ -69,16 +69,7 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
   void _resizeFromHandle(Offset renderDelta, Handle handle) {
     if (_item.locked) return;
 
-    // As the widget is rotated, the drag delta is in the coordinate system of the
-    // screen, not the rotated widget. We need to convert the delta to the local
-    // coordinate system of the widget.
-    final angle = -_radians;
-    final cosA = math.cos(angle);
-    final sinA = math.sin(angle);
-    final dx = renderDelta.dx * cosA - renderDelta.dy * sinA;
-    final dy = renderDelta.dx * sinA + renderDelta.dy * cosA;
-
-    final delta = widget.scale.renderDeltaToBase(Offset(dx, dy));
+    final delta = widget.scale.renderDeltaToBase(renderDelta);
     final updated = _item.resizeWithHandle(handle.key, delta, widget.scale);
 
     setState(() {
@@ -184,52 +175,51 @@ class _CanvasItemWidgetState extends State<CanvasItemWidget> {
         },
         onPanEnd: (_) => widget.onPanEnd(),
         onDoubleTap: _handleDoubleTap,
-        child: Transform.rotate(
-          angle: _radians,
-          alignment: Alignment.center,
-          child: Stack(
-            key: _boxKey,
-            clipBehavior: Clip.none, // allow rotated content to overflow
-            children: [
-              // selection border & content
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: widget.isSelected
-                        ? Border.all(color: Colors.blueAccent, width: 1)
-                        : null,
-                    color: Colors.transparent,
-                  ),
-                  child: Center(
+        child: Stack(
+          key: _boxKey,
+          clipBehavior: Clip.none, // allow rotated content to overflow
+          children: [
+            // selection border & content
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: widget.isSelected
+                      ? Border.all(color: Colors.blueAccent, width: 1)
+                      : null,
+                  color: Colors.transparent,
+                ),
+                child: Center(
+                  child: Transform.rotate(
+                    angle: _radians,
+                    alignment: Alignment.center,
                     child: SizedBox.expand(
                       child: _item.buildContent(widget.scale),
                     ),
                   ),
                 ),
               ),
+            ),
 
-              // resize handles
-              if (widget.isSelected && !_item.locked) ...[
-                for (final handle in _item.getHandles()) _handle(handle),
-                _rotationHandle(),
-              ],
-
-              if (_item.locked)
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    margin: const EdgeInsets.all(2),
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child:
-                        const Icon(Icons.lock, size: 12, color: Colors.white),
-                  ),
-                ),
+            // resize handles
+            if (widget.isSelected && !_item.locked) ...[
+              for (final handle in _item.getHandles()) _handle(handle),
+              _rotationHandle(),
             ],
-          ),
+
+            if (_item.locked)
+              Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  margin: const EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Icon(Icons.lock, size: 12, color: Colors.white),
+                ),
+              ),
+          ],
         ),
       ),
     );
