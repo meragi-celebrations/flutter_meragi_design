@@ -17,6 +17,8 @@ class PaletteItem extends CanvasItem {
     required super.size,
     List<Color>? paletteColors,
     this.paletteType = PaletteType.rectangle,
+    this.gap = 4.0,
+    this.padding = 6.0,
     super.locked = false,
     super.rotationDeg = 0,
   }) : paletteColors = paletteColors ??
@@ -24,6 +26,8 @@ class PaletteItem extends CanvasItem {
 
   List<Color> paletteColors;
   PaletteType paletteType;
+  final double gap;
+  final double padding;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.palette;
@@ -31,13 +35,11 @@ class PaletteItem extends CanvasItem {
   @override
   Widget buildContent(CanvasScaleHandler scale) {
     final s = scale.s;
-    final gap = 4.0 * s;
-    final pad = 6.0 * s;
     if (paletteColors.isEmpty) return const SizedBox.shrink();
 
     final children = <Widget>[];
     for (int i = 0; i < paletteColors.length; i++) {
-      if (i > 0) children.add(SizedBox(width: gap));
+      if (i > 0) children.add(SizedBox(width: gap * s));
       Widget colorWidget = Container(color: paletteColors[i]);
       if (paletteType == PaletteType.circle) {
         colorWidget = ClipOval(child: colorWidget);
@@ -46,7 +48,7 @@ class PaletteItem extends CanvasItem {
     }
 
     return Padding(
-      padding: EdgeInsets.all(pad),
+      padding: EdgeInsets.all(padding * s),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: children,
@@ -73,14 +75,35 @@ class PaletteItem extends CanvasItem {
         size: size,
         paletteColors: List<Color>.from(paletteColors),
         paletteType: paletteType,
+        gap: gap,
+        padding: padding,
         locked: locked,
         rotationDeg: rotationDeg,
       );
+
+  PaletteItem copyWith({
+    double? gap,
+    double? padding,
+  }) {
+    return PaletteItem(
+      id: id,
+      position: position,
+      size: size,
+      paletteColors: paletteColors,
+      paletteType: paletteType,
+      gap: gap ?? this.gap,
+      padding: padding ?? this.padding,
+      locked: locked,
+      rotationDeg: rotationDeg,
+    );
+  }
 
   @override
   Map<String, dynamic> propsToJson() => {
         'colors': [for (final c in paletteColors) colorToHex(c)],
         'type': paletteType.name,
+        'gap': gap,
+        'padding': padding,
       };
 
   static PaletteItem fromJson(Map<String, dynamic> j) {
@@ -105,6 +128,8 @@ class PaletteItem extends CanvasItem {
       rotationDeg: (j['rot'] as num?)?.toDouble() ?? 0,
       paletteColors: List<Color>.from(safe),
       paletteType: type,
+      gap: (p['gap'] as num?)?.toDouble() ?? 4.0,
+      padding: (p['padding'] as num?)?.toDouble() ?? 6.0,
     );
   }
 }
@@ -130,6 +155,8 @@ class _PalettePropsEditor extends StatefulWidget {
 class _PalettePropsEditorState extends State<_PalettePropsEditor> {
   final _rows = <_PaletteRow>[];
   late PaletteType _type = widget.item.paletteType;
+  late double _gap = widget.item.gap;
+  late double _padding = widget.item.padding;
   bool _begun = false;
 
   void _begin() {
@@ -154,7 +181,11 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
       }
       _disposeRows();
       _rebuildRowsFromItem();
-      setState(() => _type = widget.item.paletteType);
+      setState(() {
+        _type = widget.item.paletteType;
+        _gap = widget.item.gap;
+        _padding = widget.item.padding;
+      });
     }
   }
 
@@ -184,7 +215,7 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
       list.add(r.color);
     }
     if (list.isEmpty) return;
-    final u = widget.item.cloneWith() as PaletteItem
+    final u = widget.item.copyWith(gap: _gap, padding: _padding)
       ..paletteColors = list
       ..paletteType = _type;
     widget.onChange(u);
@@ -222,108 +253,136 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
         },
       ),
       const SizedBox(height: 16),
-      ReorderableListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _rows.length,
-        buildDefaultDragHandles: false,
-        onReorder: (oldIndex, newIndex) {
-          setState(() {
-            if (newIndex > oldIndex) {
-              newIndex -= 1;
-            }
-            final item = _rows.removeAt(oldIndex);
-            _rows.insert(newIndex, item);
-            _commit();
-          });
-        },
-        itemBuilder: (context, i) {
-          final row = _rows[i];
-          return Padding(
-            key: ValueKey(row),
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(children: [
-              ReorderableDragStartListener(
-                index: i,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.grab,
-                  child: const Icon(Icons.drag_handle),
-                ),
+      MDPanel(
+          child: Column(
+        children: [
+          ReorderableListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _rows.length,
+            buildDefaultDragHandles: false,
+            onReorder: (oldIndex, newIndex) {
+              setState(() {
+                if (newIndex > oldIndex) {
+                  newIndex -= 1;
+                }
+                final item = _rows.removeAt(oldIndex);
+                _rows.insert(newIndex, item);
+                _commit();
+              });
+            },
+            itemBuilder: (context, i) {
+              final row = _rows[i];
+              return Padding(
+                key: ValueKey(row),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(children: [
+                  ReorderableDragStartListener(
+                    index: i,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.grab,
+                      child: const Icon(Icons.drag_handle),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ColorPreview(
+                    color: row.color,
+                    onTap: () {
+                      final doc = CanvasScope.of(context, listen: false);
+                      final dialogManager = DialogManagerScope.of(context);
+                      late DraggableDialog dialog;
+                      dialog = DraggableDialog(
+                        onClose: () => dialogManager.close(dialog),
+                        child: CommonColorPicker(
+                          doc: doc,
+                          onColorSelected: (c) {
+                            setState(() => row.color = c);
+                            _commit();
+                          },
+                          onOpenColorPicker: () {
+                            dialogManager.close(dialog);
+                            late DraggableDialog colorPickerDialog;
+                            colorPickerDialog = DraggableDialog(
+                              title: 'Select Color',
+                              onClose: () =>
+                                  dialogManager.close(colorPickerDialog),
+                              child: MDColorPicker(
+                                initialColor: row.color,
+                                onColorChanged: (c) {
+                                  setState(() => row.color = c);
+                                  _commit();
+                                },
+                                onDone: (c) {
+                                  doc.applyPatch([
+                                    {
+                                      'type': 'doc.colors.add',
+                                      'color': colorToHex(c),
+                                    }
+                                  ]);
+                                  setState(() => row.color = c);
+                                  _commit();
+                                  dialogManager.close(colorPickerDialog);
+                                },
+                              ),
+                            );
+                            dialogManager.show(colorPickerDialog);
+                          },
+                        ),
+                      );
+                      dialogManager.show(dialog);
+                    },
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    width: 24,
+                    child: MDTap.ghost(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _removeRow(i),
+                      size: ShadButtonSize.sm,
+                      icon: const Icon(PhosphorIconsRegular.minusCircle),
+                    ),
+                  ),
+                ]),
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              MDTap.outline(
+                onPressed: _addRow,
+                size: ShadButtonSize.sm,
+                icon: const Icon(PhosphorIconsRegular.plus),
+                child: const Text('Add color'),
               ),
               const SizedBox(width: 8),
-              ColorPreview(
-                color: row.color,
-                onTap: () {
-                  final doc = CanvasScope.of(context, listen: false);
-                  final dialogManager = DialogManagerScope.of(context);
-                  late DraggableDialog dialog;
-                  dialog = DraggableDialog(
-                    onClose: () => dialogManager.close(dialog),
-                    child: CommonColorPicker(
-                      doc: doc,
-                      onColorSelected: (c) {
-                        setState(() => row.color = c);
-                        _commit();
-                      },
-                      onOpenColorPicker: () {
-                        dialogManager.close(dialog);
-                        late DraggableDialog colorPickerDialog;
-                        colorPickerDialog = DraggableDialog(
-                          title: 'Select Color',
-                          onClose: () => dialogManager.close(colorPickerDialog),
-                          child: MDColorPicker(
-                            initialColor: row.color,
-                            onColorChanged: (c) {
-                              setState(() => row.color = c);
-                              _commit();
-                            },
-                            onDone: (c) {
-                              doc.applyPatch([
-                                {
-                                  'type': 'doc.colors.add',
-                                  'color': colorToHex(c),
-                                }
-                              ]);
-                              setState(() => row.color = c);
-                              _commit();
-                              dialogManager.close(colorPickerDialog);
-                            },
-                          ),
-                        );
-                        dialogManager.show(colorPickerDialog);
-                      },
-                    ),
-                  );
-                  dialogManager.show(dialog);
-                },
-              ),
-              const Spacer(),
-              SizedBox(
-                width: 24,
-                child: MDTap.ghost(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => _removeRow(i),
-                  size: ShadButtonSize.sm,
-                  icon: const Icon(PhosphorIconsRegular.minusCircle),
-                ),
-              ),
-            ]),
-          );
+              Text('${_rows.length} color${_rows.length == 1 ? '' : 's'}'),
+            ],
+          ),
+        ],
+      )),
+      const SizedBox(height: 16),
+      SliderWithInput(
+        label: 'Gap',
+        value: _gap,
+        min: 0,
+        max: 32,
+        onChanged: (v) {
+          setState(() => _gap = v);
+          _commit();
         },
       ),
-      const SizedBox(height: 8),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          MDTap.outline(
-            onPressed: _addRow,
-            size: ShadButtonSize.sm,
-            icon: const Icon(PhosphorIconsRegular.plus),
-            child: const Text('Add color'),
-          ),
-          const SizedBox(width: 8),
-          Text('${_rows.length} color${_rows.length == 1 ? '' : 's'}'),
-        ],
+      const SizedBox(height: 16),
+      SliderWithInput(
+        label: 'Padding',
+        value: _padding,
+        min: 0,
+        max: 32,
+        onChanged: (v) {
+          setState(() => _padding = v);
+          _commit();
+        },
       ),
     ]);
   }
