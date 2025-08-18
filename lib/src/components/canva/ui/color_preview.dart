@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 
 class ColorPreview extends StatelessWidget {
   const ColorPreview({
@@ -12,7 +13,7 @@ class ColorPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return MDGestureDetector(
       onTap: onTap,
       child: Container(
         width: 48,

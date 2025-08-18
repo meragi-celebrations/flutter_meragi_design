@@ -8,18 +8,22 @@ import 'package:flutter_meragi_design/src/components/canva/ui/dialog_manager_sco
 import 'package:flutter_meragi_design/src/components/canva/ui/draggable_dialog.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
+enum PaletteType { rectangle, circle }
+
 class PaletteItem extends CanvasItem {
   PaletteItem({
     required super.id,
     required super.position,
     required super.size,
     List<Color>? paletteColors,
+    this.paletteType = PaletteType.rectangle,
     super.locked = false,
     super.rotationDeg = 0,
   }) : paletteColors = paletteColors ??
             const [Color(0xFF111827), Color(0xFF6B7280), Color(0xFFE5E7EB)];
 
   List<Color> paletteColors;
+  PaletteType paletteType;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.palette;
@@ -34,13 +38,19 @@ class PaletteItem extends CanvasItem {
     final children = <Widget>[];
     for (int i = 0; i < paletteColors.length; i++) {
       if (i > 0) children.add(SizedBox(width: gap));
-      children.add(Expanded(child: Container(color: paletteColors[i])));
+      Widget colorWidget = Container(color: paletteColors[i]);
+      if (paletteType == PaletteType.circle) {
+        colorWidget = ClipOval(child: colorWidget);
+      }
+      children.add(Expanded(child: colorWidget));
     }
 
     return Padding(
       padding: EdgeInsets.all(pad),
       child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      ),
     );
   }
 
@@ -62,13 +72,15 @@ class PaletteItem extends CanvasItem {
         position: position,
         size: size,
         paletteColors: List<Color>.from(paletteColors),
+        paletteType: paletteType,
         locked: locked,
         rotationDeg: rotationDeg,
       );
 
   @override
   Map<String, dynamic> propsToJson() => {
-        'colors': [for (final c in paletteColors) colorToHex(c)]
+        'colors': [for (final c in paletteColors) colorToHex(c)],
+        'type': paletteType.name,
       };
 
   static PaletteItem fromJson(Map<String, dynamic> j) {
@@ -76,6 +88,8 @@ class PaletteItem extends CanvasItem {
     final list = (p['colors'] as List?)?.cast<String>() ?? const <String>[];
     final colors =
         list.map(hexToColor).whereType<Color>().toList(growable: false);
+    final type =
+        p['type'] == 'circle' ? PaletteType.circle : PaletteType.rectangle;
     final safe = colors.isNotEmpty
         ? colors
         : const [Color(0xFF111827), Color(0xFF6B7280), Color(0xFFE5E7EB)];
@@ -90,6 +104,7 @@ class PaletteItem extends CanvasItem {
       locked: (j['locked'] as bool?) ?? false,
       rotationDeg: (j['rot'] as num?)?.toDouble() ?? 0,
       paletteColors: List<Color>.from(safe),
+      paletteType: type,
     );
   }
 }
@@ -114,6 +129,7 @@ class _PalettePropsEditor extends StatefulWidget {
 
 class _PalettePropsEditorState extends State<_PalettePropsEditor> {
   final _rows = <_PaletteRow>[];
+  late PaletteType _type = widget.item.paletteType;
   bool _begun = false;
 
   void _begin() {
@@ -138,7 +154,7 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
       }
       _disposeRows();
       _rebuildRowsFromItem();
-      setState(() {});
+      setState(() => _type = widget.item.paletteType);
     }
   }
 
@@ -149,33 +165,33 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
   }
 
   void _disposeRows() {
-    for (final r in _rows) {
-      r.ctrl.dispose();
-    }
     _rows.clear();
   }
 
   void _rebuildRowsFromItem() {
     for (final c in widget.item.paletteColors) {
-      _rows.add(_PaletteRow(initial: colorToHex(c)));
+      _rows.add(_PaletteRow(color: c));
     }
-    if (_rows.isEmpty) _rows.add(_PaletteRow(initial: '#FF000000'));
+    if (_rows.isEmpty) {
+      _rows.add(_PaletteRow(color: const Color(0xFF000000)));
+    }
   }
 
   void _commit() {
     _begin();
     final list = <Color>[];
     for (final r in _rows) {
-      final c = hexToColor(r.ctrl.text);
-      if (c != null) list.add(c);
+      list.add(r.color);
     }
     if (list.isEmpty) return;
-    final u = widget.item.cloneWith() as PaletteItem..paletteColors = list;
+    final u = widget.item.cloneWith() as PaletteItem
+      ..paletteColors = list
+      ..paletteType = _type;
     widget.onChange(u);
   }
 
   void _addRow() {
-    setState(() => _rows.add(_PaletteRow(initial: '#FFFFFFFF')));
+    setState(() => _rows.add(_PaletteRow(color: const Color(0xFFFFFFFF))));
     _commit();
   }
 
@@ -189,44 +205,54 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const SectionTitle('Palette'),
-      ListView.builder(
+      const SizedBox(height: 16),
+      MDSelect<PaletteType>(
+        onChanged: (v) {
+          if (v == null) return;
+          setState(() => _type = v);
+          _commit();
+        },
+        initialValue: _type,
+        options: const [
+          MDOption(value: PaletteType.rectangle, child: Text('Rectangle')),
+          MDOption(value: PaletteType.circle, child: Text('Circle')),
+        ],
+        selectedOptionBuilder: (context, value) {
+          return Text(value.name[0].toUpperCase() + value.name.substring(1));
+        },
+      ),
+      const SizedBox(height: 16),
+      ReorderableListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: _rows.length,
+        buildDefaultDragHandles: false,
+        onReorder: (oldIndex, newIndex) {
+          setState(() {
+            if (newIndex > oldIndex) {
+              newIndex -= 1;
+            }
+            final item = _rows.removeAt(oldIndex);
+            _rows.insert(newIndex, item);
+            _commit();
+          });
+        },
         itemBuilder: (context, i) {
           final row = _rows[i];
-          final preview = hexToColor(row.ctrl.text);
           return Padding(
+            key: ValueKey(row),
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [
-              Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  color: preview ?? Colors.transparent,
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: preview == null ? Colors.red : Colors.black26,
-                    width: 1,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: row.ctrl,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                    hintText: 'Hex Color',
-                  ),
-                  onChanged: (_) => _commit(),
-                  onSubmitted: (_) => _commit(),
+              ReorderableDragStartListener(
+                index: i,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.grab,
+                  child: const Icon(Icons.drag_handle),
                 ),
               ),
               const SizedBox(width: 8),
               ColorPreview(
-                color: hexToColor(row.ctrl.text),
+                color: row.color,
                 onTap: () {
                   final doc = CanvasScope.of(context, listen: false);
                   final dialogManager = DialogManagerScope.of(context);
@@ -236,7 +262,7 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
                     child: CommonColorPicker(
                       doc: doc,
                       onColorSelected: (c) {
-                        row.ctrl.text = colorToHex(c);
+                        setState(() => row.color = c);
                         _commit();
                       },
                       onOpenColorPicker: () {
@@ -246,9 +272,9 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
                           title: 'Select Color',
                           onClose: () => dialogManager.close(colorPickerDialog),
                           child: MDColorPicker(
-                            initialColor: hexToColor(row.ctrl.text),
+                            initialColor: row.color,
                             onColorChanged: (c) {
-                              row.ctrl.text = colorToHex(c);
+                              setState(() => row.color = c);
                               _commit();
                             },
                             onDone: (c) {
@@ -258,7 +284,7 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
                                   'color': colorToHex(c),
                                 }
                               ]);
-                              row.ctrl.text = colorToHex(c);
+                              setState(() => row.color = c);
                               _commit();
                               dialogManager.close(colorPickerDialog);
                             },
@@ -271,33 +297,39 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
                   dialogManager.show(dialog);
                 },
               ),
-              IconButton(
-                onPressed: () => _removeRow(i),
-                icon: const Icon(Icons.remove_circle_outline),
+              const Spacer(),
+              SizedBox(
+                width: 24,
+                child: MDTap.ghost(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => _removeRow(i),
+                  size: ShadButtonSize.sm,
+                  icon: const Icon(PhosphorIconsRegular.minusCircle),
+                ),
               ),
             ]),
           );
         },
       ),
       const SizedBox(height: 8),
-      Row(children: [
-        OutlinedButton.icon(
-          onPressed: _addRow,
-          icon: const Icon(Icons.add),
-          label: const Text('Add color'),
-        ),
-        const SizedBox(width: 8),
-        Text('${_rows.length} color${_rows.length == 1 ? '' : 's'}'),
-        const Spacer(),
-        if (_begun)
-          TextButton(onPressed: widget.onEnd, child: const Text('Done')),
-      ]),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          MDTap.outline(
+            onPressed: _addRow,
+            size: ShadButtonSize.sm,
+            icon: const Icon(PhosphorIconsRegular.plus),
+            child: const Text('Add color'),
+          ),
+          const SizedBox(width: 8),
+          Text('${_rows.length} color${_rows.length == 1 ? '' : 's'}'),
+        ],
+      ),
     ]);
   }
 }
 
 class _PaletteRow {
-  _PaletteRow({required String initial})
-      : ctrl = TextEditingController(text: initial);
-  final TextEditingController ctrl;
+  _PaletteRow({required this.color});
+  Color color;
 }
