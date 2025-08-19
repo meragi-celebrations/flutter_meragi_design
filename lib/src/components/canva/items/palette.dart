@@ -9,7 +9,7 @@ import 'package:flutter_meragi_design/src/components/canva/ui/draggable_dialog.d
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 class PaletteItem extends CanvasItem {
-  PaletteItem({
+  const PaletteItem({
     required super.id,
     required super.position,
     required super.size,
@@ -19,7 +19,7 @@ class PaletteItem extends CanvasItem {
   }) : paletteColors = paletteColors ??
             const [Color(0xFF111827), Color(0xFF6B7280), Color(0xFFE5E7EB)];
 
-  List<Color> paletteColors;
+  final List<Color> paletteColors;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.palette;
@@ -57,13 +57,21 @@ class PaletteItem extends CanvasItem {
   }
 
   @override
-  CanvasItem cloneWith({String? id}) => PaletteItem(
+  CanvasItem copyWith({
+    String? id,
+    Offset? position,
+    Size? size,
+    bool? locked,
+    double? rotationDeg,
+    List<Color>? paletteColors,
+  }) =>
+      PaletteItem(
         id: id ?? this.id,
-        position: position,
-        size: size,
-        paletteColors: List<Color>.from(paletteColors),
-        locked: locked,
-        rotationDeg: rotationDeg,
+        position: position ?? this.position,
+        size: size ?? this.size,
+        locked: locked ?? this.locked,
+        rotationDeg: rotationDeg ?? this.rotationDeg,
+        paletteColors: paletteColors ?? this.paletteColors,
       );
 
   @override
@@ -170,7 +178,8 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
       if (c != null) list.add(c);
     }
     if (list.isEmpty) return;
-    final u = widget.item.cloneWith() as PaletteItem..paletteColors = list;
+    final u =
+        (widget.item.copyWith() as PaletteItem).copyWith(paletteColors: list);
     widget.onChange(u);
   }
 

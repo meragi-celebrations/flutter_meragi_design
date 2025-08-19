@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// Converts between the fixed base canvas space and the current rendered space.
 /// Store ALL model values in base units. Use this to render and to map gestures.
 class CanvasScaleHandler {
-  CanvasScaleHandler({
+  const CanvasScaleHandler({
     required this.baseSize,
     required this.renderSize,
   });
@@ -27,4 +27,17 @@ class CanvasScaleHandler {
 
   // Helpers
   double fontBaseToRender(double fs) => fs * s;
+
+  CanvasScaleHandler copyWith({
+    Size? baseSize,
+    Size? renderSize,
+  }) {
+    return CanvasScaleHandler(
+      baseSize: baseSize ?? this.baseSize,
+      renderSize: renderSize ?? this.renderSize,
+    );
+  }
+
+  static CanvasScaleHandler initial() =>
+      const CanvasScaleHandler(baseSize: Size(1, 1), renderSize: Size(1, 1));
 }

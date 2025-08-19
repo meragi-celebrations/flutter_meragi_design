@@ -9,7 +9,7 @@ import 'package:flutter_meragi_design/src/components/canva/ui/draggable_dialog.d
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 
 class TextItem extends CanvasItem {
-  TextItem({
+  const TextItem({
     required super.id,
     required super.position,
     required super.size,
@@ -35,24 +35,24 @@ class TextItem extends CanvasItem {
     this.opacity = 1.0,
   });
 
-  String? text;
-  double fontSize;
-  Color fontColor;
-  FontWeight fontWeight;
-  String? fontFamily;
-  bool fontItalic;
-  bool fontUnderline;
-  bool fontStrikethrough;
-  TextDecorationStyle decorationStyle;
-  Color? decorationColor;
-  double decorationThickness;
-  List<Shadow>? shadows;
-  Color? backgroundColor;
-  TextAlign textAlign;
-  double lineHeight;
-  double letterSpacing;
-  double wordSpacing;
-  double opacity;
+  final String? text;
+  final double fontSize;
+  final Color fontColor;
+  final FontWeight fontWeight;
+  final String? fontFamily;
+  final bool fontItalic;
+  final bool fontUnderline;
+  final bool fontStrikethrough;
+  final TextDecorationStyle decorationStyle;
+  final Color? decorationColor;
+  final double decorationThickness;
+  final List<Shadow>? shadows;
+  final Color? backgroundColor;
+  final TextAlign textAlign;
+  final double lineHeight;
+  final double letterSpacing;
+  final double wordSpacing;
+  final double opacity;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.text;
@@ -112,30 +112,55 @@ class TextItem extends CanvasItem {
   }
 
   @override
-  CanvasItem cloneWith({String? id}) => TextItem(
+  CanvasItem copyWith({
+    String? id,
+    Offset? position,
+    Size? size,
+    bool? locked,
+    double? rotationDeg,
+    String? text,
+    double? fontSize,
+    Color? fontColor,
+    FontWeight? fontWeight,
+    String? fontFamily,
+    bool? fontItalic,
+    bool? fontUnderline,
+    bool? fontStrikethrough,
+    TextDecorationStyle? decorationStyle,
+    Color? decorationColor,
+    double? decorationThickness,
+    List<Shadow>? shadows,
+    Color? backgroundColor,
+    TextAlign? textAlign,
+    double? lineHeight,
+    double? letterSpacing,
+    double? wordSpacing,
+    double? opacity,
+  }) =>
+      TextItem(
         id: id ?? this.id,
-        position: position,
-        size: size,
-        text: text,
-        fontSize: fontSize,
-        fontColor: fontColor,
-        fontWeight: fontWeight,
-        fontFamily: fontFamily,
-        fontItalic: fontItalic,
-        fontUnderline: fontUnderline,
-        fontStrikethrough: fontStrikethrough,
-        decorationStyle: decorationStyle,
-        decorationColor: decorationColor,
-        decorationThickness: decorationThickness,
-        shadows: shadows,
-        backgroundColor: backgroundColor,
-        textAlign: textAlign,
-        lineHeight: lineHeight,
-        letterSpacing: letterSpacing,
-        wordSpacing: wordSpacing,
-        locked: locked,
-        rotationDeg: rotationDeg,
-        opacity: opacity,
+        position: position ?? this.position,
+        size: size ?? this.size,
+        locked: locked ?? this.locked,
+        rotationDeg: rotationDeg ?? this.rotationDeg,
+        text: text ?? this.text,
+        fontSize: fontSize ?? this.fontSize,
+        fontColor: fontColor ?? this.fontColor,
+        fontWeight: fontWeight ?? this.fontWeight,
+        fontFamily: fontFamily ?? this.fontFamily,
+        fontItalic: fontItalic ?? this.fontItalic,
+        fontUnderline: fontUnderline ?? this.fontUnderline,
+        fontStrikethrough: fontStrikethrough ?? this.fontStrikethrough,
+        decorationStyle: decorationStyle ?? this.decorationStyle,
+        decorationColor: decorationColor ?? this.decorationColor,
+        decorationThickness: decorationThickness ?? this.decorationThickness,
+        shadows: shadows ?? this.shadows,
+        backgroundColor: backgroundColor ?? this.backgroundColor,
+        textAlign: textAlign ?? this.textAlign,
+        lineHeight: lineHeight ?? this.lineHeight,
+        letterSpacing: letterSpacing ?? this.letterSpacing,
+        wordSpacing: wordSpacing ?? this.wordSpacing,
+        opacity: opacity ?? this.opacity,
       );
 
   @override
@@ -315,25 +340,26 @@ class _TextPropsEditorState extends State<_TextPropsEditor> {
 
   void _emit() {
     _begin();
-    final u = widget.item.cloneWith() as TextItem
-      ..text = _textCtrl.text
-      ..fontSize = _fontSize
-      ..fontColor = _fontColor
-      ..fontWeight = _fontWeight
-      ..fontItalic = _italic
-      ..fontUnderline = _underline
-      ..fontStrikethrough = _strikethrough
-      ..decorationStyle = _decorationStyle
-      ..decorationColor = _decorationColor
-      ..decorationThickness = _decorationThickness
-      ..fontFamily = _fontFamily
-      ..textAlign = _textAlign
-      ..lineHeight = _lineHeight
-      ..letterSpacing = _letterSpacing
-      ..wordSpacing = _wordSpacing
-      ..shadows = _shadows
-      ..backgroundColor = _backgroundColor
-      ..opacity = _opacity;
+    final u = (widget.item.copyWith() as TextItem).copyWith(
+      text: _textCtrl.text,
+      fontSize: _fontSize,
+      fontColor: _fontColor,
+      fontWeight: _fontWeight,
+      fontItalic: _italic,
+      fontUnderline: _underline,
+      fontStrikethrough: _strikethrough,
+      decorationStyle: _decorationStyle,
+      decorationColor: _decorationColor,
+      decorationThickness: _decorationThickness,
+      fontFamily: _fontFamily,
+      textAlign: _textAlign,
+      lineHeight: _lineHeight,
+      letterSpacing: _letterSpacing,
+      wordSpacing: _wordSpacing,
+      shadows: _shadows,
+      backgroundColor: _backgroundColor,
+      opacity: _opacity,
+    );
     widget.onChange(u);
   }
 

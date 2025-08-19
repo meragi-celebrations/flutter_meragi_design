@@ -205,9 +205,11 @@ class _PropertiesSidebarState extends State<PropertiesSidebar> {
     final newJsons = <Map<String, dynamic>>[];
     for (final id in ids) {
       final src = doc.itemById(id);
-      final dup = src.cloneWith(id: doc.newId())
-        ..position = src.position + const Offset(12, 12)
-        ..locked = false;
+      final dup = src.copyWith(
+        id: doc.newId(),
+        position: src.position + const Offset(12, 12),
+        locked: false,
+      );
       newJsons.add(dup.toJson(0));
     }
 

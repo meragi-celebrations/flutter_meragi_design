@@ -13,7 +13,7 @@ import 'package:flutter_meragi_design/src/components/canva/utils.dart';
 enum ShapeType { rectangle, circle, oval, line, arrow }
 
 class ShapeItem extends CanvasItem {
-  ShapeItem({
+  const ShapeItem({
     required super.id,
     required super.position,
     required super.size,
@@ -25,10 +25,10 @@ class ShapeItem extends CanvasItem {
     super.rotationDeg = 0,
   });
 
-  ShapeType shapeType;
-  Color color;
-  Color strokeColor;
-  double strokeWidth;
+  final ShapeType shapeType;
+  final Color color;
+  final Color strokeColor;
+  final double strokeWidth;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.shape;
@@ -61,16 +61,27 @@ class ShapeItem extends CanvasItem {
   }
 
   @override
-  CanvasItem cloneWith({String? id}) => ShapeItem(
+  CanvasItem copyWith({
+    String? id,
+    Offset? position,
+    Size? size,
+    bool? locked,
+    double? rotationDeg,
+    ShapeType? shapeType,
+    Color? color,
+    Color? strokeColor,
+    double? strokeWidth,
+  }) =>
+      ShapeItem(
         id: id ?? this.id,
-        position: position,
-        size: size,
-        shapeType: shapeType,
-        color: color,
-        strokeColor: strokeColor,
-        strokeWidth: strokeWidth,
-        locked: locked,
-        rotationDeg: rotationDeg,
+        position: position ?? this.position,
+        size: size ?? this.size,
+        locked: locked ?? this.locked,
+        rotationDeg: rotationDeg ?? this.rotationDeg,
+        shapeType: shapeType ?? this.shapeType,
+        color: color ?? this.color,
+        strokeColor: strokeColor ?? this.strokeColor,
+        strokeWidth: strokeWidth ?? this.strokeWidth,
       );
 
   @override
@@ -94,20 +105,22 @@ class ShapeItem extends CanvasItem {
     CanvasScaleHandler scale,
   ) {
     if (shapeType == ShapeType.line || shapeType == ShapeType.arrow) {
-      final newItem = cloneWith();
       if (handleKey == 'start') {
-        newItem.position += delta;
-        newItem.size = Size(
-          newItem.size.width - delta.dx,
-          newItem.size.height - delta.dy,
+        return copyWith(
+          position: position + delta,
+          size: Size(
+            size.width - delta.dx,
+            size.height - delta.dy,
+          ),
         );
       } else {
-        newItem.size = Size(
-          newItem.size.width + delta.dx,
-          newItem.size.height + delta.dy,
+        return copyWith(
+          size: Size(
+            size.width + delta.dx,
+            size.height + delta.dy,
+          ),
         );
       }
-      return newItem;
     }
     return super.resizeWithHandle(handleKey, delta, scale);
   }
@@ -285,11 +298,12 @@ class _ShapePropsEditorState extends State<_ShapePropsEditor> {
 
   void _emit() {
     _begin();
-    final u = widget.item.cloneWith() as ShapeItem
-      ..shapeType = _shapeType
-      ..color = _color
-      ..strokeColor = _strokeColor
-      ..strokeWidth = _strokeWidth;
+    final u = (widget.item.copyWith() as ShapeItem).copyWith(
+      shapeType: _shapeType,
+      color: _color,
+      strokeColor: _strokeColor,
+      strokeWidth: _strokeWidth,
+    );
     widget.onChange(u);
   }
 

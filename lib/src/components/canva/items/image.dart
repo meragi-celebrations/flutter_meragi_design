@@ -10,7 +10,7 @@ import 'package:flutter_meragi_design/src/theme/theme.dart';
 enum BorderStyle { none, solid, dashed, moreDashed, dotted }
 
 class ImageItem extends CanvasItem {
-  ImageItem({
+  const ImageItem({
     required super.id,
     required super.position,
     required super.size,
@@ -29,50 +29,43 @@ class ImageItem extends CanvasItem {
     this.extractedColors = const [],
   }) : borderColor = borderColor ?? const Color(0xFF000000);
 
-  String src;
+  final String src;
   final List<Color> extractedColors;
-  double radiusTL, radiusTR, radiusBL, radiusBR;
+  final double radiusTL, radiusTR, radiusBL, radiusBR;
 
   // Border
-  bool borderEnabled;
-  double borderWidth; // logical px at base scale
-  Color borderColor;
-  BorderStyle borderStyle;
+  final bool borderEnabled;
+  final double borderWidth; // logical px at base scale
+  final Color borderColor;
+  final BorderStyle borderStyle;
 
   // Opacity
-  double opacity;
-
-  ImageProvider? _cachedProvider;
-  String? _cachedSrcKey;
+  final double opacity;
 
   @override
   CanvasItemKind get kind => CanvasItemKind.image;
 
   ImageProvider? resolveProvider() {
     if (src.isEmpty) return null;
-    if (_cachedProvider != null && _cachedSrcKey == src) return _cachedProvider;
 
     try {
       if (src.startsWith('asset://')) {
         final path = src.substring('asset://'.length);
-        _cachedProvider = AssetImage(path);
+        return AssetImage(path);
       } else if (src.startsWith('data:image/')) {
         final comma = src.indexOf(',');
         if (comma > 0) {
           final b64 = src.substring(comma + 1);
           final bytes = base64Decode(b64);
-          _cachedProvider = MemoryImage(bytes);
+          return MemoryImage(bytes);
         }
       } else if (src.startsWith('http://') || src.startsWith('https://')) {
-        _cachedProvider = NetworkImage(src);
-      } else {
-        _cachedProvider = null;
+        return NetworkImage(src);
       }
     } catch (_) {
-      _cachedProvider = null;
+      return null;
     }
-    _cachedSrcKey = src;
-    return _cachedProvider;
+    return null;
   }
 
   @override
@@ -147,23 +140,41 @@ class ImageItem extends CanvasItem {
   }
 
   @override
-  CanvasItem cloneWith({String? id}) => ImageItem(
+  CanvasItem copyWith({
+    String? id,
+    Offset? position,
+    Size? size,
+    bool? locked,
+    double? rotationDeg,
+    String? src,
+    double? radiusTL,
+    double? radiusTR,
+    double? radiusBL,
+    double? radiusBR,
+    bool? borderEnabled,
+    double? borderWidth,
+    Color? borderColor,
+    BorderStyle? borderStyle,
+    double? opacity,
+    List<Color>? extractedColors,
+  }) =>
+      ImageItem(
         id: id ?? this.id,
-        position: position,
-        size: size,
-        src: src,
-        radiusTL: radiusTL,
-        radiusTR: radiusTR,
-        radiusBL: radiusBL,
-        radiusBR: radiusBR,
-        borderEnabled: borderEnabled,
-        borderWidth: borderWidth,
-        borderColor: borderColor,
-        borderStyle: borderStyle,
-        locked: locked,
-        rotationDeg: rotationDeg,
-        opacity: opacity,
-        extractedColors: extractedColors,
+        position: position ?? this.position,
+        size: size ?? this.size,
+        locked: locked ?? this.locked,
+        rotationDeg: rotationDeg ?? this.rotationDeg,
+        src: src ?? this.src,
+        radiusTL: radiusTL ?? this.radiusTL,
+        radiusTR: radiusTR ?? this.radiusTR,
+        radiusBL: radiusBL ?? this.radiusBL,
+        radiusBR: radiusBR ?? this.radiusBR,
+        borderEnabled: borderEnabled ?? this.borderEnabled,
+        borderWidth: borderWidth ?? this.borderWidth,
+        borderColor: borderColor ?? this.borderColor,
+        borderStyle: borderStyle ?? this.borderStyle,
+        opacity: opacity ?? this.opacity,
+        extractedColors: extractedColors ?? this.extractedColors,
       );
 
   @override
@@ -258,39 +269,41 @@ class DashedBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (strokeWidth <= 0) return;
+
     final paint = Paint()
       ..color = color
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
-    final path = Path()
-      ..addRRect(
-        RRect.fromRectAndCorners(
-          Rect.fromLTWH(0, 0, size.width, size.height),
-          topLeft: borderRadius.topLeft,
-          topRight: borderRadius.topRight,
-          bottomLeft: borderRadius.bottomLeft,
-          bottomRight: borderRadius.bottomRight,
-        ),
-      );
+    // Build the rounded rect and keep stroke fully inside the bounds.
+    final outer = RRect.fromRectAndCorners(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      topLeft: borderRadius.topLeft,
+      topRight: borderRadius.topRight,
+      bottomLeft: borderRadius.bottomLeft,
+      bottomRight: borderRadius.bottomRight,
+    );
+    final rrect = outer.deflate(strokeWidth / 2);
 
-    Path dashPath;
+    final basePath = Path()..addRRect(rrect);
 
+    Path toDraw;
     switch (borderStyle) {
       case BorderStyle.dashed:
-        dashPath = _getDashedPath(path, 10, 5);
+        toDraw = _getDashedPath(basePath, 10, 5);
         break;
       case BorderStyle.moreDashed:
-        dashPath = _getDashedPath(path, 5, 3);
+        toDraw = _getDashedPath(basePath, 5, 3);
         break;
       case BorderStyle.dotted:
-        dashPath = _getDashedPath(path, 2, 2);
+        toDraw = _getDashedPath(basePath, 2, 2);
         break;
       default:
-        dashPath = path;
+        toDraw = basePath;
     }
 
-    canvas.drawPath(dashPath, paint);
+    canvas.drawPath(toDraw, paint);
   }
 
   Path _getDashedPath(Path source, double dashLength, double dashSpace) {
@@ -298,18 +311,21 @@ class DashedBorderPainter extends CustomPainter {
     for (final metric in source.computeMetrics()) {
       double distance = 0.0;
       while (distance < metric.length) {
-        path.addPath(
-          metric.extractPath(distance, distance + dashLength),
-          Offset.zero,
-        );
-        distance += dashLength + dashSpace;
+        final next = distance + dashLength;
+        path.addPath(metric.extractPath(distance, next), Offset.zero);
+        distance = next + dashSpace;
       }
     }
     return path;
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant DashedBorderPainter oldDelegate) {
+    return oldDelegate.borderRadius != borderRadius ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.color != color ||
+        oldDelegate.borderStyle != borderStyle;
+  }
 }
 
 class _ImagePropsEditor extends StatefulWidget {
@@ -419,7 +435,7 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
 
   void _commit() {
     _begin();
-    final u = widget.item.cloneWith() as ImageItem;
+    ImageItem u = widget.item;
 
     double vtl = double.tryParse(_tl.text.trim()) ?? u.radiusTL;
     double vtr = double.tryParse(_tr.text.trim()) ?? u.radiusTR;
@@ -437,11 +453,12 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
 
     final maxR =
         0.5 * (u.size.width < u.size.height ? u.size.width : u.size.height);
-    u
-      ..radiusTL = vtl.clamp(0, maxR)
-      ..radiusTR = vtr.clamp(0, maxR)
-      ..radiusBL = vbl.clamp(0, maxR)
-      ..radiusBR = vbr.clamp(0, maxR);
+    u = u.copyWith(
+      radiusTL: vtl.clamp(0, maxR),
+      radiusTR: vtr.clamp(0, maxR),
+      radiusBL: vbl.clamp(0, maxR),
+      radiusBR: vbr.clamp(0, maxR),
+    ) as ImageItem;
 
     final bw = (double.tryParse(_bw.text.trim()) ?? u.borderWidth)
         .clamp(0, 5000)
@@ -450,12 +467,13 @@ class _ImagePropsEditorState extends State<_ImagePropsEditor> {
     final opacity =
         (double.tryParse(_opacity.text.trim()) ?? u.opacity).clamp(0.0, 1.0);
 
-    u
-      ..borderEnabled = _borderStyle != BorderStyle.none
-      ..borderWidth = bw
-      ..borderColor = bc
-      ..borderStyle = _borderStyle
-      ..opacity = opacity;
+    u = u.copyWith(
+      borderEnabled: _borderStyle != BorderStyle.none,
+      borderWidth: bw,
+      borderColor: bc,
+      borderStyle: _borderStyle,
+      opacity: opacity,
+    ) as ImageItem;
 
     _queueChange(u);
   }

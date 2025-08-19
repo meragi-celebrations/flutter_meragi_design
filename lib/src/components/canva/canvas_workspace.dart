@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
+import 'package:flutter_meragi_design/src/components/canva/canvas_controller.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_doc.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_scope.dart';
 import 'package:flutter_meragi_design/src/components/canva/color_extractor.dart';
@@ -9,6 +9,7 @@ import 'package:flutter_meragi_design/src/components/canva/palette_sidebar.dart'
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/grid_painter.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
+import 'package:flutter_meragi_design/src/components/canva/widgets/canvas_overlay.dart';
 import 'package:flutter_meragi_design/src/components/canva/workspace_action_bar.dart';
 
 class _Guideline {
@@ -43,12 +44,20 @@ class CanvasWorkspace extends StatefulWidget {
 }
 
 class _CanvasWorkspaceState extends State<CanvasWorkspace> {
+  late final CanvasController _controller;
   CanvasScaleHandler? _scale;
   Rect? _selectionRect;
   Offset? _dragSelectionStart;
 
   final List<_Guideline> _guidelines = [];
   Offset _snapOffset = Offset.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        CanvasController(doc: widget.doc, scale: CanvasScaleHandler.initial());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +76,7 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                       // reactive doc read
                       final doc = CanvasScope.of(context);
 
+                      // compute canvas size
                       final maxW = constraints.maxWidth;
                       final maxH = constraints.maxHeight;
                       final targetAspect =
@@ -78,10 +88,13 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                         w = h * targetAspect;
                       }
 
-                      _scale = CanvasScaleHandler(
+                      // update controller scale and reuse the SAME instance everywhere
+                      _controller.setScale(_controller.scale.copyWith(
                         baseSize: doc.baseSize,
                         renderSize: Size(w, h),
-                      );
+                      ));
+                      final scale = _controller.scale; // single source of truth
+                      _scale = scale; // keep your local ref if you need it
 
                       final canvasSize = Size(w, h);
 
@@ -136,73 +149,6 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                             canvasSize: canvasSize,
                                             isSelected: doc.selectedIds
                                                 .contains(item.id),
-                                            onPanStart: () {
-                                              doc.beginUndoGroup('Drag');
-                                              setState(() {
-                                                _guidelines.clear();
-                                              });
-                                            },
-                                            onPanMove: (delta) {
-                                              final moving =
-                                                  doc.selectedIds.isEmpty
-                                                      ? <String>{item.id}
-                                                      : doc.selectedIds;
-                                              _calculateGuidelines(
-                                                  doc, moving, delta);
-                                              doc.applyPatch([
-                                                for (final id in moving)
-                                                  {
-                                                    'type': 'update',
-                                                    'id': id,
-                                                    'changes': {
-                                                      'position': {
-                                                        'x': doc
-                                                                .itemById(id)
-                                                                .position
-                                                                .dx +
-                                                            delta.dx +
-                                                            _snapOffset.dx,
-                                                        'y': doc
-                                                                .itemById(id)
-                                                                .position
-                                                                .dy +
-                                                            delta.dy +
-                                                            _snapOffset.dy,
-                                                      }
-                                                    }
-                                                  }
-                                              ]);
-                                            },
-                                            onPanEnd: () {
-                                              doc.commitUndoGroup();
-                                              setState(() {
-                                                _guidelines.clear();
-                                              });
-                                            },
-                                            onResizeStart: () =>
-                                                doc.beginUndoGroup('Resize'),
-                                            onResizeCommit: (updated) {
-                                              doc.applyPatch([
-                                                {
-                                                  'type': 'update',
-                                                  'id': updated.id,
-                                                  'changes': {
-                                                    'position': {
-                                                      'x': updated.position.dx,
-                                                      'y': updated.position.dy,
-                                                    },
-                                                    'size': {
-                                                      'w': updated.size.width,
-                                                      'h': updated.size.height,
-                                                    },
-                                                    'rotationDeg':
-                                                        updated.rotationDeg,
-                                                  }
-                                                }
-                                              ]);
-                                            },
-                                            onResizeEnd: () =>
-                                                doc.commitUndoGroup(),
                                             scale: _scale!,
                                           ),
                                       ],
@@ -210,6 +156,13 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                   ),
                                 ),
                               ),
+                              if (_scale != null)
+                                Positioned.fill(
+                                  child: CanvasOverlay(
+                                    controller: _controller,
+                                    scale: _scale!,
+                                  ),
+                                ),
 
                               // Guidelines
                               if (_guidelines.isNotEmpty)
@@ -221,156 +174,6 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                     ),
                                   ),
                                 ),
-
-                              // Selection capture
-                              Positioned.fill(
-                                child: Listener(
-                                  behavior: HitTestBehavior.translucent,
-                                  onPointerDown: (event) {
-                                    final scale = _scale;
-                                    if (scale == null) return;
-
-                                    final localRender =
-                                        widget.toLocal(event.position);
-                                    final localBase =
-                                        scale.renderToBase(localRender);
-
-                                    String? hitId;
-                                    for (final item in doc.items.reversed) {
-                                      final rect = Rect.fromLTWH(
-                                        item.position.dx,
-                                        item.position.dy,
-                                        item.size.width,
-                                        item.size.height,
-                                      );
-                                      if (rect.contains(localBase)) {
-                                        hitId = item.id;
-                                        break;
-                                      }
-                                    }
-
-                                    if (hitId == null) {
-                                      setState(() {
-                                        _dragSelectionStart = localRender;
-                                        _selectionRect = Rect.fromLTWH(
-                                            localRender.dx,
-                                            localRender.dy,
-                                            0,
-                                            0);
-                                      });
-                                    }
-                                  },
-                                  onPointerMove: (event) {
-                                    final start = _dragSelectionStart;
-                                    if (start == null) return;
-                                    final pos = widget.toLocal(event.position);
-                                    setState(() {
-                                      _selectionRect =
-                                          Rect.fromPoints(start, pos);
-                                    });
-                                  },
-                                  onPointerUp: (event) {
-                                    final scale = _scale;
-                                    final rect = _selectionRect;
-                                    final start = _dragSelectionStart;
-
-                                    if (scale != null &&
-                                        rect != null &&
-                                        start != null) {
-                                      final baseRect = Rect.fromPoints(
-                                        scale.renderToBase(rect.topLeft),
-                                        scale.renderToBase(rect.bottomRight),
-                                      );
-
-                                      final selected = <String>{};
-                                      for (final item in doc.items) {
-                                        final itemRect = Rect.fromLTWH(
-                                          item.position.dx,
-                                          item.position.dy,
-                                          item.size.width,
-                                          item.size.height,
-                                        );
-                                        if (baseRect.overlaps(itemRect)) {
-                                          selected.add(item.id);
-                                        }
-                                      }
-                                      doc.applyPatch([
-                                        {
-                                          'type': 'selection.set',
-                                          'ids': selected.toList()
-                                        }
-                                      ]);
-                                    } else {
-                                      // no drag, handle tap
-                                      final localRender =
-                                          widget.toLocal(event.position);
-                                      final localBase =
-                                          scale!.renderToBase(localRender);
-
-                                      String? hitId;
-                                      for (final item in doc.items.reversed) {
-                                        final rect = Rect.fromLTWH(
-                                          item.position.dx,
-                                          item.position.dy,
-                                          item.size.width,
-                                          item.size.height,
-                                        );
-                                        if (rect.contains(localBase)) {
-                                          hitId = item.id;
-                                          break;
-                                        }
-                                      }
-
-                                      final keys = HardwareKeyboard
-                                          .instance.logicalKeysPressed;
-                                      final additive = keys.contains(
-                                              LogicalKeyboardKey.shiftLeft) ||
-                                          keys.contains(
-                                              LogicalKeyboardKey.shiftRight) ||
-                                          keys.contains(
-                                              LogicalKeyboardKey.controlLeft) ||
-                                          keys.contains(LogicalKeyboardKey
-                                              .controlRight) ||
-                                          keys.contains(
-                                              LogicalKeyboardKey.metaLeft) ||
-                                          keys.contains(
-                                              LogicalKeyboardKey.metaRight);
-
-                                      if (hitId == null) {
-                                        doc.applyPatch([
-                                          {
-                                            'type': 'selection.set',
-                                            'ids': <String>[]
-                                          }
-                                        ]);
-                                      } else if (additive) {
-                                        final ids =
-                                            doc.selectedIds.contains(hitId)
-                                                ? doc.selectedIds
-                                                    .where((e) => e != hitId)
-                                                    .toList()
-                                                : [...doc.selectedIds, hitId];
-                                        doc.applyPatch([
-                                          {'type': 'selection.set', 'ids': ids}
-                                        ]);
-                                      } else {
-                                        doc.applyPatch([
-                                          {
-                                            'type': 'selection.set',
-                                            'ids': [hitId]
-                                          }
-                                        ]);
-                                      }
-                                    }
-
-                                    setState(() {
-                                      _dragSelectionStart = null;
-                                      _selectionRect = null;
-                                    });
-                                  },
-                                  child: const SizedBox.expand(),
-                                ),
-                              ),
 
                               // DragTarget overlay so drops work even over items
                               Positioned.fill(

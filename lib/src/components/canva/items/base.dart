@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/item_registry.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
@@ -121,7 +123,7 @@ class _CanvasItemGestureWrapper extends StatelessWidget {
 
 /// Base class – agnostic of subclasses.
 abstract class CanvasItem {
-  CanvasItem({
+  const CanvasItem({
     required this.id,
     required this.position,
     required this.size,
@@ -130,10 +132,10 @@ abstract class CanvasItem {
   });
 
   final String id;
-  Offset position;
-  Size size;
-  bool locked;
-  double rotationDeg;
+  final Offset position;
+  final Size size;
+  final bool locked;
+  final double rotationDeg;
 
   Rect get rect =>
       Rect.fromLTWH(position.dx, position.dy, size.width, size.height);
@@ -167,51 +169,66 @@ abstract class CanvasItem {
   List<Handle> getHandles() => const [
         Handle(key: 'topLeft', alignment: Alignment.topLeft),
         Handle(key: 'topRight', alignment: Alignment.topRight),
-        Handle(key: 'bottomLeft', alignment: Alignment.bottomLeft),
         Handle(key: 'bottomRight', alignment: Alignment.bottomRight),
+        Handle(key: 'bottomLeft', alignment: Alignment.bottomLeft),
       ];
 
   CanvasItem resizeWithHandle(
-    String handleKey,
-    Offset delta,
-    CanvasScaleHandler scale,
-  ) {
-    // Default implementation for rectangular items
-    final newItem = cloneWith();
-    var left = newItem.position.dx;
-    var top = newItem.position.dy;
-    var width = newItem.size.width;
-    var height = newItem.size.height;
+      String handleKey, Offset delta, CanvasScaleHandler scale) {
+    final k = handleKey.toLowerCase();
+    final isLeft = k.contains('left');
+    final isRight = k.contains('right');
+    final isTop = k.contains('top');
+    final isBottom = k.contains('bottom');
 
-    switch (handleKey) {
-      case 'topLeft':
-        left += delta.dx;
-        top += delta.dy;
-        width -= delta.dx;
-        height -= delta.dy;
-        break;
-      case 'topRight':
-        top += delta.dy;
-        width += delta.dx;
-        height -= delta.dy;
-        break;
-      case 'bottomLeft':
-        left += delta.dx;
-        width -= delta.dx;
-        height += delta.dy;
-        break;
-      case 'bottomRight':
-        width += delta.dx;
-        height += delta.dy;
-        break;
+    final a = rotationDeg * math.pi / 180.0;
+    final c = math.cos(a), s = math.sin(a);
+
+    // rotate delta into local space
+    final local =
+        Offset(delta.dx * c + delta.dy * s, -delta.dx * s + delta.dy * c);
+
+    double w = size.width, h = size.height;
+    double ox = 0.0, oy = 0.0;
+
+    if (isLeft) {
+      w = size.width - local.dx;
+      ox = local.dx;
+    }
+    if (isRight) {
+      w = size.width + local.dx;
+    }
+    if (isTop) {
+      h = size.height - local.dy;
+      oy = local.dy;
+    }
+    if (isBottom) {
+      h = size.height + local.dy;
     }
 
-    newItem.position = Offset(left, top);
-    newItem.size = Size(width, height);
-    return newItem;
+    const minSize = 1.0;
+    if (w < minSize) {
+      ox += w - minSize;
+      w = minSize;
+    }
+    if (h < minSize) {
+      oy += h - minSize;
+      h = minSize;
+    }
+
+    // rotate origin shift back to world space
+    final worldShift = Offset(ox * c - oy * s, ox * s + oy * c);
+
+    return copyWith(position: position + worldShift, size: Size(w, h));
   }
 
-  CanvasItem cloneWith({String? id});
+  CanvasItem copyWith({
+    String? id,
+    Offset? position,
+    Size? size,
+    bool? locked,
+    double? rotationDeg,
+  });
 
   Map<String, dynamic> toJson(int zIndex) => {
         'id': id,
@@ -234,7 +251,7 @@ abstract class CanvasItem {
 
 /// ---------- Unknown (fallback) ----------
 class UnknownItem extends CanvasItem {
-  UnknownItem({
+  const UnknownItem({
     required super.id,
     required super.position,
     required super.size,
@@ -273,12 +290,19 @@ class UnknownItem extends CanvasItem {
   }
 
   @override
-  CanvasItem cloneWith({String? id}) => UnknownItem(
+  CanvasItem copyWith({
+    String? id,
+    Offset? position,
+    Size? size,
+    bool? locked,
+    double? rotationDeg,
+  }) =>
+      UnknownItem(
         id: id ?? this.id,
-        position: position,
-        size: size,
-        locked: locked,
-        rotationDeg: rotationDeg,
+        position: position ?? this.position,
+        size: size ?? this.size,
+        locked: locked ?? this.locked,
+        rotationDeg: rotationDeg ?? this.rotationDeg,
         raw: Map<String, dynamic>.from(raw),
       );
 

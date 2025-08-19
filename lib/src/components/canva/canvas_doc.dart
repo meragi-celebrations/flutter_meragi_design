@@ -185,25 +185,33 @@ class CanvasDoc extends ChangeNotifier {
     final changes =
         (op['changes'] as Map?)?.cast<String, dynamic>() ?? const {};
 
-    final it = _items[idx].cloneWith();
+    var it = _items[idx];
 
     final pos = (changes['position'] as Map?)?.cast<String, dynamic>();
     if (pos != null) {
       final x = (pos['x'] as num?)?.toDouble();
       final y = (pos['y'] as num?)?.toDouble();
-      if (x != null && y != null) it.position = Offset(x, y);
+      if (x != null && y != null) {
+        it = it.copyWith(position: Offset(x, y));
+      }
     }
     final size = (changes['size'] as Map?)?.cast<String, dynamic>();
     if (size != null) {
       final w = (size['w'] as num?)?.toDouble();
       final h = (size['h'] as num?)?.toDouble();
-      if (w != null && h != null) it.size = Size(w < 1 ? 1 : w, h < 1 ? 1 : h);
+      if (w != null && h != null) {
+        it = it.copyWith(size: Size(w < 1 ? 1 : w, h < 1 ? 1 : h));
+      }
     }
     final rot = (changes['rotationDeg'] as num?)?.toDouble();
-    if (rot != null) it.rotationDeg = rot % 360;
+    if (rot != null) {
+      it = it.copyWith(rotationDeg: rot % 360);
+    }
 
     final locked = changes['locked'];
-    if (locked is bool) it.locked = locked;
+    if (locked is bool) {
+      it = it.copyWith(locked: locked);
+    }
 
     _items[idx] = it;
   }
