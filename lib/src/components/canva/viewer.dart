@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
+import 'package:flutter_meragi_design/src/components/canva/items/registered_items.dart';
 
 import 'scaling.dart';
 import 'utils.dart';
@@ -60,7 +61,7 @@ class CanvaViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Ensure item kinds are registered somewhere during app init:
-    // registerBuiltInCanvasItems();
+    registerBuiltInCanvasItems();
 
     final canvasInfo = (document['canvas'] as Map?) ?? const {};
     final colorHex = canvasInfo['color'] as String?;
