@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
@@ -320,19 +318,23 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
 
   Rect _rotatedAabb(CanvasItem item) {
     final sc = _scale!;
-    final ptsR =
-        CanvasGeometry.corners(item, sc); // render-space corners TL,TR,BR,BL
+    final ptsR = CanvasGeometry.corners(item, sc);
     double minX = double.infinity, minY = double.infinity;
     double maxX = -double.infinity, maxY = -double.infinity;
-
     for (final pR in ptsR) {
-      final pB = sc.renderToBase(pR); // back to base space
+      final pB = sc.renderToBase(pR);
       if (pB.dx < minX) minX = pB.dx;
       if (pB.dy < minY) minY = pB.dy;
       if (pB.dx > maxX) maxX = pB.dx;
       if (pB.dy > maxY) maxY = pB.dy;
     }
     return Rect.fromLTRB(minX, minY, maxX, maxY);
+  }
+
+  double _nearestGrid(double v, double spacing) {
+    if (spacing <= 0) return v;
+    final k = (v / spacing).roundToDouble();
+    return k * spacing;
   }
 
   Offset _calculateGuidelines(
@@ -343,100 +345,101 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
       return Offset.zero;
     }
 
-    // Tune threshold in BASE units. Slightly larger is friendlier.
-    const snapThreshold = 4.0;
+    // Thresholds in BASE units
+    final gridSnap = doc.gridVisible ? doc.gridSpacing : 0.0;
+    final baseThreshold = gridSnap > 0
+        ? (gridSnap * 0.35).clamp(3.0, 10.0)
+        : 4.0; // friendly band
 
-    // Split moving vs static
     final movingItems = movingIds.map(doc.itemById).toList();
     final staticItems =
         doc.items.where((it) => !movingIds.contains(it.id)).toList();
 
-    if (movingItems.isEmpty || staticItems.isEmpty) {
+    if (movingItems.isEmpty) {
       setState(() => _guidelines.clear());
       return Offset.zero;
     }
 
-    // Union of rotated AABBs for the moving selection, then apply cumulative base delta
-    Rect movingBounds = _rotatedAabb(movingItems.first);
+    // Union of rotated AABBs for the whole selection, moved by current base delta
+    Rect moving = _rotatedAabb(movingItems.first);
     for (int i = 1; i < movingItems.length; i++) {
-      movingBounds = movingBounds.expandToInclude(_rotatedAabb(movingItems[i]));
+      moving = moving.expandToInclude(_rotatedAabb(movingItems[i]));
     }
-    movingBounds = movingBounds.translate(delta.dx, delta.dy);
+    moving = moving.translate(delta.dx, delta.dy);
 
-    // Prepare candidates: canvas centers also act like a "static item"
-    final List<Rect> staticBoundsList = [
-      for (final it in staticItems) _rotatedAabb(it),
-    ];
+    // Candidate lines in base space
+    final List<double> xs = [];
+    final List<double> ys = [];
 
-    final canvasCenter = doc.baseSize.center(Offset.zero);
-    // Represent the canvas centers as degenerate rects to reuse the same code path
-    staticBoundsList.add(Rect.fromLTWH(
-        canvasCenter.dx, 0, 0, doc.baseSize.height)); // vertical center line
-    staticBoundsList.add(Rect.fromLTWH(
-        0, canvasCenter.dy, doc.baseSize.width, 0)); // horizontal center line
+    // 1) other items’ edges and centers
+    for (final it in staticItems) {
+      final r = _rotatedAabb(it);
+      xs.addAll([r.left, r.center.dx, r.right]);
+      ys.addAll([r.top, r.center.dy, r.bottom]);
+    }
 
-    // Track best X and Y snaps
-    double? bestDx; // how much to move in X
+    // 2) canvas edges and centers
+    final W = doc.baseSize.width;
+    final H = doc.baseSize.height;
+    xs.addAll([0.0, W / 2, W]);
+    ys.addAll([0.0, H / 2, H]);
+
+    // 3) grid lines: only the nearest grid to each moving feature
+    if (gridSnap > 0) {
+      final gxL = _nearestGrid(moving.left, gridSnap);
+      final gxC = _nearestGrid(moving.center.dx, gridSnap);
+      final gxR = _nearestGrid(moving.right, gridSnap);
+      xs.addAll([gxL, gxC, gxR]);
+
+      final gyT = _nearestGrid(moving.top, gridSnap);
+      final gyC = _nearestGrid(moving.center.dy, gridSnap);
+      final gyB = _nearestGrid(moving.bottom, gridSnap);
+      ys.addAll([gyT, gyC, gyB]);
+    }
+
+    // Moving features
+    final mx = [moving.left, moving.center.dx, moving.right];
+    final my = [moving.top, moving.center.dy, moving.bottom];
+
+    double? bestDx;
     _Guideline? bestXGuide;
 
-    double? bestDy; // how much to move in Y
+    double? bestDy;
     _Guideline? bestYGuide;
 
-    // Helpers
-    void considerX(double targetX, double movingX, Rect a, Rect b) {
-      final diff = targetX - movingX;
-      if (diff.abs() <= snapThreshold &&
-          (bestDx == null || diff.abs() < bestDx!.abs())) {
-        bestDx = diff;
-        final top = math.min(a.top, b.top);
-        final bottom = math.max(a.bottom, b.bottom);
-        bestXGuide = _Guideline(
-          axis: Axis.vertical,
-          start: Offset(targetX, top),
-          end: Offset(targetX, bottom),
-        );
+    // choose the closest X among candidates to any moving x-feature
+    for (final cx in xs) {
+      for (final mxf in mx) {
+        final d = cx - mxf;
+        if (d.abs() <= baseThreshold &&
+            (bestDx == null || d.abs() < bestDx!.abs())) {
+          bestDx = d;
+          bestXGuide = _Guideline(
+            axis: Axis.vertical,
+            start: Offset(cx, 0),
+            end: Offset(cx, H),
+          );
+        }
       }
     }
 
-    void considerY(double targetY, double movingY, Rect a, Rect b) {
-      final diff = targetY - movingY;
-      if (diff.abs() <= snapThreshold &&
-          (bestDy == null || diff.abs() < bestDy!.abs())) {
-        bestDy = diff;
-        final left = math.min(a.left, b.left);
-        final right = math.max(a.right, b.right);
-        bestYGuide = _Guideline(
-          axis: Axis.horizontal,
-          start: Offset(left, targetY),
-          end: Offset(right, targetY),
-        );
+    // choose the closest Y among candidates to any moving y-feature
+    for (final cy in ys) {
+      for (final myf in my) {
+        final d = cy - myf;
+        if (d.abs() <= baseThreshold &&
+            (bestDy == null || d.abs() < bestDy!.abs())) {
+          bestDy = d;
+          bestYGuide = _Guideline(
+            axis: Axis.horizontal,
+            start: Offset(0, cy),
+            end: Offset(W, cy),
+          );
+        }
       }
     }
 
-    // Moving features (edges and centers)
-    final mxL = movingBounds.left;
-    final mxC = movingBounds.center.dx;
-    final mxR = movingBounds.right;
-
-    final myT = movingBounds.top;
-    final myC = movingBounds.center.dy;
-    final myB = movingBounds.bottom;
-
-    for (final sb in staticBoundsList) {
-      // If this is one of the synthetic "canvas center" rects, its other axis span is already correct.
-
-      // Vertical lines (x-alignment): left / center / right
-      considerX(sb.left, mxL, sb, movingBounds);
-      considerX(sb.center.dx, mxC, sb, movingBounds);
-      considerX(sb.right, mxR, sb, movingBounds);
-
-      // Horizontal lines (y-alignment): top / center / bottom
-      considerY(sb.top, myT, sb, movingBounds);
-      considerY(sb.center.dy, myC, sb, movingBounds);
-      considerY(sb.bottom, myB, sb, movingBounds);
-    }
-
-    // Apply results
+    // Show at most one guide per axis to avoid jitter
     final newGuides = <_Guideline>[];
     if (bestXGuide != null) newGuides.add(bestXGuide!);
     if (bestYGuide != null) newGuides.add(bestYGuide!);
