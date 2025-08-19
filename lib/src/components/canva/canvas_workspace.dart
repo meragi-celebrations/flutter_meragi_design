@@ -161,6 +161,17 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                   child: CanvasOverlay(
                                     controller: _controller,
                                     scale: _scale!,
+                                    onMarqueeRect: (r) {
+                                      setState(() => _selectionRect = r);
+                                    },
+                                    onComputeSnap:
+                                        (movingIds, cumulativeBaseDelta) {
+                                      return _calculateGuidelines(widget.doc,
+                                          movingIds, cumulativeBaseDelta);
+                                    },
+                                    onClearGuidelines: () {
+                                      setState(() => _guidelines.clear());
+                                    },
                                   ),
                                 ),
 
@@ -304,20 +315,24 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
     );
   }
 
-  void _calculateGuidelines(
+  // was: void _calculateGuidelines(CanvasDoc doc, Set<String> movingIds, Offset delta)
+  Offset _calculateGuidelines(
       CanvasDoc doc, Set<String> movingIds, Offset delta) {
     final newGuidelines = <_Guideline>[];
     _snapOffset = Offset.zero;
 
-    if (_scale == null) return;
+    if (_scale == null) {
+      setState(() => _guidelines.clear());
+      return Offset.zero;
+    }
 
     final movingItems = movingIds.map((id) => doc.itemById(id)).toList();
     final staticItems =
         doc.items.where((item) => !movingIds.contains(item.id)).toList();
 
-    if (staticItems.isEmpty) {
+    if (staticItems.isEmpty || movingItems.isEmpty) {
       setState(() => _guidelines.clear());
-      return;
+      return Offset.zero;
     }
 
     Rect movingBounds = movingItems.first.rect;
@@ -333,7 +348,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
 
     // Horizontal canvas center check
     if ((movingBounds.center.dx - canvasCenter.dx).abs() < snapThreshold) {
-      _snapOffset = Offset(canvasCenter.dx - movingBounds.center.dx, 0);
+      _snapOffset =
+          Offset(canvasCenter.dx - movingBounds.center.dx, _snapOffset.dy);
       newGuidelines.add(_Guideline(
         axis: Axis.vertical,
         start: Offset(canvasCenter.dx, 0),
@@ -343,7 +359,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
 
     // Vertical canvas center check
     if ((movingBounds.center.dy - canvasCenter.dy).abs() < snapThreshold) {
-      _snapOffset = Offset(0, canvasCenter.dy - movingBounds.center.dy);
+      _snapOffset =
+          Offset(_snapOffset.dx, canvasCenter.dy - movingBounds.center.dy);
       newGuidelines.add(_Guideline(
         axis: Axis.horizontal,
         start: Offset(0, canvasCenter.dy),
@@ -360,7 +377,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
       final dyCenter = (staticBounds.center.dx - movingBounds.center.dx).abs();
 
       if (dyLeft < snapThreshold) {
-        _snapOffset = Offset(staticBounds.left - movingBounds.left, 0);
+        _snapOffset =
+            Offset(staticBounds.left - movingBounds.left, _snapOffset.dy);
         newGuidelines.add(_Guideline(
           axis: Axis.vertical,
           start: Offset(
@@ -376,7 +394,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
         ));
       }
       if (dyRight < snapThreshold) {
-        _snapOffset = Offset(staticBounds.right - movingBounds.right, 0);
+        _snapOffset =
+            Offset(staticBounds.right - movingBounds.right, _snapOffset.dy);
         newGuidelines.add(_Guideline(
           axis: Axis.vertical,
           start: Offset(
@@ -392,8 +411,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
         ));
       }
       if (dyCenter < snapThreshold) {
-        _snapOffset =
-            Offset(staticBounds.center.dx - movingBounds.center.dx, 0);
+        _snapOffset = Offset(
+            staticBounds.center.dx - movingBounds.center.dx, _snapOffset.dy);
         newGuidelines.add(_Guideline(
           axis: Axis.vertical,
           start: Offset(
@@ -415,7 +434,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
       final dxCenter = (staticBounds.center.dy - movingBounds.center.dy).abs();
 
       if (dxTop < snapThreshold) {
-        _snapOffset = Offset(0, staticBounds.top - movingBounds.top);
+        _snapOffset =
+            Offset(_snapOffset.dx, staticBounds.top - movingBounds.top);
         newGuidelines.add(_Guideline(
           axis: Axis.horizontal,
           start: Offset(
@@ -431,7 +451,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
         ));
       }
       if (dxBottom < snapThreshold) {
-        _snapOffset = Offset(0, staticBounds.bottom - movingBounds.bottom);
+        _snapOffset =
+            Offset(_snapOffset.dx, staticBounds.bottom - movingBounds.bottom);
         newGuidelines.add(_Guideline(
           axis: Axis.horizontal,
           start: Offset(
@@ -447,8 +468,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
         ));
       }
       if (dxCenter < snapThreshold) {
-        _snapOffset =
-            Offset(0, staticBounds.center.dy - movingBounds.center.dy);
+        _snapOffset = Offset(
+            _snapOffset.dx, staticBounds.center.dy - movingBounds.center.dy);
         newGuidelines.add(_Guideline(
           axis: Axis.horizontal,
           start: Offset(
@@ -470,6 +491,8 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
         ..clear()
         ..addAll(newGuidelines);
     });
+
+    return _snapOffset; // return base-space snap
   }
 }
 

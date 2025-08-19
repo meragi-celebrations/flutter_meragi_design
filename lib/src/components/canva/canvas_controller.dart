@@ -207,6 +207,21 @@ class CanvasController extends ChangeNotifier {
     _dragMode = _DragMode.idle;
   }
 
+  String? topItemAt(Offset localPosition) {
+    for (final item in doc.items.reversed) {
+      if (_hitTestItem(item, localPosition)) return item.id;
+    }
+    return null;
+  }
+
+  bool isOverAnySelectedHandle(Offset localPosition) {
+    for (final id in selection) {
+      final item = doc.itemById(id);
+      if (_hitTestHandles(item, localPosition) != null) return true;
+    }
+    return false;
+  }
+
   bool _hitTestItem(CanvasItem item, Offset localPosition) {
     return CanvasGeometry.hitItem(item, scale, localPosition);
   }
