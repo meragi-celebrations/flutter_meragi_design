@@ -167,10 +167,49 @@ abstract class CanvasItem {
   Future<CanvasItem?> handleDoubleTap(BuildContext context) async => null;
 
   List<Handle> getHandles() => const [
-        Handle(key: 'topLeft', alignment: Alignment.topLeft),
-        Handle(key: 'topRight', alignment: Alignment.topRight),
-        Handle(key: 'bottomRight', alignment: Alignment.bottomRight),
-        Handle(key: 'bottomLeft', alignment: Alignment.bottomLeft),
+        // corners
+        Handle(
+          key: 'topLeft',
+          alignment: Alignment.topLeft,
+          cursor: SystemMouseCursors.resizeUpLeftDownRight,
+        ),
+        Handle(
+          key: 'topRight',
+          alignment: Alignment.topRight,
+          cursor: SystemMouseCursors.resizeUpRightDownLeft,
+        ),
+        Handle(
+          key: 'bottomRight',
+          alignment: Alignment.bottomRight,
+          cursor: SystemMouseCursors.resizeUpLeftDownRight,
+        ),
+        Handle(
+          key: 'bottomLeft',
+          alignment: Alignment.bottomLeft,
+          cursor: SystemMouseCursors.resizeUpRightDownLeft,
+        ),
+
+        // new mid-edge handles
+        Handle(
+          key: 'top',
+          alignment: Alignment.topCenter,
+          cursor: SystemMouseCursors.resizeUpDown,
+        ),
+        Handle(
+          key: 'right',
+          alignment: Alignment.centerRight,
+          cursor: SystemMouseCursors.resizeLeftRight,
+        ),
+        Handle(
+          key: 'bottom',
+          alignment: Alignment.bottomCenter,
+          cursor: SystemMouseCursors.resizeUpDown,
+        ),
+        Handle(
+          key: 'left',
+          alignment: Alignment.centerLeft,
+          cursor: SystemMouseCursors.resizeLeftRight,
+        ),
       ];
 
   CanvasItem resizeWithHandle(

@@ -227,20 +227,41 @@ class CanvasController extends ChangeNotifier {
   }
 
   String? _hitTestHandles(CanvasItem item, Offset localPosition) {
-    final pts = CanvasGeometry.corners(item, scale);
-    const handleRadius = 12.0;
+    // Match painter sizes
+    const cornerW = 12.0, cornerH = 12.0;
+    const edgeW = 18.0, edgeH = 8.0;
 
-    for (int i = 0; i < pts.length; i++) {
-      if ((localPosition - pts[i]).distanceSquared <
-          handleRadius * handleRadius) {
-        // make sure handle order matches: [TL, TR, BR, BL]
-        return item.getHandles()[i].key;
+    bool hitRotatedRect(
+        Offset center, double angle, double w, double h, Offset p) {
+      // rotate point into rect-local space
+      final d = p - center;
+      final ca = math.cos(-angle), sa = math.sin(-angle);
+      final lx = d.dx * ca - d.dy * sa;
+      final ly = d.dx * sa + d.dy * ca;
+      return lx.abs() <= w / 2 && ly.abs() <= h / 2;
+    }
+
+    for (final h in item.getHandles()) {
+      final p = CanvasGeometry.handlePosition(item, scale, h.alignment);
+      final isEdge = h.key == 'top' ||
+          h.key == 'right' ||
+          h.key == 'bottom' ||
+          h.key == 'left';
+
+      if (isEdge) {
+        final ang = CanvasGeometry.edgeAngleForKey(item, scale, h.key);
+        if (hitRotatedRect(p, ang, edgeW, edgeH, localPosition)) return h.key;
+      } else {
+        final r = Rect.fromCenter(center: p, width: cornerW, height: cornerH);
+        if (r.contains(localPosition)) return h.key;
       }
     }
 
+    // rotation handle
+    const rotHandleRadius = 16.0 / 2;
     final rotPos = CanvasGeometry.rotateHandle(item, scale);
     if ((localPosition - rotPos).distanceSquared <
-        handleRadius * handleRadius) {
+        rotHandleRadius * rotHandleRadius) {
       return 'rotate';
     }
     return null;

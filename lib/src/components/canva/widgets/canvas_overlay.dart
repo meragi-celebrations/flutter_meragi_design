@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_controller.dart';
 import 'package:flutter_meragi_design/src/components/canva/geometry.dart';
-import 'package:flutter_meragi_design/src/components/canva/items/base.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 
 class CanvasOverlay extends StatefulWidget {
@@ -255,12 +254,23 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
     switch (h) {
       case 'rotate':
         return SystemMouseCursors.click;
+
+      // corners
       case 'topLeft':
       case 'bottomRight':
         return SystemMouseCursors.resizeUpLeftDownRight;
       case 'topRight':
       case 'bottomLeft':
         return SystemMouseCursors.resizeUpRightDownLeft;
+
+      // new edges
+      case 'top':
+      case 'bottom':
+        return SystemMouseCursors.resizeUpDown;
+      case 'left':
+      case 'right':
+        return SystemMouseCursors.resizeLeftRight;
+
       default:
         return SystemMouseCursors.basic;
     }
@@ -272,7 +282,13 @@ class _SelectionPainter extends CustomPainter {
   final CanvasController controller;
   final CanvasScaleHandler scale;
 
-  static const double handleSize = 8.0;
+  // Visual sizes in render space
+  static const double cornerW = 12.0;
+  static const double cornerH = 12.0;
+  static const double edgeW = 18.0;
+  static const double edgeH = 8.0;
+  static const double handleRadius = 3.0;
+
   static const double rotHandleSize = 16.0;
   static const double rotHandleOffset = 30.0;
 
@@ -282,6 +298,7 @@ class _SelectionPainter extends CustomPainter {
       ..color = Colors.blueAccent
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
+
     final fill = Paint()..color = Colors.white;
     final stroke = Paint()
       ..color = Colors.blueAccent
@@ -290,35 +307,69 @@ class _SelectionPainter extends CustomPainter {
 
     for (final id in controller.selection) {
       final item = controller.doc.itemById(id);
-      _draw(canvas, item, sel, fill, stroke);
+
+      // outline (rotated quad)
+      final pts = CanvasGeometry.corners(item, scale); // TL, TR, BR, BL
+      canvas.drawPath(Path()..addPolygon(pts, true), sel);
+
+      // 8 handles
+      for (final h in item.getHandles()) {
+        final hovered = controller.hoveredHandleItemId == item.id &&
+            controller.hoveredHandle == h.key;
+
+        final isEdge = h.key == 'top' ||
+            h.key == 'right' ||
+            h.key == 'bottom' ||
+            h.key == 'left';
+        final baseW = isEdge ? edgeW : cornerW;
+        final baseH = isEdge ? edgeH : cornerH;
+        final scaleUp = hovered ? 1.3 : 1.0;
+
+        final p = CanvasGeometry.handlePosition(item, scale, h.alignment);
+
+        if (isEdge) {
+          final ang = CanvasGeometry.edgeAngleForKey(item, scale, h.key);
+
+          canvas.save();
+          canvas.translate(p.dx, p.dy);
+          canvas.rotate(ang); // align with the edge direction
+          final rect = Rect.fromCenter(
+            center: Offset.zero,
+            width: baseW * scaleUp,
+            height: baseH * scaleUp,
+          );
+          final rr = RRect.fromRectAndRadius(
+              rect, const Radius.circular(handleRadius));
+          canvas.drawRRect(rr, fill);
+          canvas.drawRRect(rr, stroke);
+          canvas.restore();
+        } else {
+          // corners remain axis-aligned squares
+          final rect = Rect.fromCenter(
+            center: p,
+            width: baseW * scaleUp,
+            height: baseH * scaleUp,
+          );
+          final rr = RRect.fromRectAndRadius(
+              rect, const Radius.circular(handleRadius));
+          canvas.drawRRect(rr, fill);
+          canvas.drawRRect(rr, stroke);
+        }
+      }
+
+      // rotation handle + connector
+      final rotHovered = controller.hoveredHandleItemId == item.id &&
+          controller.hoveredHandle == 'rotate';
+      final rr = (rotHovered ? rotHandleSize * 1.5 : rotHandleSize) / 2;
+
+      final topMid = (pts[0] + pts[1]) / 2;
+      final rotPos =
+          CanvasGeometry.rotateHandle(item, scale, offset: rotHandleOffset);
+
+      canvas.drawCircle(rotPos, rr, fill);
+      canvas.drawCircle(rotPos, rr, stroke);
+      canvas.drawLine(topMid, rotPos, stroke);
     }
-  }
-
-  void _draw(
-      Canvas canvas, CanvasItem item, Paint sel, Paint fill, Paint stroke) {
-    final pts = CanvasGeometry.corners(item, scale); // TL, TR, BR, BL
-    canvas.drawPath(Path()..addPolygon(pts, true), sel);
-
-    for (var i = 0; i < pts.length; i++) {
-      final handleKey = item.getHandles()[i].key;
-      final hovered = controller.hoveredHandleItemId == item.id &&
-          controller.hoveredHandle == handleKey;
-      final r = (hovered ? handleSize * 1.5 : handleSize) / 2;
-      canvas.drawCircle(pts[i], r, fill);
-      canvas.drawCircle(pts[i], r, stroke);
-    }
-
-    final rotHovered = controller.hoveredHandleItemId == item.id &&
-        controller.hoveredHandle == 'rotate';
-    final rr = (rotHovered ? rotHandleSize * 1.5 : rotHandleSize) / 2;
-
-    final rotPos =
-        CanvasGeometry.rotateHandle(item, scale, offset: rotHandleOffset);
-
-    final topMid = (pts[0] + pts[1]) / 2;
-    canvas.drawCircle(rotPos, rr, fill);
-    canvas.drawCircle(rotPos, rr, stroke);
-    canvas.drawLine(topMid, rotPos, stroke);
   }
 
   @override

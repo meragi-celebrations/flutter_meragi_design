@@ -30,6 +30,67 @@ class CanvasGeometry {
     });
   }
 
+  /// Position of a handle for a given alignment in render space.
+  /// Supports corners and mid-edges: topLeft, top, topRight, right, bottomRight, bottom, bottomLeft, left.
+  static Offset handlePosition(
+    CanvasItem item,
+    CanvasScaleHandler scale,
+    Alignment alignment,
+  ) {
+    final rect = item.rect;
+    final center = scale.baseToRender(rect.center);
+    final sizeR = scale.baseToRenderSize(rect.size);
+
+    final a = item.rotationDeg * math.pi / 180.0;
+    final ca = math.cos(a), sa = math.sin(a);
+
+    final hw = sizeR.width / 2;
+    final hh = sizeR.height / 2;
+
+    // alignment.x and alignment.y are in [-1, 1]
+    final lx = hw * alignment.x;
+    final ly = hh * alignment.y;
+
+    // rotate local offset and translate to center
+    final rx = lx * ca - ly * sa;
+    final ry = lx * sa + ly * ca;
+
+    return center + Offset(rx, ry);
+  }
+
+  /// Angle (radians) of an edge for a given handle key.
+  /// Valid keys: top, right, bottom, left. Falls back to item rotation.
+  static double edgeAngleForKey(
+    CanvasItem item,
+    CanvasScaleHandler scale,
+    String key,
+  ) {
+    final pts = corners(item, scale); // TL, TR, BR, BL
+    Offset a, b;
+    switch (key) {
+      case 'top':
+        a = pts[0];
+        b = pts[1];
+        break; // TL -> TR
+      case 'right':
+        a = pts[1];
+        b = pts[2];
+        break; // TR -> BR
+      case 'bottom':
+        a = pts[3];
+        b = pts[2];
+        break; // BL -> BR (left->right)
+      case 'left':
+        a = pts[0];
+        b = pts[3];
+        break; // TL -> BL
+      default:
+        return item.rotationDeg * math.pi / 180.0;
+    }
+    final v = b - a;
+    return math.atan2(v.dy, v.dx);
+  }
+
   /// Rotation handle position in render space.
   static Offset rotateHandle(CanvasItem item, CanvasScaleHandler scale,
       {double offset = 30}) {
