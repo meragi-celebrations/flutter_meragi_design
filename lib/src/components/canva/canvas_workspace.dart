@@ -1,11 +1,14 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_meragi_design/flutter_meragi_design.dart';
 import 'package:flutter_meragi_design/src/components/canva/canva_item.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_controller.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_doc.dart';
 import 'package:flutter_meragi_design/src/components/canva/canvas_scope.dart';
 import 'package:flutter_meragi_design/src/components/canva/color_extractor.dart';
+import 'package:flutter_meragi_design/src/components/canva/geometry.dart';
 import 'package:flutter_meragi_design/src/components/canva/items/image.dart';
-import 'package:flutter_meragi_design/src/components/canva/palette_sidebar.dart';
 import 'package:flutter_meragi_design/src/components/canva/scaling.dart';
 import 'package:flutter_meragi_design/src/components/canva/ui/grid_painter.dart';
 import 'package:flutter_meragi_design/src/components/canva/utils.dart';
@@ -315,184 +318,136 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
     );
   }
 
-  // was: void _calculateGuidelines(CanvasDoc doc, Set<String> movingIds, Offset delta)
+  Rect _rotatedAabb(CanvasItem item) {
+    final sc = _scale!;
+    final ptsR =
+        CanvasGeometry.corners(item, sc); // render-space corners TL,TR,BR,BL
+    double minX = double.infinity, minY = double.infinity;
+    double maxX = -double.infinity, maxY = -double.infinity;
+
+    for (final pR in ptsR) {
+      final pB = sc.renderToBase(pR); // back to base space
+      if (pB.dx < minX) minX = pB.dx;
+      if (pB.dy < minY) minY = pB.dy;
+      if (pB.dx > maxX) maxX = pB.dx;
+      if (pB.dy > maxY) maxY = pB.dy;
+    }
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
+  }
+
   Offset _calculateGuidelines(
       CanvasDoc doc, Set<String> movingIds, Offset delta) {
-    final newGuidelines = <_Guideline>[];
-    _snapOffset = Offset.zero;
-
-    if (_scale == null) {
+    final sc = _scale;
+    if (sc == null) {
       setState(() => _guidelines.clear());
       return Offset.zero;
     }
 
-    final movingItems = movingIds.map((id) => doc.itemById(id)).toList();
+    // Tune threshold in BASE units. Slightly larger is friendlier.
+    const snapThreshold = 4.0;
+
+    // Split moving vs static
+    final movingItems = movingIds.map(doc.itemById).toList();
     final staticItems =
-        doc.items.where((item) => !movingIds.contains(item.id)).toList();
+        doc.items.where((it) => !movingIds.contains(it.id)).toList();
 
-    if (staticItems.isEmpty || movingItems.isEmpty) {
+    if (movingItems.isEmpty || staticItems.isEmpty) {
       setState(() => _guidelines.clear());
       return Offset.zero;
     }
 
-    Rect movingBounds = movingItems.first.rect;
+    // Union of rotated AABBs for the moving selection, then apply cumulative base delta
+    Rect movingBounds = _rotatedAabb(movingItems.first);
     for (int i = 1; i < movingItems.length; i++) {
-      movingBounds = movingBounds.expandToInclude(movingItems[i].rect);
+      movingBounds = movingBounds.expandToInclude(_rotatedAabb(movingItems[i]));
     }
     movingBounds = movingBounds.translate(delta.dx, delta.dy);
 
-    const snapThreshold = 2.0;
+    // Prepare candidates: canvas centers also act like a "static item"
+    final List<Rect> staticBoundsList = [
+      for (final it in staticItems) _rotatedAabb(it),
+    ];
 
-    // Canvas centers
     final canvasCenter = doc.baseSize.center(Offset.zero);
+    // Represent the canvas centers as degenerate rects to reuse the same code path
+    staticBoundsList.add(Rect.fromLTWH(
+        canvasCenter.dx, 0, 0, doc.baseSize.height)); // vertical center line
+    staticBoundsList.add(Rect.fromLTWH(
+        0, canvasCenter.dy, doc.baseSize.width, 0)); // horizontal center line
 
-    // Horizontal canvas center check
-    if ((movingBounds.center.dx - canvasCenter.dx).abs() < snapThreshold) {
-      _snapOffset =
-          Offset(canvasCenter.dx - movingBounds.center.dx, _snapOffset.dy);
-      newGuidelines.add(_Guideline(
-        axis: Axis.vertical,
-        start: Offset(canvasCenter.dx, 0),
-        end: Offset(canvasCenter.dx, doc.baseSize.height),
-      ));
+    // Track best X and Y snaps
+    double? bestDx; // how much to move in X
+    _Guideline? bestXGuide;
+
+    double? bestDy; // how much to move in Y
+    _Guideline? bestYGuide;
+
+    // Helpers
+    void considerX(double targetX, double movingX, Rect a, Rect b) {
+      final diff = targetX - movingX;
+      if (diff.abs() <= snapThreshold &&
+          (bestDx == null || diff.abs() < bestDx!.abs())) {
+        bestDx = diff;
+        final top = math.min(a.top, b.top);
+        final bottom = math.max(a.bottom, b.bottom);
+        bestXGuide = _Guideline(
+          axis: Axis.vertical,
+          start: Offset(targetX, top),
+          end: Offset(targetX, bottom),
+        );
+      }
     }
 
-    // Vertical canvas center check
-    if ((movingBounds.center.dy - canvasCenter.dy).abs() < snapThreshold) {
-      _snapOffset =
-          Offset(_snapOffset.dx, canvasCenter.dy - movingBounds.center.dy);
-      newGuidelines.add(_Guideline(
-        axis: Axis.horizontal,
-        start: Offset(0, canvasCenter.dy),
-        end: Offset(doc.baseSize.width, canvasCenter.dy),
-      ));
+    void considerY(double targetY, double movingY, Rect a, Rect b) {
+      final diff = targetY - movingY;
+      if (diff.abs() <= snapThreshold &&
+          (bestDy == null || diff.abs() < bestDy!.abs())) {
+        bestDy = diff;
+        final left = math.min(a.left, b.left);
+        final right = math.max(a.right, b.right);
+        bestYGuide = _Guideline(
+          axis: Axis.horizontal,
+          start: Offset(left, targetY),
+          end: Offset(right, targetY),
+        );
+      }
     }
 
-    for (final staticItem in staticItems) {
-      final staticBounds = staticItem.rect;
+    // Moving features (edges and centers)
+    final mxL = movingBounds.left;
+    final mxC = movingBounds.center.dx;
+    final mxR = movingBounds.right;
 
-      // Horizontal checks
-      final dyLeft = (staticBounds.left - movingBounds.left).abs();
-      final dyRight = (staticBounds.right - movingBounds.right).abs();
-      final dyCenter = (staticBounds.center.dx - movingBounds.center.dx).abs();
+    final myT = movingBounds.top;
+    final myC = movingBounds.center.dy;
+    final myB = movingBounds.bottom;
 
-      if (dyLeft < snapThreshold) {
-        _snapOffset =
-            Offset(staticBounds.left - movingBounds.left, _snapOffset.dy);
-        newGuidelines.add(_Guideline(
-          axis: Axis.vertical,
-          start: Offset(
-              staticBounds.left,
-              staticBounds.top < movingBounds.top
-                  ? staticBounds.top
-                  : movingBounds.top),
-          end: Offset(
-              staticBounds.left,
-              staticBounds.bottom > movingBounds.bottom
-                  ? staticBounds.bottom
-                  : movingBounds.bottom),
-        ));
-      }
-      if (dyRight < snapThreshold) {
-        _snapOffset =
-            Offset(staticBounds.right - movingBounds.right, _snapOffset.dy);
-        newGuidelines.add(_Guideline(
-          axis: Axis.vertical,
-          start: Offset(
-              staticBounds.right,
-              staticBounds.top < movingBounds.top
-                  ? staticBounds.top
-                  : movingBounds.top),
-          end: Offset(
-              staticBounds.right,
-              staticBounds.bottom > movingBounds.bottom
-                  ? staticBounds.bottom
-                  : movingBounds.bottom),
-        ));
-      }
-      if (dyCenter < snapThreshold) {
-        _snapOffset = Offset(
-            staticBounds.center.dx - movingBounds.center.dx, _snapOffset.dy);
-        newGuidelines.add(_Guideline(
-          axis: Axis.vertical,
-          start: Offset(
-              staticBounds.center.dx,
-              staticBounds.top < movingBounds.top
-                  ? staticBounds.top
-                  : movingBounds.top),
-          end: Offset(
-              staticBounds.center.dx,
-              staticBounds.bottom > movingBounds.bottom
-                  ? staticBounds.bottom
-                  : movingBounds.bottom),
-        ));
-      }
+    for (final sb in staticBoundsList) {
+      // If this is one of the synthetic "canvas center" rects, its other axis span is already correct.
 
-      // Vertical checks
-      final dxTop = (staticBounds.top - movingBounds.top).abs();
-      final dxBottom = (staticBounds.bottom - movingBounds.bottom).abs();
-      final dxCenter = (staticBounds.center.dy - movingBounds.center.dy).abs();
+      // Vertical lines (x-alignment): left / center / right
+      considerX(sb.left, mxL, sb, movingBounds);
+      considerX(sb.center.dx, mxC, sb, movingBounds);
+      considerX(sb.right, mxR, sb, movingBounds);
 
-      if (dxTop < snapThreshold) {
-        _snapOffset =
-            Offset(_snapOffset.dx, staticBounds.top - movingBounds.top);
-        newGuidelines.add(_Guideline(
-          axis: Axis.horizontal,
-          start: Offset(
-              staticBounds.left < movingBounds.left
-                  ? staticBounds.left
-                  : movingBounds.left,
-              staticBounds.top),
-          end: Offset(
-              staticBounds.right > movingBounds.right
-                  ? staticBounds.right
-                  : movingBounds.right,
-              staticBounds.top),
-        ));
-      }
-      if (dxBottom < snapThreshold) {
-        _snapOffset =
-            Offset(_snapOffset.dx, staticBounds.bottom - movingBounds.bottom);
-        newGuidelines.add(_Guideline(
-          axis: Axis.horizontal,
-          start: Offset(
-              staticBounds.left < movingBounds.left
-                  ? staticBounds.left
-                  : movingBounds.left,
-              staticBounds.bottom),
-          end: Offset(
-              staticBounds.right > movingBounds.right
-                  ? staticBounds.right
-                  : movingBounds.right,
-              staticBounds.bottom),
-        ));
-      }
-      if (dxCenter < snapThreshold) {
-        _snapOffset = Offset(
-            _snapOffset.dx, staticBounds.center.dy - movingBounds.center.dy);
-        newGuidelines.add(_Guideline(
-          axis: Axis.horizontal,
-          start: Offset(
-              staticBounds.left < movingBounds.left
-                  ? staticBounds.left
-                  : movingBounds.left,
-              staticBounds.center.dy),
-          end: Offset(
-              staticBounds.right > movingBounds.right
-                  ? staticBounds.right
-                  : movingBounds.right,
-              staticBounds.center.dy),
-        ));
-      }
+      // Horizontal lines (y-alignment): top / center / bottom
+      considerY(sb.top, myT, sb, movingBounds);
+      considerY(sb.center.dy, myC, sb, movingBounds);
+      considerY(sb.bottom, myB, sb, movingBounds);
     }
+
+    // Apply results
+    final newGuides = <_Guideline>[];
+    if (bestXGuide != null) newGuides.add(bestXGuide!);
+    if (bestYGuide != null) newGuides.add(bestYGuide!);
 
     setState(() {
       _guidelines
         ..clear()
-        ..addAll(newGuidelines);
+        ..addAll(newGuides);
     });
 
-    return _snapOffset; // return base-space snap
+    return Offset(bestDx ?? 0, bestDy ?? 0);
   }
 }
 
