@@ -27,11 +27,13 @@ class ImageItem extends CanvasItem {
     super.rotationDeg = 0,
     this.opacity = 1.0,
     this.extractedColors = const [],
+    this.paletteId,
   }) : borderColor = borderColor ?? const Color(0xFF000000);
 
   final String src;
   final List<Color> extractedColors;
   final double radiusTL, radiusTR, radiusBL, radiusBR;
+  final String? paletteId;
 
   // Border
   final bool borderEnabled;
@@ -157,6 +159,7 @@ class ImageItem extends CanvasItem {
     BorderStyle? borderStyle,
     double? opacity,
     List<Color>? extractedColors,
+    String? paletteId,
   }) =>
       ImageItem(
         id: id ?? this.id,
@@ -175,6 +178,7 @@ class ImageItem extends CanvasItem {
         borderStyle: borderStyle ?? this.borderStyle,
         opacity: opacity ?? this.opacity,
         extractedColors: extractedColors ?? this.extractedColors,
+        paletteId: paletteId ?? this.paletteId,
       );
 
   @override
@@ -194,6 +198,7 @@ class ImageItem extends CanvasItem {
         },
         'opacity': opacity,
         'extractedColors': extractedColors.map((c) => _colorToHex(c)).toList(),
+        'paletteId': paletteId,
       };
 
   static ImageItem fromJson(Map<String, dynamic> j) {
@@ -231,6 +236,7 @@ class ImageItem extends CanvasItem {
       ),
       opacity: (props['opacity'] as num?)?.toDouble() ?? 1.0,
       extractedColors: extractedColors,
+      paletteId: props['paletteId'] as String?,
     );
   }
 

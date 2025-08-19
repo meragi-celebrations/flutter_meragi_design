@@ -223,6 +223,7 @@ class _CanvasWorkspaceState extends State<CanvasWorkspace> {
                                           'bl': 0,
                                           'br': 0
                                         },
+                                        'paletteId': pal.id,
                                       },
                                     };
 
