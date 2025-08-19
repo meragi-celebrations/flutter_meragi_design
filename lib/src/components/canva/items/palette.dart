@@ -194,20 +194,38 @@ class _PalettePropsEditorState extends State<_PalettePropsEditor> {
     _commit();
   }
 
+  void _onReorder(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = _rows.removeAt(oldIndex);
+    _rows.insert(newIndex, item);
+    setState(() {});
+    _commit();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const SectionTitle('Palette'),
-      ListView.builder(
+      ReorderableListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: _rows.length,
+        onReorder: _onReorder,
+        buildDefaultDragHandles: false,
         itemBuilder: (context, i) {
           final row = _rows[i];
           final preview = hexToColor(row.ctrl.text);
           return Padding(
+            key: ValueKey(row),
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [
+              ReorderableDragStartListener(
+                index: i,
+                child: const Icon(Icons.drag_handle),
+              ),
+              const SizedBox(width: 8),
               Container(
                 width: 22,
                 height: 22,
