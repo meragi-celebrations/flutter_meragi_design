@@ -161,6 +161,16 @@ class SimpleCanvaController {
     }
   }
 
+  void loadFromMap(Map<String, dynamic> map) {
+    final d = doc;
+    if (d == null) return;
+    try {
+      d.loadFromJson(map);
+    } catch (e) {
+      debugPrint('loadFromMap error: $e');
+    }
+  }
+
   void deleteSelected() {
     final d = doc;
     if (d == null) return;
