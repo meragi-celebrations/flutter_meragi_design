@@ -25,6 +25,10 @@ class CanvasController extends ChangeNotifier {
   // This will manage the set of selected item IDs.
   Set<String> get selection => doc.selectedIds;
 
+  bool get isResizing => _dragMode == _DragMode.resize;
+  bool get isRotating => _dragMode == _DragMode.rotate;
+  bool get isDragging => _dragMode == _DragMode.drag;
+
   // Interaction state
   _DragMode _dragMode = _DragMode.idle;
   String? _draggedItemId;

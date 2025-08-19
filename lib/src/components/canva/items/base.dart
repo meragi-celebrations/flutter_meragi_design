@@ -212,37 +212,36 @@ abstract class CanvasItem {
         ),
       ];
 
-  @override
   CanvasItem resizeWithHandle(
     String handleKey,
-    Offset deltaBase, // must be BASE-space delta
+    Offset deltaBase, // per-frame delta in BASE space
     CanvasScaleHandler scale, // kept for signature
   ) {
     final a = rotationDeg * math.pi / 180.0;
     final ca = math.cos(a), sa = math.sin(a);
 
-    // Local axes in BASE space
-    final axisX = Offset(ca, sa); // +width
-    final axisY = Offset(-sa, ca); // +height
+    // Local unit axes in BASE space
+    final axisX = Offset(ca, sa); // width direction
+    final axisY = Offset(-sa, ca); // height direction
 
-    // Current center in BASE
+    // Center & half extents
     final center = position + Offset(size.width / 2, size.height / 2);
     final hx = size.width / 2;
     final hy = size.height / 2;
 
-    // Corners in BASE
+    // Corners (BASE)
     final tl = center + axisX * (-hx) + axisY * (-hy);
     final tr = center + axisX * (hx) + axisY * (-hy);
     final br = center + axisX * (hx) + axisY * (hy);
     final bl = center + axisX * (-hx) + axisY * (hy);
 
-    // Edge midpoints in BASE
+    // Edge midpoints (BASE)
     final topMid = center + axisY * (-hy);
     final rightMid = center + axisX * (hx);
     final bottomMid = center + axisY * (hy);
     final leftMid = center + axisX * (-hx);
 
-    // Decide moved vs fixed points
+    // Pick moved vs fixed anchors
     Offset moved, fixed;
     bool edgeOnly = false;
     switch (handleKey) {
@@ -288,20 +287,29 @@ abstract class CanvasItem {
         return this;
     }
 
-    // Move the handle by the pointer delta in BASE space
-    final movedNew = moved + deltaBase;
+    // Project delta onto the handle's NORMAL to kill sideways drift
+    Offset effectiveDelta = deltaBase;
+    if (edgeOnly) {
+      final normal =
+          (handleKey == 'left' || handleKey == 'right') ? axisX : axisY;
+      final d = deltaBase.dx * normal.dx + deltaBase.dy * normal.dy; // dot
+      effectiveDelta = normal * d; // keep only normal component
+    }
+
+    // Move handle, recompute center from moved/fixed
+    final movedNew = moved + effectiveDelta;
     final centerNew = (movedNew + fixed) * 0.5;
     final halfVec = movedNew - centerNew;
 
-    // Project onto local axes to get half extents
+    // Project half vector onto local axes for new extents
     double halfW = (halfVec.dx * axisX.dx + halfVec.dy * axisX.dy).abs();
     double halfH = (halfVec.dx * axisY.dx + halfVec.dy * axisY.dy).abs();
 
     if (edgeOnly) {
       if (handleKey == 'left' || handleKey == 'right') {
-        halfH = hy; // keep height when dragging left/right edges
+        halfH = hy; // width only
       } else {
-        halfW = hx; // keep width when dragging top/bottom edges
+        halfW = hx; // height only
       }
     }
 

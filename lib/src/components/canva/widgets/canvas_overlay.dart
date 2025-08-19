@@ -98,34 +98,58 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
         onPanDown: (d) {
           _lastLocal = d.localPosition;
 
-          final overHandle =
+          final overHandleSelected =
               widget.controller.isOverAnySelectedHandle(d.localPosition);
+          final overHandleAny = _isOverAnyHandleAllItems(d.localPosition);
           final overItem = widget.controller.topItemAt(d.localPosition) != null;
 
+          // If pointer is on any handle, or a transform is already in progress,
+          // do not allow move-drag to start.
+          if (overHandleSelected ||
+              overHandleAny ||
+              widget.controller.isResizing ||
+              widget.controller.isRotating) {
+            widget.controller
+                .onDown(d.localPosition, multiSelect: _multiPressed);
+            _dragActive = false;
+            _dragIds = const {};
+            _cumBase = Offset.zero;
+            _snapBasePrev = Offset.zero;
+            // Optional: show initial guides for the item being resized
+            return;
+          }
+
           // Marquee if empty
-          if (!overHandle && !overItem) {
+          if (!overItem) {
             _startMarquee(d.localPosition);
             return;
           }
 
-          // Normal
+          // Normal path
           widget.controller.onDown(d.localPosition, multiSelect: _multiPressed);
 
-          // Start a selection drag if not multi-toggle and not handle
-          if (!overHandle && !_multiPressed && overItem) {
-            _dragActive = true;
-            _dragIds = widget.controller.selection; // move all selected
+          // Start a move drag only if not multi-toggle and not handle
+          _dragActive = !_multiPressed && overItem;
+          if (_dragActive) {
+            _dragIds = widget.controller.selection;
             _cumBase = Offset.zero;
             _snapBasePrev = Offset.zero;
-
-            // initial guideline compute with zero delta
             widget.onComputeSnap(_dragIds, _cumBase);
-          } else {
-            _dragActive = false;
           }
         },
         onPanUpdate: (d) {
           _lastLocal = d.localPosition;
+
+          // Block move-drag if a resize/rotate is active, or pointer sits on any handle
+          if (widget.controller.isResizing ||
+              widget.controller.isRotating ||
+              _isOverAnyHandleAllItems(d.localPosition)) {
+            // Let controller.onMove handle resize/rotate when appropriate
+            if (!(_dragActive)) {
+              widget.controller.onMove(d.localPosition, d.delta);
+            }
+            return;
+          }
 
           if (_marqueeActive) {
             widget.onMarqueeRect(_normRect(_marqueeStart!, d.localPosition));
@@ -248,6 +272,39 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
     _marqueeActive = false;
     _marqueeStart = null;
     widget.onMarqueeRect(null);
+  }
+
+  bool _isOverAnyHandleAllItems(Offset localPosition) {
+    const double cornerW = 12.0, cornerH = 12.0;
+    const double edgeW = 18.0, edgeH = 8.0;
+
+    bool hitRotatedRect(
+        Offset center, double angle, double w, double h, Offset p) {
+      final d = p - center;
+      final ca = math.cos(-angle), sa = math.sin(-angle);
+      final lx = d.dx * ca - d.dy * sa;
+      final ly = d.dx * sa + d.dy * ca;
+      return lx.abs() <= w / 2 && ly.abs() <= h / 2;
+    }
+
+    for (final it in widget.controller.doc.items.reversed) {
+      for (final h in it.getHandles()) {
+        final p = CanvasGeometry.handlePosition(it, widget.scale, h.alignment);
+        final isEdge = h.key == 'top' ||
+            h.key == 'right' ||
+            h.key == 'bottom' ||
+            h.key == 'left';
+
+        if (isEdge) {
+          final ang = CanvasGeometry.edgeAngleForKey(it, widget.scale, h.key);
+          if (hitRotatedRect(p, ang, edgeW, edgeH, localPosition)) return true;
+        } else {
+          final r = Rect.fromCenter(center: p, width: cornerW, height: cornerH);
+          if (r.contains(localPosition)) return true;
+        }
+      }
+    }
+    return false;
   }
 
   MouseCursor _cursorForHandle(String? h) {
