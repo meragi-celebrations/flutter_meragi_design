@@ -89,6 +89,7 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
         child: MouseRegion(
           cursor: cursor,
           onHover: widget.controller.onPointerHover,
+          onExit: (_) => widget.controller.clearHover(),
           child: SizedBox.expand(
             child: CustomPaint(
               painter: _SelectionPainter(
@@ -151,18 +152,21 @@ class _SelectionPainter extends CustomPainter {
     canvas.drawPath(Path()..addPolygon(pts, true), sel);
 
     for (var i = 0; i < pts.length; i++) {
-      final hovered = controller.hoveredHandle == item.getHandles()[i].key;
+      final handleKey = item.getHandles()[i].key;
+      final hovered = controller.hoveredHandleItemId == item.id &&
+          controller.hoveredHandle == handleKey;
       final r = (hovered ? handleSize * 1.5 : handleSize) / 2;
       canvas.drawCircle(pts[i], r, fill);
       canvas.drawCircle(pts[i], r, stroke);
     }
 
+    final rotHovered = controller.hoveredHandleItemId == item.id &&
+        controller.hoveredHandle == 'rotate';
+    final rr = (rotHovered ? rotHandleSize * 1.5 : rotHandleSize) / 2;
+
     final rotPos =
         CanvasGeometry.rotateHandle(item, scale, offset: rotHandleOffset);
-    final rr = (controller.hoveredHandle == 'rotate'
-            ? rotHandleSize * 1.5
-            : rotHandleSize) /
-        2;
+
     final topMid = (pts[0] + pts[1]) / 2;
     canvas.drawCircle(rotPos, rr, fill);
     canvas.drawCircle(rotPos, rr, stroke);

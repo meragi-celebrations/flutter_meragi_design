@@ -30,37 +30,46 @@ class CanvasController extends ChangeNotifier {
   String? _draggedItemId;
   String? _draggedHandle;
   String? hoveredHandle;
+  String? hoveredHandleItemId;
 
   void onPointerHover(PointerHoverEvent event) {
-    final localPosition = event.localPosition;
-    String? handleHit;
+    final local = event.localPosition;
+
+    String? key;
+    String? itemId;
+
+    // Only check currently selected items
     for (final id in selection) {
       final item = doc.itemById(id);
-      handleHit = _hitTestHandles(item, localPosition);
-      if (handleHit != null) {
+      final k = _hitTestHandles(item, local);
+      if (k != null) {
+        key = k;
+        itemId = id;
         break;
       }
     }
-    if (handleHit != hoveredHandle) {
-      hoveredHandle = handleHit;
+
+    if (key != hoveredHandle || itemId != hoveredHandleItemId) {
+      hoveredHandle = key;
+      hoveredHandleItemId = itemId;
+      notifyListeners();
+    }
+  }
+
+  void clearHover() {
+    if (hoveredHandle != null || hoveredHandleItemId != null) {
+      hoveredHandle = null;
+      hoveredHandleItemId = null;
       notifyListeners();
     }
   }
 
   void onDown(Offset localPosition, {bool multiSelect = false}) {
+    // 1) handles on already-selected items
     for (final id in selection) {
       final item = doc.itemById(id);
       final handleHit = _hitTestHandles(item, localPosition);
       if (handleHit != null) {
-        // make sure the item whose handle you grabbed is selected
-        if (!selection.contains(id)) {
-          doc.applyPatch([
-            {
-              'type': 'selection.add',
-              'ids': [id]
-            }
-          ]);
-        }
         _dragMode = handleHit == 'rotate' ? _DragMode.rotate : _DragMode.resize;
         _draggedItemId = id;
         _draggedHandle = handleHit;
@@ -70,6 +79,7 @@ class CanvasController extends ChangeNotifier {
       }
     }
 
+    // 2) hit test items (top-most first)
     String? hitId;
     for (final item in doc.items.reversed) {
       if (_hitTestItem(item, localPosition)) {
@@ -78,6 +88,7 @@ class CanvasController extends ChangeNotifier {
       }
     }
 
+    // click on empty space
     if (hitId == null) {
       if (!multiSelect) {
         doc.applyPatch([
@@ -90,51 +101,48 @@ class CanvasController extends ChangeNotifier {
       return;
     }
 
+    // multi-select toggle
     if (multiSelect) {
       if (selection.contains(hitId)) {
-        // toggle off
         doc.applyPatch([
           {
             'type': 'selection.remove',
             'ids': [hitId]
           }
         ]);
-        // do not start drag on a toggle off
-        _dragMode = _DragMode.idle;
-        _draggedItemId = null;
-        notifyListeners();
-        return;
       } else {
-        // add to selection; no drag in same gesture
         doc.applyPatch([
           {
             'type': 'selection.add',
             'ids': [hitId]
           }
         ]);
-        _dragMode = _DragMode.idle;
-        _draggedItemId = null;
-        notifyListeners();
-        return;
       }
-    } else {
-      // single select and start drag
-      doc.beginUndoGroup('Drag');
+      _dragMode = _DragMode.idle; // no drag on toggle
+      _draggedItemId = null;
+      notifyListeners();
+      return;
+    }
+
+    // single-click on an item
+    doc.beginUndoGroup('Drag');
+    if (!selection.contains(hitId)) {
+      // select only the clicked item
       doc.applyPatch([
         {
           'type': 'selection.set',
           'ids': [hitId]
         }
       ]);
-      _draggedItemId = hitId;
-      _dragMode = _DragMode.drag;
-      notifyListeners();
     }
+    // if it was already selected (possibly many selected), keep selection as-is
+    _draggedItemId = hitId;
+    _dragMode = _DragMode.drag; // drag the whole selection
+    notifyListeners();
   }
 
   void onMove(Offset localPosition, Offset deltaRenderSpace) {
     if (_dragMode == _DragMode.idle) return;
-    if (_draggedItemId == null && _dragMode != _DragMode.rotate) return;
 
     final delta = scale.renderDeltaToBase(deltaRenderSpace);
 
@@ -170,7 +178,6 @@ class CanvasController extends ChangeNotifier {
 
       case _DragMode.rotate:
         {
-          // rotation only for the active item
           final item = doc.itemById(_draggedItemId!);
           final center = scale.baseToRender(item.rect.center);
           final angle = math.atan2(
