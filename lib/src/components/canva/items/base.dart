@@ -212,53 +212,105 @@ abstract class CanvasItem {
         ),
       ];
 
+  @override
   CanvasItem resizeWithHandle(
-      String handleKey, Offset delta, CanvasScaleHandler scale) {
-    final k = handleKey.toLowerCase();
-    final isLeft = k.contains('left');
-    final isRight = k.contains('right');
-    final isTop = k.contains('top');
-    final isBottom = k.contains('bottom');
-
+    String handleKey,
+    Offset deltaBase, // must be BASE-space delta
+    CanvasScaleHandler scale, // kept for signature
+  ) {
     final a = rotationDeg * math.pi / 180.0;
-    final c = math.cos(a), s = math.sin(a);
+    final ca = math.cos(a), sa = math.sin(a);
 
-    // rotate delta into local space
-    final local =
-        Offset(delta.dx * c + delta.dy * s, -delta.dx * s + delta.dy * c);
+    // Local axes in BASE space
+    final axisX = Offset(ca, sa); // +width
+    final axisY = Offset(-sa, ca); // +height
 
-    double w = size.width, h = size.height;
-    double ox = 0.0, oy = 0.0;
+    // Current center in BASE
+    final center = position + Offset(size.width / 2, size.height / 2);
+    final hx = size.width / 2;
+    final hy = size.height / 2;
 
-    if (isLeft) {
-      w = size.width - local.dx;
-      ox = local.dx;
+    // Corners in BASE
+    final tl = center + axisX * (-hx) + axisY * (-hy);
+    final tr = center + axisX * (hx) + axisY * (-hy);
+    final br = center + axisX * (hx) + axisY * (hy);
+    final bl = center + axisX * (-hx) + axisY * (hy);
+
+    // Edge midpoints in BASE
+    final topMid = center + axisY * (-hy);
+    final rightMid = center + axisX * (hx);
+    final bottomMid = center + axisY * (hy);
+    final leftMid = center + axisX * (-hx);
+
+    // Decide moved vs fixed points
+    Offset moved, fixed;
+    bool edgeOnly = false;
+    switch (handleKey) {
+      case 'topLeft':
+        moved = tl;
+        fixed = br;
+        break;
+      case 'topRight':
+        moved = tr;
+        fixed = bl;
+        break;
+      case 'bottomRight':
+        moved = br;
+        fixed = tl;
+        break;
+      case 'bottomLeft':
+        moved = bl;
+        fixed = tr;
+        break;
+
+      case 'top':
+        moved = topMid;
+        fixed = bottomMid;
+        edgeOnly = true;
+        break;
+      case 'right':
+        moved = rightMid;
+        fixed = leftMid;
+        edgeOnly = true;
+        break;
+      case 'bottom':
+        moved = bottomMid;
+        fixed = topMid;
+        edgeOnly = true;
+        break;
+      case 'left':
+        moved = leftMid;
+        fixed = rightMid;
+        edgeOnly = true;
+        break;
+
+      default:
+        return this;
     }
-    if (isRight) {
-      w = size.width + local.dx;
-    }
-    if (isTop) {
-      h = size.height - local.dy;
-      oy = local.dy;
-    }
-    if (isBottom) {
-      h = size.height + local.dy;
+
+    // Move the handle by the pointer delta in BASE space
+    final movedNew = moved + deltaBase;
+    final centerNew = (movedNew + fixed) * 0.5;
+    final halfVec = movedNew - centerNew;
+
+    // Project onto local axes to get half extents
+    double halfW = (halfVec.dx * axisX.dx + halfVec.dy * axisX.dy).abs();
+    double halfH = (halfVec.dx * axisY.dx + halfVec.dy * axisY.dy).abs();
+
+    if (edgeOnly) {
+      if (handleKey == 'left' || handleKey == 'right') {
+        halfH = hy; // keep height when dragging left/right edges
+      } else {
+        halfW = hx; // keep width when dragging top/bottom edges
+      }
     }
 
     const minSize = 1.0;
-    if (w < minSize) {
-      ox += w - minSize;
-      w = minSize;
-    }
-    if (h < minSize) {
-      oy += h - minSize;
-      h = minSize;
-    }
+    final w = math.max(2 * halfW, minSize);
+    final h = math.max(2 * halfH, minSize);
 
-    // rotate origin shift back to world space
-    final worldShift = Offset(ox * c - oy * s, ox * s + oy * c);
-
-    return copyWith(position: position + worldShift, size: Size(w, h));
+    final newPos = Offset(centerNew.dx - w / 2, centerNew.dy - h / 2);
+    return copyWith(position: newPos, size: Size(w, h));
   }
 
   CanvasItem copyWith({
