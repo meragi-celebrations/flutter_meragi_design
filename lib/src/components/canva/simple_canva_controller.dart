@@ -125,6 +125,18 @@ class SimpleCanvaController {
   Future<Uint8List?> exportAsPng({double pixelRatio = 3}) async =>
       exportAsPngFunc?.call(pixelRatio: pixelRatio);
 
+  Map<String, dynamic> exportAsMap() {
+    final d = doc;
+    if (d == null) {
+      return {
+        'version': 1,
+        'items': [],
+        'canvas': {'color': colorToHex(Colors.white)}
+      };
+    }
+    return d.toJson();
+  }
+
   String exportAsJson({bool pretty = false}) {
     final d = doc;
     final map = d?.toJson() ??
