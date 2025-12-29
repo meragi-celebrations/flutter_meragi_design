@@ -12,7 +12,7 @@ class SelectDropdown<T, U> extends StatefulWidget {
   final double? width;
   final bool shouldMakeInitialCall;
   final bool requestFocusOnTap;
-  final InputDecorationTheme? decoration;
+  final InputDecorationThemeData? decoration;
   final GetListBloc<U> getListBloc;
   final GetOneBloc<U>? getOneBloc;
   final MDDropdownMenuEntry<T> Function(dynamic item) optionBuilder;
@@ -69,7 +69,9 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
     controller.addListener(() {
       _debounce(() {
         if (controller.text.isNotEmpty && prevText != controller.text) {
-          widget.getListBloc.addFilters([MDFilter(field: "search", operator: "eq", value: controller.text)]);
+          widget.getListBloc.addFilters([
+            MDFilter(field: "search", operator: "eq", value: controller.text)
+          ]);
           widget.getListBloc.reset();
         }
         prevText = controller.text;
@@ -86,8 +88,11 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
         widget.getListBloc.requestState,
       ],
       builder: (context, _) {
-        List<MDDropdownMenuEntry> data = widget.getListBloc.list.value.map((e) => widget.optionBuilder(e)).toList();
-        bool loadingList = widget.getListBloc.requestState.value == RequestState.loading;
+        List<MDDropdownMenuEntry> data = widget.getListBloc.list.value
+            .map((e) => widget.optionBuilder(e))
+            .toList();
+        bool loadingList =
+            widget.getListBloc.requestState.value == RequestState.loading;
         return LayoutBuilder(
           builder: (context, constraints) {
             return MDDropdownMenu(
@@ -120,7 +125,8 @@ class _SelectDropdownState<T, U> extends State<SelectDropdown<T, U>> {
                           },
                         )
                       : null,
-              selectedTrailingIcon: loadingList ? const MDLoadingIndicator() : null,
+              selectedTrailingIcon:
+                  loadingList ? const MDLoadingIndicator() : null,
               inputDecorationTheme: widget.decoration,
               errorText: widget.errorText,
               helperText: widget.helperText,
@@ -210,10 +216,12 @@ class MDSearchableDropdown<T, U> extends MDFormBuilderField<T> {
         );
 
   @override
-  MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> createState() => _MDSearchableDropdownState();
+  MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> createState() =>
+      _MDSearchableDropdownState();
 }
 
-class _MDSearchableDropdownState<T, U> extends MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> {
+class _MDSearchableDropdownState<T, U>
+    extends MDFormBuilderFieldState<MDSearchableDropdown<T, U>, T> {
   late final FocusNode focusNode;
 
   final TextEditingController controller = TextEditingController();
