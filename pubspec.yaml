@@ -35,7 +35,7 @@ dependencies:
       url: https://github.com/meragi-celebrations/appflowy-editor.git
       ref: main
   flutter_rating_stars: ^1.1.0
-  shadcn_ui: ^0.28.0
+  shadcn_ui: ^0.57.3
   flutter_animate: ^4.5.2
   youtube_player_iframe: ^5.2.1
   webview_flutter_platform_interface: ^2.13.0
