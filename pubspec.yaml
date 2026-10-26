@@ -20,7 +20,7 @@ dependencies:
   phosphor_flutter: ^2.1.0
   docking: ^1.16.0
   intl: ^0.20.2
-  timelines_plus: ^1.0.3
+  timelines_plus: ^2.0.1
   easy_image_viewer: ^1.5.1
   carousel_slider: ^5.0.0
   flutter_quill: ^11.4.1
