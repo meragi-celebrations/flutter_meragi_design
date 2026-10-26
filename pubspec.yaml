@@ -14,7 +14,7 @@ dependencies:
   theme_tailor_annotation: ^3.0.1
   hive_ce: ^2.11.3
   hive_ce_flutter: ^2.3.1
-  flutter_form_builder: ^10.1.0
+  flutter_form_builder: ^11.0.0
   form_builder_validators: ^11.0.0
   dropdown_button2: ^2.3.9
   phosphor_flutter: ^2.1.0
