@@ -16,7 +16,7 @@ dependencies:
   hive_ce_flutter: ^2.3.1
   flutter_form_builder: ^10.1.0
   form_builder_validators: ^11.0.0
-  dropdown_button2: ^2.3.9
+  dropdown_button2: ^3.1.0
   phosphor_flutter: ^2.1.0
   docking: ^1.16.0
   intl: ^0.20.2
